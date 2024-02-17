@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "688443697597",
+    "project_id": "laksi-website-61232",
+    "storage_bucket": "laksi-website-61232.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:688443697597:android:83dea6c53cbd9f53b90ad4",
+        "android_client_info": {
+          "package_name": "com.example.laksi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBm7XXCjoZymQ6CkPpzL4cZ432K2DhcSM8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
