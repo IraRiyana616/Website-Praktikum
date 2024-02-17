@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Landing%20Page/Komponen/Mahasiswa/Register/register_mhs.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Navigation/kelas_assnav.dart';
 
 class LoginMahasiswa extends StatefulWidget {
   const LoginMahasiswa({super.key});
@@ -146,17 +147,13 @@ class _LoginMahasiswaState extends State<LoginMahasiswa> {
                                         print(
                                             "User signed in: ${userCredential.user?.email}");
                                       }
-                                      //Belum sesuai navigasinya
+
                                       // ignore: use_build_context_synchronously
-                                      // Navigator.pushReplacement(
-                                      //     context,
-                                      //     MaterialPageRoute(
-                                      //         builder: (context) =>
-                                      //             //const ReportAssistantNav()
-                                      //             //const DetailsReport()
-                                      //             const AssistantNav()
-                                      //         //const TaskAssistantNav()
-                                      //         ));
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const KelasAsistenNav()));
                                     } else {
                                       if (kDebugMode) {
                                         print(
