@@ -105,6 +105,7 @@ class _RegisterDosenState extends State<RegisterDosen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Data berhasil disimpan'),
+          backgroundColor: Colors.green,
           duration: Duration(seconds: 3),
         ),
       );

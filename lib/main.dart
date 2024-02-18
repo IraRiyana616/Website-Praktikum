@@ -1,11 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:laksi/Landing%20Page/Komponen/Mahasiswa/Login/login_mhs.dart';
-import 'package:laksi/Landing%20Page/Komponen/Non%20Mahasiswa/Admin/Login/login_admin.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Screen/kelas_asisten.dart';
+import 'package:laksi/Pengguna/Dosen/Dashboard/Screen/dashboard_ds.dart';
+import 'package:laksi/Pengguna/Dosen/Mahasiswa/Screen/mahasiswa_ds.dart';
 import 'package:laksi/firebase_options.dart';
 
-import 'Pengguna/Mahasiswa/Asisten/Kelas/Navigation/kelas_assnav.dart';
+import 'Landing Page/Komponen/Non Mahasiswa/Dosen/Login/login_dosen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,11 +17,9 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-        debugShowCheckedModeBanner: false, home: LoginMahasiswa());
+        debugShowCheckedModeBanner: false, home: LoginDosen());
   }
 }
