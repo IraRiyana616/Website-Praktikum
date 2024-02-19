@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Dosen/Dashboard/Tabel/kelas_ds.dart';
+import 'package:laksi/Pengguna/Dosen/Evaluasi/Tabel/tblevaluasi_ds.dart';
 
-class DashboardDosen extends StatefulWidget {
-  const DashboardDosen({super.key});
+class EvaluasiDosen extends StatefulWidget {
+  const EvaluasiDosen({super.key});
 
   @override
-  State<DashboardDosen> createState() => _DashboardDosenState();
+  State<EvaluasiDosen> createState() => _EvaluasiDosenState();
 }
 
-class _DashboardDosenState extends State<DashboardDosen> {
+class _EvaluasiDosenState extends State<EvaluasiDosen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +27,7 @@ class _DashboardDosenState extends State<DashboardDosen> {
                 ),
                 Expanded(
                     child: Text(
-                  "Dashboard",
+                  "Evaluasi Praktikum",
                   style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -71,20 +71,29 @@ class _DashboardDosenState extends State<DashboardDosen> {
                 height: 30.0,
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 25.0, top: 20.0),
+                padding: const EdgeInsets.only(left: 25.0, top: 25.0),
                 child: Container(
                   width: 1055.0,
                   color: Colors.white,
-                  child: const Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TabelKelasDosen(),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 35.0, top: 30.0),
+                        child: Text(
+                          'Tahun Ajaran',
+                          style: GoogleFonts.quicksand(
+                              fontWeight: FontWeight.bold, fontSize: 18.0),
+                        ),
+                      ),
+                      //Tabel Evaluasi Praktikum
+                      const TabelEvaluasiDosen()
                     ],
                   ),
                 ),
               ),
               const SizedBox(
-                height: 500.0,
+                height: 1000.0,
               )
             ],
           ),

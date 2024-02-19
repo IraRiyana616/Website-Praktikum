@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:laksi/Pengguna/Dosen/Dashboard/Screen/dashboard_ds.dart';
+import 'package:laksi/Pengguna/Dosen/Evaluasi/Screen/evaluasi_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Mahasiswa/Screen/mahasiswa_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Pengaturan/Screen/pengaturan_ds.dart';
 
@@ -55,9 +57,9 @@ class _PengaturanDosenNavState extends State<PengaturanDosenNav> {
                   icon: const Icon(
                     Icons.grid_view_outlined,
                   ),
-                  page: const LoginPage(),
+                  page: const DashboardDosen(),
                   updatePage: updatePage,
-                  isActive: currentPage is LoginPage,
+                  isActive: currentPage is DashboardDosen,
                 ),
                 const SizedBox(
                   height: 10,
@@ -91,9 +93,9 @@ class _PengaturanDosenNavState extends State<PengaturanDosenNav> {
                   icon: const Icon(
                     Icons.fact_check_sharp,
                   ),
-                  page: const LoginPage(),
+                  page: const EvaluasiDosen(),
                   updatePage: updatePage,
-                  isActive: currentPage is LoginPage,
+                  isActive: currentPage is EvaluasiDosen,
                 ),
                 const SizedBox(
                   height: 10,

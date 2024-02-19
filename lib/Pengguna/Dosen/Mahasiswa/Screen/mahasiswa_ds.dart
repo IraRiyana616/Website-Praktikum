@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Pengguna/Dosen/Mahasiswa/Tabel%20Mahasiswa/tblmahasiswa_ds.dart';
 
 class DataMahasiswa extends StatefulWidget {
   const DataMahasiswa({super.key});
@@ -71,24 +72,16 @@ class _DataMahasiswaState extends State<DataMahasiswa> {
                 child: Container(
                   width: 1055.0,
                   color: Colors.white,
-                  child: Column(
+                  child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Padding(
-                      //   padding: const EdgeInsets.only(
-                      //     left: 35.0,
-                      //     top: 30.0,
-                      //   ),
-                      //   child: Text(
-                      //     'Data Mahasiswa',
-                      //     style: GoogleFonts.quicksand(
-                      //         fontWeight: FontWeight.bold, fontSize: 18.0),
-                      //   ),
-                      // ),
-                      //Tabel Mahasiswa Taruh disini
+                      TabelDataMahasiswa(),
                     ],
                   ),
                 ),
+              ),
+              const SizedBox(
+                height: 500.0,
               )
             ],
           ),

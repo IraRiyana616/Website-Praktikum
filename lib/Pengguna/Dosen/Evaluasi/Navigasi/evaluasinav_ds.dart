@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:laksi/Pengguna/Dosen/Dashboard/Screen/dashboard_ds.dart';
-import 'package:laksi/Pengguna/Dosen/Evaluasi/Screen/evaluasi_ds.dart';
-import 'package:laksi/Pengguna/Dosen/Mahasiswa/Screen/mahasiswa_ds.dart';
 
+import '../../Dashboard/Screen/dashboard_ds.dart';
+import '../../Mahasiswa/Screen/mahasiswa_ds.dart';
 import '../../Pengaturan/Screen/pengaturan_ds.dart';
+import '../Screen/evaluasi_ds.dart';
 
-class DataMahasiswaNav extends StatefulWidget {
-  const DataMahasiswaNav({super.key});
+class EvaluasiNavDosen extends StatefulWidget {
+  const EvaluasiNavDosen({super.key});
 
   @override
-  State<DataMahasiswaNav> createState() => _DataMahasiswaNavState();
+  State<EvaluasiNavDosen> createState() => _EvaluasiNavDosenState();
 }
 
-class _DataMahasiswaNavState extends State<DataMahasiswaNav> {
-  Widget currentPage = const DataMahasiswa();
+class _EvaluasiNavDosenState extends State<EvaluasiNavDosen> {
+  Widget currentPage = const EvaluasiDosen();
   @override
   Widget build(BuildContext context) {
     return Scaffold(

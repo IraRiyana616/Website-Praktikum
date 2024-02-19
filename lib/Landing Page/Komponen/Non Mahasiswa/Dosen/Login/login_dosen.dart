@@ -3,9 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Dosen/Pengaturan/Screen/pengaturan_ds.dart';
-
-import '../../../../../Pengguna/Dosen/Dashboard/Screen/dashboard_ds.dart';
 import '../../../../../Pengguna/Dosen/Pengaturan/Navigasi/pengaturan_nav.dart';
 import '../../Admin/Login/login_admin.dart';
 import '../Register/register_dosen.dart';
