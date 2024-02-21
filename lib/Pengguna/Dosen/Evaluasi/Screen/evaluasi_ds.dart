@@ -68,10 +68,10 @@ class _EvaluasiDosenState extends State<EvaluasiDosen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(
-                height: 30.0,
+                height: 20.0,
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 25.0, top: 25.0),
+                padding: const EdgeInsets.only(left: 25.0, top: 5.0),
                 child: Container(
                   width: 1055.0,
                   color: Colors.white,

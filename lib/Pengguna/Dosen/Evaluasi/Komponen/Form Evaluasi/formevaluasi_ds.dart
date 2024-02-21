@@ -71,7 +71,7 @@ class _FormEvaluasiDosenState extends State<FormEvaluasiDosen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Kode kelas sudah ada dalam data evaluasi'),
+            content: Text('Kode kelas sudah terdapat pada database'),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
           ),

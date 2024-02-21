@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:laksi/Pengguna/Dosen/Evaluasi/Komponen/Detail%20Evaluasi/detail_evaluasids.dart';
 import 'package:laksi/Pengguna/Dosen/Evaluasi/Komponen/Form%20Evaluasi/formevaluasi_ds.dart';
 
 class TabelEvaluasiDosen extends StatefulWidget {
@@ -117,6 +118,22 @@ class _TabelEvaluasiDosenState extends State<TabelEvaluasiDosen> {
     });
   }
 
+  Future<void> deleteData(String documentId) async {
+    try {
+      await dataEvaluasiCollection.doc(documentId).delete();
+      // Hapus data dari tampilan setelah berhasil dihapus dari Firestore
+      setState(() {
+        demoDataEvaluasi.removeWhere((data) => data.documentId == documentId);
+        filteredDataEvaluasi
+            .removeWhere((data) => data.documentId == documentId);
+      });
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error deleting data: $error');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -158,6 +175,9 @@ class _TabelEvaluasiDosenState extends State<TabelEvaluasiDosen> {
                 underline: Container(),
               ),
             ),
+          ),
+          const SizedBox(
+            height: 10.0,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -275,8 +295,15 @@ class _TabelEvaluasiDosenState extends State<TabelEvaluasiDosen> {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
+                        DataColumn(
+                          label: Text(
+                            "Aksi",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                       ],
-                      source: DataSource(filteredDataEvaluasi, context),
+                      source:
+                          DataSource(filteredDataEvaluasi, context, deleteData),
                       rowsPerPage:
                           calculateRowsPerPage(filteredDataEvaluasi.length),
                     )
@@ -324,8 +351,8 @@ class DataEvaluasi {
   });
 }
 
-DataRow dataFileDataRow(
-    DataEvaluasi fileInfo, int index, BuildContext context) {
+DataRow dataFileDataRow(DataEvaluasi fileInfo, int index, BuildContext context,
+    Function(String p1) onDelete) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -339,22 +366,48 @@ DataRow dataFileDataRow(
                   color: Colors.lightBlue[700],
                   fontWeight: FontWeight.bold)), onTap: () {
         //Navigate to detail evaluation screen with documentID
-        // Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //         builder: (context) => DetailEvaluationScreen(
-        //               documentId: fileInfo.documentId,
-        //             )));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DetailEvaluasiDosen(
+                      documentId: fileInfo.documentId,
+                    )));
       }),
       DataCell(Text(fileInfo.lulus.toString())),
       DataCell(Text(fileInfo.tidak.toString())),
       DataCell(Text(getLimitedText(fileInfo.hasil, 20))),
+      DataCell(IconButton(
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Konfirmasi Hapus'),
+                    content: const Text(
+                        'Apakah Anda yakin ingin menghapus data ini?'),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Batal')),
+                      TextButton(
+                          onPressed: () {
+                            onDelete(fileInfo.documentId);
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Hapus'))
+                    ],
+                  );
+                });
+          },
+          icon: const Icon(Icons.delete)))
     ],
   );
 }
 
 String getLimitedText(String text, int limit) {
-  return text.length <= limit ? text : '${text.substring(0, limit)}...';
+  return text.length <= limit ? text : text.substring(0, limit);
 }
 
 Color getRowColor(int index) {
@@ -364,8 +417,9 @@ Color getRowColor(int index) {
 class DataSource extends DataTableSource {
   final List<DataEvaluasi> data;
   final BuildContext context;
+  final Function(String) onDelete;
 
-  DataSource(this.data, this.context);
+  DataSource(this.data, this.context, this.onDelete);
 
   @override
   DataRow? getRow(int index) {
@@ -374,7 +428,7 @@ class DataSource extends DataTableSource {
     }
 
     final fileInfo = data[index];
-    return dataFileDataRow(fileInfo, index, context);
+    return dataFileDataRow(fileInfo, index, context, onDelete);
   }
 
   @override

@@ -64,9 +64,6 @@ class _DataMahasiswaState extends State<DataMahasiswa> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 30.0,
-              ),
               Padding(
                 padding: const EdgeInsets.only(left: 25.0, top: 20.0),
                 child: Container(
