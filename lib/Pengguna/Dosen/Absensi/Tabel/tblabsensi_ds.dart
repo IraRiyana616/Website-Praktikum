@@ -3,20 +3,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Komponen/form_kelas.dart';
+import '../Komponen/Asisten/Screen/absensiass_ds.dart';
 
-class TabelKelasDosen extends StatefulWidget {
-  const TabelKelasDosen({super.key});
+class TabelDataAbsensi extends StatefulWidget {
+  const TabelDataAbsensi({super.key});
 
   @override
-  State<TabelKelasDosen> createState() => _TabelKelasDosenState();
+  State<TabelDataAbsensi> createState() => _TabelDataAbsensiState();
 }
 
-class _TabelKelasDosenState extends State<TabelKelasDosen> {
-  List<DataClass> demoClassData = [];
-  List<DataClass> filteredClassData = [];
+class _TabelDataAbsensiState extends State<TabelDataAbsensi> {
+  List<DataHasilStudi> demoDataHasilStudi = [];
+  List<DataHasilStudi> filteredDataHasilStudi = [];
   final TextEditingController _textController = TextEditingController();
-  bool _isTextFieldNotEmpty = false;
   String selectedYear = 'Tampilkan Semua';
   List<String> availableYears = [];
 
@@ -52,9 +51,10 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
             await FirebaseFirestore.instance.collection('data_kelas').get();
       }
 
-      List<DataClass> data = querySnapshot.docs.map((doc) {
+      List<DataHasilStudi> data = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
-        return DataClass(
+        return DataHasilStudi(
+          documentId: doc.id,
           kelas: data['kode_kelas'],
           asisten: data['kode_asisten'],
           tahun: data['tahun_ajaran'],
@@ -64,8 +64,8 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
         );
       }).toList();
       setState(() {
-        demoClassData = data;
-        filteredClassData = demoClassData;
+        demoDataHasilStudi = data;
+        filteredDataHasilStudi = demoDataHasilStudi;
       });
     } catch (error) {
       if (kDebugMode) {
@@ -91,14 +91,13 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
 
   void _onTextChanged() {
     setState(() {
-      _isTextFieldNotEmpty = _textController.text.isNotEmpty;
       filterData(_textController.text);
     });
   }
 
   void filterData(String query) {
     setState(() {
-      filteredClassData = demoClassData
+      filteredDataHasilStudi = demoDataHasilStudi
           .where((data) =>
               (data.kelas.toLowerCase().contains(query.toLowerCase()) ||
                   data.asisten.toLowerCase().contains(query.toLowerCase()) ||
@@ -132,7 +131,7 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Kelas Praktikum',
+            child: Text('Data Absensi Praktikum',
                 style: GoogleFonts.quicksand(
                     fontSize: 18, fontWeight: FontWeight.bold)),
           ),
@@ -177,82 +176,6 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
                     ),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 25.0),
-                      child: SizedBox(
-                        width: 250.0,
-                        height: 35.0,
-                        child: Row(
-                          children: [
-                            const Text("Search :",
-                                style: TextStyle(fontSize: 16)),
-                            const SizedBox(width: 10.0),
-                            Expanded(
-                              child: TextField(
-                                onChanged: (value) {
-                                  filterData(value);
-                                },
-                                controller: _textController,
-                                decoration: InputDecoration(
-                                  hintText: '',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(0.0),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 0, horizontal: 10),
-                                  suffixIcon: Visibility(
-                                    visible: _isTextFieldNotEmpty,
-                                    child: IconButton(
-                                      onPressed: clearSearchField,
-                                      icon: const Icon(Icons.clear),
-                                    ),
-                                  ),
-                                  labelStyle: const TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 27.0),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 25.0, top: 10.0),
-                      child: SizedBox(
-                        height: 40.0,
-                        width: 140.0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3CBEA9),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const FormKelasDosen(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "+ Tambah Kelas",
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
                 const SizedBox(
                   height: 15,
                 ),
@@ -260,19 +183,13 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
                   padding: const EdgeInsets.only(left: 18.0, right: 25.0),
                   child: SizedBox(
                     width: double.infinity,
-                    child: filteredClassData.isNotEmpty
+                    child: filteredDataHasilStudi.isNotEmpty
                         ? PaginatedDataTable(
                             columnSpacing: 10,
                             columns: const [
                               DataColumn(
                                 label: Text(
                                   "Kode Kelas",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  "Kode Asisten",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -295,9 +212,9 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
                                 ),
                               ),
                             ],
-                            source: DataSource(filteredClassData),
-                            rowsPerPage:
-                                calculateRowsPerPage(filteredClassData.length),
+                            source: DataSource(filteredDataHasilStudi, context),
+                            rowsPerPage: calculateRowsPerPage(
+                                filteredDataHasilStudi.length),
                           )
                         : const Center(
                             child: Text(
@@ -329,24 +246,26 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
   }
 }
 
-class DataClass {
+class DataHasilStudi {
   String kelas;
   String asisten;
   String tahun;
   String matkul;
   String jmlhasisten;
   String jmlhmhs;
-  DataClass({
-    required this.kelas,
-    required this.asisten,
-    required this.tahun,
-    required this.matkul,
-    required this.jmlhasisten,
-    required this.jmlhmhs,
-  });
+  String documentId;
+  DataHasilStudi(
+      {required this.kelas,
+      required this.asisten,
+      required this.tahun,
+      required this.matkul,
+      required this.jmlhasisten,
+      required this.jmlhmhs,
+      required this.documentId});
 }
 
-DataRow dataFileDataRow(DataClass fileInfo, int index) {
+DataRow dataFileDataRow(
+    DataHasilStudi fileInfo, int index, BuildContext context) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -359,13 +278,12 @@ DataRow dataFileDataRow(DataClass fileInfo, int index) {
             fileInfo.kelas,
             style: TextStyle(
                 color: Colors.lightBlue[700], fontWeight: FontWeight.bold),
-          ),
-          onTap: () {}),
-      DataCell(
-        Text(
-          fileInfo.asisten,
-        ),
-      ),
+          ), onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const DataAbsensiAsisten()));
+      }),
       DataCell(Text(fileInfo.matkul)),
       DataCell(Text(fileInfo.jmlhasisten)),
       DataCell(Text(fileInfo.jmlhmhs)),
@@ -382,15 +300,16 @@ Color getRowColor(int index) {
 }
 
 class DataSource extends DataTableSource {
-  final List<DataClass> data;
-  DataSource(this.data);
+  final List<DataHasilStudi> data;
+  final BuildContext context;
+  DataSource(this.data, this.context);
   @override
   DataRow? getRow(int index) {
     if (index >= data.length) {
       return null;
     }
     final fileInfo = data[index];
-    return dataFileDataRow(fileInfo, index);
+    return dataFileDataRow(fileInfo, index, context);
   }
 
   @override

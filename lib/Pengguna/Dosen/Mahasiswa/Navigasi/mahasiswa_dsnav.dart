@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:laksi/Pengguna/Dosen/Absensi/Screen/absensi_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Dashboard/Screen/dashboard_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Evaluasi/Screen/evaluasi_ds.dart';
+import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Screen/hasilstudi_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Mahasiswa/Screen/mahasiswa_ds.dart';
 
+import '../../Hasil Studi/Komponen/Penulisan Laporan/Tabel/penulisanlaporan_ds.dart';
 import '../../Pengaturan/Screen/pengaturan_ds.dart';
 
 class DataMahasiswaNav extends StatefulWidget {
@@ -82,9 +85,21 @@ class _DataMahasiswaNavState extends State<DataMahasiswaNav> {
                   icon: const Icon(
                     Icons.check_circle_rounded,
                   ),
-                  page: const LoginPage(),
+                  page: const AbsensiDosen(),
                   updatePage: updatePage,
-                  isActive: currentPage is LoginPage,
+                  isActive: currentPage is AbsensiDosen,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                DashboardListTile(
+                  title: 'Hasil Studi',
+                  icon: const Icon(
+                    Icons.score,
+                  ),
+                  page: const HasilStudiDosen(),
+                  updatePage: updatePage,
+                  isActive: currentPage is HasilStudiDosen,
                 ),
                 const SizedBox(
                   height: 10,
