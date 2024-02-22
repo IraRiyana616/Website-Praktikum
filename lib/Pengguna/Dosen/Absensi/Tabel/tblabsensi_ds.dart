@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Komponen/Asisten/Screen/absensiass_ds.dart';
+import '../Komponen/Praktikan/Screen/absensiprak_ds.dart';
 
 class TabelDataAbsensi extends StatefulWidget {
   const TabelDataAbsensi({super.key});
@@ -282,7 +282,7 @@ DataRow dataFileDataRow(
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => const DataAbsensiAsisten()));
+                builder: (context) => const DataAbsensiPraktikan()));
       }),
       DataCell(Text(fileInfo.matkul)),
       DataCell(Text(fileInfo.jmlhasisten)),

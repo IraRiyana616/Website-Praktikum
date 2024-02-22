@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Absensi/Screen/absensi_ass.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Data%20Mahasiswa/Screen/datamahasiswa_ass.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Screen/absensi_mhs.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
 
 import '../../Kelas/Screen/kelas_asisten.dart';
 import '../../Pengaturan/Screen/pengaturan.dart';
@@ -56,9 +59,9 @@ class _AbsensiAsistenNavState extends State<AbsensiAsistenNav> {
                       icon: const Icon(
                         Icons.grid_view_outlined,
                       ),
-                      page: const KelasAsisten(),
+                      page: const DashboardPraktikan(),
                       updatePage: updatePage,
-                      isActive: currentPage is KelasAsisten,
+                      isActive: currentPage is DashboardPraktikan,
                     ),
                     const SizedBox(
                       height: 10,
@@ -68,9 +71,9 @@ class _AbsensiAsistenNavState extends State<AbsensiAsistenNav> {
                       icon: const Icon(
                         Icons.people,
                       ),
-                      page: const KelasAsisten(),
+                      page: const AbsensiPraktikan(),
                       updatePage: updatePage,
-                      isActive: currentPage is KelasAsisten,
+                      isActive: currentPage is AbsensiPraktikan,
                     ),
                     const SizedBox(
                       height: 10,
@@ -79,7 +82,7 @@ class _AbsensiAsistenNavState extends State<AbsensiAsistenNav> {
                     DashboardListTile(
                       title: 'Hasil Studi',
                       icon: const Icon(
-                        Icons.task_rounded,
+                        Icons.score,
                       ),
                       page: const KelasAsisten(),
                       updatePage: updatePage,
@@ -122,9 +125,9 @@ class _AbsensiAsistenNavState extends State<AbsensiAsistenNav> {
                       icon: const Icon(
                         Icons.people,
                       ),
-                      page: const KelasAsisten(),
+                      page: const DataMahasiswaAss(),
                       updatePage: updatePage,
-                      isActive: currentPage is KelasAsisten,
+                      isActive: currentPage is DataMahasiswaAss,
                     ),
 
                     const SizedBox(
@@ -141,6 +144,18 @@ class _AbsensiAsistenNavState extends State<AbsensiAsistenNav> {
                     ),
                     const SizedBox(
                       height: 10,
+                    ),
+                    DashboardListTile(
+                      title: 'Hasil Studi',
+                      icon: const Icon(
+                        Icons.score,
+                      ),
+                      page: const KelasAsisten(),
+                      updatePage: updatePage,
+                      isActive: currentPage is KelasAsisten,
+                    ),
+                    const SizedBox(
+                      height: 10.0,
                     ),
                     DashboardListTile(
                       title: 'Settings',

@@ -3,16 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Tabel%20Kelas/Komponen/token_asisten.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Tabel/Komponen/token_mhs.dart';
 
-class TabelKelasAsisten extends StatefulWidget {
-  const TabelKelasAsisten({super.key});
+class TabelKelasPraktikan extends StatefulWidget {
+  const TabelKelasPraktikan({super.key});
 
   @override
-  State<TabelKelasAsisten> createState() => _TabelKelasAsistenState();
+  State<TabelKelasPraktikan> createState() => _TabelKelasPraktikanState();
 }
 
-class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
+class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
   List<DataToken> demoTokenData = [];
   List<DataToken> filteredTokenData = [];
 
@@ -37,9 +37,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
           nim = userNim.toString(); // Ubah ke string dan simpan ke dalam nim
 
           QuerySnapshot<Map<String, dynamic>> querySnapshot =
-              await FirebaseFirestore.instance
-                  .collection('token_asisten')
-                  .get();
+              await FirebaseFirestore.instance.collection('token_kelas').get();
           Set<String> years = querySnapshot.docs
               .map((doc) => doc['tahun_ajaran'].toString())
               .toSet();
@@ -60,12 +58,12 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
       QuerySnapshot<Map<String, dynamic>> tokenQuerySnapshot;
       if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
         tokenQuerySnapshot = await FirebaseFirestore.instance
-            .collection('token_asisten')
+            .collection('token_kelas')
             .where('tahun_ajaran', isEqualTo: selectedYear)
             .get();
       } else {
         tokenQuerySnapshot =
-            await FirebaseFirestore.instance.collection('token_asisten').get();
+            await FirebaseFirestore.instance.collection('token_kelas').get();
       }
 
       List<DataToken> data = [];
@@ -79,7 +77,6 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
           // Check kesamaan NIM dengan pengguna yang sedang login
           Map<String, dynamic> tokenData = tokenDoc.data();
           data.add(DataToken(
-            asisten: tokenData['kode_asisten'] ?? '',
             kode: tokenData['kode_kelas'] ?? '',
             tahun: tokenData['tahun_ajaran'] ?? '',
             matkul: tokenData['matakuliah'] ?? '',
@@ -145,9 +142,9 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Kelas Praktikum',
+            child: Text('Data Kelas',
                 style: GoogleFonts.quicksand(
-                    fontSize: 20.0, fontWeight: FontWeight.bold)),
+                    fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           RefreshIndicator(
             onRefresh: _onRefresh,
@@ -207,7 +204,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        const TokenAsisten()));
+                                        const TokenPraktikan()));
                           },
                           child: const Text(
                             "+ Tambah Kelas",
@@ -235,18 +232,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                             columns: const [
                               DataColumn(
                                 label: Text(
-                                  "Kode Asisten",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              DataColumn(
-                                  label: Text(
-                                'Kode Mahasiswa',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              )),
-                              DataColumn(
-                                label: Text(
-                                  "Tahun Ajaran",
+                                  "Kode Mahasiswa",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -298,15 +284,13 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
 }
 
 class DataToken {
-  String asisten;
   String kode;
   String matkul;
   String tahun;
   String jmlhmhs;
 
   DataToken(
-      {required this.asisten,
-      required this.kode,
+      {required this.kode,
       required this.tahun,
       required this.matkul,
       required this.jmlhmhs});
@@ -321,22 +305,10 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
     ),
     cells: [
       DataCell(
-          Text(fileInfo.asisten,
-              style: TextStyle(
-                  color: Colors.lightBlue[700],
-                  fontWeight: FontWeight.bold)), onTap: () {
-        // Navigator.push(context,
-        //     MaterialPageRoute(builder: (context) => const SilabusScreen()));
-      }),
-      DataCell(
           Text(fileInfo.kode,
               style: TextStyle(
-                  color: Colors.lightBlue[700],
-                  fontWeight: FontWeight.bold)), onTap: () {
-        // Navigator.push(context,
-        //     MaterialPageRoute(builder: (context) => const KelasPraktikum()));
-      }),
-      DataCell(Text(fileInfo.tahun)),
+                  color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
+          onTap: () {}),
       DataCell(Text(fileInfo.matkul)),
       DataCell(Text(fileInfo.jmlhmhs)),
     ],

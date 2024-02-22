@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:laksi/Landing%20Page/Komponen/Non%20Mahasiswa/Dosen/Login/login_dosen.dart';
 import 'package:laksi/firebase_options.dart';
 
-import 'Pengguna/Dosen/Hasil Studi/Komponen/Penulisan Laporan/Screen/penulisanlaporan_ds.dart';
+import 'Landing Page/Komponen/Mahasiswa/Login/login_mhs.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +18,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-        debugShowCheckedModeBanner: false, home: LoginDosen());
+        debugShowCheckedModeBanner: false, home: LoginMahasiswa());
   }
 }

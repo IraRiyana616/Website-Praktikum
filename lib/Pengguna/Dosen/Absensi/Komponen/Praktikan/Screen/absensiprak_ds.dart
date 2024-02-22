@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../Praktikan/Screen/absensiprak_ds.dart';
-import '../Tabel/tblabsensiass_ds.dart';
+import 'package:laksi/Pengguna/Dosen/Absensi/Komponen/Asisten/Screen/absensiass_ds.dart';
+import '../Tabel/tblabsensiprak_ds.dart';
 
-class DataAbsensiAsisten extends StatefulWidget {
-  const DataAbsensiAsisten({super.key});
+class DataAbsensiPraktikan extends StatefulWidget {
+  const DataAbsensiPraktikan({super.key});
 
   @override
-  State<DataAbsensiAsisten> createState() => _DataAbsensiAsistenState();
+  State<DataAbsensiPraktikan> createState() => _DataAbsensiPraktikanState();
 }
 
-class _DataAbsensiAsistenState extends State<DataAbsensiAsisten> {
+class _DataAbsensiPraktikanState extends State<DataAbsensiPraktikan> {
   bool isSelected = false;
   bool isMahasiswaSelected = true;
 
@@ -31,7 +31,7 @@ class _DataAbsensiAsistenState extends State<DataAbsensiAsisten> {
                   color: Colors.black,
                 )),
             title: Padding(
-              padding: const EdgeInsets.only(top: 8.0, left: 10.0),
+              padding: const EdgeInsets.only(top: 8.0, left: 20.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -85,40 +85,6 @@ class _DataAbsensiAsistenState extends State<DataAbsensiAsisten> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          isMahasiswaSelected = false;
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const DataAbsensiPraktikan()));
-                        });
-                      },
-                      child: Container(
-                        height: 45.0,
-                        width: 150.0,
-                        color: isMahasiswaSelected
-                            ? Colors.white
-                            : const Color(0xFF3CBEA9),
-                        child: Center(
-                          child: Text(
-                            "Mahasiswa",
-                            style: GoogleFonts.quicksand(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: isMahasiswaSelected
-                                  ? Colors.black
-                                  : Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 6.0,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
                           isMahasiswaSelected = true;
                         });
                       },
@@ -130,13 +96,47 @@ class _DataAbsensiAsistenState extends State<DataAbsensiAsisten> {
                             : Colors.white,
                         child: Center(
                           child: Text(
-                            "Asisten",
+                            "Mahasiswa",
                             style: GoogleFonts.quicksand(
                               fontSize: 14.0,
                               fontWeight: FontWeight.bold,
                               color: isMahasiswaSelected
                                   ? Colors.white
                                   : Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 6.0,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isMahasiswaSelected = false;
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const DataAbsensiAsisten()));
+                        });
+                      },
+                      child: Container(
+                        height: 45.0,
+                        width: 150.0,
+                        color: isMahasiswaSelected
+                            ? Colors.white
+                            : const Color(0xFF3CBEA9),
+                        child: Center(
+                          child: Text(
+                            "Asisten",
+                            style: GoogleFonts.quicksand(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                              color: isMahasiswaSelected
+                                  ? Colors.black
+                                  : Colors.white,
                             ),
                           ),
                         ),
@@ -152,7 +152,7 @@ class _DataAbsensiAsistenState extends State<DataAbsensiAsisten> {
                   color: Colors.white,
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [TabelAbsensiAsisten()],
+                    children: [TabelAbsensiPraktikan()],
                   ),
                 ),
               ),

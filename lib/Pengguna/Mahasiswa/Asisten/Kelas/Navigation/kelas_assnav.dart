@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Absensi/Screen/absensi_ass.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Data%20Mahasiswa/Screen/datamahasiswa_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Screen/kelas_asisten.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Pengaturan/Screen/pengaturan.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Screen/absensi_mhs.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
 
 class KelasAsistenNav extends StatefulWidget {
   const KelasAsistenNav({super.key});
@@ -55,9 +58,9 @@ class _KelasAsistenNavState extends State<KelasAsistenNav> {
                       icon: const Icon(
                         Icons.grid_view_outlined,
                       ),
-                      page: const KelasAsisten(),
+                      page: const DashboardPraktikan(),
                       updatePage: updatePage,
-                      isActive: currentPage is KelasAsisten,
+                      isActive: currentPage is DashboardPraktikan,
                     ),
                     const SizedBox(
                       height: 10,
@@ -67,9 +70,9 @@ class _KelasAsistenNavState extends State<KelasAsistenNav> {
                       icon: const Icon(
                         Icons.people,
                       ),
-                      page: const KelasAsisten(),
+                      page: const AbsensiPraktikan(),
                       updatePage: updatePage,
-                      isActive: currentPage is KelasAsisten,
+                      isActive: currentPage is AbsensiPraktikan,
                     ),
                     const SizedBox(
                       height: 10,
@@ -78,7 +81,7 @@ class _KelasAsistenNavState extends State<KelasAsistenNav> {
                     DashboardListTile(
                       title: 'Hasil Studi',
                       icon: const Icon(
-                        Icons.task_rounded,
+                        Icons.score,
                       ),
                       page: const KelasAsisten(),
                       updatePage: updatePage,
@@ -121,9 +124,9 @@ class _KelasAsistenNavState extends State<KelasAsistenNav> {
                       icon: const Icon(
                         Icons.people,
                       ),
-                      page: const KelasAsisten(),
+                      page: const DataMahasiswaAss(),
                       updatePage: updatePage,
-                      isActive: currentPage is KelasAsisten,
+                      isActive: currentPage is DataMahasiswaAss,
                     ),
 
                     const SizedBox(
@@ -140,6 +143,19 @@ class _KelasAsistenNavState extends State<KelasAsistenNav> {
                     ),
                     const SizedBox(
                       height: 10,
+                    ),
+
+                    DashboardListTile(
+                      title: 'Hasil Studi',
+                      icon: const Icon(
+                        Icons.score,
+                      ),
+                      page: const KelasAsisten(),
+                      updatePage: updatePage,
+                      isActive: currentPage is KelasAsisten,
+                    ),
+                    const SizedBox(
+                      height: 10.0,
                     ),
                     DashboardListTile(
                       title: 'Settings',

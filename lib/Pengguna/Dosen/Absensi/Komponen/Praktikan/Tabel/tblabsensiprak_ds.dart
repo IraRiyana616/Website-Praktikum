@@ -2,14 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class TabelAbsensiAsisten extends StatefulWidget {
-  const TabelAbsensiAsisten({super.key});
+class TabelAbsensiPraktikan extends StatefulWidget {
+  const TabelAbsensiPraktikan({super.key});
 
   @override
-  State<TabelAbsensiAsisten> createState() => _TabelAbsensiAsistenState();
+  State<TabelAbsensiPraktikan> createState() => _TabelAbsensiPraktikanState();
 }
 
-class _TabelAbsensiAsistenState extends State<TabelAbsensiAsisten> {
+class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
   List<DataAbsensi> demoDataAbsensi = [];
   List<DataAbsensi> filteredDataAbsensi = [];
   final TextEditingController _textController = TextEditingController();
@@ -20,7 +20,9 @@ class _TabelAbsensiAsistenState extends State<TabelAbsensiAsisten> {
   Future<void> fetchAvailableKode() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await FirebaseFirestore.instance.collection('absensi_asisten').get();
+          await FirebaseFirestore.instance
+              .collection('absensi_mahasiswa')
+              .get();
 
       Set<String> kode =
           querySnapshot.docs.map((doc) => doc['kode_kelas'].toString()).toSet();

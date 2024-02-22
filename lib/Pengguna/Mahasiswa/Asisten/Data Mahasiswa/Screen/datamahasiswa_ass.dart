@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Tabel%20Kelas/tabel_kelas.dart';
 
-class KelasAsisten extends StatefulWidget {
-  const KelasAsisten({super.key});
+import '../../../../Dosen/Mahasiswa/Tabel Mahasiswa/tblmahasiswa_ds.dart';
+
+class DataMahasiswaAss extends StatefulWidget {
+  const DataMahasiswaAss({super.key});
 
   @override
-  State<KelasAsisten> createState() => _KelasAsistenState();
+  State<DataMahasiswaAss> createState() => _DataMahasiswaAssState();
 }
 
-class _KelasAsistenState extends State<KelasAsisten> {
+class _DataMahasiswaAssState extends State<DataMahasiswaAss> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70.0),
-        child: AppBar(
+          preferredSize: const Size.fromHeight(70.0),
+          child: AppBar(
+            automaticallyImplyLeading: false,
             backgroundColor: const Color(0xFFF7F8FA),
             title: Padding(
-              padding: const EdgeInsets.only(top: 8.0),
+              padding: const EdgeInsets.only(top: 8.0, left: 20.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const SizedBox(width: 10.0),
                   Expanded(
-                    child: Text(
-                      "Dashboard Asisten",
-                      style: GoogleFonts.quicksand(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
-                    ),
-                  ),
+                      child: Text(
+                    'Data Mahasiswa',
+                    style: GoogleFonts.quicksand(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  )),
                   const SizedBox(
                     width: 750.0,
                   ),
@@ -56,24 +56,26 @@ class _KelasAsistenState extends State<KelasAsisten> {
                   )
                 ],
               ),
-            )),
-      ),
+            ),
+          )),
       body: SingleChildScrollView(
         child: Container(
           color: const Color(0xFFE3E8EF),
+          width: 2000.0,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 20.0,
-              ),
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 35.0, right: 40.0),
-                  child: Container(
-                      width: 1090.0,
-                      color: Colors.white,
-                      child: const TabelKelasAsisten()),
+              Padding(
+                padding: const EdgeInsets.only(left: 25.0, top: 20.0),
+                child: Container(
+                  width: 1055.0,
+                  color: Colors.white,
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TabelDataMahasiswa(),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(
