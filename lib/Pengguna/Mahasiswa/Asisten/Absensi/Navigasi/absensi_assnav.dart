@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Absensi/Screen/absensi_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Data%20Mahasiswa/Screen/datamahasiswa_ass.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Screen/hasilstudi_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Screen/absensi_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
 
@@ -150,9 +151,9 @@ class _AbsensiAsistenNavState extends State<AbsensiAsistenNav> {
                       icon: const Icon(
                         Icons.score,
                       ),
-                      page: const KelasAsisten(),
+                      page: const HasilStudiAsisten(),
                       updatePage: updatePage,
-                      isActive: currentPage is KelasAsisten,
+                      isActive: currentPage is HasilStudiAsisten,
                     ),
                     const SizedBox(
                       height: 10.0,

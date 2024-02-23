@@ -98,66 +98,51 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70.0),
-        child: AppBar(
-            automaticallyImplyLeading: false,
+          preferredSize: const Size.fromHeight(70.0),
+          child: AppBar(
             backgroundColor: const Color(0xFFF7F8FA),
             title: Padding(
-              padding: const EdgeInsets.only(top: 8.0, left: 15.0),
+              padding: const EdgeInsets.only(top: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  const SizedBox(
+                    width: 10.0,
+                  ),
                   Expanded(
-                      child: Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: Text(
-                      "Absensi Praktikum",
-                      style: GoogleFonts.quicksand(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
-                    ),
+                      child: Text(
+                    'Dashboard',
+                    style: GoogleFonts.quicksand(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
                   )),
                   const SizedBox(
-                    width: 500,
+                    width: 750.0,
                   ),
                   IconButton(
                       onPressed: () {},
                       icon: const Icon(
-                        Icons.notifications_none_outlined,
+                        Icons.logout,
                         color: Color(0xFF031F31),
                       )),
                   const SizedBox(
-                    width: 15.0,
+                    width: 10.0,
                   ),
-                  ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0xFF3CBEA9)),
-                        fixedSize: MaterialStateProperty.all<Size>(
-                          const Size(150.0,
-                              40.0), // Gantilah dengan nilai yang diinginkan untuk width dan height
-                        ),
-                      ),
-                      onPressed: () {},
-                      child: Row(
-                        children: [
-                          const Icon(Icons.play_arrow),
-                          const SizedBox(width: 5.0),
-                          Text(
-                            "Lihat Tutorial",
-                            style: GoogleFonts.quicksand(
-                                fontSize: 12.0, fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      )),
+                  Text(
+                    'Log out',
+                    style: GoogleFonts.quicksand(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF031F31)),
+                  ),
                   const SizedBox(
                     width: 50.0,
                   )
                 ],
               ),
-            )),
-      ),
+            ),
+          )),
       body: SingleChildScrollView(
         child: Container(
           color: const Color(0xFFE3E8EF),

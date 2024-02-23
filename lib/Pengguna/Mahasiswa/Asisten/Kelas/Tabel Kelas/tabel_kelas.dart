@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/form_deskripsi.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Tabel%20Kelas/Komponen/token_asisten.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
 
 class TabelKelasAsisten extends StatefulWidget {
   const TabelKelasAsisten({super.key});
@@ -79,6 +81,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
           // Check kesamaan NIM dengan pengguna yang sedang login
           Map<String, dynamic> tokenData = tokenDoc.data();
           data.add(DataToken(
+            documentId: tokenDoc.id,
             asisten: tokenData['kode_asisten'] ?? '',
             kode: tokenData['kode_kelas'] ?? '',
             tahun: tokenData['tahun_ajaran'] ?? '',
@@ -235,21 +238,15 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                             columns: const [
                               DataColumn(
                                 label: Text(
-                                  "Kode Asisten",
+                                  "Kode Mahasiswa",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                   label: Text(
-                                'Kode Mahasiswa',
+                                'Kode Asisten',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               )),
-                              DataColumn(
-                                label: Text(
-                                  "Tahun Ajaran",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
                               DataColumn(
                                 label: Text(
                                   "MataKuliah",
@@ -303,13 +300,15 @@ class DataToken {
   String matkul;
   String tahun;
   String jmlhmhs;
+  String documentId;
 
   DataToken(
       {required this.asisten,
       required this.kode,
       required this.tahun,
       required this.matkul,
-      required this.jmlhmhs});
+      required this.jmlhmhs,
+      required this.documentId});
 }
 
 DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
@@ -321,22 +320,27 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
     ),
     cells: [
       DataCell(
-          Text(fileInfo.asisten,
-              style: TextStyle(
-                  color: Colors.lightBlue[700],
-                  fontWeight: FontWeight.bold)), onTap: () {
-        // Navigator.push(context,
-        //     MaterialPageRoute(builder: (context) => const SilabusScreen()));
-      }),
-      DataCell(
           Text(fileInfo.kode,
               style: TextStyle(
                   color: Colors.lightBlue[700],
                   fontWeight: FontWeight.bold)), onTap: () {
-        // Navigator.push(context,
-        //     MaterialPageRoute(builder: (context) => const KelasPraktikum()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DeskripsiKelas(
+                      documentId: fileInfo.documentId,
+                    )));
       }),
-      DataCell(Text(fileInfo.tahun)),
+      DataCell(
+          Text(fileInfo.asisten,
+              style: TextStyle(
+                  color: Colors.lightBlue[700],
+                  fontWeight: FontWeight.bold)), onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const FormDeskripsiKelas()));
+      }),
       DataCell(Text(fileInfo.matkul)),
       DataCell(Text(fileInfo.jmlhmhs)),
     ],

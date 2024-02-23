@@ -80,9 +80,10 @@ class _PenulisanLaporanDosenState extends State<PenulisanLaporanDosen> {
                 height: 20.0,
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 55.0, top: 5.0),
+                padding:
+                    const EdgeInsets.only(left: 35.0, top: 5.0, right: 15.0),
                 child: Container(
-                  width: 1250.0,
+                  width: 1300,
                   color: Colors.white,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,10 +142,17 @@ class _PenulisanLaporanDosenState extends State<PenulisanLaporanDosen> {
                           )
                         ],
                       ),
+                      const Padding(
+                        padding:
+                            EdgeInsets.only(left: 15.0, right: 15.0, top: 8.0),
+                        child: Divider(
+                          thickness: 0.5,
+                          color: Colors.grey,
+                        ),
+                      ),
                       const SizedBox(
                         height: 30.0,
                       ),
-                      //Tabel Evaluasi Praktikum
                       const TabelPenulisanLaporan()
                     ],
                   ),
