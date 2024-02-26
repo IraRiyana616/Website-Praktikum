@@ -13,15 +13,15 @@ class FormKelasDosen extends StatefulWidget {
 
 class _FormKelasDosenState extends State<FormKelasDosen> {
   final CollectionReference _dataKelasCollection =
-      FirebaseFirestore.instance.collection('data_kelas');
+      FirebaseFirestore.instance.collection('dataKelas');
 
   final TextEditingController _kodeKelasController = TextEditingController();
   final TextEditingController _kodeAsistenController = TextEditingController();
   final TextEditingController _tahunAjaranController = TextEditingController();
   final TextEditingController _mataKuliahController = TextEditingController();
-  final TextEditingController _jumlahAsistenController =
+  final TextEditingController _dosenPengampu1Controller =
       TextEditingController();
-  final TextEditingController _jumlahMahasiswaController =
+  final TextEditingController _dosenPengampu2Controller =
       TextEditingController();
 
   Future<void> _saveDataToFirestore(Map<String, dynamic> data) async {
@@ -31,8 +31,8 @@ class _FormKelasDosenState extends State<FormKelasDosen> {
           _kodeAsistenController.text.isEmpty ||
           _tahunAjaranController.text.isEmpty ||
           _mataKuliahController.text.isEmpty ||
-          _jumlahAsistenController.text.isEmpty ||
-          _jumlahMahasiswaController.text.isEmpty) {
+          _dosenPengampu1Controller.text.isEmpty ||
+          _dosenPengampu2Controller.text.isEmpty) {
         // Tampilkan pesan kesalahan jika ada TextField yang kosong
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -42,58 +42,44 @@ class _FormKelasDosenState extends State<FormKelasDosen> {
           ),
         );
       } else {
-        // Validasi untuk memastikan "Jumlah Mahasiswa" dan "Jumlah Asisten" berupa angka
-        if (!_isNumeric(_jumlahMahasiswaController.text) ||
-            !_isNumeric(_jumlahAsistenController.text)) {
-          // Tampilkan pesan kesalahan jika bukan angka
+        // Validasi untuk memastikan tidak ada data yang sama pada kode kelas dan kode asisten
+        var existingData = await _dataKelasCollection
+            .where('kodeKelas', isEqualTo: _kodeKelasController.text)
+            .where('kodeAsisten', isEqualTo: _kodeAsistenController.text)
+            .get();
+
+        if (existingData.docs.isNotEmpty) {
+          // Tampilkan pesan kesalahan jika data sudah ada di database
+          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                  'Jumlah Mahasiswa dan Jumlah Asisten harus berupa angka'),
+                  'Data dengan kode kelas dan kode asisten tersebut sudah ada'),
               backgroundColor: Colors.red,
               duration: Duration(seconds: 3),
             ),
           );
         } else {
-          // Validasi untuk memastikan tidak ada data yang sama pada kode kelas dan kode asisten
-          var existingData = await _dataKelasCollection
-              .where('kode_kelas', isEqualTo: _kodeKelasController.text)
-              .where('kode_asisten', isEqualTo: _kodeAsistenController.text)
-              .get();
+          // Jika tidak ada kesalahan, simpan data ke Firestore
+          await _dataKelasCollection.add(data);
 
-          if (existingData.docs.isNotEmpty) {
-            // Tampilkan pesan kesalahan jika data sudah ada di database
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                    'Data dengan kode kelas dan kode asisten tersebut sudah ada'),
-                backgroundColor: Colors.red,
-                duration: Duration(seconds: 3),
-              ),
-            );
-          } else {
-            // Jika tidak ada kesalahan, simpan data ke Firestore
-            await _dataKelasCollection.add(data);
+          // Tampilkan pesan sukses
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Data berhasil disimpan'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
+          );
 
-            // Tampilkan pesan sukses
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Data berhasil disimpan'),
-                backgroundColor: Colors.green,
-                duration: Duration(seconds: 3),
-              ),
-            );
-
-            // Clear semua TextField setelah data disimpan
-            _kodeKelasController.clear();
-            _kodeAsistenController.clear();
-            _tahunAjaranController.clear();
-            _mataKuliahController.clear();
-            _jumlahAsistenController.clear();
-            _jumlahMahasiswaController.clear();
-          }
+          // Clear semua TextField setelah data disimpan
+          _kodeKelasController.clear();
+          _kodeAsistenController.clear();
+          _tahunAjaranController.clear();
+          _mataKuliahController.clear();
+          _dosenPengampu1Controller.clear();
+          _dosenPengampu2Controller.clear();
         }
       }
     } catch (error) {
@@ -101,15 +87,6 @@ class _FormKelasDosenState extends State<FormKelasDosen> {
         print(error);
       }
     }
-  }
-
-  // Fungsi utilitas untuk memeriksa apakah suatu string adalah angka
-  bool _isNumeric(String value) {
-    // ignore: unnecessary_null_comparison
-    if (value == null) {
-      return false;
-    }
-    return double.tryParse(value) != null;
   }
 
   @override
@@ -386,12 +363,12 @@ class _FormKelasDosenState extends State<FormKelasDosen> {
                                       ),
                                     ),
                                   ),
-                                  //Jumlah Asisten
+                                  //Nama Dosen Pengampu 1
                                   Padding(
                                     padding: const EdgeInsets.only(
                                         left: 70.0, top: 35.0),
                                     child: Text(
-                                      "Jumlah Asisten",
+                                      "Dosen Pengampu 1",
                                       style: GoogleFonts.quicksand(
                                           fontSize: 16.0,
                                           fontWeight: FontWeight.bold),
@@ -406,60 +383,55 @@ class _FormKelasDosenState extends State<FormKelasDosen> {
                                     child: SizedBox(
                                       width: 450.0,
                                       child: TextField(
-                                        controller: _jumlahAsistenController,
-                                        decoration: InputDecoration(
-                                            hintText: 'Masukkan Jumlah Asisten',
-                                            border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        10.0)),
-                                            filled: true,
-                                            fillColor: Colors.white),
-                                        inputFormatters: [
-                                          LengthLimitingTextInputFormatter(2)
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  //Jumlah Mahasiswa
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 70.0, top: 35.0),
-                                    child: Text(
-                                      "Jumlah Mahasiswa",
-                                      style: GoogleFonts.quicksand(
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 15.0,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 70.0, right: 30.0),
-                                    child: SizedBox(
-                                      width: 450.0,
-                                      child: TextField(
-                                        controller: _jumlahMahasiswaController,
+                                        controller: _dosenPengampu1Controller,
                                         decoration: InputDecoration(
                                             hintText:
-                                                'Masukkan Jumlah Mahasiswa',
+                                                'Masukkan Nama Dosen Pengampu',
                                             border: OutlineInputBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(
                                                         10.0)),
                                             filled: true,
                                             fillColor: Colors.white),
-                                        inputFormatters: [
-                                          LengthLimitingTextInputFormatter(2)
-                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  // Nama Dosen Pengampu 2
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 70.0, top: 35.0),
+                                    child: Text(
+                                      "Dosen Pengampu 2",
+                                      style: GoogleFonts.quicksand(
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 15.0,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 70.0, right: 30.0),
+                                    child: SizedBox(
+                                      width: 450.0,
+                                      child: TextField(
+                                        controller: _dosenPengampu2Controller,
+                                        decoration: InputDecoration(
+                                            hintText:
+                                                'Masukkan Nama Dosen Pengampu',
+                                            border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        10.0)),
+                                            filled: true,
+                                            fillColor: Colors.white),
                                       ),
                                     ),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(
-                                        top: 30.0, left: 390.0),
+                                        top: 35.0, left: 390.0),
                                     child: SizedBox(
                                       height: 40.0,
                                       width: 130.0,
@@ -470,26 +442,26 @@ class _FormKelasDosenState extends State<FormKelasDosen> {
                                           ),
                                           onPressed: () {
                                             _saveDataToFirestore({
-                                              'kode_kelas':
+                                              'kodeKelas':
                                                   _kodeKelasController.text,
-                                              'kode_asisten':
+                                              'kodeAsisten':
                                                   _kodeAsistenController.text,
-                                              'tahun_ajaran':
+                                              'tahunAjaran':
                                                   _tahunAjaranController.text,
-                                              'matakuliah':
+                                              'mataKuliah':
                                                   _mataKuliahController.text,
-                                              'jumlah_asisten':
-                                                  _jumlahAsistenController.text,
-                                              'jumlah_mahasiswa':
-                                                  _jumlahMahasiswaController
-                                                      .text
+                                              'dosenPengampu':
+                                                  _dosenPengampu1Controller
+                                                      .text,
+                                              'dosenPengampu2':
+                                                  _dosenPengampu2Controller.text
                                             });
                                             _kodeKelasController.clear();
                                             _kodeAsistenController.clear();
                                             _tahunAjaranController.clear();
                                             _mataKuliahController.clear();
-                                            _jumlahAsistenController.clear();
-                                            _jumlahMahasiswaController.clear();
+                                            _dosenPengampu1Controller.clear();
+                                            _dosenPengampu2Controller.clear();
                                           },
                                           child: Text(
                                             'Simpan Data',

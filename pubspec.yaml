@@ -41,9 +41,7 @@ dependencies:
   firebase_auth: ^4.12.1
   firebase_storage: ^11.6.0
   file_picker: ^6.1.1
-  
-  # Masih error
-  youtube_player_flutter: ^8.1.2
+ 
 
 dev_dependencies:
   flutter_test:

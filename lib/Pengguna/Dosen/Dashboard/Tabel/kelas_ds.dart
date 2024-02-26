@@ -23,9 +23,9 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
   Future<void> fetchAvailableYears() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await FirebaseFirestore.instance.collection('data_kelas').get();
+          await FirebaseFirestore.instance.collection('dataKelas').get();
       Set<String> years = querySnapshot.docs
-          .map((doc) => doc['tahun_ajaran'].toString())
+          .map((doc) => doc['tahunAjaran'].toString())
           .toSet();
 
       setState(() {
@@ -44,23 +44,23 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
 
       if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
         querySnapshot = await FirebaseFirestore.instance
-            .collection('data_kelas')
-            .where('tahun_ajaran', isEqualTo: selectedYear)
+            .collection('dataKelas')
+            .where('tahunAjaran', isEqualTo: selectedYear)
             .get();
       } else {
         querySnapshot =
-            await FirebaseFirestore.instance.collection('data_kelas').get();
+            await FirebaseFirestore.instance.collection('dataKelas').get();
       }
 
       List<DataClass> data = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
         return DataClass(
-          kelas: data['kode_kelas'],
-          asisten: data['kode_asisten'],
-          tahun: data['tahun_ajaran'],
-          matkul: data['matakuliah'],
-          jmlhasisten: data['jumlah_asisten'],
-          jmlhmhs: data['jumlah_mahasiswa'],
+          kelas: data['kodeKelas'],
+          asisten: data['kodeAsisten'],
+          tahun: data['tahunAjaran'],
+          matkul: data['mataKuliah'],
+          dosenpengampu: data['dosenPengampu'],
+          dosenpengampu2: data['dosenPengampu2'],
         );
       }).toList();
       setState(() {
@@ -284,13 +284,13 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Jumlah Asisten",
+                                  "Dosen Pengampu 1",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Jumlah Mahasiswa",
+                                  "Dosen Pengampu 2",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -319,7 +319,7 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 50;
+    const int defaultRowsPerPage = 25;
 
     if (rowCount <= defaultRowsPerPage) {
       return rowCount;
@@ -334,15 +334,15 @@ class DataClass {
   String asisten;
   String tahun;
   String matkul;
-  String jmlhasisten;
-  String jmlhmhs;
+  String dosenpengampu;
+  String dosenpengampu2;
   DataClass({
     required this.kelas,
     required this.asisten,
     required this.tahun,
     required this.matkul,
-    required this.jmlhasisten,
-    required this.jmlhmhs,
+    required this.dosenpengampu,
+    required this.dosenpengampu2,
   });
 }
 
@@ -367,10 +367,18 @@ DataRow dataFileDataRow(DataClass fileInfo, int index) {
         ),
       ),
       DataCell(Text(fileInfo.matkul)),
-      DataCell(Text(fileInfo.jmlhasisten)),
-      DataCell(Text(fileInfo.jmlhmhs)),
+      DataCell(SizedBox(
+          width: 180.0,
+          child: Text(getLimitedText(fileInfo.dosenpengampu, 30)))),
+      DataCell(SizedBox(
+          width: 180.0,
+          child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
     ],
   );
+}
+
+String getLimitedText(String text, int limit) {
+  return text.length <= limit ? text : text.substring(0, limit);
 }
 
 Color getRowColor(int index) {

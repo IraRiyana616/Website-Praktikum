@@ -15,14 +15,16 @@ class TabelKelasAsisten extends StatefulWidget {
 }
 
 class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
-  List<DataToken> demoTokenData = [];
-  List<DataToken> filteredTokenData = [];
+  //DataCell Data Kelas
+  List<DataKelas> demoDataKelas = [];
+  List<DataKelas> filteredDataKelas = [];
 
   //Dropdown Button Tahun Ajaran
   String selectedYear = 'Tampilkan Semua';
   List<String> availableYears = [];
 
-  String nim = ''; // Deklarasi variable nim di luar block if
+  //Deklarasi variable nim diluar block if
+  String nim = '';
   User? user = FirebaseAuth.instance.currentUser;
 
   Future<void> fetchUserNIMFromDatabase(
@@ -70,18 +72,18 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
             await FirebaseFirestore.instance.collection('token_asisten').get();
       }
 
-      List<DataToken> data = [];
+      List<DataKelas> data = [];
 
       // Pemrosesan pencocokan berdasarkan NIM
-      for (var tokenDoc in tokenQuerySnapshot.docs) {
+      for (var doc in tokenQuerySnapshot.docs) {
         // Menggunakan 'nim' sebagai int karena sudah diubah di fetchUserNIMFromDatabase
-        int tokenNim = tokenDoc['nim'] as int;
+        int tokenNim = doc['nim'] as int;
 
         if (tokenNim.toString() == nim) {
           // Check kesamaan NIM dengan pengguna yang sedang login
-          Map<String, dynamic> tokenData = tokenDoc.data();
-          data.add(DataToken(
-            documentId: tokenDoc.id,
+          Map<String, dynamic> tokenData = doc.data();
+          data.add(DataKelas(
+            documentId: doc.id,
             asisten: tokenData['kode_asisten'] ?? '',
             kode: tokenData['kode_kelas'] ?? '',
             tahun: tokenData['tahun_ajaran'] ?? '',
@@ -92,8 +94,8 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
       }
 
       setState(() {
-        demoTokenData = data;
-        filteredTokenData = demoTokenData;
+        demoDataKelas = data;
+        filteredDataKelas = demoDataKelas;
       });
     } catch (error) {
       if (kDebugMode) {
@@ -124,7 +126,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
 
   void filterData(String query) {
     setState(() {
-      filteredTokenData = demoTokenData
+      filteredDataKelas = demoDataKelas
           .where((data) =>
               (data.tahun.toLowerCase().contains(query.toLowerCase())))
           .toList();
@@ -232,7 +234,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                   padding: const EdgeInsets.only(left: 18.0, right: 25.0),
                   child: SizedBox(
                     width: double.infinity,
-                    child: filteredTokenData.isNotEmpty
+                    child: filteredDataKelas.isNotEmpty
                         ? PaginatedDataTable(
                             columnSpacing: 10,
                             columns: const [
@@ -260,9 +262,9 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                                 ),
                               ),
                             ],
-                            source: DataSource(filteredTokenData, context),
+                            source: DataSource(filteredDataKelas, context),
                             rowsPerPage:
-                                calculateRowsPerPage(filteredTokenData.length),
+                                calculateRowsPerPage(filteredDataKelas.length),
                           )
                         : const Center(
                             child: Text(
@@ -294,7 +296,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
   }
 }
 
-class DataToken {
+class DataKelas {
   String asisten;
   String kode;
   String matkul;
@@ -302,7 +304,7 @@ class DataToken {
   String jmlhmhs;
   String documentId;
 
-  DataToken(
+  DataKelas(
       {required this.asisten,
       required this.kode,
       required this.tahun,
@@ -311,7 +313,7 @@ class DataToken {
       required this.documentId});
 }
 
-DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
+DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -356,7 +358,7 @@ Color getRowColor(int index) {
 }
 
 class DataSource extends DataTableSource {
-  final List<DataToken> data;
+  final List<DataKelas> data;
   final BuildContext context;
 
   DataSource(this.data, this.context);

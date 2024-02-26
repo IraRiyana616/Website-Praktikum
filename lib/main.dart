@@ -1,11 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:laksi/Landing%20Page/Komponen/Mahasiswa/Login/login_mhs.dart';
 import 'package:laksi/Landing%20Page/Komponen/Non%20Mahasiswa/Dosen/Login/login_dosen.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Tugas/tugas.dart';
 import 'package:laksi/firebase_options.dart';
-
-import 'Landing Page/Komponen/Mahasiswa/Login/login_mhs.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +17,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-        debugShowCheckedModeBanner: false, home: LoginMahasiswa()
+        debugShowCheckedModeBanner: false, home: LoginDosen()
+        //YoutubePlayerUntukModul()
         //   PengumpulanTugas(
         // documentId: '1',
         );
