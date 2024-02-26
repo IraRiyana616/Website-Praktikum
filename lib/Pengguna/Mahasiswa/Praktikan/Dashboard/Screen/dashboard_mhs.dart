@@ -27,7 +27,7 @@ class _DashboardPraktikanState extends State<DashboardPraktikan> {
                   ),
                   Expanded(
                       child: Text(
-                    'Dashboard',
+                    'Dashboard Praktikan',
                     style: GoogleFonts.quicksand(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,

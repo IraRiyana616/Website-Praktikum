@@ -37,9 +37,9 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
           nim = userNim.toString(); // Ubah ke string dan simpan ke dalam nim
 
           QuerySnapshot<Map<String, dynamic>> querySnapshot =
-              await FirebaseFirestore.instance.collection('token_kelas').get();
+              await FirebaseFirestore.instance.collection('tokenKelas').get();
           Set<String> years = querySnapshot.docs
-              .map((doc) => doc['tahun_ajaran'].toString())
+              .map((doc) => doc['tahunAjaran'].toString())
               .toSet();
           setState(() {
             availableYears = ['Tampilkan Semua', ...years.toList()];
@@ -58,12 +58,12 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
       QuerySnapshot<Map<String, dynamic>> tokenQuerySnapshot;
       if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
         tokenQuerySnapshot = await FirebaseFirestore.instance
-            .collection('token_kelas')
-            .where('tahun_ajaran', isEqualTo: selectedYear)
+            .collection('tokenKelas')
+            .where('tahunAjaran', isEqualTo: selectedYear)
             .get();
       } else {
         tokenQuerySnapshot =
-            await FirebaseFirestore.instance.collection('token_kelas').get();
+            await FirebaseFirestore.instance.collection('tokenKelas').get();
       }
 
       List<DataToken> data = [];
@@ -77,10 +77,11 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
           // Check kesamaan NIM dengan pengguna yang sedang login
           Map<String, dynamic> tokenData = tokenDoc.data();
           data.add(DataToken(
-            kode: tokenData['kode_kelas'] ?? '',
-            tahun: tokenData['tahun_ajaran'] ?? '',
-            matkul: tokenData['matakuliah'] ?? '',
-            jmlhmhs: tokenData['jumlah_mahasiswa'] ?? '',
+            kode: tokenData['kodeKelas'] ?? '',
+            tahun: tokenData['tahunAjaran'] ?? '',
+            matkul: tokenData['mataKuliah'] ?? '',
+            dosenpengampu: tokenData['dosenPengampu'] ?? '',
+            dosenpengampu2: tokenData['dosenPengampu2'] ?? '',
           ));
         }
       }
@@ -142,9 +143,9 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Kelas',
+            child: Text('Data Kelas Praktikum',
                 style: GoogleFonts.quicksand(
-                    fontSize: 18, fontWeight: FontWeight.bold)),
+                    fontSize: 20.0, fontWeight: FontWeight.bold)),
           ),
           RefreshIndicator(
             onRefresh: _onRefresh,
@@ -244,7 +245,13 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Jumlah Mahasiswa",
+                                  "Dosen Pengampu 1",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  "Dosen Pengampu 2",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -287,13 +294,15 @@ class DataToken {
   String kode;
   String matkul;
   String tahun;
-  String jmlhmhs;
+  String dosenpengampu;
+  String dosenpengampu2;
 
   DataToken(
       {required this.kode,
       required this.tahun,
       required this.matkul,
-      required this.jmlhmhs});
+      required this.dosenpengampu,
+      required this.dosenpengampu2});
 }
 
 DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
@@ -310,9 +319,18 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
                   color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
           onTap: () {}),
       DataCell(Text(fileInfo.matkul)),
-      DataCell(Text(fileInfo.jmlhmhs)),
+      DataCell(SizedBox(
+          width: 180.0,
+          child: Text(getLimitedText(fileInfo.dosenpengampu, 30)))),
+      DataCell(SizedBox(
+          width: 180.0,
+          child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
     ],
   );
+}
+
+String getLimitedText(String text, int limit) {
+  return text.length <= limit ? text : text.substring(0, limit);
 }
 
 Color getRowColor(int index) {

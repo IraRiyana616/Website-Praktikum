@@ -32,21 +32,21 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
 
           QuerySnapshot<Map<String, dynamic>> classSnapshot =
               await FirebaseFirestore.instance
-                  .collection('data_kelas')
-                  .where('kode_kelas', isEqualTo: _classCodeController.text)
+                  .collection('dataKelas')
+                  .where('kodeKelas', isEqualTo: _classCodeController.text)
                   .get();
 
           if (classSnapshot.docs.isNotEmpty) {
             for (QueryDocumentSnapshot<Map<String, dynamic>> classDocument
                 in classSnapshot.docs) {
-              String classCode = classDocument['kode_kelas'];
+              String classCode = classDocument['kodeKelas'];
 
               // Check if there is an existing document with the same nim and kode_kelas
               QuerySnapshot<Map<String, dynamic>> existingTokenSnapshot =
                   await FirebaseFirestore.instance
-                      .collection('token_kelas')
+                      .collection('tokenKelas')
                       .where('nim', isEqualTo: userNim)
-                      .where('kode_kelas', isEqualTo: classCode)
+                      .where('kodeKelas', isEqualTo: classCode)
                       .get();
 
               if (existingTokenSnapshot.docs.isNotEmpty) {
@@ -61,16 +61,17 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
               } else {
                 // Jika data belum terdaftar, simpan data baru
                 Map<String, dynamic> updatedClassData = {
-                  'kode_kelas': classDocument['kode_kelas'],
-                  'matakuliah': classDocument['matakuliah'],
-                  'tahun_ajaran': classDocument['tahun_ajaran'],
-                  'jumlah_mahasiswa': classDocument['jumlah_mahasiswa'],
+                  'kodeKelas': classDocument['kodeKelas'],
+                  'mataKuliah': classDocument['mataKuliah'],
+                  'tahunAjaran': classDocument['tahunAjaran'],
+                  'dosenPengampu': classDocument['dosenPengampu'],
+                  'dosenPengampu2': classDocument['dosenPengampu2'],
                   'nim': userNim,
                   'nama': userSnapshot['nama'],
                 };
 
                 await FirebaseFirestore.instance
-                    .collection('token_kelas')
+                    .collection('tokenKelas')
                     .add(updatedClassData);
 
                 // Tampilkan snackbar bahwa data berhasil disimpan
@@ -80,6 +81,7 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
                     backgroundColor: Colors.green,
                   ),
                 );
+                _classCodeController.clear();
               }
             }
           } else {

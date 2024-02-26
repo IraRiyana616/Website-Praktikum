@@ -30,21 +30,21 @@ class _TokenAsistenState extends State<TokenAsisten> {
 
           QuerySnapshot<Map<String, dynamic>> classSnapshot =
               await FirebaseFirestore.instance
-                  .collection('data_kelas')
-                  .where('kode_asisten', isEqualTo: _classCodeController.text)
+                  .collection('dataKelas')
+                  .where('kodeAsisten', isEqualTo: _classCodeController.text)
                   .get();
 
           if (classSnapshot.docs.isNotEmpty) {
             for (QueryDocumentSnapshot<Map<String, dynamic>> classDocument
                 in classSnapshot.docs) {
-              String classCode = classDocument['kode_asisten'];
+              String classCode = classDocument['kodeAsisten'];
 
               // Check if there is an existing document with the same nim and kode_kelas
               QuerySnapshot<Map<String, dynamic>> existingTokenSnapshot =
                   await FirebaseFirestore.instance
-                      .collection('token_asisten')
+                      .collection('tokenAsisten')
                       .where('nim', isEqualTo: userNim)
-                      .where('kode_asisten', isEqualTo: classCode)
+                      .where('kodeAsisten', isEqualTo: classCode)
                       .get();
 
               if (existingTokenSnapshot.docs.isNotEmpty) {
@@ -60,16 +60,18 @@ class _TokenAsistenState extends State<TokenAsisten> {
               } else {
                 // Jika data belum terdaftar, simpan data baru
                 Map<String, dynamic> updatedClassData = {
-                  'kode_asisten': classDocument['kode_asisten'],
-                  'matakuliah': classDocument['matakuliah'],
-                  'tahun_ajaran': classDocument['tahun_ajaran'],
-                  'jumlah_mahasiswa': classDocument['jumlah_mahasiswa'],
+                  'kodeAsisten': classDocument['kodeAsisten'],
+                  'kodeKelas': classDocument['kodeKelas'],
+                  'mataKuliah': classDocument['mataKuliah'],
+                  'tahunAjaran': classDocument['tahunAjaran'],
+                  'dosenPengampu': classDocument['dosenPengampu'],
+                  'dosenPengampu2': classDocument['dosenPengampu2'],
                   'nim': userNim,
                   'nama': userSnapshot['nama'],
                 };
 
                 await FirebaseFirestore.instance
-                    .collection('token_asisten')
+                    .collection('tokenAsisten')
                     .add(updatedClassData);
 
                 // Tampilkan snackbar bahwa data berhasil disimpan
@@ -80,6 +82,7 @@ class _TokenAsistenState extends State<TokenAsisten> {
                     backgroundColor: Colors.green,
                   ),
                 );
+                _classCodeController.clear();
               }
             }
           } else {
@@ -116,9 +119,7 @@ class _TokenAsistenState extends State<TokenAsisten> {
         ),
       );
       if (kDebugMode) {
-        if (kDebugMode) {
-          print('Error: $e');
-        }
+        print('Error: $e');
       }
     }
   }
