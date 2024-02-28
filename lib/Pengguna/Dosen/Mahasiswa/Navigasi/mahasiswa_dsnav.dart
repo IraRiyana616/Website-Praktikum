@@ -4,8 +4,6 @@ import 'package:laksi/Pengguna/Dosen/Dashboard/Screen/dashboard_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Evaluasi/Screen/evaluasi_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Screen/hasilstudi_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Mahasiswa/Screen/mahasiswa_ds.dart';
-
-import '../../Hasil Studi/Komponen/Penulisan Laporan/Tabel/penulisanlaporan_ds.dart';
 import '../../Pengaturan/Screen/pengaturan_ds.dart';
 
 class DataMahasiswaNav extends StatefulWidget {

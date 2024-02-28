@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Screen/hasilstudi_ds.dart';
-
 import '../../Dashboard/Screen/dashboard_ds.dart';
-import '../../Hasil Studi/Komponen/Penulisan Laporan/Tabel/penulisanlaporan_ds.dart';
 import '../../Mahasiswa/Screen/mahasiswa_ds.dart';
 import '../../Pengaturan/Screen/pengaturan_ds.dart';
 import '../Screen/evaluasi_ds.dart';

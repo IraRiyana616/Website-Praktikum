@@ -269,7 +269,7 @@ class _TabelDataMahasiswaState extends State<TabelDataMahasiswa> {
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 50; // Set your default value here
+    const int defaultRowsPerPage = 25; // Set your default value here
 
     if (rowCount <= defaultRowsPerPage) {
       return rowCount;
@@ -305,11 +305,17 @@ DataRow dataFileDataRow(DataMahasiswa fileInfo, int index) {
     ),
     cells: [
       DataCell(Text(fileInfo.nim.toString())),
-      DataCell(Text(fileInfo.nama)),
-      DataCell(Text(fileInfo.email)),
+      DataCell(SizedBox(
+          width: 180.0, child: Text(getLimitedText(fileInfo.nama, 30)))),
+      DataCell(SizedBox(
+          width: 180.0, child: Text(getLimitedText(fileInfo.email, 30)))),
       DataCell(Text(fileInfo.nohp.toString())),
     ],
   );
+}
+
+String getLimitedText(String text, int limit) {
+  return text.length <= limit ? text : text.substring(0, limit);
 }
 
 Color getRowColor(int index) {

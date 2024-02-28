@@ -51,7 +51,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
 
     //Mendapatkan reference untuk collection 'kelas_praktikum
     CollectionReference silabusCollection =
-        firestore.collection('deskripsi_kelas');
+        firestore.collection('deskripsiKelas');
 
     //Memeriksa apakah semua textfield telah diisi
     if (_kodeKelasController.text.isEmpty ||
@@ -69,8 +69,8 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
 
     //Mengecheck apakah kode_asisten terdapat dalam Firestore 'token_asisten'
     QuerySnapshot kodeAsistenSnapshot = await firestore
-        .collection('token_asisten')
-        .where('kode_asisten', isEqualTo: _kodeKelasController.text)
+        .collection('tokenAsisten')
+        .where('kodeKelas', isEqualTo: _kodeKelasController.text)
         .get();
 
     // Jika kode_asisten tidak ditemukan
@@ -94,12 +94,12 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
     //Menyimpan kelas praktikum ke Firestore dengan document_id nomor urut
     await silabusCollection.doc(nextDocumentId.toString()).set({
       //Kode Kelas dan Deskripsi Kelas
-      'kode_asisten': _kodeKelasController.text,
+      'kodeKelas': _kodeKelasController.text,
       'deskripsi_kelas': _deskripsiKelasController.text,
 
       //Peralatan Belajar
       'ram': _ramController.text,
-      'sistem_operasi': _sistemOperasiController.text,
+      'sistemOperasi': _sistemOperasiController.text,
       'prosesor': _presesorController.text,
     });
 
@@ -136,8 +136,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
   /// Menghubungkan ke saveSilabus Screen pada Firebase
   void _saveSilabus() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    CollectionReference silabusCollection =
-        firestore.collection('materi_kelas');
+    CollectionReference silabusCollection = firestore.collection('materiKelas');
 
     // Memeriksa apakah semua textfield telah diisi
     if (_kodeAsistenController.text.isEmpty ||
@@ -155,8 +154,8 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
 
     // Mengecek apakah kode_asisten terdapat dalam Firestore 'token_asisten'
     QuerySnapshot kodeAsistenSnapshot = await firestore
-        .collection('token_asisten')
-        .where('kode_asisten', isEqualTo: _kodeAsistenController.text)
+        .collection('tokenAsisten')
+        .where('kodeKelas', isEqualTo: _kodeAsistenController.text)
         .get();
 
     // Jika kode_asisten tidak ditemukan, tampilkan snackbar dan hentikan proses
@@ -176,10 +175,10 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
     int nextDocumentId = documentCount + 1;
 
     await silabusCollection.doc(nextDocumentId.toString()).set({
-      'kode_asisten': _kodeAsistenController.text,
+      'kodeKelas': _kodeAsistenController.text,
       'judulMateri': _judulMateriController.text,
       'jadwal': _jadwalPraktikumController.text,
-      'waktuPraktikum': _waktuPraktikumController.text,
+      'waktu': _waktuPraktikumController.text,
     });
 
     // ignore: use_build_context_synchronously
@@ -285,15 +284,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
-                            //Kuis
-                            // Padding(
-                            //   padding:
-                            //       const EdgeInsets.only(left: 50.0, top: 38.0),
-                            //   child: Text(
-                            //     'Kuis',
-                            //     style: GoogleFonts.quicksand(fontSize: 16.0),
-                            //   ),
-                            // ),
+
                             //Tugas
                             Padding(
                               padding:
@@ -357,7 +348,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                                   children: [
                                     //Komponen Kode Kelas
                                     Text(
-                                      'Kode Asisten',
+                                      'Kode Kelas',
                                       style: GoogleFonts.quicksand(
                                           fontSize: 20.0,
                                           fontWeight: FontWeight.bold),
@@ -370,7 +361,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                                         child: TextField(
                                           controller: _kodeKelasController,
                                           decoration: InputDecoration(
-                                            hintText: 'Masukkan Kode Asisten',
+                                            hintText: 'Masukkan Kode Kelas',
                                             border: OutlineInputBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(

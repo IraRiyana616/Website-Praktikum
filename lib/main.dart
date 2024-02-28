@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:laksi/Landing%20Page/Komponen/Mahasiswa/Login/login_mhs.dart';
-import 'package:laksi/Landing%20Page/Komponen/Non%20Mahasiswa/Dosen/Login/login_dosen.dart';
 import 'package:laksi/firebase_options.dart';
 
 Future<void> main() async {

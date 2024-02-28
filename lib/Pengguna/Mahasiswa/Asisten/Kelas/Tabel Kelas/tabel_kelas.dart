@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,90 +14,31 @@ class TabelKelasAsisten extends StatefulWidget {
 }
 
 class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
-  //DataCell Data Kelas
   List<DataKelas> demoDataKelas = [];
   List<DataKelas> filteredDataKelas = [];
 
-  //Dropdown Button Tahun Ajaran
+  CollectionReference dataKelasCollection =
+      FirebaseFirestore.instance.collection('tokenAsisten');
+
+  //TahunAjaran
   String selectedYear = 'Tampilkan Semua';
   List<String> availableYears = [];
 
-  //Deklarasi variable nim diluar block if
-  String nim = '';
-  User? user = FirebaseAuth.instance.currentUser;
-
-  Future<void> fetchUserNIMFromDatabase(
-      String userUid, String? selectedYear) async {
+  Future<void> fetchAvailableYears() async {
     try {
-      if (userUid.isNotEmpty) {
-        DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-            await FirebaseFirestore.instance
-                .collection('akun_mahasiswa')
-                .doc(userUid)
-                .get();
-        if (userSnapshot.exists) {
-          int userNim = userSnapshot['nim'] as int;
-          nim = userNim.toString(); // Ubah ke string dan simpan ke dalam nim
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance.collection('tokenAsisten').get();
 
-          QuerySnapshot<Map<String, dynamic>> querySnapshot =
-              await FirebaseFirestore.instance.collection('tokenAsisten').get();
-          Set<String> years = querySnapshot.docs
-              .map((doc) => doc['tahunAjaran'].toString())
-              .toSet();
-          setState(() {
-            availableYears = ['Tampilkan Semua', ...years.toList()];
-          });
-        }
-      }
-    } catch (error) {
-      if (kDebugMode) {
-        print('Error fetching user data from Firebase: $error');
-      }
-    }
-  }
-
-  Future<void> fetchDataFromFirebase(String? selectedYear) async {
-    try {
-      QuerySnapshot<Map<String, dynamic>> tokenQuerySnapshot;
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
-        tokenQuerySnapshot = await FirebaseFirestore.instance
-            .collection('tokenAsisten')
-            .where('tahunAjaran', isEqualTo: selectedYear)
-            .get();
-      } else {
-        tokenQuerySnapshot =
-            await FirebaseFirestore.instance.collection('tokenAsisten').get();
-      }
-
-      List<DataKelas> data = [];
-
-      // Pemrosesan pencocokan berdasarkan NIM
-      for (var doc in tokenQuerySnapshot.docs) {
-        // Menggunakan 'nim' sebagai int karena sudah diubah di fetchUserNIMFromDatabase
-        int tokenNim = doc['nim'] as int;
-
-        if (tokenNim.toString() == nim) {
-          // Check kesamaan NIM dengan pengguna yang sedang login
-          Map<String, dynamic> tokenData = doc.data();
-          data.add(DataKelas(
-            documentId: doc.id,
-            asisten: tokenData['kodeAsisten'] ?? '',
-            kode: tokenData['kodeKelas'] ?? '',
-            tahun: tokenData['tahunAjaran'] ?? '',
-            matkul: tokenData['mataKuliah'] ?? '',
-            dosenpengampu: tokenData['dosenPengampu'] ?? '',
-            dosenpengampu2: tokenData['dosenPengampu2'] ?? '',
-          ));
-        }
-      }
+      Set<String> years = querySnapshot.docs
+          .map((doc) => doc['tahunAjaran'].toString())
+          .toSet();
 
       setState(() {
-        demoDataKelas = data;
-        filteredDataKelas = demoDataKelas;
+        availableYears = ['Tampilkan Semua', ...years.toList()];
       });
-    } catch (error) {
+    } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data from Firebase: $error');
+        print('Error fetching availbale years from Firebase: $e');
       }
     }
   }
@@ -106,31 +46,163 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
   @override
   void initState() {
     super.initState();
+    fetchAvailableYears().then((_) {
+      fetchDataFromFirebase(selectedYear);
+    });
+  }
 
-    // Ambil tahun ajaran yang tersedia
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      // Dapatkan NIM pengguna yang sedang Login
-      String userUid = user.uid;
-      fetchUserNIMFromDatabase(userUid, selectedYear).then((_) {
-        // Mengambil data dari Firebase
-        fetchDataFromFirebase(selectedYear);
+  Future<void> fetchDataFromFirebase(String? selectedYear) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+
+      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('tokenAsisten')
+            .where('tahunAjaran', isEqualTo: selectedYear)
+            .get();
+      } else {
+        querySnapshot =
+            await FirebaseFirestore.instance.collection('tokenAsisten').get();
+      }
+      List<DataKelas> data = querySnapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data();
+        return DataKelas(
+            asisten: data['kodeAsisten'] ?? '',
+            kode: data['kodeKelas'] ?? '',
+            tahun: data['tahunAjaran'] ?? '',
+            matkul: data['mataKuliah'] ?? '',
+            dosenpengampu: data['dosenPengampu'] ?? '',
+            dosenpengampu2: data['dosenPengampu2'] ?? '',
+            documentId: doc.id);
+      }).toList();
+
+      setState(() {
+        demoDataKelas = data;
+        filteredDataKelas = demoDataKelas;
       });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching data: $e');
+      }
     }
   }
+
+  // //DataCell Data Kelas
+  // List<DataKelas> demoDataKelas = [];
+  // List<DataKelas> filteredDataKelas = [];
+
+  // //Dropdown Button Tahun Ajaran
+  // String selectedYear = 'Tampilkan Semua';
+  // List<String> availableYears = [];
+
+  // //Deklarasi variable nim diluar block if
+  // String nim = '';
+  // User? user = FirebaseAuth.instance.currentUser;
+
+  // Future<void> fetchUserNIMFromDatabase(
+  //     String userUid, String? selectedYear) async {
+  //   try {
+  //     if (userUid.isNotEmpty) {
+  //       DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+  //           await FirebaseFirestore.instance
+  //               .collection('akun_mahasiswa')
+  //               .doc(userUid)
+  //               .get();
+  //       if (userSnapshot.exists) {
+  //         int userNim = userSnapshot['nim'] as int;
+  //         nim = userNim.toString(); // Ubah ke string dan simpan ke dalam nim
+
+  //         QuerySnapshot<Map<String, dynamic>> querySnapshot =
+  //             await FirebaseFirestore.instance.collection('tokenAsisten').get();
+  //         Set<String> years = querySnapshot.docs
+  //             .map((doc) => doc['tahunAjaran'].toString())
+  //             .toSet();
+  //         setState(() {
+  //           availableYears = ['Tampilkan Semua', ...years.toList()];
+  //         });
+  //       }
+  //     }
+  //   } catch (error) {
+  //     if (kDebugMode) {
+  //       print('Error fetching user data from Firebase: $error');
+  //     }
+  //   }
+  // }
+
+  // Future<void> fetchDataFromFirebase(String? selectedYear) async {
+  //   try {
+  //     QuerySnapshot<Map<String, dynamic>> tokenQuerySnapshot;
+  //     if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+  //       tokenQuerySnapshot = await FirebaseFirestore.instance
+  //           .collection('tokenAsisten')
+  //           .where('tahunAjaran', isEqualTo: selectedYear)
+  //           .get();
+  //     } else {
+  //       tokenQuerySnapshot =
+  //           await FirebaseFirestore.instance.collection('tokenAsisten').get();
+  //     }
+
+  //     List<DataKelas> data = [];
+
+  //     // Pemrosesan pencocokan berdasarkan NIM
+  //     for (var doc in tokenQuerySnapshot.docs) {
+  //       // Menggunakan 'nim' sebagai int karena sudah diubah di fetchUserNIMFromDatabase
+  //       int tokenNim = doc['nim'] as int;
+
+  //       if (tokenNim.toString() == nim) {
+  //         // Check kesamaan NIM dengan pengguna yang sedang login
+  //         Map<String, dynamic> tokenData = doc.data();
+  //         data.add(DataKelas(
+  //           documentId: doc.id,
+  //           asisten: tokenData['kodeAsisten'] ?? '',
+  //           kode: tokenData['kodeKelas'] ?? '',
+  //           tahun: tokenData['tahunAjaran'] ?? '',
+  //           matkul: tokenData['mataKuliah'] ?? '',
+  //           dosenpengampu: tokenData['dosenPengampu'] ?? '',
+  //           dosenpengampu2: tokenData['dosenPengampu2'] ?? '',
+  //         ));
+  //       }
+  //     }
+
+  //     setState(() {
+  //       demoDataKelas = data;
+  //       filteredDataKelas = demoDataKelas;
+  //     });
+  //   } catch (error) {
+  //     if (kDebugMode) {
+  //       print('Error fetching data from Firebase: $error');
+  //     }
+  //   }
+  // }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+
+  //   // Ambil tahun ajaran yang tersedia
+  //   User? user = FirebaseAuth.instance.currentUser;
+  //   if (user != null) {
+  //     // Dapatkan NIM pengguna yang sedang Login
+  //     String userUid = user.uid;
+  //     fetchUserNIMFromDatabase(userUid, selectedYear).then((_) {
+  //       // Mengambil data dari Firebase
+  //       fetchDataFromFirebase(selectedYear);
+  //     });
+  //   }
+  // }
 
   Future<void> _onRefresh() async {
     await fetchDataFromFirebase(selectedYear);
   }
 
-  void filterData(String query) {
-    setState(() {
-      filteredDataKelas = demoDataKelas
-          .where((data) =>
-              (data.tahun.toLowerCase().contains(query.toLowerCase())))
-          .toList();
-    });
-  }
+  // void filterData(String query) {
+  //   setState(() {
+  //     filteredDataKelas = demoDataKelas
+  //         .where((data) =>
+  //             (data.tahun.toLowerCase().contains(query.toLowerCase())))
+  //         .toList();
+  //   });
+  // }
 
   Color getRowColor(int index) {
     if (index % 2 == 0) {

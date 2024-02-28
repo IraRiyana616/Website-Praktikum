@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Tabel/Komponen/token_mhs.dart';
 
 class TabelKelasPraktikan extends StatefulWidget {
@@ -316,8 +317,14 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
       DataCell(
           Text(fileInfo.kode,
               style: TextStyle(
-                  color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
-          onTap: () {}),
+                  color: Colors.lightBlue[700],
+                  fontWeight: FontWeight.bold)), onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    DeskripsiKelas(documentId: fileInfo.kode)));
+      }),
       DataCell(Text(fileInfo.matkul)),
       DataCell(SizedBox(
           width: 180.0,

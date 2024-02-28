@@ -1,74 +1,112 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AbsensiPraktikan extends StatefulWidget {
-  const AbsensiPraktikan({super.key});
+  const AbsensiPraktikan({Key? key}) : super(key: key);
 
   @override
   State<AbsensiPraktikan> createState() => _AbsensiPraktikanState();
 }
 
 class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
-  final TextEditingController _nimEditingController = TextEditingController();
   final TextEditingController _kodeEditingController = TextEditingController();
   final TextEditingController _modulEditingController = TextEditingController();
   String selectedAbsen = 'Status Kehadiran';
-  List<String> dropdownItems = [
-    'Status Kehadiran',
-    'Hadir',
-    'Tanpa Keterangan',
-    'Sakit'
-  ];
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  void saveDataToFirestore() async {
+  List<String> dropdownItems = ['Status Kehadiran', 'Hadir', 'Sakit'];
+
+  Future<void> saveDataToFirestore() async {
     DateTime currentDate = DateTime.now();
     String formattedDate =
-        "${currentDate.year}-${currentDate.month}-${currentDate.day}";
+        '${currentDate.year}-${currentDate.month}-${currentDate.day}';
+    try {
+      String userUid = FirebaseAuth.instance.currentUser!.uid;
 
-    // Check if an entry for the same class code on the current date already exists
-    QuerySnapshot existingEntry = await _firestore
-        .collection('absensi_mahasiswa')
-        .where('kode_kelas', isEqualTo: _kodeEditingController.text)
-        .where('date', isEqualTo: formattedDate)
-        .get();
+      DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+          await FirebaseFirestore.instance
+              .collection('akun_mahasiswa')
+              .doc(userUid)
+              .get();
 
-    if (existingEntry.docs.isEmpty) {
-      // If no entry exists, add the new entry
-      await _firestore.collection('absensi_mahasiswa').add({
-        'kode_kelas': _kodeEditingController.text,
-        'nim': _nimEditingController.text,
-        'modul': _modulEditingController.text,
-        'keterangan': selectedAbsen,
-        'timestamp': FieldValue.serverTimestamp(),
-        'date': formattedDate,
-      });
+      if (userSnapshot.exists) {
+        int userNim = userSnapshot['nim'];
 
-      _kodeEditingController.clear();
-      _nimEditingController.clear();
-      _modulEditingController.clear();
-      setState(() {
-        selectedAbsen = 'Status Kehadiran';
-      });
-      // Show SnackBar on successful data save
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Data berhasil disimpan'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } else {
-      // If an entry already exists, show an error or handle it accordingly
-      // For example, you can display a SnackBar with an error message
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Data telah terdapat pada database'),
-          backgroundColor: Colors.red,
-        ),
-      );
+        // Check if the user has already submitted attendance for today with the same code and module
+        QuerySnapshot<Map<String, dynamic>> existingAttendanceSnapshot =
+            await FirebaseFirestore.instance
+                .collection('absensiMahasiswa')
+                .where('nim', isEqualTo: userNim)
+                .where('tanggal', isEqualTo: formattedDate)
+                .where('kodeKelas', isEqualTo: _kodeEditingController.text)
+                .where('modul', isEqualTo: _modulEditingController.text)
+                .get();
+
+        if (existingAttendanceSnapshot.docs.isNotEmpty) {
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+                'Anda sudah melakukan absensi untuk kode kelas dan modul ini hari ini.'),
+            backgroundColor: Colors.red,
+          ));
+        } else {
+          // Check if the kodeKelas exists for the current user
+          QuerySnapshot<Map<String, dynamic>> tokenKelasSnapshot =
+              await FirebaseFirestore.instance
+                  .collection('tokenKelas')
+                  .where('nim', isEqualTo: userNim)
+                  .where('kodeKelas', isEqualTo: _kodeEditingController.text)
+                  .get();
+
+          if (tokenKelasSnapshot.docs.isEmpty) {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content:
+                  Text('Data yang anda masukkan tidak terdapat pada database.'),
+              backgroundColor: Colors.red,
+            ));
+            return;
+          }
+
+          Map<String, dynamic> updatedAbsenData = {
+            'kodeKelas': _kodeEditingController.text,
+            'modul': _modulEditingController.text,
+            'nama': userSnapshot['nama'],
+            'nim': userNim,
+            'tanggal': formattedDate,
+            'timestamp': FieldValue.serverTimestamp(),
+            'keterangan': selectedAbsen
+          };
+          await FirebaseFirestore.instance
+              .collection('absensiMahasiswa')
+              .add(updatedAbsenData);
+
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Data berhasil disimpan'),
+            backgroundColor: Colors.green,
+          ));
+
+          // Update dropdownItems with the new value
+          dropdownItems.add(selectedAbsen);
+          setState(() {});
+
+          _kodeEditingController.clear();
+          _modulEditingController.clear();
+          setState(() {
+            selectedAbsen = 'Status Kehadiran';
+          });
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error:$e'),
+        backgroundColor: Colors.red,
+      ));
+      if (kDebugMode) {
+        print('Error:$e');
+      }
     }
   }
 
@@ -81,7 +119,7 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
   Future<void> fetchDataFromFirestore() async {
     try {
       QuerySnapshot querySnapshot =
-          await _firestore.collection('absensi_mahasiswa').get();
+          await FirebaseFirestore.instance.collection('absensiMahasiswa').get();
       for (var doc in querySnapshot.docs) {
         String keterangan = doc['keterangan'];
         dropdownItems.add(keterangan);
@@ -111,9 +149,9 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                   ),
                   Expanded(
                       child: Text(
-                    'Dashboard',
+                    'Absensi Praktikan',
                     style: GoogleFonts.quicksand(
-                        fontSize: 18.0,
+                        fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
                   )),
@@ -163,7 +201,7 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                       Padding(
                         padding: const EdgeInsets.only(left: 40.0, top: 30.0),
                         child: Text(
-                          "Formulir Absensi",
+                          "Formulir Absensi Praktikum",
                           style: GoogleFonts.quicksand(
                               fontWeight: FontWeight.bold, fontSize: 18.0),
                         ),
@@ -192,34 +230,6 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                               controller: _kodeEditingController,
                               decoration: InputDecoration(
                                   hintText: ' Masukkan Kode Kelas',
-                                  border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                  filled: true,
-                                  fillColor: Colors.white),
-                            ),
-                          ),
-                        )
-                      ]),
-
-                      /// NIM
-                      Row(children: [
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(left: 300.0, top: 10.0),
-                          child: Text("NIM",
-                              style: GoogleFonts.quicksand(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold)),
-                        ),
-                        const SizedBox(width: 85.0),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20.0),
-                          child: SizedBox(
-                            width: 300.0,
-                            child: TextField(
-                              controller: _nimEditingController,
-                              decoration: InputDecoration(
-                                  hintText: ' Masukkan NIM',
                                   border: OutlineInputBorder(
                                       borderRadius:
                                           BorderRadius.circular(10.0)),
@@ -290,7 +300,6 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                                     'Status Kehadiran',
                                     'Hadir',
                                     'Telat',
-                                    'Tanpa Keterangan',
                                     'Sakit'
                                   ].map<DropdownMenuItem<String>>(
                                       (String value) {
