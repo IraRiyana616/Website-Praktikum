@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Penulisan%20Laporan/Screen/nilai_tugas.dart';
 
 class TabelHasilAsisten extends StatefulWidget {
   const TabelHasilAsisten({super.key});
@@ -63,13 +64,14 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
       List<DataKelas> data = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
         return DataKelas(
-            asisten: data['kodeAsisten'] ?? '',
-            kode: data['kodeKelas'] ?? '',
-            tahun: data['tahunAjaran'] ?? '',
-            matkul: data['mataKuliah'] ?? '',
-            dosenpengampu: data['dosenPengampu'] ?? '',
-            dosenpengampu2: data['dosenPengampu2'] ?? '',
-            documentId: doc.id);
+          documentId: doc.id,
+          asisten: data['kodeAsisten'] ?? '',
+          kode: data['kodeKelas'] ?? '',
+          tahun: data['tahunAjaran'] ?? '',
+          matkul: data['mataKuliah'] ?? '',
+          dosenpengampu: data['dosenPengampu'] ?? '',
+          dosenpengampu2: data['dosenPengampu2'] ?? '',
+        );
       }).toList();
 
       setState(() {
@@ -161,12 +163,6 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
                             columnSpacing: 10,
                             columns: const [
                               DataColumn(
-                                label: Text(
-                                  "Kode Mahasiswa",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              DataColumn(
                                   label: Text(
                                 'Kode Asisten',
                                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -251,27 +247,29 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
-      DataCell(
-          Text(fileInfo.kode,
-              style: TextStyle(
-                  color: Colors.lightBlue[700],
-                  fontWeight: FontWeight.bold)), onTap: () {
-        // Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //         builder: (context) => DeskripsiKelas(
-        //               documentId: fileInfo.documentId,
-        //             )));
-      }),
+      // DataCell(
+      //     Text(fileInfo.kode,
+      //         style: TextStyle(
+      //             color: Colors.lightBlue[700],
+      //             fontWeight: FontWeight.bold)), onTap: () {
+      //   // Navigator.push(
+      //   //     context,
+      //   //     MaterialPageRoute(
+      //   //         builder: (context) => DeskripsiKelas(
+      //   //               documentId: fileInfo.documentId,
+      //   //             )));
+      // }),
       DataCell(
           Text(fileInfo.asisten,
               style: TextStyle(
                   color: Colors.lightBlue[700],
                   fontWeight: FontWeight.bold)), onTap: () {
-        // Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //         builder: (context) => const FormDeskripsiKelas()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => NilaiTugas(
+                      documentId: fileInfo.documentId,
+                    )));
       }),
       DataCell(Text(fileInfo.matkul)),
       DataCell(SizedBox(
