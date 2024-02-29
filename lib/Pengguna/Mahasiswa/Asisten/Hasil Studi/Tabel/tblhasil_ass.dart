@@ -2,21 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/form_deskripsi.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Tabel%20Kelas/Komponen/token_asisten.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
 
-class TabelKelasAsisten extends StatefulWidget {
-  const TabelKelasAsisten({super.key});
+class TabelHasilAsisten extends StatefulWidget {
+  const TabelHasilAsisten({super.key});
 
   @override
-  State<TabelKelasAsisten> createState() => _TabelKelasAsistenState();
+  State<TabelHasilAsisten> createState() => _TabelHasilAsistenState();
 }
 
-class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
+class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
   List<DataKelas> demoDataKelas = [];
   List<DataKelas> filteredDataKelas = [];
-
   CollectionReference dataKelasCollection =
       FirebaseFirestore.instance.collection('tokenAsisten');
 
@@ -108,7 +104,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Kelas Praktikum',
+            child: Text('Data Hasil Praktikum',
                 style: GoogleFonts.quicksand(
                     fontSize: 20.0, fontWeight: FontWeight.bold)),
           ),
@@ -152,38 +148,6 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                       underline: Container(),
                     ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 25.0, top: 10.0),
-                      child: SizedBox(
-                        height: 40.0,
-                        width: 140.0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3CBEA9),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const TokenAsisten()));
-                          },
-                          child: const Text(
-                            "+ Tambah Kelas",
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
                 ),
                 const SizedBox(
                   height: 15,
@@ -292,22 +256,22 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
               style: TextStyle(
                   color: Colors.lightBlue[700],
                   fontWeight: FontWeight.bold)), onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => DeskripsiKelas(
-                      documentId: fileInfo.documentId,
-                    )));
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) => DeskripsiKelas(
+        //               documentId: fileInfo.documentId,
+        //             )));
       }),
       DataCell(
           Text(fileInfo.asisten,
               style: TextStyle(
                   color: Colors.lightBlue[700],
                   fontWeight: FontWeight.bold)), onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const FormDeskripsiKelas()));
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) => const FormDeskripsiKelas()));
       }),
       DataCell(Text(fileInfo.matkul)),
       DataCell(SizedBox(
