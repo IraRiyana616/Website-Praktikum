@@ -443,6 +443,11 @@ class _PenilaianTugasAsistenState extends State<PenilaianTugasAsisten> {
                         columns: const [
                           DataColumn(
                               label: Text(
+                            'Kode Kelas',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
+                          DataColumn(
+                              label: Text(
                             'NIM',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           )),
@@ -547,6 +552,7 @@ DataRow dataFileDataRow(
       }),
       cells: [
         DataCell(Text(fileInfo.nim.toString())),
+        DataCell(Text(fileInfo.kode)),
         DataCell(SizedBox(
             width: 180.0, child: Text(getLimitedText(fileInfo.nama, 30)))),
         DataCell(Text(fileInfo.percobaan.toString())),

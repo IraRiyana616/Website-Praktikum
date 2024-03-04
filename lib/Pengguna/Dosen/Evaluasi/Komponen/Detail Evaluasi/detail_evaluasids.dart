@@ -17,7 +17,7 @@ class _DetailEvaluasiDosenState extends State<DetailEvaluasiDosen> {
   void initState() {
     super.initState();
     futureData = FirebaseFirestore.instance
-        .collection('data_evaluasi')
+        .collection('dataEvaluasi')
         .doc(widget.documentId)
         .get();
   }
@@ -144,7 +144,7 @@ class _DetailEvaluasiDosenState extends State<DetailEvaluasiDosen> {
                             Padding(
                               padding: const EdgeInsets.only(left: 35.0),
                               child: Text(
-                                  "${data['kode_kelas'] ?? 'Not available'}",
+                                  "${data['kodeKelas'] ?? 'Not available'}",
                                   style: const TextStyle(fontSize: 15.0)),
                             ),
                             const SizedBox(
@@ -163,7 +163,7 @@ class _DetailEvaluasiDosenState extends State<DetailEvaluasiDosen> {
                             Padding(
                               padding: const EdgeInsets.only(left: 35.0),
                               child: Text(
-                                  "${data['tahun_ajaran'] ?? 'Not available'}",
+                                  "${data['tahunAjaran'] ?? 'Not available'}",
                                   style: const TextStyle(fontSize: 15.0)),
                             ),
                             const SizedBox(
@@ -181,7 +181,8 @@ class _DetailEvaluasiDosenState extends State<DetailEvaluasiDosen> {
                             ),
                             Padding(
                               padding: const EdgeInsets.only(left: 35.0),
-                              child: Text("${data['lulus'] ?? 'Not available'}",
+                              child: Text(
+                                  "${data['jumlahLulus'] ?? 'Not available'}",
                                   style: const TextStyle(fontSize: 15.0)),
                             ),
                             const SizedBox(
@@ -200,7 +201,7 @@ class _DetailEvaluasiDosenState extends State<DetailEvaluasiDosen> {
                             Padding(
                               padding: const EdgeInsets.only(left: 35.0),
                               child: Text(
-                                  "${data['tidak_lulus'] ?? 'Not available'}",
+                                  "${data['jumlahTidak_lulus'] ?? 'Not available'}",
                                   style: const TextStyle(fontSize: 15.0)),
                             ),
                             const SizedBox(
@@ -220,7 +221,7 @@ class _DetailEvaluasiDosenState extends State<DetailEvaluasiDosen> {
                               padding: const EdgeInsets.only(
                                   left: 35.0, right: 45.0),
                               child: Text(
-                                  "${data['hasil_evaluasi'] ?? 'Not available'}",
+                                  "${data['hasilEvaluasi'] ?? 'Not available'}",
                                   style: const TextStyle(
                                       fontSize: 15.0, height: 2.0)),
                             ),

@@ -113,7 +113,7 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                 height: 320.0,
                                 width: double.infinity,
                                 child: Image.asset(
-                                  'assets/images.kelas.jpg',
+                                  'assets/images/kelas.jpg',
                                   fit: BoxFit.cover,
                                 ),
                               ),

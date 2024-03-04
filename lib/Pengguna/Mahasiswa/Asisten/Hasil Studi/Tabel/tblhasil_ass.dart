@@ -56,6 +56,9 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
         querySnapshot = await FirebaseFirestore.instance
             .collection('tokenAsisten')
             .where('tahunAjaran', isEqualTo: selectedYear)
+            .where('kodeKelas',
+                isEqualTo:
+                    'KodeKelasYangDiperiksa') // Ganti dengan kode kelas yang sedang diperiksa
             .get();
       } else {
         querySnapshot =
@@ -64,7 +67,6 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
       List<DataKelas> data = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
         return DataKelas(
-          documentId: doc.id,
           asisten: data['kodeAsisten'] ?? '',
           kode: data['kodeKelas'] ?? '',
           tahun: data['tahunAjaran'] ?? '',
@@ -164,7 +166,7 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
                             columns: const [
                               DataColumn(
                                   label: Text(
-                                'Kode Asisten',
+                                'Kode Kelas',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               )),
                               DataColumn(
@@ -227,16 +229,15 @@ class DataKelas {
   String tahun;
   String dosenpengampu;
   String dosenpengampu2;
-  String documentId;
 
-  DataKelas(
-      {required this.asisten,
-      required this.kode,
-      required this.tahun,
-      required this.matkul,
-      required this.dosenpengampu,
-      required this.dosenpengampu2,
-      required this.documentId});
+  DataKelas({
+    required this.asisten,
+    required this.kode,
+    required this.tahun,
+    required this.matkul,
+    required this.dosenpengampu,
+    required this.dosenpengampu2,
+  });
 }
 
 DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
@@ -247,29 +248,13 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
-      // DataCell(
-      //     Text(fileInfo.kode,
-      //         style: TextStyle(
-      //             color: Colors.lightBlue[700],
-      //             fontWeight: FontWeight.bold)), onTap: () {
-      //   // Navigator.push(
-      //   //     context,
-      //   //     MaterialPageRoute(
-      //   //         builder: (context) => DeskripsiKelas(
-      //   //               documentId: fileInfo.documentId,
-      //   //             )));
-      // }),
       DataCell(
-          Text(fileInfo.asisten,
+          Text(fileInfo.kode,
               style: TextStyle(
                   color: Colors.lightBlue[700],
                   fontWeight: FontWeight.bold)), onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => NilaiTugas(
-                      documentId: fileInfo.documentId,
-                    )));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const NilaiTugas()));
       }),
       DataCell(Text(fileInfo.matkul)),
       DataCell(SizedBox(

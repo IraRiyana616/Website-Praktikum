@@ -24,8 +24,8 @@ class _FormEvaluasiDosenState extends State<FormEvaluasiDosen> {
 
     if (kodeKelas.isNotEmpty) {
       var querySnapshot = await FirebaseFirestore.instance
-          .collection('data_evaluasi')
-          .where('kode_kelas',
+          .collection('dataEvaluasi')
+          .where('kodeKelas',
               isEqualTo:
                   kodeKelas) // Memeriksa apakah kode kelas sudah ada di koleksi 'data_evaluasi'
           .get();
@@ -33,17 +33,17 @@ class _FormEvaluasiDosenState extends State<FormEvaluasiDosen> {
       // Jika tidak ada dokumen dengan kode kelas yang sama
       if (querySnapshot.docs.isEmpty) {
         var kelasQuerySnapshot = await FirebaseFirestore.instance
-            .collection('data_kelas')
-            .where('kode_kelas', isEqualTo: kodeKelas)
+            .collection('dataKelas')
+            .where('kodeKelas', isEqualTo: kodeKelas)
             .get();
 
         if (kelasQuerySnapshot.docs.isNotEmpty) {
-          await FirebaseFirestore.instance.collection('data_evaluasi').add({
-            'kode_kelas': kodeKelas,
-            'tahun_ajaran': _tahunAjaranController.text,
-            'jumlah_lulus': _lulusController.text,
-            'jumlah_tidak_lulus': _tidakController.text,
-            'hasil_evaluasi': _hasilEvaluasiController.text,
+          await FirebaseFirestore.instance.collection('dataEvaluasi').add({
+            'kodeKelas': kodeKelas,
+            'tahunAjaran': _tahunAjaranController.text,
+            'jumlahLulus': _lulusController.text,
+            'jumlahTidak_lulus': _tidakController.text,
+            'hasilEvaluasi': _hasilEvaluasiController.text,
           });
 
           ScaffoldMessenger.of(context).showSnackBar(

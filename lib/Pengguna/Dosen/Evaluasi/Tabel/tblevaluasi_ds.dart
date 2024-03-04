@@ -19,7 +19,7 @@ class _TabelEvaluasiDosenState extends State<TabelEvaluasiDosen> {
 
   //Koneksi ke database
   CollectionReference dataEvaluasiCollection =
-      FirebaseFirestore.instance.collection('data_evaluasi');
+      FirebaseFirestore.instance.collection('dataEvaluasi');
 
 //Tahun Ajaran
   String selectedYear = 'Tampilkan Semua';
@@ -28,10 +28,10 @@ class _TabelEvaluasiDosenState extends State<TabelEvaluasiDosen> {
   Future<void> fetchAvailableYears() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await FirebaseFirestore.instance.collection('data_evaluasi').get();
+          await FirebaseFirestore.instance.collection('dataEvaluasi').get();
 
       Set<String> years = querySnapshot.docs
-          .map((doc) => doc['tahun_ajaran'].toString())
+          .map((doc) => doc['tahunAjaran'].toString())
           .toSet();
 
       setState(() {
@@ -61,24 +61,24 @@ class _TabelEvaluasiDosenState extends State<TabelEvaluasiDosen> {
 
       if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
         querySnapshot = await FirebaseFirestore.instance
-            .collection('data_evaluasi')
-            .where('tahun_ajaran', isEqualTo: selectedYear)
+            .collection('dataEvaluasi')
+            .where('tahunAjaran', isEqualTo: selectedYear)
             .get();
       } else {
         querySnapshot =
-            await FirebaseFirestore.instance.collection('data_evaluasi').get();
+            await FirebaseFirestore.instance.collection('dataEvaluasi').get();
       }
 
       List<DataEvaluasi> data = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
         return DataEvaluasi(
           documentId: doc.id,
-          kode: data['kode_kelas'] ?? '', // default to empty string if null
-          ta: data['tahun_ajaran'] ?? '', // default to empty string if null
-          lulus: data['lulus'] ?? 0, // default to 0 if null
-          tidak: data['tidak_lulus'] ?? 0, // default to 0 if null
-          hasil:
-              data['hasil_evaluasi'] ?? '', // default to empty string if null
+          kode: data['kodeKelas'] ?? '', // default to empty string if null
+          ta: data['tahunAjaran'] ?? '', // default to empty string if null
+          lulus: int.parse(data['jumlahLulus'] ?? '0'), // Konversi ke integer
+          tidak: int.parse(
+              data['jumlahTidak_lulus'] ?? '0'), // Konversi ke integer
+          hasil: data['hasilEvaluasi'] ?? '', // default to empty string if null
         );
       }).toList();
 

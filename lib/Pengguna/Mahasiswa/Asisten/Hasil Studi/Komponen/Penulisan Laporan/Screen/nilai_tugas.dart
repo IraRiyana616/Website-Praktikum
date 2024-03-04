@@ -3,8 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Penulisan%20Laporan/Nilai/penilaian_tugas.dart';
 
 class NilaiTugas extends StatefulWidget {
-  final String documentId;
-  const NilaiTugas({super.key, required this.documentId});
+  const NilaiTugas({super.key});
 
   @override
   State<NilaiTugas> createState() => _NilaiTugasState();

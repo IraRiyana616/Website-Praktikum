@@ -23,23 +23,23 @@ class _TabelPenulisanLaporanState extends State<TabelPenulisanLaporan> {
     try {
       // Fetching data from 'data_kelas'
       QuerySnapshot dataKelasSnapshot =
-          await FirebaseFirestore.instance.collection('data_kelas').get();
+          await FirebaseFirestore.instance.collection('dataKelas').get();
 
       // Fetching data from 'token_kelas'
       QuerySnapshot tokenKelasSnapshot =
-          await FirebaseFirestore.instance.collection('token_kelas').get();
+          await FirebaseFirestore.instance.collection('tokenKelas').get();
 
       // Grouping token_kelas data based on 'kode_kelas'
       Map<String, List<QueryDocumentSnapshot>> groupedTokenData = {};
       for (var tokenDoc in tokenKelasSnapshot.docs) {
-        String kodeKelas = tokenDoc['kode_kelas'];
+        String kodeKelas = tokenDoc['kodeKelas'];
         groupedTokenData.putIfAbsent(kodeKelas, () => []);
         groupedTokenData[kodeKelas]!.add(tokenDoc);
       }
 
       // Connecting data based on 'kode_kelas'
       for (QueryDocumentSnapshot dataKelasDoc in dataKelasSnapshot.docs) {
-        String kodeKelas = dataKelasDoc['kode_kelas'];
+        String kodeKelas = dataKelasDoc['kodeKelas'];
 
         // Finding all token_kelas that match kode_kelas
         List<QueryDocumentSnapshot>? tokenKelasDocs =

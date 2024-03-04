@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Tabel/tblhasilstudi.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Tabel/tblhasil_ass.dart';
-
-import '../../Kelas/Tabel Kelas/tabel_kelas.dart';
 
 class HasilStudiAsisten extends StatefulWidget {
   const HasilStudiAsisten({super.key});
