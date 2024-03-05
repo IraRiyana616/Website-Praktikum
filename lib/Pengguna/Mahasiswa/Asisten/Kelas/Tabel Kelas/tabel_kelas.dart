@@ -6,8 +6,10 @@ import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/form_d
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Tabel%20Kelas/Komponen/token_asisten.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
 
+import '../../../Praktikan/Dashboard/Komponen/Deskripsi/Screen/candangan.dart';
+
 class TabelKelasAsisten extends StatefulWidget {
-  const TabelKelasAsisten({super.key});
+  const TabelKelasAsisten({Key? key}) : super(key: key);
 
   @override
   State<TabelKelasAsisten> createState() => _TabelKelasAsistenState();
@@ -67,13 +69,13 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
       List<DataKelas> data = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
         return DataKelas(
-            asisten: data['kodeAsisten'] ?? '',
-            kode: data['kodeKelas'] ?? '',
-            tahun: data['tahunAjaran'] ?? '',
-            matkul: data['mataKuliah'] ?? '',
-            dosenpengampu: data['dosenPengampu'] ?? '',
-            dosenpengampu2: data['dosenPengampu2'] ?? '',
-            documentId: doc.id);
+          asisten: data['kodeAsisten'] ?? '',
+          kode: data['kodeKelas'] ?? '',
+          tahun: data['tahunAjaran'] ?? '',
+          matkul: data['mataKuliah'] ?? '',
+          dosenpengampu: data['dosenPengampu'] ?? '',
+          dosenpengampu2: data['dosenPengampu2'] ?? '',
+        );
       }).toList();
 
       setState(() {
@@ -197,12 +199,6 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                             columnSpacing: 10,
                             columns: const [
                               DataColumn(
-                                label: Text(
-                                  "Kode Mahasiswa",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              DataColumn(
                                   label: Text(
                                 'Kode Asisten',
                                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -222,6 +218,12 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                               DataColumn(
                                 label: Text(
                                   "Dosen Pengampu 2",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  "",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -267,16 +269,15 @@ class DataKelas {
   String tahun;
   String dosenpengampu;
   String dosenpengampu2;
-  String documentId;
 
-  DataKelas(
-      {required this.asisten,
-      required this.kode,
-      required this.tahun,
-      required this.matkul,
-      required this.dosenpengampu,
-      required this.dosenpengampu2,
-      required this.documentId});
+  DataKelas({
+    required this.asisten,
+    required this.kode,
+    required this.tahun,
+    required this.matkul,
+    required this.dosenpengampu,
+    required this.dosenpengampu2,
+  });
 }
 
 DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
@@ -287,35 +288,48 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
+      DataCell(Text(fileInfo.asisten)),
       DataCell(
-          Text(fileInfo.kode,
+          Text(fileInfo.matkul,
               style: TextStyle(
                   color: Colors.lightBlue[700],
                   fontWeight: FontWeight.bold)), onTap: () {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => DeskripsiKelas(
-                      documentId: fileInfo.documentId,
+                builder: (context) => TokenAsistenScreen(
+                      kodeKelas: fileInfo.kode,
                     )));
       }),
-      DataCell(
-          Text(fileInfo.asisten,
-              style: TextStyle(
-                  color: Colors.lightBlue[700],
-                  fontWeight: FontWeight.bold)), onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const FormDeskripsiKelas()));
-      }),
-      DataCell(Text(fileInfo.matkul)),
       DataCell(SizedBox(
           width: 180.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu, 30)))),
       DataCell(SizedBox(
           width: 180.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
+      DataCell(Row(
+        children: [
+          const Icon(
+            Icons.edit,
+            color: Colors.grey,
+          ),
+          const SizedBox(
+            width: 5.0,
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const FormDeskripsiKelas()));
+            },
+            child: const Text(
+              'Edit Data',
+              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+            ),
+          )
+        ],
+      )),
     ],
   );
 }

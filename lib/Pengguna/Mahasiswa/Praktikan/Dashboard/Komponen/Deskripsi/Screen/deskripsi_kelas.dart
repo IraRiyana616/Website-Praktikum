@@ -17,7 +17,7 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
   void initState() {
     super.initState();
     futureData = FirebaseFirestore.instance
-        .collection('deskripsiKelas')
+        .collection('tokenAsisten')
         .doc(widget.documentId)
         .get();
   }
@@ -184,7 +184,7 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                             padding: const EdgeInsets.only(
                                                 top: 20.0),
                                             child: Text(
-                                              '${data['deskripsi_kelas'] ?? 'Not available'}',
+                                              '${data['deskripsiKelas'] ?? 'Not available'}',
                                               style: GoogleFonts.quicksand(
                                                   fontSize: 15.0,
                                                   height: 2.5,

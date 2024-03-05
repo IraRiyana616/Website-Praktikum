@@ -319,11 +319,11 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
               style: TextStyle(
                   color: Colors.lightBlue[700],
                   fontWeight: FontWeight.bold)), onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    DeskripsiKelas(documentId: fileInfo.kode)));
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) =>
+        //             DeskripsiKelas(documentId: fileInfo.kode)));
       }),
       DataCell(Text(fileInfo.matkul)),
       DataCell(SizedBox(

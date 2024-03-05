@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../Komponen/form_kelas.dart';
 
 class TabelKelasDosen extends StatefulWidget {
-  const TabelKelasDosen({super.key});
+  const TabelKelasDosen({Key? key});
 
   @override
   State<TabelKelasDosen> createState() => _TabelKelasDosenState();
@@ -55,6 +55,7 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
       List<DataClass> data = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
         return DataClass(
+          id: doc.id,
           kelas: data['kodeKelas'],
           asisten: data['kodeAsisten'],
           tahun: data['tahunAjaran'],
@@ -294,8 +295,14 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
+                              DataColumn(
+                                label: Text(
+                                  "Aksi",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
                             ],
-                            source: DataSource(filteredClassData),
+                            source: DataSource(filteredClassData, deleteData),
                             rowsPerPage:
                                 calculateRowsPerPage(filteredClassData.length),
                           )
@@ -327,9 +334,21 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
       return defaultRowsPerPage;
     }
   }
+
+  void deleteData(String id) async {
+    try {
+      await FirebaseFirestore.instance.collection('dataKelas').doc(id).delete();
+      fetchDataFromFirebase(selectedYear);
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error deleting data: $error');
+      }
+    }
+  }
 }
 
 class DataClass {
+  String id;
   String kelas;
   String asisten;
   String tahun;
@@ -337,6 +356,7 @@ class DataClass {
   String dosenpengampu;
   String dosenpengampu2;
   DataClass({
+    required this.id,
     required this.kelas,
     required this.asisten,
     required this.tahun,
@@ -346,7 +366,8 @@ class DataClass {
   });
 }
 
-DataRow dataFileDataRow(DataClass fileInfo, int index) {
+DataRow dataFileDataRow(
+    DataClass fileInfo, int index, Function(String) onDelete) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -355,12 +376,13 @@ DataRow dataFileDataRow(DataClass fileInfo, int index) {
     ),
     cells: [
       DataCell(
-          Text(
-            fileInfo.kelas,
-            style: TextStyle(
-                color: Colors.lightBlue[700], fontWeight: FontWeight.bold),
-          ),
-          onTap: () {}),
+        Text(
+          fileInfo.kelas,
+          style: TextStyle(
+              color: Colors.lightBlue[700], fontWeight: FontWeight.bold),
+        ),
+        onTap: () {},
+      ),
       DataCell(
         Text(
           fileInfo.asisten,
@@ -373,6 +395,12 @@ DataRow dataFileDataRow(DataClass fileInfo, int index) {
       DataCell(SizedBox(
           width: 180.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
+      DataCell(
+        IconButton(
+          icon: const Icon(Icons.delete),
+          onPressed: () => onDelete(fileInfo.id),
+        ),
+      ),
     ],
   );
 }
@@ -391,14 +419,15 @@ Color getRowColor(int index) {
 
 class DataSource extends DataTableSource {
   final List<DataClass> data;
-  DataSource(this.data);
+  final Function(String) onDelete;
+  DataSource(this.data, this.onDelete);
   @override
   DataRow? getRow(int index) {
     if (index >= data.length) {
       return null;
     }
     final fileInfo = data[index];
-    return dataFileDataRow(fileInfo, index);
+    return dataFileDataRow(fileInfo, index, onDelete);
   }
 
   @override
