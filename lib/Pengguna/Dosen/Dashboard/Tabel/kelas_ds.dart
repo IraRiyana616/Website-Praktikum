@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../Komponen/form_kelas.dart';
 
 class TabelKelasDosen extends StatefulWidget {
-  const TabelKelasDosen({Key? key});
+  const TabelKelasDosen({super.key});
 
   @override
   State<TabelKelasDosen> createState() => _TabelKelasDosenState();
@@ -375,20 +375,17 @@ DataRow dataFileDataRow(
       },
     ),
     cells: [
-      DataCell(
-        Text(
-          fileInfo.kelas,
-          style: TextStyle(
-              color: Colors.lightBlue[700], fontWeight: FontWeight.bold),
-        ),
-        onTap: () {},
-      ),
+      DataCell(Text(fileInfo.kelas)),
       DataCell(
         Text(
           fileInfo.asisten,
         ),
       ),
-      DataCell(Text(fileInfo.matkul)),
+      DataCell(
+          Text(fileInfo.matkul,
+              style: TextStyle(
+                  color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
+          onTap: () {}),
       DataCell(SizedBox(
           width: 180.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu, 30)))),

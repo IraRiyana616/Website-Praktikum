@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../Laporan/form_laporan.dart';
 import '../Tugas/form_tugas.dart';
 
@@ -121,64 +123,68 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
     _presesorController.clear();
   }
 
-  //Materi
-  //Kode Asisten
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///Fungsi untuk database SilabusPraktikum
   final TextEditingController _kodeAsistenController = TextEditingController();
-  //Judul Materi
   final TextEditingController _judulMateriController = TextEditingController();
-  //Jadwal Praktikum
-  final TextEditingController _jadwalPraktikumController =
-      TextEditingController();
-  //Waktu Praktikum
   final TextEditingController _waktuPraktikumController =
       TextEditingController();
+  String _fileName = "";
 
-  /// Menghubungkan ke saveSilabus Screen pada Firebase
   void _saveSilabus() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    CollectionReference silabusCollection = firestore.collection('materiKelas');
+    String kodeKelas = _kodeAsistenController.text;
+    String judulMateri = _judulMateriController.text;
+    String waktuPraktikum = _waktuPraktikumController.text;
+    String modulPraktikum = _fileName; // Mengambil nama file modul
 
-    // Memeriksa apakah semua textfield telah diisi
-    if (_kodeAsistenController.text.isEmpty ||
-        _judulMateriController.text.isEmpty ||
-        _jadwalPraktikumController.text.isEmpty ||
-        _waktuPraktikumController.text.isEmpty) {
+    // Cek apakah kodeKelas, judulMateri, waktuPraktikum, dan modulPraktikum terisi
+    if (kodeKelas.isEmpty ||
+        judulMateri.isEmpty ||
+        waktuPraktikum.isEmpty ||
+        modulPraktikum.isEmpty) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Harap isi semua kolom'),
+        content: Text('Harap lengkapi semua data'),
         backgroundColor: Colors.red,
         duration: Duration(seconds: 2),
       ));
       return;
     }
 
-    // Mengecek apakah kode_asisten terdapat dalam Firestore 'token_asisten'
-    QuerySnapshot kodeAsistenSnapshot = await firestore
-        .collection('tokenAsisten')
-        .where('kodeKelas', isEqualTo: _kodeAsistenController.text)
-        .get();
+    // Cek apakah data dengan kodeKelas dan judulMateri yang sama sudah ada
+    bool dataExists = false;
+    await FirebaseFirestore.instance
+        .collection('silabusPraktikum')
+        .where('kodeKelas', isEqualTo: kodeKelas)
+        .where('judulMateri', isEqualTo: judulMateri)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.docs.isNotEmpty) {
+        dataExists = true;
+      }
+    });
 
-    // Jika kode_asisten tidak ditemukan, tampilkan snackbar dan hentikan proses
-    if (kodeAsistenSnapshot.docs.isEmpty) {
+    if (dataExists) {
+      // Jika data sudah ada
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Data tidak terdapat pada database'),
+        content: Text('Data telah terdaftar pada database'),
         backgroundColor: Colors.red,
         duration: Duration(seconds: 2),
       ));
       return;
     }
 
-    // Jika kode_asisten ditemukan, lanjutkan dengan penyimpanan data
-    QuerySnapshot querySnapshot = await silabusCollection.get();
-    int documentCount = querySnapshot.docs.length;
-    int nextDocumentId = documentCount + 1;
-
-    await silabusCollection.doc(nextDocumentId.toString()).set({
-      'kodeKelas': _kodeAsistenController.text,
-      'judulMateri': _judulMateriController.text,
-      'jadwal': _jadwalPraktikumController.text,
-      'waktu': _waktuPraktikumController.text,
+    // Simpan data ke Firestore 'silabusPraktikum'
+    await FirebaseFirestore.instance.collection('silabusPraktikum').add({
+      'kodeKelas': kodeKelas,
+      'judulMateri': judulMateri,
+      'waktuPraktikum': waktuPraktikum,
+      'modulPraktikum': modulPraktikum, // Simpan nama file modul
     });
 
     // ignore: use_build_context_synchronously
@@ -188,10 +194,48 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
       duration: Duration(seconds: 2),
     ));
 
+    // Reset form
     _kodeAsistenController.clear();
     _judulMateriController.clear();
-    _jadwalPraktikumController.clear();
     _waktuPraktikumController.clear();
+    setState(() {
+      _fileName = '';
+    });
+  }
+
+  void _uploadFile() async {
+    // Upload file to Firebase Storage
+    String kodeKelas = _kodeAsistenController.text;
+
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      PlatformFile file = result.files.first;
+
+      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('$kodeKelas/${file.name}');
+
+      try {
+        // Upload file
+        await ref.putData(file.bytes!);
+
+        // Get download URL
+        String downloadURL = await ref.getDownloadURL();
+
+        setState(() {
+          _fileName = file.name;
+        });
+      } catch (e) {
+        // Handle error during upload or getting download URL
+        if (kDebugMode) {
+          print("Error during upload or getting download URL: $e");
+        }
+        // Show error message or snackbar
+      }
+    } else {
+      // Show error message or snackbar
+    }
   }
 
   @override
@@ -610,8 +654,9 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                               Text(
                                 'Silabus',
                                 style: GoogleFonts.quicksand(
-                                    fontSize: 30.0,
-                                    fontWeight: FontWeight.bold),
+                                  fontSize: 30.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 15.0),
@@ -622,228 +667,256 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                               ),
                               const SizedBox(height: 50.0),
                               Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 95.0),
-                                          child: Container(
-                                            color: Colors.white,
-                                            width: 526.0,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                //Komponen Kode Kelas
-                                                Text(
-                                                  'Kode Asisten',
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 95.0),
+                                        child: Container(
+                                          color: Colors.white,
+                                          width: 526.0,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Kode Kelas',
+                                                style: GoogleFonts.quicksand(
+                                                  fontSize: 20.0,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 20.0),
+                                                child: SizedBox(
+                                                  width: 600.0,
+                                                  child: TextField(
+                                                    controller:
+                                                        _kodeAsistenController,
+                                                    decoration: InputDecoration(
+                                                      hintText:
+                                                          'Masukkan Kode Kelas',
+                                                      border:
+                                                          OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10.0),
+                                                      ),
+                                                      filled: true,
+                                                      fillColor: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 20.0),
+                                                child: Text(
+                                                  'Judul Materi',
                                                   style: GoogleFonts.quicksand(
-                                                      fontSize: 20.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                                    fontSize: 20.0,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
-                                                //TextField Kode kelas
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 20.0),
-                                                  child: SizedBox(
-                                                    width: 600.0,
-                                                    child: TextField(
-                                                      controller:
-                                                          _kodeAsistenController,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        hintText:
-                                                            'Masukkan Kode Asisten',
-                                                        border: OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10.0)),
-                                                        filled: true,
-                                                        fillColor: Colors.white,
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 20.0),
+                                                child: SizedBox(
+                                                  width: 600.0,
+                                                  child: TextField(
+                                                    controller:
+                                                        _judulMateriController,
+                                                    decoration: InputDecoration(
+                                                      hintText:
+                                                          'Masukkan Judul Materi',
+                                                      border:
+                                                          OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10.0),
                                                       ),
+                                                      filled: true,
+                                                      fillColor: Colors.white,
                                                     ),
                                                   ),
                                                 ),
-                                                //Judul Materi
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 20.0),
-                                                  child: Text(
-                                                    'Judul Materi',
-                                                    style:
-                                                        GoogleFonts.quicksand(
-                                                            fontSize: 20.0,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                  ),
-                                                ),
-                                                //TextField Judul Materi
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 20.0),
-                                                  child: SizedBox(
-                                                    width: 600.0,
-                                                    child: TextField(
-                                                      controller:
-                                                          _judulMateriController,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        hintText:
-                                                            'Masukkan Judul Materi',
-                                                        border: OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10.0)),
-                                                        filled: true,
-                                                        fillColor: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              right: 70.0),
-                                          child: Container(
-                                            color: Colors.white,
-                                            width: 526.0,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                //Pengawas Praktikum
-                                                Text(
-                                                  'Jadwal Praktikum',
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 70.0),
+                                        child: Container(
+                                          color: Colors.white,
+                                          width: 526.0,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Waktu Praktikum',
+                                                style: GoogleFonts.quicksand(
+                                                  fontSize: 20.0,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 20.0),
+                                                child: SizedBox(
+                                                  width: 600.0,
+                                                  child: TextField(
+                                                    controller:
+                                                        _waktuPraktikumController,
+                                                    decoration: InputDecoration(
+                                                      hintText:
+                                                          'Masukkan Waktu Praktikum',
+                                                      border:
+                                                          OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10.0),
+                                                      ),
+                                                      filled: true,
+                                                      fillColor: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 20.0),
+                                                child: Text(
+                                                  'Upload Modul',
                                                   style: GoogleFonts.quicksand(
-                                                      fontSize: 20.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                                    fontSize: 20.0,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
-                                                //TextField Judul Materi
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 20.0),
-                                                  child: SizedBox(
-                                                    width: 600.0,
-                                                    child: TextField(
-                                                      controller:
-                                                          _jadwalPraktikumController,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        hintText:
-                                                            'Masukkan Jadwal Praktikum',
-                                                        border: OutlineInputBorder(
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 20.0),
+                                                child: SizedBox(
+                                                  width: 600.0,
+                                                  child: Stack(
+                                                    children: [
+                                                      TextField(
+                                                        decoration:
+                                                            InputDecoration(
+                                                          hintText:
+                                                              'Nama File Modul',
+                                                          border:
+                                                              OutlineInputBorder(
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
-                                                                        10.0)),
-                                                        filled: true,
-                                                        fillColor: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                //Pengawas Praktikum
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 20.0),
-                                                  child: Text(
-                                                    'Waktu Praktikum',
-                                                    style:
-                                                        GoogleFonts.quicksand(
-                                                            fontSize: 20.0,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                  ),
-                                                ),
-                                                //TextField Judul Materi
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 20.0),
-                                                  child: SizedBox(
-                                                    width: 600.0,
-                                                    child: TextField(
-                                                      controller:
-                                                          _waktuPraktikumController,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        hintText:
-                                                            'Masukkan Waktu Praktikum',
-                                                        border: OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10.0)),
-                                                        filled: true,
-                                                        fillColor: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 370.0,
-                                                          top: 30.0),
-                                                  child: ElevatedButton(
-                                                      style: ButtonStyle(
-                                                        backgroundColor:
-                                                            MaterialStateProperty
-                                                                .all<Color>(
-                                                                    const Color(
-                                                                        0xFF3CBEA9)),
-                                                        fixedSize:
-                                                            MaterialStateProperty
-                                                                .all<Size>(
-                                                          const Size(
-                                                              150.0, 45.0),
+                                                                        10.0),
+                                                          ),
+                                                          filled: true,
+                                                          fillColor:
+                                                              Colors.white,
                                                         ),
+                                                        controller:
+                                                            TextEditingController(
+                                                                text:
+                                                                    _fileName),
                                                       ),
-                                                      onPressed: _saveSilabus,
-                                                      child: Text(
-                                                        'Simpan Data',
-                                                        style: GoogleFonts
-                                                            .quicksand(
-                                                                fontSize: 15.0,
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                top: 5.0,
+                                                                left: 400.0),
+                                                        child: SizedBox(
+                                                          height: 40.0,
+                                                          width: 120.0,
+                                                          child: ElevatedButton(
+                                                            style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStateProperty.all<
+                                                                          Color>(
+                                                                      const Color(
+                                                                          0xFF3CBEA9)),
+                                                            ),
+                                                            onPressed:
+                                                                () async {
+                                                              _uploadFile();
+                                                              setState(() {});
+                                                            },
+                                                            child: Text(
+                                                              'Upload File',
+                                                              style: GoogleFonts
+                                                                  .quicksand(
+                                                                fontSize: 13,
                                                                 fontWeight:
                                                                     FontWeight
-                                                                        .bold),
-                                                      )),
-                                                )
-                                              ],
-                                            ),
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 370.0, top: 30.0),
+                                                child: ElevatedButton(
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all<Color>(
+                                                                const Color(
+                                                                    0xFF3CBEA9)),
+                                                    fixedSize:
+                                                        MaterialStateProperty
+                                                            .all<Size>(
+                                                                const Size(
+                                                                    150.0,
+                                                                    45.0)),
+                                                  ),
+                                                  onPressed: _saveSilabus,
+                                                  child: Text(
+                                                    'Simpan Data',
+                                                    style:
+                                                        GoogleFonts.quicksand(
+                                                      fontSize: 15.0,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
                                           ),
-                                        )
-                                      ],
-                                    ),
-                                    const SizedBox(height: 50.0)
-                                  ]),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  const SizedBox(height: 50.0)
+                                ],
+                              ),
                             ],
                           ),
                         ),
                       ]),
                 ),
-              )
+              ),
             ],
           ),
         ),

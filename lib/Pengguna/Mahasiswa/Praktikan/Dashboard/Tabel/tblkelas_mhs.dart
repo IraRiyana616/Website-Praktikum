@@ -234,7 +234,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
                             columns: const [
                               DataColumn(
                                 label: Text(
-                                  "Kode Mahasiswa",
+                                  "Kode Kelas",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -314,18 +314,21 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
+      DataCell(Text(fileInfo.kode)),
       DataCell(
-          Text(fileInfo.kode,
-              style: TextStyle(
-                  color: Colors.lightBlue[700],
-                  fontWeight: FontWeight.bold)), onTap: () {
-        // Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //         builder: (context) =>
-        //             DeskripsiKelas(documentId: fileInfo.kode)));
-      }),
-      DataCell(Text(fileInfo.matkul)),
+        Text(
+          fileInfo.matkul,
+          style: TextStyle(
+              color: Colors.lightBlue[700], fontWeight: FontWeight.bold),
+        ),
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      DeskripsiKelas(kodeKelas: fileInfo.kode)));
+        },
+      ),
       DataCell(SizedBox(
           width: 180.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu, 30)))),

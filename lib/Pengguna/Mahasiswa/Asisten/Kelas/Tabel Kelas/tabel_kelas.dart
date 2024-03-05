@@ -6,8 +6,6 @@ import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/form_d
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Tabel%20Kelas/Komponen/token_asisten.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
 
-import '../../../Praktikan/Dashboard/Komponen/Deskripsi/Screen/candangan.dart';
-
 class TabelKelasAsisten extends StatefulWidget {
   const TabelKelasAsisten({Key? key}) : super(key: key);
 
@@ -297,7 +295,7 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => TokenAsistenScreen(
+                builder: (context) => DeskripsiKelas(
                       kodeKelas: fileInfo.kode,
                     )));
       }),
