@@ -3,10 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
 import '../Komponen/form_kelas.dart';
 
 class TabelKelasDosen extends StatefulWidget {
-  const TabelKelasDosen({super.key});
+  const TabelKelasDosen({Key? key}) : super(key: key);
 
   @override
   State<TabelKelasDosen> createState() => _TabelKelasDosenState();
@@ -302,7 +303,8 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
                                 ),
                               ),
                             ],
-                            source: DataSource(filteredClassData, deleteData),
+                            source: DataSource(
+                                filteredClassData, deleteData, context),
                             rowsPerPage:
                                 calculateRowsPerPage(filteredClassData.length),
                           )
@@ -366,8 +368,8 @@ class DataClass {
   });
 }
 
-DataRow dataFileDataRow(
-    DataClass fileInfo, int index, Function(String) onDelete) {
+DataRow dataFileDataRow(DataClass fileInfo, int index,
+    Function(String) onDelete, BuildContext context) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -382,16 +384,40 @@ DataRow dataFileDataRow(
         ),
       ),
       DataCell(
-          Text(fileInfo.matkul,
-              style: TextStyle(
-                  color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
-          onTap: () {}),
-      DataCell(SizedBox(
+        Text(
+          fileInfo.matkul,
+          style: const TextStyle(
+            color: Colors.lightBlue,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DeskripsiKelas(
+                kodeKelas: fileInfo.kelas,
+              ),
+            ),
+          );
+        },
+      ),
+      DataCell(
+        SizedBox(
           width: 180.0,
-          child: Text(getLimitedText(fileInfo.dosenpengampu, 30)))),
-      DataCell(SizedBox(
+          child: Text(
+            getLimitedText(fileInfo.dosenpengampu, 30),
+          ),
+        ),
+      ),
+      DataCell(
+        SizedBox(
           width: 180.0,
-          child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
+          child: Text(
+            getLimitedText(fileInfo.dosenpengampu2, 30),
+          ),
+        ),
+      ),
       DataCell(
         IconButton(
           icon: const Icon(Icons.delete),
@@ -407,30 +433,31 @@ String getLimitedText(String text, int limit) {
 }
 
 Color getRowColor(int index) {
-  if (index % 2 == 0) {
-    return Colors.grey.shade200;
-  } else {
-    return Colors.transparent;
-  }
+  return index % 2 == 0 ? Colors.grey.shade200 : Colors.transparent;
 }
 
 class DataSource extends DataTableSource {
   final List<DataClass> data;
   final Function(String) onDelete;
-  DataSource(this.data, this.onDelete);
+  final BuildContext context;
+
+  DataSource(this.data, this.onDelete, this.context);
+
   @override
   DataRow? getRow(int index) {
     if (index >= data.length) {
       return null;
     }
     final fileInfo = data[index];
-    return dataFileDataRow(fileInfo, index, onDelete);
+    return dataFileDataRow(fileInfo, index, onDelete, context);
   }
 
   @override
   int get rowCount => data.length;
+
   @override
   bool get isRowCountApproximate => false;
+
   @override
   int get selectedRowCount => 0;
 }

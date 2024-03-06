@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../Modul/tabel_modul.dart';
+
 class DeskripsiKelas extends StatefulWidget {
   final String kodeKelas;
   const DeskripsiKelas({Key? key, required this.kodeKelas}) : super(key: key);
@@ -408,12 +410,14 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                       ),
                                     ),
                                     const SizedBox(
-                                      height: 50.0,
+                                      height: 35.0,
                                     )
                                   ],
                                 ),
                               ),
-                              //Taruh navigasi untuk ke tabel
+
+                              const TabelSilabusPraktikum(),
+                              const SizedBox(height: 50.0)
                             ],
                           ),
                         ),

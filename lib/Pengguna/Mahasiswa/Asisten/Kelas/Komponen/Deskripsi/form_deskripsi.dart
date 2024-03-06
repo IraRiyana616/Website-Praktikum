@@ -155,6 +155,29 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
       return;
     }
 
+    // Cek apakah kodeKelas terdapat dalam Firestore 'tokenAsisten'
+    bool kodeKelasExists = false;
+    await FirebaseFirestore.instance
+        .collection('tokenAsisten')
+        .doc(kodeKelas)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        kodeKelasExists = true;
+      }
+    });
+
+    if (!kodeKelasExists) {
+      // Jika kodeKelas tidak terdapat pada database
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Kode kelas tidak terdapat pada database'),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 2),
+      ));
+      return;
+    }
+
     // Cek apakah data dengan kodeKelas dan judulMateri yang sama sudah ada
     bool dataExists = false;
     await FirebaseFirestore.instance
