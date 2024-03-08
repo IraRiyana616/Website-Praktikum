@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../../Asisten/Kelas/Komponen/Absensi/Screen/absensi_asst.dart';
 import '../Modul/tabel_modul.dart';
 
 class DeskripsiKelas extends StatefulWidget {
@@ -154,13 +155,34 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                       ),
                                     ),
                                   ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const AbsensiMahasiswaScreen()));
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 50.0,
+                                        top: 38.0,
+                                      ),
+                                      child: Text(
+                                        'Absensi',
+                                        style: GoogleFonts.quicksand(
+                                          fontSize: 16.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                   Padding(
                                     padding: const EdgeInsets.only(
                                       left: 50.0,
                                       top: 38.0,
                                     ),
                                     child: Text(
-                                      'Absensi',
+                                      'Tugas',
                                       style: GoogleFonts.quicksand(
                                         fontSize: 16.0,
                                       ),

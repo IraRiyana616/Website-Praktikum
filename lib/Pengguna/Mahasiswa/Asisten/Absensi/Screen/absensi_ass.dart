@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AbsensiAsisten extends StatefulWidget {
-  const AbsensiAsisten({super.key});
+  const AbsensiAsisten({Key? key});
 
   @override
   State<AbsensiAsisten> createState() => _AbsensiAsistenState();
@@ -13,9 +13,12 @@ class AbsensiAsisten extends StatefulWidget {
 
 class _AbsensiAsistenState extends State<AbsensiAsisten> {
   final TextEditingController _kodeEditingController = TextEditingController();
-  final TextEditingController _modulEditingController = TextEditingController();
+  //Status Kehadiran
   String selectedAbsen = 'Status Kehadiran';
-  List<String> dropdownItems = ['Status Kehadiran', 'Hadir', 'Sakit'];
+
+  //Modul Praktikum
+  String selectedModul = 'Pilih Modul Praktikum';
+  List<String> dropdownItems = ['Pilih Modul Praktikum'];
 
   Future<void> saveDataToFirestore() async {
     DateTime currentDate = DateTime.now();
@@ -33,71 +36,33 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
       if (userSnapshot.exists) {
         int userNim = userSnapshot['nim'];
 
-        // Check if the user has already submitted attendance for today with the same code and module
-        QuerySnapshot<Map<String, dynamic>> existingAttendanceSnapshot =
-            await FirebaseFirestore.instance
-                .collection('absensiAsisten')
-                .where('nim', isEqualTo: userNim)
-                .where('tanggal', isEqualTo: formattedDate)
-                .where('kodeAsisten', isEqualTo: _kodeEditingController.text)
-                .where('modul', isEqualTo: _modulEditingController.text)
-                .get();
+        Map<String, dynamic> updatedAbsenData = {
+          'kodeAsisten': _kodeEditingController.text,
+          'judulMateri': selectedModul,
+          'nama': userSnapshot['nama'],
+          'nim': userNim,
+          'tanggal': formattedDate,
+          'timestamp': FieldValue.serverTimestamp(),
+          'keterangan': selectedAbsen
+        };
+        await FirebaseFirestore.instance
+            .collection('absensiAsisten')
+            .add(updatedAbsenData);
 
-        if (existingAttendanceSnapshot.docs.isNotEmpty) {
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text(
-                'Anda sudah melakukan absensi untuk kode kelas dan modul ini hari ini.'),
-            backgroundColor: Colors.red,
-          ));
-        } else {
-          // Check if the kodeKelas exists for the current user
-          QuerySnapshot<Map<String, dynamic>> tokenKelasSnapshot =
-              await FirebaseFirestore.instance
-                  .collection('tokenAsisten')
-                  .where('nim', isEqualTo: userNim)
-                  .where('kodeAsisten', isEqualTo: _kodeEditingController.text)
-                  .get();
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Data berhasil disimpan'),
+          backgroundColor: Colors.green,
+        ));
 
-          if (tokenKelasSnapshot.docs.isEmpty) {
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content:
-                  Text('Data yang anda masukkan tidak terdapat pada database.'),
-              backgroundColor: Colors.red,
-            ));
-            return;
-          }
+        // Update dropdownItems with the new value
+        dropdownItems.add(selectedModul);
+        setState(() {});
 
-          Map<String, dynamic> updatedAbsenData = {
-            'kodeAsisten': _kodeEditingController.text,
-            'modul': _modulEditingController.text,
-            'nama': userSnapshot['nama'],
-            'nim': userNim,
-            'tanggal': formattedDate,
-            'timestamp': FieldValue.serverTimestamp(),
-            'keterangan': selectedAbsen
-          };
-          await FirebaseFirestore.instance
-              .collection('absensiAsisten')
-              .add(updatedAbsenData);
-
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Data berhasil disimpan'),
-            backgroundColor: Colors.green,
-          ));
-
-          // Update dropdownItems with the new value
-          dropdownItems.add(selectedAbsen);
-          setState(() {});
-
-          _kodeEditingController.clear();
-          _modulEditingController.clear();
-          setState(() {
-            selectedAbsen = 'Status Kehadiran';
-          });
-        }
+        _kodeEditingController.clear();
+        setState(() {
+          selectedAbsen = 'Status Kehadiran';
+          selectedModul = 'Pilih Modul Praktikum'; // Reset dropdown to default
+        });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -119,10 +84,10 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
   Future<void> fetchDataFromFirestore() async {
     try {
       QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('absensiAsisten').get();
+          await FirebaseFirestore.instance.collection('silabusPraktikum').get();
       for (var doc in querySnapshot.docs) {
-        String keterangan = doc['keterangan'];
-        dropdownItems.add(keterangan);
+        String judulMateri = doc['judulMateri'];
+        dropdownItems.add(judulMateri);
       }
       setState(() {});
     } catch (e) {
@@ -253,18 +218,45 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
                         Padding(
                           padding: const EdgeInsets.only(top: 20.0),
                           child: SizedBox(
-                            width: 300.0,
-                            child: TextField(
-                              controller: _modulEditingController,
-                              decoration: InputDecoration(
-                                  hintText: ' Masukkan Nama Modul',
-                                  border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                  filled: true,
-                                  fillColor: Colors.white),
-                            ),
-                          ),
+                              width: 300.0,
+                              child: Container(
+                                height: 47.0,
+                                width: 980.0,
+                                decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade700),
+                                    borderRadius: BorderRadius.circular(8.0)),
+                                child: DropdownButton<String>(
+                                  value: selectedModul,
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectedModul = newValue!;
+                                    });
+                                  },
+                                  items: dropdownItems
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem(
+                                        value: value,
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 15.0),
+                                          child: Text(
+                                            value,
+                                            style:
+                                                const TextStyle(fontSize: 16.0),
+                                          ),
+                                        ));
+                                  }).toList(),
+                                  style: TextStyle(color: Colors.grey.shade700),
+                                  icon: const Icon(Icons.arrow_drop_down,
+                                      color: Colors.grey),
+                                  iconSize: 24,
+                                  elevation: 16,
+                                  isExpanded: true,
+                                  underline: Container(),
+                                ),
+                              )),
                         )
                       ]),
 

@@ -244,7 +244,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
         await ref.putData(file.bytes!);
 
         // Get download URL
-        String downloadURL = await ref.getDownloadURL();
+        // String downloadURL = await ref.getDownloadURL();
 
         setState(() {
           _fileName = file.name;
