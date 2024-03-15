@@ -288,13 +288,9 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
                                       selectedAbsen = newValue!;
                                     });
                                   },
-                                  items: [
-                                    'Status Kehadiran',
-                                    'Hadir',
-                                    'Telat',
-                                    'Sakit'
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
+                                  items: ['Status Kehadiran', 'Hadir', 'Sakit']
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
                                     return DropdownMenuItem(
                                         value: value,
                                         child: Padding(

@@ -4,7 +4,7 @@ import 'package:laksi/Pengguna/Mahasiswa/Asisten/Pengaturan/Screen/pengaturan.da
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Screen/absensi_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
 
-import '../../Absensi/Screen/absensi_ass.dart';
+import '../../Absensi/Form/Screen/absensi_ass.dart';
 import '../../Kelas/Screen/kelas_asisten.dart';
 
 class PengaturanNav extends StatefulWidget {

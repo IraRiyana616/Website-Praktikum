@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Absensi/Screen/absensi_ass.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Absensi/Form/Screen/absensi_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Data%20Mahasiswa/Screen/datamahasiswa_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Screen/hasilstudi_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Screen/kelas_asisten.dart';

@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../../../../Asisten/Kelas/Komponen/Absensi/Screen/absensi_asst.dart';
-import '../Modul/tabel_modul.dart';
+import '../../../../../Asisten/Kelas/Komponen/Modul/tabel_modul.dart';
+import '../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
 
 class DeskripsiKelas extends StatefulWidget {
   final String kodeKelas;
@@ -142,6 +141,7 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                               ),
                               Row(
                                 children: [
+                                  //Deskripsi Kelas
                                   Padding(
                                     padding: const EdgeInsets.only(
                                       top: 38.0,
@@ -155,13 +155,16 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                       ),
                                     ),
                                   ),
+                                  //Absensi Mahasiswa
                                   GestureDetector(
                                     onTap: () {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const AbsensiMahasiswaScreen()));
+                                                  AbsensiPraktikanScreen(
+                                                    kodeKelas: widget.kodeKelas,
+                                                  )));
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
@@ -176,27 +179,31 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                       ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 50.0,
-                                      top: 38.0,
-                                    ),
-                                    child: Text(
-                                      'Tugas',
-                                      style: GoogleFonts.quicksand(
-                                        fontSize: 16.0,
+                                  GestureDetector(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 50.0,
+                                        top: 38.0,
+                                      ),
+                                      child: Text(
+                                        'Tugas',
+                                        style: GoogleFonts.quicksand(
+                                          fontSize: 16.0,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 50.0,
-                                      top: 38.0,
-                                    ),
-                                    child: Text(
-                                      'Laporan',
-                                      style: GoogleFonts.quicksand(
-                                        fontSize: 16.0,
+                                  GestureDetector(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 50.0,
+                                        top: 38.0,
+                                      ),
+                                      child: Text(
+                                        'Laporan',
+                                        style: GoogleFonts.quicksand(
+                                          fontSize: 16.0,
+                                        ),
                                       ),
                                     ),
                                   )
@@ -438,7 +445,9 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                 ),
                               ),
 
-                              const TabelSilabusPraktikum(),
+                              TabelSilabusPraktikum(
+                                  kodeKelas: widget.kodeKelas),
+
                               const SizedBox(height: 50.0)
                             ],
                           ),
@@ -455,3 +464,80 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
     );
   }
 }
+///Catatan 
+///import 'package:flutter/material.dart';
+// import 'package:google_fonts/google_fonts.dart';
+
+// class YourWidget extends StatefulWidget {
+//   @override
+//   _YourWidgetState createState() => _YourWidgetState();
+// }
+
+// class _YourWidgetState extends State<YourWidget> {
+//   bool isAbsensiClicked = false;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       children: [
+//         Padding(
+//           padding: const EdgeInsets.only(
+//             top: 38.0,
+//             left: 95.0,
+//           ),
+//           child: Text(
+//             'Deskripsi',
+//             style: GoogleFonts.quicksand(
+//               fontSize: 16.0,
+//               fontWeight: FontWeight.bold,
+//             ),
+//           ),
+//         ),
+//         GestureDetector(
+//           onTap: () {
+//             setState(() {
+//               isAbsensiClicked = !isAbsensiClicked;
+//             });
+//           },
+//           child: Padding(
+//             padding: const EdgeInsets.only(
+//               left: 50.0,
+//               top: 38.0,
+//             ),
+//             child: Text(
+//               'Absensi',
+//               style: GoogleFonts.quicksand(
+//                 fontSize: 16.0,
+//                 fontWeight: isAbsensiClicked ? FontWeight.bold : FontWeight.normal,
+//               ),
+//             ),
+//           ),
+//         ),
+//         Padding(
+//           padding: const EdgeInsets.only(
+//             left: 50.0,
+//             top: 38.0,
+//           ),
+//           child: Text(
+//             'Tugas',
+//             style: GoogleFonts.quicksand(
+//               fontSize: 16.0,
+//             ),
+//           ),
+//         ),
+//         Padding(
+//           padding: const EdgeInsets.only(
+//             left: 50.0,
+//             top: 38.0,
+//           ),
+//           child: Text(
+//             'Laporan',
+//             style: GoogleFonts.quicksand(
+//               fontSize: 16.0,
+//             ),
+//           ),
+//         )
+//       ],
+//     );
+//   }
+// }

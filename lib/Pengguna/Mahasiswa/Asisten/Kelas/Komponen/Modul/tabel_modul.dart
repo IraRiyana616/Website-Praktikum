@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TabelSilabusPraktikum extends StatefulWidget {
-  const TabelSilabusPraktikum({super.key});
+  final String kodeKelas;
+
+  const TabelSilabusPraktikum({Key? key, required this.kodeKelas})
+      : super(key: key);
 
   @override
   State<TabelSilabusPraktikum> createState() => _TabelSilabusPraktikumState();
@@ -16,11 +19,15 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
   List<DataSilabus> filteredDataSilabus = [];
 
   Future<void> fetchDataFromFirestore() async {
-    final QuerySnapshot silabusSnapshot =
-        await FirebaseFirestore.instance.collection('silabusPraktikum').get();
+    final QuerySnapshot silabusSnapshot = await FirebaseFirestore.instance
+        .collection('silabusPraktikum')
+        .where('kodeKelas', isEqualTo: widget.kodeKelas)
+        .get();
 
-    final QuerySnapshot deskripsiSnapshot =
-        await FirebaseFirestore.instance.collection('deskripsiKelas').get();
+    final QuerySnapshot deskripsiSnapshot = await FirebaseFirestore.instance
+        .collection('deskripsiKelas')
+        .where('kodeKelas', isEqualTo: widget.kodeKelas)
+        .get();
 
     final Map<String, String> kodeKelasMap = Map.fromEntries(
       deskripsiSnapshot.docs.map(
@@ -169,7 +176,7 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index) {
             ),
           )
         ],
-      ))
+      )),
     ],
   );
 }

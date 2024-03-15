@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Absensi/Screen/absensi_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Data%20Mahasiswa/Screen/datamahasiswa_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Screen/hasilstudi_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Screen/absensi_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
-
-import '../../Kelas/Screen/kelas_asisten.dart';
-import '../../Pengaturan/Screen/pengaturan.dart';
+import '../../../Kelas/Screen/kelas_asisten.dart';
+import '../../../Pengaturan/Screen/pengaturan.dart';
+import '../Screen/absensi_ass.dart';
 
 class AbsensiAsistenNav extends StatefulWidget {
   const AbsensiAsistenNav({super.key});
