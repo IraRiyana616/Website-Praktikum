@@ -18,6 +18,20 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
   List<DataSilabus> demoDataSilabus = [];
   List<DataSilabus> filteredDataSilabus = [];
 
+  Future<void> deleteDataFromFirestore(String documentId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('silabusPraktikum')
+          .doc(documentId)
+          .delete();
+      fetchDataFromFirestore();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error deleting document: $e');
+      }
+    }
+  }
+
   Future<void> fetchDataFromFirestore() async {
     final QuerySnapshot silabusSnapshot = await FirebaseFirestore.instance
         .collection('silabusPraktikum')
@@ -44,6 +58,7 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
         jadwal: data['waktuPraktikum'],
         file: data['modulPraktikum'],
         deskripsiKelas: kodeKelasMap[kodeKelas] ?? '',
+        documentId: doc.id, // Add documentId to DataSilabus
       );
     }).toList();
 
@@ -68,7 +83,7 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
           child: Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 25.0),
             child: Container(
-              width: 900.0,
+              width: 1020.0,
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey.shade400),
                   borderRadius: BorderRadius.circular(6.0)),
@@ -94,8 +109,17 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
+                        DataColumn(
+                          label: Text(
+                            '',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                       ],
-                      source: DataSource(filteredDataSilabus),
+                      source: DataSource(
+                          filteredDataSilabus,
+                          deleteDataFromFirestore,
+                          context), // Pass delete function
                       rowsPerPage:
                           calculateRowsPerPage(filteredDataSilabus.length),
                     )
@@ -116,7 +140,7 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 25;
+    const int defaultRowsPerPage = 15;
 
     if (rowCount <= defaultRowsPerPage) {
       return rowCount;
@@ -132,6 +156,7 @@ class DataSilabus {
   String jadwal;
   String file;
   String deskripsiKelas;
+  String documentId; // Added documentId field
 
   DataSilabus({
     required this.modul,
@@ -139,10 +164,13 @@ class DataSilabus {
     required this.kode,
     required this.file,
     required this.deskripsiKelas,
+    required this.documentId, // Initialize documentId in constructor
   });
 }
 
-DataRow dataFileDataRow(DataSilabus fileInfo, int index) {
+DataRow dataFileDataRow(DataSilabus fileInfo, int index,
+    Function(String) onDelete, BuildContext context) {
+  // Pass onDelete function
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -177,6 +205,47 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index) {
           )
         ],
       )),
+      DataCell(Row(
+        children: [
+          const Icon(Icons.delete, color: Colors.grey),
+          const SizedBox(
+            width: 5.0,
+          ),
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text(
+                        'Hapus Modul',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16.0),
+                      ),
+                      content:
+                          const Text('Apakah Anda yakin ingin menghapusnya ?'),
+                      actions: [
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Batal')),
+                        TextButton(
+                            onPressed: () {
+                              onDelete(fileInfo.documentId);
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Hapus'))
+                      ],
+                    );
+                  });
+            },
+            child: const Text('Hapus Data',
+                style:
+                    TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+          )
+        ],
+      ))
     ],
   );
 }
@@ -214,8 +283,10 @@ Color getRowColor(int index) {
 
 class DataSource extends DataTableSource {
   final List<DataSilabus> data;
+  final Function(String) onDelete;
+  final BuildContext context;
 
-  DataSource(this.data);
+  DataSource(this.data, this.onDelete, this.context);
 
   @override
   DataRow? getRow(int index) {
@@ -223,7 +294,7 @@ class DataSource extends DataTableSource {
       return null;
     }
     final fileInfo = data[index];
-    return dataFileDataRow(fileInfo, index);
+    return dataFileDataRow(fileInfo, index, onDelete, context);
   }
 
   @override

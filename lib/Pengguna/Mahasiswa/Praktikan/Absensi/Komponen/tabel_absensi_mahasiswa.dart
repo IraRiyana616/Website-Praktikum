@@ -30,9 +30,9 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
           await FirebaseFirestore.instance.collection('tokenKelas').get();
 
       final Map<String, Map<String, dynamic>> tokenDataMap = {};
-      tokenSnapshot.docs.forEach((doc) {
+      for (var doc in tokenSnapshot.docs) {
         tokenDataMap[doc['kodeKelas'] + doc['nim'].toString()] = doc.data();
-      });
+      }
 
       final List<AbsensiPraktikan> absenList = absensiSnapshot.docs.map((doc) {
         final Map<String, dynamic> data = doc.data();

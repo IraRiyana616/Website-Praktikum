@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Screen/kelas_asisten.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Komponen/tabel_absensi_mahasiswa.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
 
 class AbsensiPraktikanScreen extends StatefulWidget {
   final String kodeKelas;

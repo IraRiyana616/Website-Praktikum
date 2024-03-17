@@ -44,12 +44,6 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
     });
   }
 
-  void _onTextChanged() {
-    setState(() {
-      filterData(_textController.text);
-    });
-  }
-
   void filterData(String query) {
     setState(() {
       filteredDataAbsensi = demoDataAbsensi

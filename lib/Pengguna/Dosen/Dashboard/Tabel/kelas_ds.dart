@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
+import '../../../Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
 import '../Komponen/form_kelas.dart';
 
 class TabelKelasDosen extends StatefulWidget {

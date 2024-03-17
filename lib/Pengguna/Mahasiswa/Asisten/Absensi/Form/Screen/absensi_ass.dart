@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AbsensiAsisten extends StatefulWidget {
-  const AbsensiAsisten({Key? key});
+  const AbsensiAsisten({super.key});
 
   @override
   State<AbsensiAsisten> createState() => _AbsensiAsistenState();
@@ -49,6 +49,7 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
             .collection('absensiAsisten')
             .add(updatedAbsenData);
 
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Data berhasil disimpan'),
           backgroundColor: Colors.green,

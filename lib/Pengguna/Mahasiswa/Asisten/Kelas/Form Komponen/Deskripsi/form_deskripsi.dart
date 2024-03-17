@@ -136,17 +136,19 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
   String _fileName = "";
 
   void _saveSilabus() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference modulCollection =
+        firestore.collection('silabusPraktikum');
+
     String kodeKelas = _kodeAsistenController.text;
     String judulMateri = _judulMateriController.text;
     String waktuPraktikum = _waktuPraktikumController.text;
-    String modulPraktikum = _fileName; // Mengambil nama file modul
+    String modulPraktikum = _fileName;
 
-    // Cek apakah kodeKelas, judulMateri, waktuPraktikum, dan modulPraktikum terisi
     if (kodeKelas.isEmpty ||
         judulMateri.isEmpty ||
         waktuPraktikum.isEmpty ||
         modulPraktikum.isEmpty) {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Harap lengkapi semua data'),
         backgroundColor: Colors.red,
@@ -155,59 +157,44 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
       return;
     }
 
-    // Cek apakah kodeKelas terdapat dalam Firestore 'tokenAsisten'
-    bool kodeKelasExists = false;
-    await FirebaseFirestore.instance
+    QuerySnapshot kodeKelasSnapshot = await firestore
         .collection('tokenAsisten')
-        .doc(kodeKelas)
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      if (documentSnapshot.exists) {
-        kodeKelasExists = true;
-      }
-    });
+        .where('kodeKelas', isEqualTo: kodeKelas)
+        .get();
 
-    if (!kodeKelasExists) {
-      // Jika kodeKelas tidak terdapat pada database
+    if (kodeKelasSnapshot.docs.isEmpty) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Kode kelas tidak terdapat pada database'),
+        content: Text('Kode Kelas tidak terdapat pada database'),
         backgroundColor: Colors.red,
         duration: Duration(seconds: 2),
       ));
       return;
     }
-
-    // Cek apakah data dengan kodeKelas dan judulMateri yang sama sudah ada
-    bool dataExists = false;
-    await FirebaseFirestore.instance
-        .collection('silabusPraktikum')
+    QuerySnapshot existingDataSnapshot = await modulCollection
         .where('kodeKelas', isEqualTo: kodeKelas)
         .where('judulMateri', isEqualTo: judulMateri)
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      if (querySnapshot.docs.isNotEmpty) {
-        dataExists = true;
-      }
-    });
+        .get();
 
-    if (dataExists) {
-      // Jika data sudah ada
+    if (existingDataSnapshot.docs.isNotEmpty) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Data telah terdaftar pada database'),
+        content: Text('Judul Materi sudah ada untuk Kode Kelas ini'),
         backgroundColor: Colors.red,
         duration: Duration(seconds: 2),
       ));
       return;
     }
 
-    // Simpan data ke Firestore 'silabusPraktikum'
-    await FirebaseFirestore.instance.collection('silabusPraktikum').add({
+    QuerySnapshot querySnapshot = await modulCollection.get();
+    int documentCount = querySnapshot.docs.length;
+    int nextDocumentId = documentCount + 1;
+
+    await modulCollection.doc(nextDocumentId.toString()).set({
       'kodeKelas': kodeKelas,
       'judulMateri': judulMateri,
       'waktuPraktikum': waktuPraktikum,
-      'modulPraktikum': modulPraktikum, // Simpan nama file modul
+      'modulPraktikum': modulPraktikum,
     });
 
     // ignore: use_build_context_synchronously
@@ -217,7 +204,6 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
       duration: Duration(seconds: 2),
     ));
 
-    // Reset form
     _kodeAsistenController.clear();
     _judulMateriController.clear();
     _waktuPraktikumController.clear();
