@@ -773,7 +773,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                'Waktu Praktikum',
+                                                'Jadwal Praktikum',
                                                 style: GoogleFonts.quicksand(
                                                   fontSize: 20.0,
                                                   fontWeight: FontWeight.bold,
@@ -789,7 +789,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                                                         _waktuPraktikumController,
                                                     decoration: InputDecoration(
                                                       hintText:
-                                                          'Masukkan Waktu Praktikum',
+                                                          'Masukkan Jadwal Praktikum',
                                                       border:
                                                           OutlineInputBorder(
                                                         borderRadius:

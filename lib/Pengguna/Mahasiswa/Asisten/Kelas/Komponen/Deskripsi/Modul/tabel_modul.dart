@@ -99,7 +99,7 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
                         ),
                         DataColumn(
                           label: Text(
-                            'Waktu Praktikum',
+                            'Jadwal Praktikum',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -179,9 +179,12 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
     ),
     cells: [
       DataCell(
-        SizedBox(
-          width: 250.0,
-          child: Text(getLimitedText(fileInfo.modul, 50)),
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: SizedBox(
+            width: 250.0,
+            child: Text(getLimitedText(fileInfo.modul, 50)),
+          ),
         ),
       ),
       DataCell(Text(fileInfo.jadwal)),

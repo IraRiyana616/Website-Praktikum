@@ -1,13 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../Navigation/kelas_assnav.dart';
 import '../Deskripsi/form_deskripsi.dart';
 import '../Laporan/form_laporan.dart';
 
 class FormPengumpulanTugas extends StatefulWidget {
-  const FormPengumpulanTugas({super.key});
+  const FormPengumpulanTugas({Key? key}) : super(key: key);
 
   @override
   State<FormPengumpulanTugas> createState() => _FormPengumpulanTugasState();
@@ -18,6 +17,8 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
       TextEditingController();
   final TextEditingController _judulModulController = TextEditingController();
   final TextEditingController _kodeKelasController = TextEditingController();
+  final TextEditingController _bukaController = TextEditingController();
+  final TextEditingController _tutupController = TextEditingController();
 
   //Jumlah kata maksimum yang diizinkan pada deskripsi kelas
   int _remainingWords = 1500;
@@ -43,10 +44,10 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
   Future<bool> _checkKodeKelas(String kodeKelas) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     //Menggunakan collection 'data_kelas' sebagai referensi
-    CollectionReference kelasCollection = firestore.collection('token_asisten');
+    CollectionReference kelasCollection = firestore.collection('tokenAsisten');
     //Melakukan query untuk mencari data dengan kode kelas yang sesuai
     QuerySnapshot querySnapshot =
-        await kelasCollection.where('kode_kelas', isEqualTo: kodeKelas).get();
+        await kelasCollection.where('kodeKelas', isEqualTo: kodeKelas).get();
     //Mengembalikan true jika data ditemukan, false jika tidak
     return querySnapshot.docs.isNotEmpty;
   }
@@ -70,7 +71,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
 
     //Mendapatka reference untuk collection 'pengumpulan_tugas'
     CollectionReference tugasCollection =
-        firestore.collection('pengumpulan_tugas');
+        firestore.collection('pengumpulanLatihan');
 
     //Mengambil data terakhir di collection untuk mendapatkan nomor urut
     QuerySnapshot querySnapshot = await tugasCollection.get();
@@ -80,9 +81,11 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
     int nextDocumentId = documentCount + 1;
     //Menyimpan pengumpulan tugas ke Firestore dengan document_id nomor urut
     await tugasCollection.doc(nextDocumentId.toString()).set({
-      'kode_kelas': _kodeKelasController.text,
-      'deskripsiTugas': _deskripsiTugasController.text,
-      'judulModul': _judulModulController.text,
+      'kodeKelas': _kodeKelasController.text,
+      'deskripsiLathan': _deskripsiTugasController.text,
+      'judulMateri': _judulModulController.text,
+      'aksesLatihan': DateTime.parse(_bukaController.text),
+      'tutupAksesLatihan': DateTime.parse(_tutupController.text),
     });
     //Tampilkan pesan sukses
     // ignore: use_build_context_synchronously
@@ -95,68 +98,106 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
     _kodeKelasController.clear();
     _judulModulController.clear();
     _deskripsiTugasController.clear();
+    _bukaController.clear();
+    _tutupController.clear();
+  }
+
+  Future<void> _selectDate(
+      BuildContext context, TextEditingController controller) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2101));
+    if (picked != null) {
+      // Jika tanggal dipilih, pilih juga waktu
+      await _selectTime(context, controller, picked);
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context,
+      TextEditingController controller, DateTime selectedDate) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      // Gabungkan tanggal dan waktu yang dipilih
+      DateTime selectedDateTime = DateTime(
+        selectedDate.year,
+        selectedDate.month,
+        selectedDate.day,
+        picked.hour,
+        picked.minute,
+      );
+
+      setState(() {
+        controller.text = selectedDateTime.toString();
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(70.0),
-          child: AppBar(
-            leading: IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const KelasAsistenNav()));
-                },
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
+        preferredSize: const Size.fromHeight(70.0),
+        child: AppBar(
+          leading: IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const KelasAsistenNav()));
+              },
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.black,
+              )),
+          backgroundColor: const Color(0xFFF7F8FA),
+          title: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(
+                  width: 10.0,
+                ),
+                Expanded(
+                    child: Text(
+                  'Kelas Praktikum',
+                  style: GoogleFonts.quicksand(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
                 )),
-            backgroundColor: const Color(0xFFF7F8FA),
-            title: Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(
-                    width: 10.0,
-                  ),
-                  Expanded(
-                      child: Text(
-                    'Kelas Praktikum',
-                    style: GoogleFonts.quicksand(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
-                  )),
-                  const SizedBox(
-                    width: 800.0,
-                  ),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.logout,
-                        color: Color(0xFF031F31),
-                      )),
-                  const SizedBox(
-                    width: 10.0,
-                  ),
-                  Text(
-                    'Log out',
-                    style: GoogleFonts.quicksand(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF031F31)),
-                  ),
-                  const SizedBox(
-                    width: 50.0,
-                  )
-                ],
-              ),
+                const SizedBox(
+                  width: 800.0,
+                ),
+                IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.logout,
+                      color: Color(0xFF031F31),
+                    )),
+                const SizedBox(
+                  width: 10.0,
+                ),
+                Text(
+                  'Log out',
+                  style: GoogleFonts.quicksand(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF031F31)),
+                ),
+                const SizedBox(
+                  width: 50.0,
+                )
+              ],
             ),
-          )),
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Container(
           color: const Color(0xFFE3E8EF),
@@ -257,7 +298,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Kode Asisten',
+                                              'Kode Kelas',
                                               style: GoogleFonts.quicksand(
                                                 fontSize: 20.0,
                                                 fontWeight: FontWeight.bold,
@@ -273,7 +314,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                                                       _kodeKelasController,
                                                   decoration: InputDecoration(
                                                     hintText:
-                                                        'Masukkan Kode Asisten',
+                                                        'Masukkan Kode Kelas',
                                                     border: OutlineInputBorder(
                                                       borderRadius:
                                                           BorderRadius.circular(
@@ -285,18 +326,10 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                                                 ),
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-
-                                      // Judul Modul
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 20.0, left: 40.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
+                                            const SizedBox(
+                                              height: 15.0,
+                                            ),
+                                            //Judul Modul
                                             Text(
                                               'Judul Modul',
                                               style: GoogleFonts.quicksand(
@@ -329,13 +362,105 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                                           ],
                                         ),
                                       ),
+
+                                      // Judul Modul
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 20.0, left: 40.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Akses Latihan',
+                                              style: GoogleFonts.quicksand(
+                                                fontSize: 20.0,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 20.0),
+                                              child: SizedBox(
+                                                width: 580.0,
+                                                child: TextField(
+                                                  readOnly: true,
+                                                  controller: _bukaController,
+                                                  decoration: InputDecoration(
+                                                    hintText:
+                                                        'Pilih Tanggal Akses',
+                                                    border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10.0),
+                                                    ),
+                                                    filled: true,
+                                                    fillColor: Colors.white,
+                                                    suffixIcon: IconButton(
+                                                      icon: const Icon(
+                                                          Icons.calendar_today),
+                                                      onPressed: () async {
+                                                        await _selectDate(
+                                                            context,
+                                                            _bukaController);
+                                                      },
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 15.0,
+                                            ),
+                                            //Judul Modul
+                                            Text(
+                                              'Tutup Akses',
+                                              style: GoogleFonts.quicksand(
+                                                fontSize: 20.0,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 20.0),
+                                              child: SizedBox(
+                                                width: 580.0,
+                                                child: TextField(
+                                                  readOnly: true,
+                                                  controller: _tutupController,
+                                                  decoration: InputDecoration(
+                                                    hintText:
+                                                        'Pilih Tanggal Tutup Akses',
+                                                    border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10.0),
+                                                    ),
+                                                    filled: true,
+                                                    fillColor: Colors.white,
+                                                    suffixIcon: IconButton(
+                                                      icon: const Icon(
+                                                          Icons.calendar_today),
+                                                      onPressed: () async {
+                                                        await _selectDate(
+                                                            context,
+                                                            _tutupController);
+                                                      },
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   ),
 
                                   Padding(
                                     padding: const EdgeInsets.only(top: 30.0),
                                     child: Text(
-                                      'Deskripsi Tugas',
+                                      'Deskripsi Latihan',
                                       style: GoogleFonts.quicksand(
                                           fontSize: 20.0,
                                           fontWeight: FontWeight.bold),
@@ -355,7 +480,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                                         },
                                         decoration: InputDecoration(
                                             hintText:
-                                                'Masukkan Deskripsi Tugas',
+                                                'Masukkan Deskripsi Latihan',
                                             border: OutlineInputBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(
@@ -398,9 +523,9 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                                 ],
                               ),
                             ),
-                          )
+                          ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
