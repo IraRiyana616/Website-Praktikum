@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Pre-Test/pre_test.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TabelSilabusPraktikum extends StatefulWidget {
@@ -179,11 +180,22 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
     ),
     cells: [
       DataCell(
-        MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: SizedBox(
-            width: 250.0,
-            child: Text(getLimitedText(fileInfo.modul, 50)),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => UjianPemahaman(
+                          kodeKelas: fileInfo.kode,
+                          modul: fileInfo.modul,
+                        )));
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: SizedBox(
+              width: 250.0,
+              child: Text(getLimitedText(fileInfo.modul, 50)),
+            ),
           ),
         ),
       ),

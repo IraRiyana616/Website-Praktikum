@@ -21,11 +21,11 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
   final TextEditingController _tutupController = TextEditingController();
 
   //Jumlah kata maksimum yang diizinkan pada deskripsi kelas
-  int _remainingWords = 1500;
+  int _remainingWords = 1000;
   void updateRemainingWords(String text) {
     //Menghitung sisa kata dan memperbaharui state
     int currentWordCount = text.split('').length;
-    int remaining = 1500 - currentWordCount;
+    int remaining = 1000 - currentWordCount;
 
     setState(() {
       _remainingWords = remaining;
@@ -34,10 +34,23 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
     if (_remainingWords <= 0) {
       //Menonaktifkan pengeditan jika sisa kata habis
       _deskripsiTugasController.text =
-          _deskripsiTugasController.text.substring(0, 2500);
+          _deskripsiTugasController.text.substring(0, 1000);
       _deskripsiTugasController.selection = TextSelection.fromPosition(
           TextPosition(offset: _deskripsiTugasController.text.length));
     }
+  }
+
+  Future<bool> _checkJudulMateri(String judulMateri) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference silabusCollection =
+        firestore.collection('silabusPraktikum');
+
+    QuerySnapshot querySnapshot = await silabusCollection
+        .where('judulMateri', isEqualTo: judulMateri)
+        .get();
+
+    // Mengembalikan true jika data ditemukan, false jika tidak
+    return querySnapshot.docs.isNotEmpty;
   }
 
   // Menambah fungsi untuk mengecek kode kelas
@@ -52,8 +65,68 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
     return querySnapshot.docs.isNotEmpty;
   }
 
-  //Menghubungkan ke saveTugasForm pada Firebase
+  // //Menghubungkan ke saveTugasForm pada Firebase
+  // void _saveTugasForm() async {
+  //   //Memeriksa apakah kode kelas terdapat dalam Firestore 'data_kelas'
+  //   bool isKodeKelasValid = await _checkKodeKelas(_kodeKelasController.text);
+  //   //Jika tidak valid, tampilkan snackbar dan berhenti eksekusi
+  //   if (!isKodeKelasValid) {
+  //     // ignore: use_build_context_synchronously
+  //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+  //       content: Text('Kode kelas tidak terdapat pada database'),
+  //       backgroundColor: Colors.red,
+  //       duration: Duration(seconds: 2),
+  //     ));
+  //     return;
+  //   }
+  //   //Mendapatkan instance Firestore
+  //   FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  //   //Mendapatka reference untuk collection 'pengumpulan_tugas'
+  //   CollectionReference tugasCollection =
+  //       firestore.collection('pengumpulanLatihan');
+
+  //   //Mengambil data terakhir di collection untuk mendapatkan nomor urut
+  //   QuerySnapshot querySnapshot = await tugasCollection.get();
+  //   int documentCount = querySnapshot.docs.length;
+
+  //   //Membuat nomor urut berikutnya
+  //   int nextDocumentId = documentCount + 1;
+  //   //Menyimpan pengumpulan tugas ke Firestore dengan document_id nomor urut
+  //   await tugasCollection.doc(nextDocumentId.toString()).set({
+  //     'kodeKelas': _kodeKelasController.text,
+  //     'deskripsiLatihan': _deskripsiTugasController.text,
+  //     'judulMateri': _judulModulController.text,
+  //     'aksesLatihan': DateTime.parse(_bukaController.text),
+  //     'tutupAksesLatihan': DateTime.parse(_tutupController.text),
+  //   });
+  //   //Tampilkan pesan sukses
+  //   // ignore: use_build_context_synchronously
+  //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+  //     content: Text('Data berhasil disimpan'),
+  //     backgroundColor: Colors.green,
+  //     duration: Duration(seconds: 2),
+  //   ));
+  //   //Clear TextField
+  //   _kodeKelasController.clear();
+  //   _judulModulController.clear();
+  //   _deskripsiTugasController.clear();
+  //   _bukaController.clear();
+  //   _tutupController.clear();
+  // }
   void _saveTugasForm() async {
+    bool isJudulMateriValid =
+        await _checkJudulMateri(_judulModulController.text);
+    if (!isJudulMateriValid) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Judul materi tidak terdapat pada database'),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 2),
+      ));
+      return;
+    }
+
     //Memeriksa apakah kode kelas terdapat dalam Firestore 'data_kelas'
     bool isKodeKelasValid = await _checkKodeKelas(_kodeKelasController.text);
     //Jika tidak valid, tampilkan snackbar dan berhenti eksekusi
@@ -66,6 +139,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
       ));
       return;
     }
+
     //Mendapatkan instance Firestore
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -82,7 +156,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
     //Menyimpan pengumpulan tugas ke Firestore dengan document_id nomor urut
     await tugasCollection.doc(nextDocumentId.toString()).set({
       'kodeKelas': _kodeKelasController.text,
-      'deskripsiLathan': _deskripsiTugasController.text,
+      'deskripsiLatihan': _deskripsiTugasController.text,
       'judulMateri': _judulModulController.text,
       'aksesLatihan': DateTime.parse(_bukaController.text),
       'tutupAksesLatihan': DateTime.parse(_tutupController.text),
@@ -111,6 +185,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
         lastDate: DateTime(2101));
     if (picked != null) {
       // Jika tanggal dipilih, pilih juga waktu
+      // ignore: use_build_context_synchronously
       await _selectTime(context, controller, picked);
     }
   }
@@ -498,7 +573,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                                     padding:
                                         const EdgeInsets.only(left: 1065.0),
                                     child: Text(
-                                      'Sisa Kata: $_remainingWords/1500',
+                                      'Sisa Kata: $_remainingWords/1000',
                                       style:
                                           const TextStyle(color: Colors.grey),
                                     ),
