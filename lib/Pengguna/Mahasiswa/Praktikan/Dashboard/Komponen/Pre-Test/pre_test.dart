@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class UjianPemahaman extends StatefulWidget {
   final String kodeKelas;
@@ -13,12 +17,100 @@ class UjianPemahaman extends StatefulWidget {
 }
 
 class _UjianPemahamanState extends State<UjianPemahaman> {
-  int _selectedIndex = 0; // untuk mengatur index bottom navigation
+  late int userNim;
+  late String userName;
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  Future<void> _getData() async {
+    try {
+      String userUid = FirebaseAuth.instance.currentUser!.uid;
+      // ignore: unnecessary_null_comparison
+      if (userUid != null) {
+        DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+            await FirebaseFirestore.instance
+                .collection('akun_mahasiswa')
+                .doc(userUid)
+                .get();
+
+        if (userSnapshot.exists) {
+          userNim = userSnapshot['nim'];
+          userName = userSnapshot['nama'];
+        } else {
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Data akun tidak ditemukan'),
+            backgroundColor: Colors.red,
+          ));
+          return;
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Harap login terlebih dahulu'),
+          backgroundColor: Colors.red,
+        ));
+        return;
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $e'),
+        backgroundColor: Colors.red,
+      ));
+      if (kDebugMode) {
+        print('Error: $e');
+      }
+      return;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getData();
+  }
+
+  Future<void> uploadFile(String fileName, PlatformFile file) async {
+    try {
+      final firebase_storage.Reference storageRef = firebase_storage
+          .FirebaseStorage.instance
+          .ref()
+          .child('pre-test/${widget.kodeKelas}/${widget.modul}/$fileName');
+
+      await storageRef.putData(file.bytes!);
+
+      await FirebaseFirestore.instance.collection('pre-test').add({
+        'namaFile': fileName,
+        'waktuPengumpulan': DateTime.now(),
+        'nim': userNim,
+        'nama': userName,
+        'kodeKelas': widget.kodeKelas,
+      });
+
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Data berhasil disimpan'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
+      ));
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error uploading file: $e');
+      }
+    }
+  }
+
+  bool isButtonVisible(Map<String, dynamic> data) {
+    Timestamp? aksesLatihan = data['aksesLatihan'];
+    Timestamp? tutupAksesLatihan = data['tutupAksesLatihan'];
+    Timestamp now = Timestamp.now();
+
+    if (aksesLatihan != null && tutupAksesLatihan != null) {
+      // Perbandingan menggunakan nilai waktu dalam objek Timestamp
+      if (now.seconds > aksesLatihan.seconds &&
+          now.seconds < tutupAksesLatihan.seconds) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @override
@@ -128,36 +220,97 @@ class _UjianPemahamanState extends State<UjianPemahaman> {
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       left: 75.0, top: 30.0),
-                                  child: SizedBox(
-                                    height: 45.0,
-                                    width: 150.0,
-                                    child: ElevatedButton(
-                                      style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                          const Color(0xFF3CBEA9),
-                                        ),
-                                      ),
-                                      onPressed: () {},
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.upload,
-                                            color: Colors.white,
-                                          ),
-                                          const SizedBox(width: 5.0),
-                                          Text(
-                                            'Upload File',
-                                            style: GoogleFonts.quicksand(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14.0,
-                                              color: Colors.white,
+                                  child: isButtonVisible(data)
+                                      ? SizedBox(
+                                          height: 45.0,
+                                          width: 150.0,
+                                          child: ElevatedButton(
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all<
+                                                      Color>(
+                                                const Color(0xFF3CBEA9),
+                                              ),
+                                            ),
+                                            onPressed: () async {
+                                              try {
+                                                FilePickerResult? result =
+                                                    await FilePicker.platform
+                                                        .pickFiles();
+
+                                                if (result != null) {
+                                                  PlatformFile file =
+                                                      result.files.first;
+                                                  String fileName = file.name;
+
+                                                  // Upload file and save details to Firestore
+                                                  await uploadFile(
+                                                      fileName, file);
+
+                                                  if (kDebugMode) {
+                                                    print(
+                                                        'Selected file: $fileName');
+                                                  }
+                                                } else {
+                                                  // User canceled the picker
+                                                  if (kDebugMode) {
+                                                    print(
+                                                        'File picker canceled');
+                                                  }
+                                                }
+                                              } catch (e) {
+                                                if (kDebugMode) {
+                                                  print(
+                                                      'Error picking/uploading file: $e');
+                                                }
+                                              }
+                                            },
+                                            child: Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.upload,
+                                                  color: Colors.white,
+                                                ),
+                                                const SizedBox(width: 5.0),
+                                                Text(
+                                                  'Upload File',
+                                                  style: GoogleFonts.quicksand(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14.0,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                        )
+                                      : SizedBox(
+                                          height: 45.0,
+                                          width: 150.0,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.grey,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        10.0)),
+                                            child: Row(children: [
+                                              const SizedBox(width: 15.0),
+                                              const Icon(
+                                                Icons.upload,
+                                                color: Colors.white,
+                                              ),
+                                              const SizedBox(width: 5.0),
+                                              Text(
+                                                'Upload File',
+                                                style: GoogleFonts.quicksand(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14.0,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ]),
+                                          ),
+                                        ), // Atau Container() jika tidak ingin menampilkan apa pun
                                 ),
                                 const SizedBox(height: 35.0),
                               ],
@@ -173,25 +326,6 @@ class _UjianPemahamanState extends State<UjianPemahaman> {
             }).toList(),
           );
         },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.school),
-            label: 'School',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
       ),
     );
   }
