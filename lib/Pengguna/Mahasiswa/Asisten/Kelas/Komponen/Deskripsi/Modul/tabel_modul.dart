@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Modul/Komponen/Latihan/latihan_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Pre-Test/pre_test.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -185,7 +186,7 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => UjianPemahaman(
+                    builder: (context) => LatihanAsisten(
                           kodeKelas: fileInfo.kode,
                           modul: fileInfo.modul,
                         )));

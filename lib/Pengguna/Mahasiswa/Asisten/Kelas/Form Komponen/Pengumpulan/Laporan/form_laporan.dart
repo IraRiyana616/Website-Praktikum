@@ -1,24 +1,62 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../Navigation/kelas_assnav.dart';
-import '../Deskripsi/form_deskripsi.dart';
-import '../Laporan/form_laporan.dart';
 
-class FormPengumpulanTugas extends StatefulWidget {
-  const FormPengumpulanTugas({Key? key}) : super(key: key);
+import '../../../Navigation/kelas_assnav.dart';
+import '../../Deskripsi/form_deskripsi.dart';
+import '../Latihan/form_latihan.dart';
+import '../Tugas/form_tugas.dart';
+
+class FormPengumpulanLaporan extends StatefulWidget {
+  const FormPengumpulanLaporan({super.key});
 
   @override
-  State<FormPengumpulanTugas> createState() => _FormPengumpulanTugasState();
+  State<FormPengumpulanLaporan> createState() => _FormPengumpulanLaporanState();
 }
 
-class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
+class _FormPengumpulanLaporanState extends State<FormPengumpulanLaporan> {
   final TextEditingController _deskripsiTugasController =
       TextEditingController();
   final TextEditingController _judulModulController = TextEditingController();
   final TextEditingController _kodeKelasController = TextEditingController();
   final TextEditingController _bukaController = TextEditingController();
   final TextEditingController _tutupController = TextEditingController();
+
+  //Fungsi Untuk Bottom Navigation
+  int _selectedIndex = 2; // untuk mengatur index bottom navigation
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      // Memilih halaman sesuai dengan index yang dipilih
+      if (index == 0) {
+        // Tindakan ketika item "Latihan" ditekan
+        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan latihan
+        // Misalnya:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const FormPengumpulanLatihan()),
+        );
+      } else if (index == 1) {
+        // Tindakan ketika item "Tugas" ditekan
+        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
+        // Misalnya:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const FormPengumpulanTugas()),
+        );
+      } else if (index == 2) {
+        // Tindakan ketika item "Tugas" ditekan
+        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
+        // Misalnya:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const FormPengumpulanLaporan()),
+        );
+      }
+    });
+  }
 
   //Jumlah kata maksimum yang diizinkan pada deskripsi kelas
   int _remainingWords = 1000;
@@ -65,55 +103,6 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
     return querySnapshot.docs.isNotEmpty;
   }
 
-  // //Menghubungkan ke saveTugasForm pada Firebase
-  // void _saveTugasForm() async {
-  //   //Memeriksa apakah kode kelas terdapat dalam Firestore 'data_kelas'
-  //   bool isKodeKelasValid = await _checkKodeKelas(_kodeKelasController.text);
-  //   //Jika tidak valid, tampilkan snackbar dan berhenti eksekusi
-  //   if (!isKodeKelasValid) {
-  //     // ignore: use_build_context_synchronously
-  //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-  //       content: Text('Kode kelas tidak terdapat pada database'),
-  //       backgroundColor: Colors.red,
-  //       duration: Duration(seconds: 2),
-  //     ));
-  //     return;
-  //   }
-  //   //Mendapatkan instance Firestore
-  //   FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-  //   //Mendapatka reference untuk collection 'pengumpulan_tugas'
-  //   CollectionReference tugasCollection =
-  //       firestore.collection('pengumpulanLatihan');
-
-  //   //Mengambil data terakhir di collection untuk mendapatkan nomor urut
-  //   QuerySnapshot querySnapshot = await tugasCollection.get();
-  //   int documentCount = querySnapshot.docs.length;
-
-  //   //Membuat nomor urut berikutnya
-  //   int nextDocumentId = documentCount + 1;
-  //   //Menyimpan pengumpulan tugas ke Firestore dengan document_id nomor urut
-  //   await tugasCollection.doc(nextDocumentId.toString()).set({
-  //     'kodeKelas': _kodeKelasController.text,
-  //     'deskripsiLatihan': _deskripsiTugasController.text,
-  //     'judulMateri': _judulModulController.text,
-  //     'aksesLatihan': DateTime.parse(_bukaController.text),
-  //     'tutupAksesLatihan': DateTime.parse(_tutupController.text),
-  //   });
-  //   //Tampilkan pesan sukses
-  //   // ignore: use_build_context_synchronously
-  //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-  //     content: Text('Data berhasil disimpan'),
-  //     backgroundColor: Colors.green,
-  //     duration: Duration(seconds: 2),
-  //   ));
-  //   //Clear TextField
-  //   _kodeKelasController.clear();
-  //   _judulModulController.clear();
-  //   _deskripsiTugasController.clear();
-  //   _bukaController.clear();
-  //   _tutupController.clear();
-  // }
   void _saveTugasForm() async {
     bool isJudulMateriValid =
         await _checkJudulMateri(_judulModulController.text);
@@ -145,7 +134,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
 
     //Mendapatka reference untuk collection 'pengumpulan_tugas'
     CollectionReference tugasCollection =
-        firestore.collection('pengumpulanLatihan');
+        firestore.collection('pengumpulanLaporan');
 
     //Mengambil data terakhir di collection untuk mendapatkan nomor urut
     QuerySnapshot querySnapshot = await tugasCollection.get();
@@ -156,10 +145,10 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
     //Menyimpan pengumpulan tugas ke Firestore dengan document_id nomor urut
     await tugasCollection.doc(nextDocumentId.toString()).set({
       'kodeKelas': _kodeKelasController.text,
-      'deskripsiLatihan': _deskripsiTugasController.text,
+      'deskripsiLaporan': _deskripsiTugasController.text,
       'judulMateri': _judulModulController.text,
-      'aksesLatihan': DateTime.parse(_bukaController.text),
-      'tutupAksesLatihan': DateTime.parse(_tutupController.text),
+      'aksesTugas': DateTime.parse(_bukaController.text),
+      'tutupAksesLaporan': DateTime.parse(_tutupController.text),
     });
     //Tampilkan pesan sukses
     // ignore: use_build_context_synchronously
@@ -246,28 +235,6 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                       fontWeight: FontWeight.bold,
                       color: Colors.black),
                 )),
-                const SizedBox(
-                  width: 800.0,
-                ),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.logout,
-                      color: Color(0xFF031F31),
-                    )),
-                const SizedBox(
-                  width: 10.0,
-                ),
-                Text(
-                  'Log out',
-                  style: GoogleFonts.quicksand(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF031F31)),
-                ),
-                const SizedBox(
-                  width: 50.0,
-                )
               ],
             ),
           ),
@@ -319,26 +286,9 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                             padding:
                                 const EdgeInsets.only(left: 50.0, top: 38.0),
                             child: Text(
-                              'Tugas',
+                              'Pengumpulan',
                               style: GoogleFonts.quicksand(
                                   fontSize: 16.0, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 50.0, top: 38.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const FormPengempulanLaporan()));
-                              },
-                              child: Text(
-                                'Laporan',
-                                style: GoogleFonts.quicksand(fontSize: 16.0),
-                              ),
                             ),
                           )
                         ],
@@ -447,7 +397,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Akses Latihan',
+                                              'Akses Laporan',
                                               style: GoogleFonts.quicksand(
                                                 fontSize: 20.0,
                                                 fontWeight: FontWeight.bold,
@@ -535,7 +485,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 30.0),
                                     child: Text(
-                                      'Deskripsi Latihan',
+                                      'Deskripsi Laporan',
                                       style: GoogleFonts.quicksand(
                                           fontSize: 20.0,
                                           fontWeight: FontWeight.bold),
@@ -555,7 +505,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                                         },
                                         decoration: InputDecoration(
                                             hintText:
-                                                'Masukkan Deskripsi Latihan',
+                                                'Masukkan Deskripsi Laporan',
                                             border: OutlineInputBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(
@@ -593,7 +543,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
                                             fontWeight: FontWeight.bold),
                                       )),
                                   const SizedBox(
-                                    height: 20.0,
+                                    height: 40.0,
                                   )
                                 ],
                               ),
@@ -608,6 +558,25 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.task),
+            label: 'Latihan',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book),
+            label: 'Tugas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmarks),
+            label: 'Laporan',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: const Color(0xFF3CBEA9),
+        onTap: _onItemTapped,
       ),
     );
   }

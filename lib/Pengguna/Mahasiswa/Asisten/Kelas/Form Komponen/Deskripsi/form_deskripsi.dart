@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import '../Laporan/form_laporan.dart';
-import '../Tugas/form_tugas.dart';
+import '../../Navigation/kelas_assnav.dart';
+import '../Pengumpulan/Latihan/form_latihan.dart';
 
 class FormDeskripsiKelas extends StatefulWidget {
   const FormDeskripsiKelas({super.key});
@@ -255,7 +255,10 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
         child: AppBar(
           leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const KelasAsistenNav()));
             },
             icon: const Icon(
               Icons.arrow_back,
@@ -280,21 +283,6 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                       color: Colors.black,
                     ),
                   ),
-                ),
-                const SizedBox(
-                  width: 800.0,
-                ),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.logout, color: Color(0xFF031F31))),
-                const SizedBox(width: 10.0),
-                Text('Log out',
-                    style: GoogleFonts.quicksand(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF031F31))),
-                const SizedBox(
-                  width: 50.0,
                 ),
               ],
             ),
@@ -338,7 +326,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                               ),
                             ),
 
-                            //Tugas
+                            //Pengumpulan
                             Padding(
                               padding:
                                   const EdgeInsets.only(left: 50.0, top: 38.0),
@@ -348,32 +336,14 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              const FormPengumpulanTugas()));
+                                              const FormPengumpulanLatihan()));
                                 },
                                 child: Text(
-                                  'Tugas',
+                                  'Pengumpulan',
                                   style: GoogleFonts.quicksand(fontSize: 16.0),
                                 ),
                               ),
                             ),
-                            //Laporan
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 50.0, top: 38.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const FormPengempulanLaporan()));
-                                },
-                                child: Text(
-                                  'Laporan',
-                                  style: GoogleFonts.quicksand(fontSize: 16.0),
-                                ),
-                              ),
-                            )
                           ],
                         ),
                         const Padding(
