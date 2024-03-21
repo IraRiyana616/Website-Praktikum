@@ -115,11 +115,14 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
                           calculateRowsPerPage(filteredAbsensiPraktikan.length),
                     )
                   : const Center(
-                      child: Text(
-                        'No data available',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 30.0),
+                        child: Text(
+                          'No data available',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),

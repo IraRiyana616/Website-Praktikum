@@ -13,13 +13,14 @@ class AbsensiPraktikan extends StatefulWidget {
 
 class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
   final TextEditingController _kodeEditingController = TextEditingController();
-
-  //Status Kehadiran
+  final TextEditingController _modulEditingController = TextEditingController();
   String selectedAbsen = 'Status Kehadiran';
 
-  //Modul Praktikum
-  String selectedModul = 'Pilih Modul Praktikum';
-  List<String> dropdownItems = ['Pilih Modul Praktikum'];
+  @override
+  void initState() {
+    super.initState();
+    fetchDataFromFirestore();
+  }
 
   Future<void> saveDataToFirestore() async {
     DateTime currentDate = DateTime.now();
@@ -37,34 +38,55 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
       if (userSnapshot.exists) {
         int userNim = userSnapshot['nim'];
 
-        Map<String, dynamic> updatedAbsenData = {
-          'kodeKelas': _kodeEditingController.text,
-          'judulMateri': selectedModul,
-          'nama': userSnapshot['nama'],
-          'nim': userNim,
-          'tanggal': formattedDate,
-          'timestamp': FieldValue.serverTimestamp(),
-          'keterangan': selectedAbsen
-        };
-        await FirebaseFirestore.instance
-            .collection('absensiMahasiswa')
-            .add(updatedAbsenData);
+        // Memeriksa apakah judulMateri sesuai dengan yang ada di Firestore
+        bool isModulValid =
+            await checkModulInFirestore(_modulEditingController.text);
 
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Data berhasil disimpan'),
-          backgroundColor: Colors.green,
-        ));
+        if (isModulValid) {
+          // Memeriksa apakah data dengan tanggal yang sama telah ada dalam database
+          bool isDataExists = await checkDataExists(formattedDate);
+          if (isDataExists) {
+            // Data dengan tanggal yang sama telah ada dalam database
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Data telah terdapat pada database'),
+              backgroundColor: Colors.red,
+            ));
+          } else {
+            // Data belum ada dalam database, simpan data baru
+            Map<String, dynamic> updatedAbsenData = {
+              'kodeKelas': _kodeEditingController.text,
+              'judulMateri': _modulEditingController.text,
+              'nama': userSnapshot['nama'],
+              'nim': userNim,
+              'tanggal': formattedDate,
+              'timestamp': FieldValue.serverTimestamp(),
+              'keterangan': selectedAbsen
+            };
+            await FirebaseFirestore.instance
+                .collection('absensiMahasiswa')
+                .add(updatedAbsenData);
 
-        // Update dropdownItems with the new value
-        dropdownItems.add(selectedModul);
-        setState(() {});
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Data berhasil disimpan'),
+              backgroundColor: Colors.green,
+            ));
 
-        _kodeEditingController.clear();
-        setState(() {
-          selectedAbsen = 'Status Kehadiran';
-          selectedModul = 'Pilih Modul Praktikum'; // Reset dropdown to default
-        });
+            _kodeEditingController.clear();
+            _modulEditingController.clear();
+            setState(() {
+              selectedAbsen = 'Status Kehadiran';
+            });
+          }
+        } else {
+          // JudulMateri tidak sesuai dengan yang ada di Firestore
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Data tidak terdapat pada database'),
+            backgroundColor: Colors.red,
+          ));
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -77,10 +99,38 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchDataFromFirestore();
+  Future<bool> checkModulInFirestore(String judulMateri) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> modulSnapshot =
+          await FirebaseFirestore.instance
+              .collection('silabusPraktikum')
+              .where('judulMateri', isEqualTo: judulMateri)
+              .get();
+
+      return modulSnapshot.docs.isNotEmpty;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching modul data: $e');
+      }
+      return false;
+    }
+  }
+
+  Future<bool> checkDataExists(String formattedDate) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> dataSnapshot = await FirebaseFirestore
+          .instance
+          .collection('absensiMahasiswa')
+          .where('tanggal', isEqualTo: formattedDate)
+          .get();
+
+      return dataSnapshot.docs.isNotEmpty;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error checking data existence: $e');
+      }
+      return false;
+    }
   }
 
   Future<void> fetchDataFromFirestore() async {
@@ -94,16 +144,6 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
               .get();
 
       if (userSnapshot.exists) {
-        String tokenKelas = userSnapshot['tokenKelas'];
-
-        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-            .collection('silabusPraktikum')
-            .where('kodeKelas', isEqualTo: tokenKelas)
-            .get();
-        for (var doc in querySnapshot.docs) {
-          String judulMateri = doc['judulMateri'];
-          dropdownItems.add(judulMateri);
-        }
         setState(() {});
       }
     } catch (e) {
@@ -234,45 +274,18 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                         Padding(
                           padding: const EdgeInsets.only(top: 20.0),
                           child: SizedBox(
-                              width: 300.0,
-                              child: Container(
-                                height: 47.0,
-                                width: 980.0,
-                                decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.grey.shade700),
-                                    borderRadius: BorderRadius.circular(8.0)),
-                                child: DropdownButton<String>(
-                                  value: selectedModul,
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      selectedModul = newValue!;
-                                    });
-                                  },
-                                  items: dropdownItems
-                                      .map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                    return DropdownMenuItem(
-                                        value: value,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 15.0),
-                                          child: Text(
-                                            value,
-                                            style:
-                                                const TextStyle(fontSize: 16.0),
-                                          ),
-                                        ));
-                                  }).toList(),
-                                  style: TextStyle(color: Colors.grey.shade700),
-                                  icon: const Icon(Icons.arrow_drop_down,
-                                      color: Colors.grey),
-                                  iconSize: 24,
-                                  elevation: 16,
-                                  isExpanded: true,
-                                  underline: Container(),
-                                ),
-                              )),
+                            width: 300.0,
+                            child: TextField(
+                              controller: _modulEditingController,
+                              decoration: InputDecoration(
+                                  hintText: ' Masukkan Nama Modul',
+                                  border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(10.0)),
+                                  filled: true,
+                                  fillColor: Colors.white),
+                            ),
+                          ),
                         )
                       ]),
 

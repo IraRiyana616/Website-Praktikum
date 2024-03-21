@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Dosen/Absensi/Komponen/Praktikan/Tabel/tblabsensiprak_ds.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Navigation/kelas_assnav.dart';
 
 class AbsensiMahasiswaScreen extends StatefulWidget {
   const AbsensiMahasiswaScreen({super.key});
@@ -19,10 +18,10 @@ class _AbsensiMahasiswaScreenState extends State<AbsensiMahasiswaScreen> {
         child: AppBar(
           leading: IconButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const KelasAsistenNav()));
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => const AsistenNav()));
               },
               icon: const Icon(
                 Icons.arrow_back,

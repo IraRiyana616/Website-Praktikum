@@ -1,17 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../Modul/tabel_modul.dart';
+import '../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
+import '../Modul/modul_mhs.dart';
 
-class DeskripsiKelas extends StatefulWidget {
+class DeskripsiMahasiswa extends StatefulWidget {
   final String kodeKelas;
-  const DeskripsiKelas({Key? key, required this.kodeKelas}) : super(key: key);
+  const DeskripsiMahasiswa({super.key, required this.kodeKelas});
 
   @override
-  State<DeskripsiKelas> createState() => _DeskripsiKelasState();
+  State<DeskripsiMahasiswa> createState() => _DeskripsiMahasiswaState();
 }
 
-class _DeskripsiKelasState extends State<DeskripsiKelas> {
+class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -156,7 +157,15 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                   ),
                                   //Absensi Mahasiswa
                                   GestureDetector(
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AbsensiPraktikanScreen(
+                                                    kodeKelas: widget.kodeKelas,
+                                                  )));
+                                    },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                         left: 50.0,
@@ -170,6 +179,22 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                       ),
                                     ),
                                   ),
+                                  //Latihan
+                                  GestureDetector(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 50.0,
+                                        top: 38.0,
+                                      ),
+                                      child: Text(
+                                        'Latihan',
+                                        style: GoogleFonts.quicksand(
+                                          fontSize: 16.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  //Tugas
                                   GestureDetector(
                                     child: Padding(
                                       padding: const EdgeInsets.only(
@@ -436,9 +461,8 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                 ),
                               ),
 
-                              TabelSilabusPraktikum(
+                              TabelSilabusPraktikumMahasiswa(
                                   kodeKelas: widget.kodeKelas),
-
                               const SizedBox(height: 50.0)
                             ],
                           ),
