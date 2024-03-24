@@ -3,19 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Modul/Komponen/Tugas/tugas_mhs.dart';
 
-class LatihanAsisten extends StatefulWidget {
+class TugasAsisten extends StatefulWidget {
   final String kodeKelas;
   final String modul;
-  const LatihanAsisten(
-      {super.key, required this.kodeKelas, required this.modul});
+  const TugasAsisten({super.key, required this.kodeKelas, required this.modul});
 
   @override
-  State<LatihanAsisten> createState() => _LatihanAsistenState();
+  State<TugasAsisten> createState() => _TugasAsistenState();
 }
 
-class _LatihanAsistenState extends State<LatihanAsisten> {
+class _TugasAsistenState extends State<TugasAsisten> {
   final TextEditingController _bukaController = TextEditingController();
   final TextEditingController _tutupController = TextEditingController();
   late int userNim;
@@ -110,7 +108,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
           Timestamp.fromDate(DateTime.parse(_tutupController.text));
 
       await FirebaseFirestore.instance
-          .collection('pengumpulanLatihan')
+          .collection('pengumpulanTugas')
           .where('kodeKelas', isEqualTo: widget.kodeKelas)
           .where('judulMateri', isEqualTo: widget.modul)
           .get()
@@ -118,8 +116,8 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
         // ignore: avoid_function_literals_in_foreach_calls
         querySnapshot.docs.forEach((doc) async {
           await doc.reference.update({
-            'aksesLatihan': bukaTimestamp,
-            'tutupAksesLatihan': tutupTimestamp,
+            'aksesTugas': bukaTimestamp,
+            'tutupAksesTugas': tutupTimestamp,
           });
         });
       });
@@ -163,7 +161,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                       readOnly: true,
                       controller: _bukaController,
                       decoration: InputDecoration(
-                        hintText: 'Pilih Tanggal Akses Latihan',
+                        hintText: 'Pilih Tanggal Akses Tugas',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
@@ -236,25 +234,6 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
     );
   }
 
-// Fungsi async untuk memeriksa keberadaan kodeKelas dan judulMateri dalam Firestore
-  Future<bool> checkDataExist(String kodeKelas, String modul) async {
-    bool exists = false;
-
-    // Melakukan query ke Firestore
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('pengumpulanTugas')
-        .where('kodeKelas', isEqualTo: kodeKelas)
-        .where('judulMateri', isEqualTo: modul)
-        .get();
-
-    // Jika data ditemukan, set exists menjadi true
-    if (querySnapshot.docs.isNotEmpty) {
-      exists = true;
-    }
-
-    return exists;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -294,7 +273,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
-            .collection('pengumpulanLatihan')
+            .collection('pengumpulanTugas')
             .where('kodeKelas', isEqualTo: widget.kodeKelas)
             .where('judulMateri', isEqualTo: widget.modul)
             .snapshots(),
@@ -353,7 +332,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                                   padding: const EdgeInsets.only(
                                       left: 75.0, right: 100.0, top: 55.0),
                                   child: Text(
-                                    '${data['deskripsiLatihan'] ?? 'Not available'}',
+                                    '${data['deskripsiTugas'] ?? 'Not available'}',
                                     style: const TextStyle(
                                       fontSize: 15.0,
                                       height: 2.0,
@@ -419,25 +398,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 GestureDetector(
-                  onTap: () async {
-                    // Memeriksa keberadaan data sebelum melakukan navigasi
-                    bool dataExists =
-                        await checkDataExist(widget.kodeKelas, widget.modul);
-                    if (dataExists) {
-                      // ignore: use_build_context_synchronously
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => TugasAsisten(
-                                  kodeKelas: widget.kodeKelas,
-                                  modul: widget.modul)));
-                    } else {
-                      // Tampilkan pesan atau lakukan aksi lain sesuai kebutuhan
-                      if (kDebugMode) {
-                        print('Data tidak ditemukan di Firestore');
-                      }
-                    }
-                  },
+                  onTap: () {},
                   child: MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: Text(
