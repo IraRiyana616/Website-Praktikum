@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Tugas/tugas.dart';
 
 class UjianPemahaman extends StatefulWidget {
   final String kodeKelas;
@@ -111,6 +112,25 @@ class _UjianPemahamanState extends State<UjianPemahaman> {
     }
 
     return false;
+  }
+
+  // Fungsi async untuk memeriksa keberadaan kodeKelas dan judulMateri dalam Firestore
+  Future<bool> checkDataExist(String kodeKelas, String modul) async {
+    bool exists = false;
+
+    // Melakukan query ke Firestore
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('pengumpulanTugas')
+        .where('kodeKelas', isEqualTo: kodeKelas)
+        .where('judulMateri', isEqualTo: modul)
+        .get();
+
+    // Jika data ditemukan, set exists menjadi true
+    if (querySnapshot.docs.isNotEmpty) {
+      exists = true;
+    }
+
+    return exists;
   }
 
   @override
@@ -326,6 +346,57 @@ class _UjianPemahamanState extends State<UjianPemahaman> {
             }).toList(),
           );
         },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Container(
+          height: 50.0,
+          color: const Color(0xFFF7F8FA),
+          child: Padding(
+            padding: const EdgeInsets.only(right: 70.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    // Memeriksa keberadaan data sebelum melakukan navigasi
+                    bool dataExists =
+                        await checkDataExist(widget.kodeKelas, widget.modul);
+                    if (dataExists) {
+                      // ignore: use_build_context_synchronously
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PengumpulanTugas(
+                                  kodeKelas: widget.kodeKelas,
+                                  modul: widget.modul)));
+                    } else {
+                      // Tampilkan pesan atau lakukan aksi lain sesuai kebutuhan
+                      if (kDebugMode) {
+                        print('Data tidak ditemukan di Firestore');
+                      }
+                    }
+                  },
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Text(
+                      'Selanjutnya',
+                      style: GoogleFonts.quicksand(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 8.0,
+                ),
+                const Icon(Icons.arrow_circle_right)
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

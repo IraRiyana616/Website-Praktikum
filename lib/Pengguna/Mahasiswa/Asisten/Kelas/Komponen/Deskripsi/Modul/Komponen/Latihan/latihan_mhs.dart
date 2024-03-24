@@ -149,7 +149,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            'Edit Jadwal Akses',
+            'Edit JadwalPengumpulan',
             style: GoogleFonts.quicksand(fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
@@ -163,7 +163,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                       readOnly: true,
                       controller: _bukaController,
                       decoration: InputDecoration(
-                        hintText: 'Pilih Tanggal Akses Latihan',
+                        hintText: 'Pilih Tanggal Akses',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),

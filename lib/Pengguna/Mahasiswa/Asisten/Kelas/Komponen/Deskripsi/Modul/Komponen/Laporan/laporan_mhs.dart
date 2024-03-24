@@ -4,18 +4,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Laporan/laporan_mhs.dart';
-
-class TugasAsisten extends StatefulWidget {
+class LaporanAsisten extends StatefulWidget {
   final String kodeKelas;
   final String modul;
-  const TugasAsisten({super.key, required this.kodeKelas, required this.modul});
+  const LaporanAsisten(
+      {super.key, required this.kodeKelas, required this.modul});
 
   @override
-  State<TugasAsisten> createState() => _TugasAsistenState();
+  State<LaporanAsisten> createState() => _LaporanAsistenState();
 }
 
-class _TugasAsistenState extends State<TugasAsisten> {
+class _LaporanAsistenState extends State<LaporanAsisten> {
   final TextEditingController _bukaController = TextEditingController();
   final TextEditingController _tutupController = TextEditingController();
   late int userNim;
@@ -110,7 +109,7 @@ class _TugasAsistenState extends State<TugasAsisten> {
           Timestamp.fromDate(DateTime.parse(_tutupController.text));
 
       await FirebaseFirestore.instance
-          .collection('pengumpulanTugas')
+          .collection('pengumpulanLaporan')
           .where('kodeKelas', isEqualTo: widget.kodeKelas)
           .where('judulMateri', isEqualTo: widget.modul)
           .get()
@@ -118,8 +117,8 @@ class _TugasAsistenState extends State<TugasAsisten> {
         // ignore: avoid_function_literals_in_foreach_calls
         querySnapshot.docs.forEach((doc) async {
           await doc.reference.update({
-            'aksesTugas': bukaTimestamp,
-            'tutupAksesTugas': tutupTimestamp,
+            'aksesLaporan': bukaTimestamp,
+            'tutupAksesLaporarn': tutupTimestamp,
           });
         });
       });
@@ -236,25 +235,6 @@ class _TugasAsistenState extends State<TugasAsisten> {
     );
   }
 
-  // Fungsi async untuk memeriksa keberadaan kodeKelas dan judulMateri dalam Firestore
-  Future<bool> checkDataExist(String kodeKelas, String modul) async {
-    bool exists = false;
-
-    // Melakukan query ke Firestore
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('pengumpulanLaporan')
-        .where('kodeKelas', isEqualTo: kodeKelas)
-        .where('judulMateri', isEqualTo: modul)
-        .get();
-
-    // Jika data ditemukan, set exists menjadi true
-    if (querySnapshot.docs.isNotEmpty) {
-      exists = true;
-    }
-
-    return exists;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -294,7 +274,7 @@ class _TugasAsistenState extends State<TugasAsisten> {
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
-            .collection('pengumpulanTugas')
+            .collection('pengumpulanLaporan')
             .where('kodeKelas', isEqualTo: widget.kodeKelas)
             .where('judulMateri', isEqualTo: widget.modul)
             .snapshots(),
@@ -353,7 +333,7 @@ class _TugasAsistenState extends State<TugasAsisten> {
                                   padding: const EdgeInsets.only(
                                       left: 75.0, right: 100.0, top: 55.0),
                                   child: Text(
-                                    '${data['deskripsiTugas'] ?? 'Not available'}',
+                                    '${data['deskripsiLaporan'] ?? 'Not available'}',
                                     style: const TextStyle(
                                       fontSize: 15.0,
                                       height: 2.0,
@@ -412,50 +392,8 @@ class _TugasAsistenState extends State<TugasAsisten> {
         child: Container(
           height: 50.0,
           color: const Color(0xFFF7F8FA),
-          child: Padding(
-            padding: const EdgeInsets.only(right: 70.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () async {
-                    // Memeriksa keberadaan data sebelum melakukan navigasi
-                    bool dataExists =
-                        await checkDataExist(widget.kodeKelas, widget.modul);
-                    if (dataExists) {
-                      // ignore: use_build_context_synchronously
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LaporanAsisten(
-                                  kodeKelas: widget.kodeKelas,
-                                  modul: widget.modul)));
-                    } else {
-                      // Tampilkan pesan atau lakukan aksi lain sesuai kebutuhan
-                      if (kDebugMode) {
-                        print('Data tidak ditemukan di Firestore');
-                      }
-                    }
-                  },
-                  child: MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: Text(
-                      'Selanjutnya',
-                      style: GoogleFonts.quicksand(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 8.0,
-                ),
-                const Icon(Icons.arrow_circle_right)
-              ],
-            ),
+          child: const Padding(
+            padding: EdgeInsets.only(right: 70.0),
           ),
         ),
       ),
