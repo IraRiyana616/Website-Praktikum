@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Asisten/Screen/absensi_ass_sc.dart';
 import '../Modul/tabel_modul.dart';
 
 class DeskripsiKelas extends StatefulWidget {
@@ -46,30 +47,6 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  width: 800.0,
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.logout,
-                    color: Color(0xFF031F31),
-                  ),
-                ),
-                const SizedBox(
-                  width: 10.0,
-                ),
-                Text(
-                  'Log out',
-                  style: GoogleFonts.quicksand(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF031F31),
-                  ),
-                ),
-                const SizedBox(
-                  width: 50.0,
-                )
               ],
             ),
           ),
@@ -156,44 +133,62 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                   ),
                                   //Absensi Mahasiswa
                                   GestureDetector(
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => AbsenKu(
+                                                  kodeKelas:
+                                                      widget.kodeKelas)));
+                                    },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                         left: 50.0,
                                         top: 38.0,
                                       ),
-                                      child: Text(
-                                        'Absensi',
-                                        style: GoogleFonts.quicksand(
-                                          fontSize: 16.0,
+                                      child: MouseRegion(
+                                        cursor: SystemMouseCursors.click,
+                                        child: Text(
+                                          'Absensi',
+                                          style: GoogleFonts.quicksand(
+                                            fontSize: 16.0,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
+                                  //Pengumpulan Pre-Test, Latihan dan Tugas
                                   GestureDetector(
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                         left: 50.0,
                                         top: 38.0,
                                       ),
-                                      child: Text(
-                                        'Tugas',
-                                        style: GoogleFonts.quicksand(
-                                          fontSize: 16.0,
+                                      child: MouseRegion(
+                                        cursor: SystemMouseCursors.click,
+                                        child: Text(
+                                          'Pengumpulan',
+                                          style: GoogleFonts.quicksand(
+                                            fontSize: 16.0,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
+                                  //Asistensi Laporan
                                   GestureDetector(
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                         left: 50.0,
                                         top: 38.0,
                                       ),
-                                      child: Text(
-                                        'Laporan',
-                                        style: GoogleFonts.quicksand(
-                                          fontSize: 16.0,
+                                      child: MouseRegion(
+                                        cursor: SystemMouseCursors.click,
+                                        child: Text(
+                                          'Asistensi',
+                                          style: GoogleFonts.quicksand(
+                                            fontSize: 16.0,
+                                          ),
                                         ),
                                       ),
                                     ),

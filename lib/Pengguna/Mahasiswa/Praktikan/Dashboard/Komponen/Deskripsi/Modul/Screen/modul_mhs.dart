@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../Pre-Test/pre_test.dart';
+import '../Komponen/Pre-Test/pre_test.dart';
 
 class TabelSilabusPraktikumMahasiswa extends StatefulWidget {
   final String kodeKelas;

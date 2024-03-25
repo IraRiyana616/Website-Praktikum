@@ -102,9 +102,11 @@ class _AbsensiMahasiswaScreenState extends State<AbsensiMahasiswaScreen> {
                                 const EdgeInsets.only(top: 38.0, left: 95.0),
                             child: GestureDetector(
                               onTap: () {},
-                              child: Text(
-                                'Deskripsi',
-                                style: GoogleFonts.quicksand(fontSize: 16.0),
+                              child: MouseRegion(
+                                child: Text(
+                                  'Deskripsi',
+                                  style: GoogleFonts.quicksand(fontSize: 16.0),
+                                ),
                               ),
                             ),
                           ),
