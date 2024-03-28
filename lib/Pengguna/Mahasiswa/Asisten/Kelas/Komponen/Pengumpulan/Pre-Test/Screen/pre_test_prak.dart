@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Asisten/Screen/absensi_ass_sc.dart';
-
-import '../../../Absensi/Praktikan/Screen/absensi_prak.dart';
 import '../../../Deskripsi/Screen/deskripsi_kelas.dart';
+import '../Tabel/tbl_ujipemahaman.dart';
 
 class KumpulUjianPemahaman extends StatefulWidget {
   final String kodeKelas;
@@ -24,35 +23,35 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
         // Tindakan ketika item "Latihan" ditekan
         // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan latihan
         // Misalnya:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => AbsenKu(
-                    kodeKelas: widget.kodeKelas,
-                  )),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) => KumpulUjianPemahaman(
+        //             kodeKelas: widget.kodeKelas,
+        //           )),
+        // );
       } else if (index == 1) {
         // Tindakan ketika item "Tugas" ditekan
         // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
         // Misalnya:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => AbsensiMahasiswaScreen(
-                    kodeKelas: widget.kodeKelas,
-                  )),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) => AbsensiMahasiswaScreen(
+        //             kodeKelas: widget.kodeKelas,
+        //           )),
+        // );
       } else if (index == 2) {
         // Tindakan ketika item "Tugas" ditekan
         // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
         // Misalnya:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => AbsensiMahasiswaScreen(
-                    kodeKelas: widget.kodeKelas,
-                  )),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) => AbsensiMahasiswaScreen(
+        //             kodeKelas: widget.kodeKelas,
+        //           )),
+        // );
       }
     });
   }
@@ -225,7 +224,9 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
                       const SizedBox(
                         height: 20.0,
                       ),
-                      // TabelAbsenKu(kodeKelas: widget.kodeKelas),
+                      TabelPengumpulanUjiPemahaman(
+                        kodeKelas: widget.kodeKelas,
+                      ),
                       const SizedBox(
                         height: 20.0,
                       )
