@@ -10,8 +10,8 @@ class TabelAbsenKu extends StatefulWidget {
 }
 
 class _TabelAbsenKuState extends State<TabelAbsenKu> {
-  late List<AbsensiPraktikan> demoAbsensiPraktikan;
-  late List<AbsensiPraktikan> filteredAbsensiPraktikan;
+  List<AbsensiPraktikan> demoAbsensiPraktikan = [];
+  List<AbsensiPraktikan> filteredAbsensiPraktikan = [];
 
   @override
   void initState() {
@@ -176,8 +176,8 @@ DataRow dataFileDataRow(AbsensiPraktikan fileInfo, int index) {
       ),
       DataCell(
         SizedBox(
-          width: 200.0,
-          child: Text(getLimitedText(fileInfo.modul, 30)),
+          width: 250.0,
+          child: Text(getLimitedText(fileInfo.modul, 35)),
         ),
       ),
       DataCell(Text(fileInfo.keterangan)),

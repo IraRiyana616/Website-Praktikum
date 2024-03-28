@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
-class TabelAbsensiPraktikan extends StatefulWidget {
-  const TabelAbsensiPraktikan({super.key});
+class TabelPengumpulanUjiPemahaman extends StatefulWidget {
+  final String kodeKelas;
+  const TabelPengumpulanUjiPemahaman({super.key, required this.kodeKelas});
 
   @override
-  State<TabelAbsensiPraktikan> createState() => _TabelAbsensiPraktikanState();
+  State<TabelPengumpulanUjiPemahaman> createState() =>
+      _TabelPengumpulanUjiPemahamanState();
 }
 
-class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
-  List<AbsensiPraktikan> demoAbsensiPraktikan = [];
-  List<AbsensiPraktikan> filteredAbsensiPraktikan = [];
+class _TabelPengumpulanUjiPemahamanState
+    extends State<TabelPengumpulanUjiPemahaman> {
+  List<Pengumpulan> demoPengumpulan = [];
+  List<Pengumpulan> filteredPengumpulan = [];
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +25,7 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
             padding: const EdgeInsets.only(left: 70.0, right: 100.0),
             child: SizedBox(
               width: double.infinity,
-              child: filteredAbsensiPraktikan.isNotEmpty
+              child: filteredPengumpulan.isNotEmpty
                   ? PaginatedDataTable(
                       columnSpacing: 10,
                       columns: const [
@@ -34,20 +37,26 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
                         ),
                         DataColumn(
                           label: Text(
-                            'Judul Modul',
+                            'NIM',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                         DataColumn(
                           label: Text(
-                            'Keterangan',
+                            'Nama',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            '',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
-                      source: DataSource(filteredAbsensiPraktikan),
+                      source: DataSource(filteredPengumpulan),
                       rowsPerPage:
-                          calculateRowsPerPage(filteredAbsensiPraktikan.length),
+                          calculateRowsPerPage(filteredPengumpulan.length),
                     )
                   : const Center(
                       child: Padding(
@@ -75,27 +84,23 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
   }
 }
 
-class AbsensiPraktikan {
+class Pengumpulan {
   final String kode;
   final String nama;
   final int nim;
-  final String modul;
+  final String file;
   final String timestap;
-  final String tanggal;
-  final String keterangan;
 
-  AbsensiPraktikan({
+  Pengumpulan({
     required this.kode,
     required this.nama,
     required this.nim,
-    required this.modul,
+    required this.file,
     required this.timestap,
-    required this.tanggal,
-    required this.keterangan,
   });
 }
 
-DataRow dataFileDataRow(AbsensiPraktikan fileInfo, int index) {
+DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -109,13 +114,31 @@ DataRow dataFileDataRow(AbsensiPraktikan fileInfo, int index) {
           child: Text(getLimitedText(fileInfo.timestap, 19)),
         ),
       ),
+      DataCell(Text(fileInfo.nim.toString())),
       DataCell(
         SizedBox(
           width: 250.0,
-          child: Text(getLimitedText(fileInfo.modul, 35)),
+          child: Text(getLimitedText(fileInfo.nama, 20)),
         ),
       ),
-      DataCell(Text(fileInfo.keterangan)),
+      DataCell(Row(
+        children: [
+          const Icon(
+            Icons.download,
+            color: Colors.grey,
+          ),
+          const SizedBox(
+            width: 5.0,
+          ),
+          GestureDetector(
+            onTap: () {},
+            child: const Text(
+              'Download',
+              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+            ),
+          )
+        ],
+      )),
     ],
   );
 }
@@ -129,7 +152,7 @@ Color getRowColor(int index) {
 }
 
 class DataSource extends DataTableSource {
-  final List<AbsensiPraktikan> data;
+  final List<Pengumpulan> data;
 
   DataSource(this.data);
 

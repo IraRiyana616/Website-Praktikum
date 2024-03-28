@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Screen/kelas_asisten.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Komponen/tabel_absensi_mahasiswa.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_mhs.dart';
 
 class AbsensiPraktikanScreen extends StatefulWidget {
   final String kodeKelas;
@@ -47,28 +47,6 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                       fontWeight: FontWeight.bold,
                       color: Colors.black),
                 )),
-                const SizedBox(
-                  width: 800.0,
-                ),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.logout,
-                      color: Color(0xFF031F31),
-                    )),
-                const SizedBox(
-                  width: 10.0,
-                ),
-                Text(
-                  'Log out',
-                  style: GoogleFonts.quicksand(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF031F31)),
-                ),
-                const SizedBox(
-                  width: 50.0,
-                )
               ],
             ),
           ),
@@ -109,7 +87,7 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => DeskripsiKelas(
+                                      builder: (context) => DeskripsiMahasiswa(
                                           kodeKelas: widget.kodeKelas)));
                             },
                             child: Padding(
@@ -117,10 +95,13 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                                 top: 38.0,
                                 left: 95.0,
                               ),
-                              child: Text(
-                                'Deskripsi',
-                                style: GoogleFonts.quicksand(
-                                  fontSize: 16.0,
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Text(
+                                  'Deskripsi',
+                                  style: GoogleFonts.quicksand(
+                                    fontSize: 16.0,
+                                  ),
                                 ),
                               ),
                             ),
@@ -139,32 +120,44 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                               ),
                             ),
                           ),
-                          //Tugas
+                          //Pengumpulan
                           Padding(
                             padding: const EdgeInsets.only(
                               left: 50.0,
                               top: 38.0,
                             ),
-                            child: Text(
-                              'Tugas',
-                              style: GoogleFonts.quicksand(
-                                fontSize: 16.0,
+                            child: GestureDetector(
+                              onTap: () {},
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Text(
+                                  'Pengumpulan',
+                                  style: GoogleFonts.quicksand(
+                                    fontSize: 16.0,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                          //Laporan
+                          //Asistensi
                           Padding(
                             padding: const EdgeInsets.only(
                               left: 50.0,
                               top: 38.0,
                             ),
-                            child: Text(
-                              'Laporan',
-                              style: GoogleFonts.quicksand(
-                                fontSize: 16.0,
+                            child: GestureDetector(
+                              onTap: () {},
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Text(
+                                  'Asistensi',
+                                  style: GoogleFonts.quicksand(
+                                    fontSize: 16.0,
+                                  ),
+                                ),
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                       const Padding(
@@ -183,7 +176,7 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                 ),
               ),
               //Tampilan Tabel Absensi Praktikan
-              const TabelAbsensiPraktikan()
+              const TabelAbsensiPraktikan(),
             ],
           ),
         ),

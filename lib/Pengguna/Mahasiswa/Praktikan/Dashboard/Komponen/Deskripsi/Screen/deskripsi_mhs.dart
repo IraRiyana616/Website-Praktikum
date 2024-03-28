@@ -47,30 +47,6 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  width: 800.0,
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.logout,
-                    color: Color(0xFF031F31),
-                  ),
-                ),
-                const SizedBox(
-                  width: 10.0,
-                ),
-                Text(
-                  'Log out',
-                  style: GoogleFonts.quicksand(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF031F31),
-                  ),
-                ),
-                const SizedBox(
-                  width: 50.0,
-                )
               ],
             ),
           ),
@@ -193,6 +169,25 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                                         cursor: SystemMouseCursors.click,
                                         child: Text(
                                           'Pengumpulan',
+                                          style: GoogleFonts.quicksand(
+                                            fontSize: 16.0,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  //Asistensi
+                                  //Pengumpulan
+                                  GestureDetector(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 50.0,
+                                        top: 38.0,
+                                      ),
+                                      child: MouseRegion(
+                                        cursor: SystemMouseCursors.click,
+                                        child: Text(
+                                          'Asistensi',
                                           style: GoogleFonts.quicksand(
                                             fontSize: 16.0,
                                           ),

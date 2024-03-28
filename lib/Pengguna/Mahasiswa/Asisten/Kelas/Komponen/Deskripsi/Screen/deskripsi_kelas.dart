@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Asisten/Screen/absensi_ass_sc.dart';
+import '../../Pengumpulan/Pre-Test/Screen/pre_test_prak.dart';
 import '../Modul/tabel_modul.dart';
 
 class DeskripsiKelas extends StatefulWidget {
@@ -164,12 +165,23 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                         left: 50.0,
                                         top: 38.0,
                                       ),
-                                      child: MouseRegion(
-                                        cursor: SystemMouseCursors.click,
-                                        child: Text(
-                                          'Pengumpulan',
-                                          style: GoogleFonts.quicksand(
-                                            fontSize: 16.0,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      KumpulUjianPemahaman(
+                                                          kodeKelas: widget
+                                                              .kodeKelas)));
+                                        },
+                                        child: MouseRegion(
+                                          cursor: SystemMouseCursors.click,
+                                          child: Text(
+                                            'Pengumpulan',
+                                            style: GoogleFonts.quicksand(
+                                              fontSize: 16.0,
+                                            ),
                                           ),
                                         ),
                                       ),

@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Asisten/Tabel/tbl_absenku.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Praktikan/Screen/absensi_prak.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Asisten/Screen/absensi_ass_sc.dart';
 
-import '../../../Pengumpulan/Pre-Test/Screen/pre_test_prak.dart';
+import '../../../Absensi/Praktikan/Screen/absensi_prak.dart';
+import '../../../Deskripsi/Screen/deskripsi_kelas.dart';
 
-class AbsenKu extends StatefulWidget {
+class KumpulUjianPemahaman extends StatefulWidget {
   final String kodeKelas;
-  const AbsenKu({super.key, required this.kodeKelas});
+  const KumpulUjianPemahaman({super.key, required this.kodeKelas});
 
   @override
-  State<AbsenKu> createState() => _AbsenKuState();
+  State<KumpulUjianPemahaman> createState() => _KumpulUjianPemahamanState();
 }
 
-class _AbsenKuState extends State<AbsenKu> {
+class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
   //Fungsi Untuk Bottom Navigation
   int _selectedIndex = 0; // untuk mengatur index bottom navigation
   void _onItemTapped(int index) {
@@ -33,6 +32,17 @@ class _AbsenKuState extends State<AbsenKu> {
                   )),
         );
       } else if (index == 1) {
+        // Tindakan ketika item "Tugas" ditekan
+        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
+        // Misalnya:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => AbsensiMahasiswaScreen(
+                    kodeKelas: widget.kodeKelas,
+                  )),
+        );
+      } else if (index == 2) {
         // Tindakan ketika item "Tugas" ditekan
         // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
         // Misalnya:
@@ -146,11 +156,22 @@ class _AbsenKuState extends State<AbsenKu> {
                               left: 50.0,
                               top: 38.0,
                             ),
-                            child: Text(
-                              'Absensi',
-                              style: GoogleFonts.quicksand(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AbsenKu(
+                                            kodeKelas: widget.kodeKelas)));
+                              },
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Text(
+                                  'Absensi',
+                                  style: GoogleFonts.quicksand(
+                                    fontSize: 16.0,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -161,24 +182,11 @@ class _AbsenKuState extends State<AbsenKu> {
                                 left: 50.0,
                                 top: 38.0,
                               ),
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              KumpulUjianPemahaman(
-                                                  kodeKelas:
-                                                      widget.kodeKelas)));
-                                },
-                                child: MouseRegion(
-                                  cursor: SystemMouseCursors.click,
-                                  child: Text(
-                                    'Pengumpulan',
-                                    style: GoogleFonts.quicksand(
-                                      fontSize: 16.0,
-                                    ),
-                                  ),
+                              child: Text(
+                                'Pengumpulan',
+                                style: GoogleFonts.quicksand(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
@@ -217,7 +225,7 @@ class _AbsenKuState extends State<AbsenKu> {
                       const SizedBox(
                         height: 20.0,
                       ),
-                      TabelAbsenKu(kodeKelas: widget.kodeKelas),
+                      // TabelAbsenKu(kodeKelas: widget.kodeKelas),
                       const SizedBox(
                         height: 20.0,
                       )
@@ -232,12 +240,16 @@ class _AbsenKuState extends State<AbsenKu> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'AbsenKu',
+            icon: Icon(Icons.book),
+            label: 'Pre-Test',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Praktikan',
+            icon: Icon(Icons.book),
+            label: 'Latihan',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmarks),
+            label: 'Tugas',
           ),
         ],
         currentIndex: _selectedIndex,
