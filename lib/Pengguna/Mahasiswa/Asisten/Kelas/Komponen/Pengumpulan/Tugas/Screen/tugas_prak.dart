@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Asisten/Screen/absensi_ass_sc.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Pengumpulan/Tugas/Screen/tugas_prak.dart';
-import '../../../Deskripsi/Screen/deskripsi_kelas.dart';
-import '../Tabel/tbl_ujipemahaman.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Pengumpulan/Tugas/Tabel/tbl_tugas_prak.dart';
 
-class KumpulUjianPemahaman extends StatefulWidget {
+import '../../Pre-Test/Screen/pre_test_prak.dart';
+
+class KumpulTugas extends StatefulWidget {
   final String kodeKelas;
-  const KumpulUjianPemahaman({super.key, required this.kodeKelas});
+  const KumpulTugas({super.key, required this.kodeKelas});
 
   @override
-  State<KumpulUjianPemahaman> createState() => _KumpulUjianPemahamanState();
+  State<KumpulTugas> createState() => _KumpulTugasState();
 }
 
-class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
+class _KumpulTugasState extends State<KumpulTugas> {
   //Fungsi Untuk Bottom Navigation
-  int _selectedIndex = 0; // untuk mengatur index bottom navigation
+  int _selectedIndex = 1; // untuk mengatur index bottom navigation
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -24,6 +25,13 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
         // Tindakan ketika item "Latihan" ditekan
         // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan latihan
         // Misalnya:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => KumpulUjianPemahaman(
+                    kodeKelas: widget.kodeKelas,
+                  )),
+        );
       } else if (index == 1) {
         // Tindakan ketika item "Tugas" ditekan
         // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
@@ -46,14 +54,13 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
           leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.black,
-            ),
-          ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.black,
+              )),
           backgroundColor: const Color(0xFFF7F8FA),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
@@ -64,15 +71,13 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
                   width: 10.0,
                 ),
                 Expanded(
-                  child: Text(
-                    widget.kodeKelas,
-                    style: GoogleFonts.quicksand(
+                    child: Text(
+                  widget.kodeKelas,
+                  style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
+                      color: Colors.black),
+                ))
               ],
             ),
           ),
@@ -93,11 +98,7 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 0.5,
-                            color: Colors.grey,
-                          ),
-                        ),
+                            border: Border.all(width: 0.5, color: Colors.grey)),
                         height: 320.0,
                         width: double.infinity,
                         child: Image.asset(
@@ -109,10 +110,8 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
                         children: [
                           //Deskripsi Kelas
                           Padding(
-                            padding: const EdgeInsets.only(
-                              top: 38.0,
-                              left: 95.0,
-                            ),
+                            padding:
+                                const EdgeInsets.only(top: 38.0, left: 95.0),
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -125,19 +124,15 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
                                 cursor: SystemMouseCursors.click,
                                 child: Text(
                                   'Deskripsi',
-                                  style: GoogleFonts.quicksand(
-                                    fontSize: 16.0,
-                                  ),
+                                  style: GoogleFonts.quicksand(fontSize: 16.0),
                                 ),
                               ),
                             ),
                           ),
                           //Absensi Mahasiswa
                           Padding(
-                            padding: const EdgeInsets.only(
-                              left: 50.0,
-                              top: 38.0,
-                            ),
+                            padding:
+                                const EdgeInsets.only(top: 38.0, left: 95.0),
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -149,26 +144,31 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: Text(
-                                  'Absensi',
-                                  style: GoogleFonts.quicksand(
-                                    fontSize: 16.0,
-                                  ),
+                                  'Deskripsi',
+                                  style: GoogleFonts.quicksand(fontSize: 16.0),
                                 ),
                               ),
                             ),
                           ),
                           //Pengumpulan Pre-Test, Latihan dan Tugas
-                          GestureDetector(
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                left: 50.0,
-                                top: 38.0,
-                              ),
-                              child: Text(
-                                'Pengumpulan',
-                                style: GoogleFonts.quicksand(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.bold,
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(top: 38.0, left: 95.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => KumpulTugas(
+                                            kodeKelas: widget.kodeKelas)));
+                              },
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Text(
+                                  'Pengumpulan',
+                                  style: GoogleFonts.quicksand(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
@@ -194,11 +194,8 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
                         ],
                       ),
                       const Padding(
-                        padding: EdgeInsets.only(
-                          top: 10.0,
-                          left: 45.0,
-                          right: 45.0,
-                        ),
+                        padding:
+                            EdgeInsets.only(top: 10.0, left: 45.0, right: 45.0),
                         child: Divider(
                           thickness: 0.5,
                           color: Colors.grey,
@@ -207,30 +204,22 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
                       const SizedBox(
                         height: 20.0,
                       ),
-                      TabelPengumpulanUjiPemahaman(
-                        kodeKelas: widget.kodeKelas,
-                      ),
+                      TabelKumpulTugas(kodeKelas: widget.kodeKelas),
                       const SizedBox(
                         height: 20.0,
                       )
                     ],
                   ),
                 ),
-              ),
+              )
             ],
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'Pre-Test',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmarks),
-            label: 'Tugas',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Pre-Test'),
+          BottomNavigationBarItem(icon: Icon(Icons.bookmarks), label: 'Tugas'),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: const Color(0xFF3CBEA9),

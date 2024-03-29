@@ -74,16 +74,17 @@ class _UjianPemahamanState extends State<UjianPemahaman> {
       final firebase_storage.Reference storageRef = firebase_storage
           .FirebaseStorage.instance
           .ref()
-          .child('pre-test/${widget.kodeKelas}/$fileName');
+          .child('latihan/${widget.kodeKelas}/$fileName');
 
       await storageRef.putData(file.bytes!);
 
-      await FirebaseFirestore.instance.collection('pre-test').add({
+      await FirebaseFirestore.instance.collection('latihan').add({
         'namaFile': fileName,
         'waktuPengumpulan': DateTime.now(),
         'nim': userNim,
         'nama': userName,
         'kodeKelas': widget.kodeKelas,
+        'judulMateri': widget.modul
       });
 
       // ignore: use_build_context_synchronously

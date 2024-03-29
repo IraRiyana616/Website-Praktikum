@@ -4,26 +4,25 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class TabelPengumpulanUjiPemahaman extends StatefulWidget {
+class TabelKumpulTugas extends StatefulWidget {
   final String kodeKelas;
-  const TabelPengumpulanUjiPemahaman({super.key, required this.kodeKelas});
+  const TabelKumpulTugas({super.key, required this.kodeKelas});
 
   @override
-  State<TabelPengumpulanUjiPemahaman> createState() =>
-      _TabelPengumpulanUjiPemahamanState();
+  State<TabelKumpulTugas> createState() => _TabelKumpulTugasState();
 }
 
-class _TabelPengumpulanUjiPemahamanState
-    extends State<TabelPengumpulanUjiPemahaman> {
+class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
   List<Pengumpulan> demoPengumpulan = [];
   List<Pengumpulan> filteredPengumpulan = [];
   //Judul Materi
   String selectedModul = 'Tampilkan Semua';
   List<String> availableModuls = ['Tampilkan Semua'];
+
   Future<void> deleteDataFromFirestore(String documentId) async {
     try {
       await FirebaseFirestore.instance
-          .collection('pre-test')
+          .collection('tugas')
           .doc(documentId)
           .delete();
       fetchDataFromFirestore();
@@ -36,7 +35,7 @@ class _TabelPengumpulanUjiPemahamanState
 
   Future<void> fetchDataFromFirestore() async {
     final QuerySnapshot silabusSnapshot = await FirebaseFirestore.instance
-        .collection('latihan')
+        .collection('tugas')
         .where('kodeKelas', isEqualTo: widget.kodeKelas)
         .get();
 
@@ -66,12 +65,6 @@ class _TabelPengumpulanUjiPemahamanState
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchDataFromFirestore();
-  }
-
   void _filterData(String? modul) {
     if (modul != null) {
       setState(() {
@@ -79,9 +72,8 @@ class _TabelPengumpulanUjiPemahamanState
         if (modul == 'Tampilkan Semua') {
           filteredPengumpulan = demoPengumpulan;
         } else {
-          filteredPengumpulan = demoPengumpulan
-              .where((latihan) => latihan.modul == modul)
-              .toList();
+          filteredPengumpulan =
+              demoPengumpulan.where((tugas) => tugas.modul == modul).toList();
         }
       });
     }
@@ -91,6 +83,12 @@ class _TabelPengumpulanUjiPemahamanState
     setState(() {
       filteredPengumpulan.sort((a, b) => a.nama.compareTo(b.nama));
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDataFromFirestore();
   }
 
   @override
@@ -203,14 +201,13 @@ class Pengumpulan {
   final String waktu;
   final String modul;
 
-  Pengumpulan({
-    required this.kode,
-    required this.nama,
-    required this.nim,
-    required this.file,
-    required this.waktu,
-    required this.modul,
-  });
+  Pengumpulan(
+      {required this.kode,
+      required this.nama,
+      required this.nim,
+      required this.file,
+      required this.waktu,
+      required this.modul});
 }
 
 DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
@@ -247,7 +244,7 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
           ),
           GestureDetector(
             onTap: () {
-              downloadFile(fileInfo.kode, fileInfo.file);
+              downloadFile(fileInfo.kode, fileInfo.file, fileInfo.modul);
             },
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
@@ -264,9 +261,10 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
   );
 }
 
-void downloadFile(String kodeKelas, String fileName) async {
-  final ref =
-      FirebaseStorage.instance.ref().child('pre-test/$kodeKelas/$fileName');
+void downloadFile(String kodeKelas, String fileName, String judulMateri) async {
+  final ref = FirebaseStorage.instance
+      .ref()
+      .child('tugas/$kodeKelas/$judulMateri/$fileName');
 
   try {
     final url = await ref.getDownloadURL();

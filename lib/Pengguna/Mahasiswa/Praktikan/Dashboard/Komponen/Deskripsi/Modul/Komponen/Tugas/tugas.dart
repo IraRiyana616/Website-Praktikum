@@ -74,7 +74,7 @@ class _PengumpulanTugasState extends State<PengumpulanTugas> {
       final firebase_storage.Reference storageRef = firebase_storage
           .FirebaseStorage.instance
           .ref()
-          .child('tugas/${widget.kodeKelas}/$fileName');
+          .child('tugas/${widget.kodeKelas}/${widget.modul}/$fileName');
 
       await storageRef.putData(file.bytes!);
 
@@ -84,6 +84,7 @@ class _PengumpulanTugasState extends State<PengumpulanTugas> {
         'nim': userNim,
         'nama': userName,
         'kodeKelas': widget.kodeKelas,
+        'judulMateri': widget.modul,
       });
 
       // ignore: use_build_context_synchronously
