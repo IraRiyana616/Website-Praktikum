@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Asisten/Screen/absensi_ass_sc.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Pengumpulan/Tugas/Screen/tugas_prak.dart';
+import '../../../Asistensi Laporan/Screen/data_prak.dart';
 import '../../../Deskripsi/Screen/deskripsi_kelas.dart';
 import '../Tabel/tbl_ujipemahaman.dart';
 
@@ -175,6 +176,15 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
                           ),
                           //Asistensi Laporan
                           GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          DataPraktikanAsistensi(
+                                            kodeKelas: widget.kodeKelas,
+                                          )));
+                            },
                             child: Padding(
                               padding: const EdgeInsets.only(
                                 left: 50.0,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Praktikan/Tabel/tbl_absensi_prak.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
+import '../../../Asistensi Laporan/Screen/data_prak.dart';
 import '../../Asisten/Screen/absensi_ass_sc.dart';
 
 class AbsensiMahasiswaScreen extends StatefulWidget {
@@ -173,6 +174,15 @@ class _AbsensiMahasiswaScreenState extends State<AbsensiMahasiswaScreen> {
                           ),
                           //Asistensi Laporan
                           GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          DataPraktikanAsistensi(
+                                            kodeKelas: widget.kodeKelas,
+                                          )));
+                            },
                             child: Padding(
                               padding: const EdgeInsets.only(
                                 left: 50.0,

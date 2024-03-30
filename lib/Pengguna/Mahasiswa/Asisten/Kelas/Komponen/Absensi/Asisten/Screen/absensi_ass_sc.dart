@@ -4,6 +4,7 @@ import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Asisten/
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Praktikan/Screen/absensi_prak.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
 
+import '../../../Asistensi Laporan/Screen/data_prak.dart';
 import '../../../Pengumpulan/Pre-Test/Screen/pre_test_prak.dart';
 
 class AbsenKu extends StatefulWidget {
@@ -185,6 +186,15 @@ class _AbsenKuState extends State<AbsenKu> {
                           ),
                           //Asistensi Laporan
                           GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          DataPraktikanAsistensi(
+                                            kodeKelas: widget.kodeKelas,
+                                          )));
+                            },
                             child: Padding(
                               padding: const EdgeInsets.only(
                                 left: 50.0,

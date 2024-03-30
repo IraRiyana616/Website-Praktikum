@@ -72,7 +72,7 @@ class _PengumpulanLaporanState extends State<PengumpulanLaporan> {
       final firebase_storage.Reference storageRef = firebase_storage
           .FirebaseStorage.instance
           .ref()
-          .child('laporan/${widget.kodeKelas}/$fileName');
+          .child('laporan/${widget.kodeKelas}/${widget.modul}/$fileName');
 
       await storageRef.putData(file.bytes!);
 
@@ -82,6 +82,7 @@ class _PengumpulanLaporanState extends State<PengumpulanLaporan> {
         'nim': userNim,
         'nama': userName,
         'kodeKelas': widget.kodeKelas,
+        'judulMateri': widget.modul
       });
 
       // ignore: use_build_context_synchronously
@@ -98,7 +99,7 @@ class _PengumpulanLaporanState extends State<PengumpulanLaporan> {
   }
 
   bool isButtonVisible(Map<String, dynamic> data) {
-    Timestamp? aksesLatihan = data['aksesTugas'];
+    Timestamp? aksesLatihan = data['aksesLaporan'];
     Timestamp? tutupAksesLatihan = data['tutupAksesLaporan'];
     Timestamp now = Timestamp.now();
 

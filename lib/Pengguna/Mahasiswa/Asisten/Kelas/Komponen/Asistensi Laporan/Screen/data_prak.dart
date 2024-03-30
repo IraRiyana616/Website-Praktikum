@@ -1,89 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Asisten/Screen/absensi_ass_sc.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Asistensi%20Laporan/Tabel/tbl_data_prak.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Pengumpulan/Tugas/Tabel/tbl_tugas_prak.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Pengumpulan/Tugas/Screen/tugas_prak.dart';
 
-import '../../../Asistensi Laporan/Screen/data_prak.dart';
-import '../../Pre-Test/Screen/pre_test_prak.dart';
-
-class KumpulTugas extends StatefulWidget {
+class DataPraktikanAsistensi extends StatefulWidget {
   final String kodeKelas;
-  const KumpulTugas({super.key, required this.kodeKelas});
+  const DataPraktikanAsistensi({super.key, required this.kodeKelas});
 
   @override
-  State<KumpulTugas> createState() => _KumpulTugasState();
+  State<DataPraktikanAsistensi> createState() => _DataPraktikanAsistensiState();
 }
 
-class _KumpulTugasState extends State<KumpulTugas> {
-  //Fungsi Untuk Bottom Navigation
-  int _selectedIndex = 1; // untuk mengatur index bottom navigation
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      // Memilih halaman sesuai dengan index yang dipilih
-      if (index == 0) {
-        // Tindakan ketika item "Latihan" ditekan
-        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan latihan
-        // Misalnya:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => KumpulUjianPemahaman(
-                    kodeKelas: widget.kodeKelas,
-                  )),
-        );
-      } else if (index == 1) {
-        // Tindakan ketika item "Tugas" ditekan
-        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
-        // Misalnya:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => KumpulTugas(
-                    kodeKelas: widget.kodeKelas,
-                  )),
-        );
-      }
-    });
-  }
-
+class _DataPraktikanAsistensiState extends State<DataPraktikanAsistensi> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70.0),
-        child: AppBar(
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-              )),
-          backgroundColor: const Color(0xFFF7F8FA),
-          title: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox(
-                  width: 10.0,
-                ),
-                Expanded(
-                    child: Text(
-                  widget.kodeKelas,
-                  style: GoogleFonts.quicksand(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ))
-              ],
+          preferredSize: const Size.fromHeight(70.0),
+          child: AppBar(
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                )),
+            backgroundColor: const Color(0xFFF7F8FA),
+            title: Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(
+                    width: 10.0,
+                  ),
+                  Expanded(
+                      child: Text(
+                    widget.kodeKelas,
+                    style: GoogleFonts.quicksand(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ))
+                ],
+              ),
             ),
-          ),
-        ),
-      ),
+          )),
       body: SingleChildScrollView(
         child: Container(
           color: const Color(0xFFE3E8EF),
@@ -132,8 +97,10 @@ class _KumpulTugasState extends State<KumpulTugas> {
                           ),
                           //Absensi Mahasiswa
                           Padding(
-                            padding:
-                                const EdgeInsets.only(top: 38.0, left: 50.0),
+                            padding: const EdgeInsets.only(
+                              top: 38.0,
+                              left: 50.0,
+                            ),
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -145,16 +112,18 @@ class _KumpulTugasState extends State<KumpulTugas> {
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: Text(
-                                  'Deskripsi',
+                                  'Absensi',
                                   style: GoogleFonts.quicksand(fontSize: 16.0),
                                 ),
                               ),
                             ),
                           ),
-                          //Pengumpulan Pre-Test, Latihan dan Tugas
+                          //Pengumpulan
                           Padding(
-                            padding:
-                                const EdgeInsets.only(top: 38.0, left: 50.0),
+                            padding: const EdgeInsets.only(
+                              top: 38.0,
+                              left: 50.0,
+                            ),
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -167,36 +136,33 @@ class _KumpulTugasState extends State<KumpulTugas> {
                                 cursor: SystemMouseCursors.click,
                                 child: Text(
                                   'Pengumpulan',
-                                  style: GoogleFonts.quicksand(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold),
+                                  style: GoogleFonts.quicksand(fontSize: 16.0),
                                 ),
                               ),
                             ),
                           ),
-                          //Asistensi Laporan
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          DataPraktikanAsistensi(
-                                            kodeKelas: widget.kodeKelas,
-                                          )));
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                left: 50.0,
-                                top: 38.0,
-                              ),
+                          //Asistensi
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: 38.0,
+                              left: 50.0,
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            DataPraktikanAsistensi(
+                                                kodeKelas: widget.kodeKelas)));
+                              },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: Text(
                                   'Asistensi',
                                   style: GoogleFonts.quicksand(
-                                    fontSize: 16.0,
-                                  ),
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
@@ -211,10 +177,9 @@ class _KumpulTugasState extends State<KumpulTugas> {
                           color: Colors.grey,
                         ),
                       ),
-                      const SizedBox(
-                        height: 20.0,
-                      ),
-                      TabelKumpulTugas(kodeKelas: widget.kodeKelas),
+
+                      //Tabel Data Praktikan
+                      TabelDataPraktikan(kodeKelas: widget.kodeKelas),
                       const SizedBox(
                         height: 20.0,
                       )
@@ -225,15 +190,6 @@ class _KumpulTugasState extends State<KumpulTugas> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Pre-Test'),
-          BottomNavigationBarItem(icon: Icon(Icons.bookmarks), label: 'Tugas'),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFF3CBEA9),
-        onTap: _onItemTapped,
       ),
     );
   }

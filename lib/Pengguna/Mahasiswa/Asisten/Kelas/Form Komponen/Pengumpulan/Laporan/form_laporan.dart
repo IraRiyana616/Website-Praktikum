@@ -147,7 +147,7 @@ class _FormPengumpulanLaporanState extends State<FormPengumpulanLaporan> {
       'kodeKelas': _kodeKelasController.text,
       'deskripsiLaporan': _deskripsiTugasController.text,
       'judulMateri': _judulModulController.text,
-      'aksesTugas': DateTime.parse(_bukaController.text),
+      'aksesLaporan': DateTime.parse(_bukaController.text),
       'tutupAksesLaporan': DateTime.parse(_tutupController.text),
     });
     //Tampilkan pesan sukses

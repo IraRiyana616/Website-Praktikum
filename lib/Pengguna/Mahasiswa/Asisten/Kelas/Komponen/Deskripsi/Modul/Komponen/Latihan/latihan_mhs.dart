@@ -242,7 +242,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
 
     // Melakukan query ke Firestore
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('pengumpulanTugas')
+        .collection('pengumpulanLatihan')
         .where('kodeKelas', isEqualTo: kodeKelas)
         .where('judulMateri', isEqualTo: modul)
         .get();

@@ -118,7 +118,7 @@ class _LaporanAsistenState extends State<LaporanAsisten> {
         querySnapshot.docs.forEach((doc) async {
           await doc.reference.update({
             'aksesLaporan': bukaTimestamp,
-            'tutupAksesLaporarn': tutupTimestamp,
+            'tutupAksesLaporan': tutupTimestamp,
           });
         });
       });
