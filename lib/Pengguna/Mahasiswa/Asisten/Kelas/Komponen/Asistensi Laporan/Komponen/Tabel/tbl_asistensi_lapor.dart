@@ -347,7 +347,7 @@ Future<void> showInfoDialog(
 Future<void> uploadFile(
   String kodeKelas,
   String fileName,
-  String uid, // tambahkan parameter uid
+  String nama,
   String modul,
   BuildContext context,
 ) async {
@@ -386,15 +386,7 @@ Future<void> uploadFile(
           .child('asistensiLaporan/$kodeKelas/$modul/$fileName');
 
       await storageRef.putData(Uint8List.fromList(file.bytes!));
-
-      // Mengambil nama pemeriksa dari Firestore
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('akun_mahasiswa')
-          .doc(uid) // menggunakan uid untuk mengambil data pengguna yang login
-          .get();
-      String namaPemeriksa = userSnapshot['nama'];
-
-      // Mengambil referensi ke jumlah dokumen saat ini dalam koleksi 'laporan'
+// Mengambil referensi ke jumlah dokumen saat ini dalam koleksi 'laporan'
       QuerySnapshot querySnapshot =
           await FirebaseFirestore.instance.collection('asistensiLaporan').get();
       int userUid = querySnapshot.docs.length + 1;
@@ -402,7 +394,7 @@ Future<void> uploadFile(
         'UserUid': userUid,
         'namaFile': fileName,
         'waktuPengumpulan': DateTime.now(),
-        'namaPemeriksa': namaPemeriksa, // Menambahkan nama pemeriksa
+        'namaPemeriksa': nama,
         'kodeKelas': kodeKelas,
         'judulMateri': modul,
       });
