@@ -1,8 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -112,7 +116,6 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
           laporanSnapshot.docs.map((DocumentSnapshot document) {
         Map<String, dynamic> data = document.data() as Map<String, dynamic>;
         return AsistensiLaporan(
-          userUid: data['UserUid'] ?? 0,
           modul: data['judulMateri'] ?? '',
           kode: data['kodeKelas'] ?? '',
           nama: data['nama'] ?? '',
@@ -137,7 +140,6 @@ class AsistensiLaporan {
   String file;
   int nim;
   DateTime waktu;
-  int userUid;
 
   AsistensiLaporan({
     required this.modul,
@@ -146,7 +148,6 @@ class AsistensiLaporan {
     required this.file,
     required this.nim,
     required this.waktu,
-    required this.userUid,
   });
 }
 
@@ -246,7 +247,6 @@ Future<void> showInfoDialog(
         await asistensiRef
             .where('kodeKelas', isEqualTo: fileInfo.kode)
             .where('judulMateri', isEqualTo: fileInfo.modul)
-            .where('UserUid', isEqualTo: fileInfo.userUid)
             .get();
 
     if (asistensiSnapshot.docs.isNotEmpty) {
@@ -255,7 +255,6 @@ Future<void> showInfoDialog(
       final namaPemeriksa = document['namaPemeriksa'];
       final waktuPengumpulan = document['waktuPengumpulan'];
 
-      // ignore: use_build_context_synchronously
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -318,7 +317,6 @@ Future<void> showInfoDialog(
         },
       );
     } else {
-      // ignore: use_build_context_synchronously
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -379,6 +377,18 @@ Future<void> uploadFile(
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
       PlatformFile file = result.files.first;
+      User? user = FirebaseAuth.instance.currentUser;
+      String nama = ''; // Deklarasi variable nama di luar block if
+
+      // Ambil nama dari Firestore
+      if (user != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('akun_mahasiswa')
+            .doc(user.uid)
+            .get();
+        nama = userDoc[
+            'nama']; // Asumsi field untuk nama di Firestore adalah 'nama'
+      }
 
       final firebase_storage.Reference storageRef = firebase_storage
           .FirebaseStorage.instance
@@ -386,12 +396,26 @@ Future<void> uploadFile(
           .child('asistensiLaporan/$kodeKelas/$modul/$fileName');
 
       await storageRef.putData(Uint8List.fromList(file.bytes!));
-// Mengambil referensi ke jumlah dokumen saat ini dalam koleksi 'laporan'
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('asistensiLaporan').get();
-      int userUid = querySnapshot.docs.length + 1;
-      await FirebaseFirestore.instance.collection('asistensiLaporan').add({
-        'UserUid': userUid,
+
+      // Menggunakan transaksi untuk memastikan increment documentId
+      String nextDocumentId = '';
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        DocumentReference counterRef = FirebaseFirestore.instance
+            .collection('counters')
+            .doc('asistensiLaporan');
+        DocumentSnapshot counterSnapshot = await transaction.get(counterRef);
+        int currentCount =
+            counterSnapshot.exists ? counterSnapshot.get('count') : 0;
+        nextDocumentId =
+            '${currentCount + 1}'; // Mengubah count menjadi string untuk digunakan sebagai ID
+        transaction.set(counterRef, {'count': currentCount + 1});
+      });
+
+      // Menambahkan dokumen dengan ID yang telah ditentukan
+      await FirebaseFirestore.instance
+          .collection('asistensiLaporan')
+          .doc(nextDocumentId)
+          .set({
         'namaFile': fileName,
         'waktuPengumpulan': DateTime.now(),
         'namaPemeriksa': nama,
@@ -400,11 +424,9 @@ Future<void> uploadFile(
       });
 
       // Menutup dialog loading setelah upload selesai
-      // ignore: use_build_context_synchronously
       Navigator.pop(context);
 
       // Menampilkan dialog sukses setelah file di-upload
-      // ignore: use_build_context_synchronously
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -447,7 +469,6 @@ Future<void> uploadFile(
       );
     } else {
       // Menutup dialog loading jika tidak ada file yang dipilih
-      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     }
   } catch (e) {
