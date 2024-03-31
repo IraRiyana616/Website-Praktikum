@@ -75,8 +75,13 @@ class _PengumpulanLaporanState extends State<PengumpulanLaporan> {
           .child('laporan/${widget.kodeKelas}/${widget.modul}/$fileName');
 
       await storageRef.putData(file.bytes!);
+      // Mengambil referensi ke jumlah dokumen saat ini dalam koleksi 'laporan'
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('laporan').get();
+      int userUid = querySnapshot.docs.length + 1;
 
       await FirebaseFirestore.instance.collection('laporan').add({
+        'UserUid': userUid,
         'namaFile': fileName,
         'waktuPengumpulan': DateTime.now(),
         'nim': userNim,

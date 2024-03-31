@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -105,11 +106,13 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
         .where('kodeKelas', isEqualTo: widget.kodeKelas)
         .where('nama', isEqualTo: widget.nama)
         .get();
+
     if (laporanSnapshot.docs.isNotEmpty) {
       List<AsistensiLaporan> fetchedData =
           laporanSnapshot.docs.map((DocumentSnapshot document) {
         Map<String, dynamic> data = document.data() as Map<String, dynamic>;
         return AsistensiLaporan(
+          userUid: data['UserUid'] ?? 0,
           modul: data['judulMateri'] ?? '',
           kode: data['kodeKelas'] ?? '',
           nama: data['nama'] ?? '',
@@ -134,6 +137,7 @@ class AsistensiLaporan {
   String file;
   int nim;
   DateTime waktu;
+  int userUid;
 
   AsistensiLaporan({
     required this.modul,
@@ -142,6 +146,7 @@ class AsistensiLaporan {
     required this.file,
     required this.nim,
     required this.waktu,
+    required this.userUid,
   });
 }
 
@@ -216,7 +221,9 @@ DataRow dataFileDataRow(
             MouseRegion(
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  showInfoDialog(fileInfo, context); // Pass context here
+                },
                 child: const Icon(
                   Icons.info,
                   color: Colors.grey,
@@ -230,10 +237,117 @@ DataRow dataFileDataRow(
   );
 }
 
+Future<void> showInfoDialog(
+    AsistensiLaporan fileInfo, BuildContext context) async {
+  try {
+    final CollectionReference<Map<String, dynamic>> asistensiRef =
+        FirebaseFirestore.instance.collection('asistensiLaporan');
+    final QuerySnapshot<Map<String, dynamic>> asistensiSnapshot =
+        await asistensiRef
+            .where('kodeKelas', isEqualTo: fileInfo.kode)
+            .where('judulMateri', isEqualTo: fileInfo.modul)
+            .where('UserUid', isEqualTo: fileInfo.userUid)
+            .get();
+
+    if (asistensiSnapshot.docs.isNotEmpty) {
+      final DocumentSnapshot<Map<String, dynamic>> document =
+          asistensiSnapshot.docs.first;
+      final namaPemeriksa = document['namaPemeriksa'];
+      final waktuPengumpulan = document['waktuPengumpulan'];
+
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              'Data Asisten',
+              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  height: 13.0,
+                ),
+                Row(
+                  children: [
+                    const Text(
+                      'Nama Pemeriksa : ',
+                      style: TextStyle(fontSize: 14.0),
+                    ),
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    Text(
+                      '$namaPemeriksa',
+                      style: const TextStyle(fontSize: 14.0),
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 18.0,
+                ),
+                Row(
+                  children: [
+                    const Text(
+                      'Waktu Asistensi   :', // Menggunakan toDate() untuk mengonversi Timestamp menjadi DateTime
+                      style: TextStyle(fontSize: 14.0),
+                    ),
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    Text(
+                      ' ${DateFormat('dd-MM-yyyy HH:mm:ss').format(waktuPengumpulan.toDate())}',
+                      style: const TextStyle(fontSize: 14.0),
+                    )
+                  ],
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Data Asisten'),
+            content: const Text('Belum Melakukan Asistensi Laporan'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error fetching info: $e');
+    }
+  }
+}
+
 Future<void> uploadFile(
   String kodeKelas,
   String fileName,
-  String nama,
+  String uid, // tambahkan parameter uid
   String modul,
   BuildContext context,
 ) async {
@@ -273,10 +387,22 @@ Future<void> uploadFile(
 
       await storageRef.putData(Uint8List.fromList(file.bytes!));
 
+      // Mengambil nama pemeriksa dari Firestore
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('akun_mahasiswa')
+          .doc(uid) // menggunakan uid untuk mengambil data pengguna yang login
+          .get();
+      String namaPemeriksa = userSnapshot['nama'];
+
+      // Mengambil referensi ke jumlah dokumen saat ini dalam koleksi 'laporan'
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('asistensiLaporan').get();
+      int userUid = querySnapshot.docs.length + 1;
       await FirebaseFirestore.instance.collection('asistensiLaporan').add({
+        'UserUid': userUid,
         'namaFile': fileName,
         'waktuPengumpulan': DateTime.now(),
-        'namaPemeriksa': nama,
+        'namaPemeriksa': namaPemeriksa, // Menambahkan nama pemeriksa
         'kodeKelas': kodeKelas,
         'judulMateri': modul,
       });
