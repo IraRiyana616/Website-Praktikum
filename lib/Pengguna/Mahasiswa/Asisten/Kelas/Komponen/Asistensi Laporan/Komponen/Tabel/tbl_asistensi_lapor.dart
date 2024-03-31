@@ -1,13 +1,24 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class TabelAsistensiLaporan extends StatefulWidget {
   final String kodeKelas;
-  const TabelAsistensiLaporan({Key? key, required this.kodeKelas})
-      : super(key: key);
+  final String nama;
+  final String modul;
+
+  const TabelAsistensiLaporan({
+    Key? key,
+    required this.kodeKelas,
+    required this.nama,
+    required this.modul,
+  }) : super(key: key);
 
   @override
   State<TabelAsistensiLaporan> createState() => _TabelAsistensiLaporanState();
@@ -16,26 +27,8 @@ class TabelAsistensiLaporan extends StatefulWidget {
 class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
   List<AsistensiLaporan> demoAsistensiLaporan = [];
   List<AsistensiLaporan> filteredAsistenLaporan = [];
-  @override
-  void initState() {
-    super.initState();
-    fetchDataFromFirestore();
-  }
-
-  void fetchDataFromFirestore() async {
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection('tokenKelas')
-        .where('kodeKelas', isEqualTo: widget.kodeKelas)
-        .get();
-
-    final data = querySnapshot.docs
-        .map((doc) => AsistensiLaporan.fromFirestore(doc))
-        .toList();
-
-    setState(() {
-      filteredAsistenLaporan = data;
-    });
-  }
+  late int userNim;
+  late String userName;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +36,8 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
       children: [
         Center(
           child: Padding(
-            padding: const EdgeInsets.only(left: 18.0, right: 25.0),
+            padding: const EdgeInsets.only(
+                left: 18.0, right: 25.0, top: 20.0, bottom: 20.0),
             child: SizedBox(
               width: 1195.0,
               child: filteredAsistenLaporan.isNotEmpty
@@ -64,10 +58,15 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
                         ),
                         DataColumn(
                           label: Text(
-                            'Dowload File',
+                            'Download File',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
+                        DataColumn(
+                            label: Text(
+                          'File Asistensi',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
                       ],
                       source: DataSource(filteredAsistenLaporan, context),
                       rowsPerPage:
@@ -89,10 +88,41 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
 
   int calculateRowsPerPage(int rowCount) {
     const int defaultRowsPerPage = 25;
-    if (rowCount <= defaultRowsPerPage) {
-      return rowCount;
-    } else {
-      return defaultRowsPerPage;
+    return rowCount <= defaultRowsPerPage ? rowCount : defaultRowsPerPage;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    checkAndFetchData();
+  }
+
+  Future<void> checkAndFetchData() async {
+    final CollectionReference<Map<String, dynamic>> laporanRef =
+        FirebaseFirestore.instance.collection('laporan');
+    final QuerySnapshot<Map<String, dynamic>> laporanSnapshot = await laporanRef
+        .where('kodeKelas', isEqualTo: widget.kodeKelas)
+        .where('nama', isEqualTo: widget.nama)
+        .get();
+    if (laporanSnapshot.docs.isNotEmpty) {
+      List<AsistensiLaporan> fetchedData =
+          laporanSnapshot.docs.map((DocumentSnapshot document) {
+        Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+        return AsistensiLaporan(
+          modul: data['judulMateri'] ?? '',
+          kode: data['kodeKelas'] ?? '',
+          nama: data['nama'] ?? '',
+          file: data['namaFile'] ?? '',
+          nim: data['nim'] ?? 0,
+          waktu: (data['waktuPengumpulan'] as Timestamp).toDate(),
+        );
+      }).toList();
+
+      setState(() {
+        demoAsistensiLaporan = fetchedData;
+        filteredAsistenLaporan = fetchedData;
+      });
     }
   }
 }
@@ -104,6 +134,7 @@ class AsistensiLaporan {
   String file;
   int nim;
   DateTime waktu;
+
   AsistensiLaporan({
     required this.modul,
     required this.kode,
@@ -112,17 +143,6 @@ class AsistensiLaporan {
     required this.nim,
     required this.waktu,
   });
-  factory AsistensiLaporan.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return AsistensiLaporan(
-      nim: data['nim'] ?? 0,
-      nama: data['nama'] ?? '',
-      kode: data['kodeKelas'] ?? '',
-      modul: data['judulMateri'] ?? '',
-      file: data['namaFile'] ?? '',
-      waktu: (data['timestamp'] as Timestamp).toDate(),
-    );
-  }
 }
 
 DataRow dataFileDataRow(
@@ -138,14 +158,12 @@ DataRow dataFileDataRow(
         width: 150.0,
         child: Text(
           getLimitedText(fileInfo.waktu.toString(), 19),
-          style: const TextStyle(color: Colors.black),
         ),
       )),
       DataCell(SizedBox(
         width: 250.0,
         child: Text(
           getLimitedText(fileInfo.modul, 40),
-          style: const TextStyle(color: Colors.black),
         ),
       )),
       DataCell(Row(
@@ -164,27 +182,185 @@ DataRow dataFileDataRow(
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               child: Text(
-                getLimitedText(
-                  fileInfo.file,
-                  20,
-                  style: const TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                getLimitedText(fileInfo.file, 20),
               ),
             ),
           ),
         ],
       )),
+      DataCell(Padding(
+        padding: const EdgeInsets.only(left: 15.0),
+        child: Row(
+          children: [
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () {
+                  uploadFile(
+                    fileInfo.kode,
+                    fileInfo.file,
+                    fileInfo.nama,
+                    fileInfo.modul,
+                    context,
+                  );
+                },
+                child: const Icon(
+                  Icons.upload,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 2.0,
+            ),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () {},
+                child: const Icon(
+                  Icons.info,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ],
+        ),
+      )),
     ],
   );
+}
+
+Future<void> uploadFile(
+  String kodeKelas,
+  String fileName,
+  String nama,
+  String modul,
+  BuildContext context,
+) async {
+  // Menampilkan loading dialog
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Mencegah dialog ditutup secara manual
+    builder: (BuildContext context) {
+      return Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LoadingAnimationWidget.fourRotatingDots(
+                color: Colors.blue,
+                size: 50,
+              ),
+              const SizedBox(width: 20),
+              const Text("Uploading..."),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+
+  try {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      PlatformFile file = result.files.first;
+
+      final firebase_storage.Reference storageRef = firebase_storage
+          .FirebaseStorage.instance
+          .ref()
+          .child('asistensiLaporan/$kodeKelas/$modul/$fileName');
+
+      await storageRef.putData(Uint8List.fromList(file.bytes!));
+
+      await FirebaseFirestore.instance.collection('asistensiLaporan').add({
+        'namaFile': fileName,
+        'waktuPengumpulan': DateTime.now(),
+        'namaPemeriksa': nama,
+        'kodeKelas': kodeKelas,
+        'judulMateri': modul,
+      });
+
+      // Menutup dialog loading setelah upload selesai
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+
+      // Menampilkan dialog sukses setelah file di-upload
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SizedBox(
+            height: 20.0,
+            width: 50.0,
+            child: AlertDialog(
+              title: Column(
+                children: [
+                  Center(
+                    child: SizedBox(
+                      height: 120.0,
+                      width: 120.0,
+                      child: Image.asset(
+                        'assets/images/upload.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      'Data berhasil diupload.',
+                      style: GoogleFonts.quicksand(
+                          fontSize: 17.0, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } else {
+      // Menutup dialog loading jika tidak ada file yang dipilih
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+    }
+  } catch (e) {
+    // Menutup dialog loading jika terjadi error
+    Navigator.pop(context);
+
+    // Menampilkan pesan error
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text('Error uploading file: $e'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 void downloadFile(String kodeKelas, String fileName, String judulMateri) async {
   final ref = FirebaseStorage.instance
       .ref()
-      .child('tugas/$kodeKelas/$judulMateri/$fileName');
+      .child('laporan/$kodeKelas/$judulMateri/$fileName');
 
   try {
     final url = await ref.getDownloadURL();
@@ -202,16 +378,15 @@ void downloadFile(String kodeKelas, String fileName, String judulMateri) async {
   }
 }
 
-String getLimitedText(String text, int limit, {TextStyle? style}) {
+String getLimitedText(
+  String text,
+  int limit,
+) {
   return text.length <= limit ? text : text.substring(0, limit);
 }
 
 Color getRowColor(int index) {
-  if (index % 2 == 0) {
-    return Colors.grey.shade200;
-  } else {
-    return Colors.transparent;
-  }
+  return index % 2 == 0 ? Colors.grey.shade200 : Colors.transparent;
 }
 
 class DataSource extends DataTableSource {

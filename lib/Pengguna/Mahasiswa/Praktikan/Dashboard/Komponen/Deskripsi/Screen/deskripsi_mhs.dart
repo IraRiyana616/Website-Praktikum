@@ -6,7 +6,11 @@ import '../Modul/Screen/modul_mhs.dart';
 
 class DeskripsiMahasiswa extends StatefulWidget {
   final String kodeKelas;
-  const DeskripsiMahasiswa({super.key, required this.kodeKelas});
+
+  const DeskripsiMahasiswa({
+    super.key,
+    required this.kodeKelas,
+  });
 
   @override
   State<DeskripsiMahasiswa> createState() => _DeskripsiMahasiswaState();

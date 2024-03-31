@@ -6,7 +6,11 @@ import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/
 
 class AbsensiPraktikanScreen extends StatefulWidget {
   final String kodeKelas;
-  const AbsensiPraktikanScreen({super.key, required this.kodeKelas});
+
+  const AbsensiPraktikanScreen({
+    super.key,
+    required this.kodeKelas,
+  });
 
   @override
   State<AbsensiPraktikanScreen> createState() => _AbsensiPraktikanScreenState();
@@ -176,7 +180,9 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                 ),
               ),
               //Tampilan Tabel Absensi Praktikan
-              const TabelAbsensiPraktikan(),
+              TabelAbsensiPraktikan(
+                kodeKelas: widget.kodeKelas,
+              ),
             ],
           ),
         ),

@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Tabel/tbl_asistensi_lapor.dart';
-
-class AsistensiLaporan extends StatefulWidget {
+class AsistensiScreen extends StatefulWidget {
   final String kodeKelas;
   final String nama;
   final String modul;
 
-  const AsistensiLaporan({
+  const AsistensiScreen({
     super.key,
     required this.kodeKelas,
     required this.nama,
@@ -16,10 +14,10 @@ class AsistensiLaporan extends StatefulWidget {
   });
 
   @override
-  State<AsistensiLaporan> createState() => _AsistensiLaporanState();
+  State<AsistensiScreen> createState() => _AsistensiScreenState();
 }
 
-class _AsistensiLaporanState extends State<AsistensiLaporan> {
+class _AsistensiScreenState extends State<AsistensiScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +41,7 @@ class _AsistensiLaporanState extends State<AsistensiLaporan> {
                   children: [
                     Expanded(
                         child: Text(
-                      widget.nama,
+                      widget.modul,
                       style: GoogleFonts.quicksand(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
@@ -64,14 +62,10 @@ class _AsistensiLaporanState extends State<AsistensiLaporan> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 35.0, right: 40.0),
                 child: Container(
-                    width: 1230.0,
-                    color: Colors.white,
-                    //Tabel disini
-                    child: TabelAsistensiLaporan(
-                      modul: widget.modul,
-                      kodeKelas: widget.kodeKelas,
-                      nama: widget.nama,
-                    )),
+                  width: 1230.0,
+                  color: Colors.white,
+                  //Tabel disini
+                ),
               ),
             ),
             const SizedBox(

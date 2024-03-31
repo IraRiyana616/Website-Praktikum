@@ -326,8 +326,9 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      DeskripsiMahasiswa(kodeKelas: fileInfo.kode)));
+                  builder: (context) => DeskripsiMahasiswa(
+                        kodeKelas: fileInfo.kode,
+                      )));
         },
       ),
       DataCell(SizedBox(

@@ -138,7 +138,10 @@ DataRow dataFileDataRow(
                 context,
                 MaterialPageRoute(
                     builder: (context) => AsistensiLaporan(
-                        kodeKelas: fileInfo.kode, nama: fileInfo.nama)));
+                          kodeKelas: fileInfo.kode,
+                          nama: fileInfo.nama,
+                          modul: fileInfo.matkul,
+                        )));
           },
           child: const MouseRegion(
             cursor: SystemMouseCursors.click,
