@@ -7,6 +7,7 @@ import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Pengumpulan/Tuga
 
 class DataPraktikanAsistensi extends StatefulWidget {
   final String kodeKelas;
+
   const DataPraktikanAsistensi({super.key, required this.kodeKelas});
 
   @override
@@ -107,7 +108,8 @@ class _DataPraktikanAsistensiState extends State<DataPraktikanAsistensi> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => AbsenKu(
-                                            kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -154,7 +156,8 @@ class _DataPraktikanAsistensiState extends State<DataPraktikanAsistensi> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             DataPraktikanAsistensi(
-                                                kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,

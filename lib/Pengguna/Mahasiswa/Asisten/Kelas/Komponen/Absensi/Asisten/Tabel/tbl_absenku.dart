@@ -1,9 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class TabelAbsenKu extends StatefulWidget {
-  const TabelAbsenKu({super.key, required String kodeKelas});
+  final String kodeKelas;
+
+  const TabelAbsenKu({
+    Key? key,
+    required this.kodeKelas,
+  }) : super(key: key);
 
   @override
   State<TabelAbsenKu> createState() => _TabelAbsenKuState();
@@ -12,67 +17,45 @@ class TabelAbsenKu extends StatefulWidget {
 class _TabelAbsenKuState extends State<TabelAbsenKu> {
   List<AbsensiPraktikan> demoAbsensiPraktikan = [];
   List<AbsensiPraktikan> filteredAbsensiPraktikan = [];
+  int nim = 0;
 
   @override
   void initState() {
     super.initState();
-    demoAbsensiPraktikan = [];
-    filteredAbsensiPraktikan = [];
-    fetchDataFromFirestore();
+    fetchData();
   }
 
-  Future<void> fetchDataFromFirestore() async {
-    try {
-      final absensiSnapshot =
-          await FirebaseFirestore.instance.collection('absensiAsisten').get();
+  Future<void> fetchData() async {
+    User? user = FirebaseAuth.instance.currentUser;
 
-      final tokenSnapshot =
-          await FirebaseFirestore.instance.collection('tokenAsisten').get();
+    if (user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('akun_mahasiswa')
+          .doc(user.uid)
+          .get();
+      nim = userDoc['nim'];
 
-      final Map<String, Map<String, dynamic>> tokenDataMap = {};
-      for (var doc in tokenSnapshot.docs) {
-        tokenDataMap[doc['kodeAsisten'] + doc['nim'].toString()] = doc.data();
-      }
-
-      final List<AbsensiPraktikan> absenList = absensiSnapshot.docs.map((doc) {
-        final Map<String, dynamic> data = doc.data();
-        final key = data['kodeAsisten'] + data['nim'].toString();
-        if (tokenDataMap.containsKey(key)) {
-          final tokenData = tokenDataMap[key]!;
-          return AbsensiPraktikan(
-            kode: tokenData['kodeAsisten'] ?? '',
-            nama: tokenData['nama'] ?? '',
-            nim: tokenData['nim'] ?? 0,
-            modul: data['judulMateri'] ?? '',
-            timestap: data['timestamp'] != null
-                ? (data['timestamp'] as Timestamp).toDate().toString()
-                : '',
-            tanggal: data['tanggal'] ?? '',
-            keterangan: data['keterangan'] ?? '',
-          );
-        } else {
-          return AbsensiPraktikan(
-            kode: data['kodeAsisten'] ?? '',
-            nama: '',
-            nim: 0,
-            modul: data['judulMateri'] ?? '',
-            timestap: data['timestamp'] != null
-                ? (data['timestamp'] as Timestamp).toDate().toString()
-                : '',
-            tanggal: data['tanggal'] ?? '',
-            keterangan: data['keterangan'] ?? '',
-          );
-        }
-      }).toList();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('absensiAsisten')
+          .where('nim', isEqualTo: nim)
+          .get();
 
       setState(() {
-        demoAbsensiPraktikan = absenList;
-        filteredAbsensiPraktikan = demoAbsensiPraktikan;
+        demoAbsensiPraktikan = querySnapshot.docs.map((doc) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          return AbsensiPraktikan(
+            kode: data['kodeAsisten'] ?? '',
+            nama: data['nama'] ?? '',
+            nim: data['nim'] ?? 0,
+            modul: data['judulMateri'] ?? '',
+            tanggal: data['tanggal'] ?? '',
+            timestap: (data['timestamp'] as Timestamp).toDate().toString(),
+            keterangan: data['keterangan'] ?? '',
+          );
+        }).toList();
+
+        filteredAbsensiPraktikan = List.from(demoAbsensiPraktikan);
       });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching data: $e');
-      }
     }
   }
 

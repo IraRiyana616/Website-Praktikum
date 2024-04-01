@@ -9,6 +9,7 @@ import '../../../Pengumpulan/Pre-Test/Screen/pre_test_prak.dart';
 
 class AbsenKu extends StatefulWidget {
   final String kodeKelas;
+
   const AbsenKu({super.key, required this.kodeKelas});
 
   @override
@@ -227,7 +228,9 @@ class _AbsenKuState extends State<AbsenKu> {
                       const SizedBox(
                         height: 20.0,
                       ),
-                      TabelAbsenKu(kodeKelas: widget.kodeKelas),
+                      TabelAbsenKu(
+                        kodeKelas: widget.kodeKelas,
+                      ),
                       const SizedBox(
                         height: 20.0,
                       )

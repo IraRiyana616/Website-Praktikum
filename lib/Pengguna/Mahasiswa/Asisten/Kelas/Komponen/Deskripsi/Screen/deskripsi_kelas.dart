@@ -8,6 +8,7 @@ import '../Modul/tabel_modul.dart';
 
 class DeskripsiKelas extends StatefulWidget {
   final String kodeKelas;
+
   const DeskripsiKelas({Key? key, required this.kodeKelas}) : super(key: key);
 
   @override
@@ -140,8 +141,8 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) => AbsenKu(
-                                                  kodeKelas:
-                                                      widget.kodeKelas)));
+                                                    kodeKelas: widget.kodeKelas,
+                                                  )));
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
