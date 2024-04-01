@@ -44,7 +44,7 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
 
         if (isModulValid) {
           // Memeriksa apakah data dengan tanggal yang sama telah ada dalam database
-          bool isDataExists = await checkDataExists(formattedDate);
+          bool isDataExists = await checkDataExists(formattedDate, userNim);
           if (isDataExists) {
             // Data dengan tanggal yang sama telah ada dalam database
             // ignore: use_build_context_synchronously
@@ -116,13 +116,14 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
     }
   }
 
-  Future<bool> checkDataExists(String formattedDate) async {
+  Future<bool> checkDataExists(String formattedDate, int userNim) async {
     try {
-      QuerySnapshot<Map<String, dynamic>> dataSnapshot = await FirebaseFirestore
-          .instance
-          .collection('absensiAsisten')
-          .where('tanggal', isEqualTo: formattedDate)
-          .get();
+      QuerySnapshot<Map<String, dynamic>> dataSnapshot =
+          await FirebaseFirestore.instance
+              .collection('absensiAsisten')
+              .where('tanggal', isEqualTo: formattedDate)
+              .where('nim', isEqualTo: userNim) // check for userNim as well
+              .get();
 
       return dataSnapshot.docs.isNotEmpty;
     } catch (e) {
