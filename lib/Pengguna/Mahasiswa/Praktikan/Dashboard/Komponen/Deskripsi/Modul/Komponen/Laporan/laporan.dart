@@ -1,16 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class PengumpulanLaporan extends StatefulWidget {
   final String kodeKelas;
   final String modul;
-  const PengumpulanLaporan(
-      {super.key, required this.kodeKelas, required this.modul});
+
+  const PengumpulanLaporan({
+    Key? key,
+    required this.kodeKelas,
+    required this.modul,
+  }) : super(key: key);
 
   @override
   State<PengumpulanLaporan> createState() => _PengumpulanLaporanState();
@@ -19,6 +23,7 @@ class PengumpulanLaporan extends StatefulWidget {
 class _PengumpulanLaporanState extends State<PengumpulanLaporan> {
   late int userNim;
   late String userName;
+  late String selectedRevisi = 'Status Asistensi';
 
   Future<void> _getData() async {
     try {
@@ -67,7 +72,8 @@ class _PengumpulanLaporanState extends State<PengumpulanLaporan> {
     _getData();
   }
 
-  Future<void> uploadFile(String fileName, PlatformFile file) async {
+  Future<void> uploadFile(
+      String fileName, PlatformFile file, String revisi) async {
     try {
       final firebase_storage.Reference storageRef = firebase_storage
           .FirebaseStorage.instance
@@ -82,7 +88,8 @@ class _PengumpulanLaporanState extends State<PengumpulanLaporan> {
         'nim': userNim,
         'nama': userName,
         'kodeKelas': widget.kodeKelas,
-        'judulMateri': widget.modul
+        'judulMateri': widget.modul,
+        'statusRevisi': revisi,
       });
 
       // ignore: use_build_context_synchronously
@@ -98,13 +105,78 @@ class _PengumpulanLaporanState extends State<PengumpulanLaporan> {
     }
   }
 
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Status Revisi',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+          ),
+          content: DropdownButton(
+            value: selectedRevisi,
+            onChanged: (String? newValue) {
+              setState(() {
+                selectedRevisi = newValue!;
+              });
+              Navigator.of(context).pop();
+              _openFilePicker();
+            },
+            items: <String>[
+              'Status Asistensi', // Pisahkan dengan koma di sini
+              'Revisi 1',
+              'Revisi 2',
+              'Revisi 3',
+              'Revisi 4',
+              'Revisi 5'
+            ].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _openFilePicker() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+      if (result != null) {
+        PlatformFile file = result.files.first;
+        String fileName = file.name;
+
+        await uploadFile(fileName, file, selectedRevisi);
+
+        if (kDebugMode) {
+          print('Selected file: $fileName');
+        }
+      } else {
+        if (kDebugMode) {
+          print('File picker canceled');
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error picking/uploading file: $e'),
+        backgroundColor: Colors.red,
+      ));
+      if (kDebugMode) {
+        print('Error picking/uploading file: $e');
+      }
+    }
+  }
+
   bool isButtonVisible(Map<String, dynamic> data) {
     Timestamp? aksesLatihan = data['aksesLaporan'];
     Timestamp? tutupAksesLatihan = data['tutupAksesLaporan'];
     Timestamp now = Timestamp.now();
 
     if (aksesLatihan != null && tutupAksesLatihan != null) {
-      // Perbandingan menggunakan nilai waktu dalam objek Timestamp
       if (now.seconds > aksesLatihan.seconds &&
           now.seconds < tutupAksesLatihan.seconds) {
         return true;
@@ -112,25 +184,6 @@ class _PengumpulanLaporanState extends State<PengumpulanLaporan> {
     }
 
     return false;
-  }
-
-  // Fungsi async untuk memeriksa keberadaan kodeKelas dan judulMateri dalam Firestore
-  Future<bool> checkDataExist(String kodeKelas, String modul) async {
-    bool exists = false;
-
-    // Melakukan query ke Firestore
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('pengumpulanLaporan')
-        .where('kodeKelas', isEqualTo: kodeKelas)
-        .where('judulMateri', isEqualTo: modul)
-        .get();
-
-    // Jika data ditemukan, set exists menjadi true
-    if (querySnapshot.docs.isNotEmpty) {
-      exists = true;
-    }
-
-    return exists;
   }
 
   @override
@@ -253,38 +306,8 @@ class _PengumpulanLaporanState extends State<PengumpulanLaporan> {
                                                 const Color(0xFF3CBEA9),
                                               ),
                                             ),
-                                            onPressed: () async {
-                                              try {
-                                                FilePickerResult? result =
-                                                    await FilePicker.platform
-                                                        .pickFiles();
-
-                                                if (result != null) {
-                                                  PlatformFile file =
-                                                      result.files.first;
-                                                  String fileName = file.name;
-
-                                                  // Upload file and save details to Firestore
-                                                  await uploadFile(
-                                                      fileName, file);
-
-                                                  if (kDebugMode) {
-                                                    print(
-                                                        'Selected file: $fileName');
-                                                  }
-                                                } else {
-                                                  // User canceled the picker
-                                                  if (kDebugMode) {
-                                                    print(
-                                                        'File picker canceled');
-                                                  }
-                                                }
-                                              } catch (e) {
-                                                if (kDebugMode) {
-                                                  print(
-                                                      'Error picking/uploading file: $e');
-                                                }
-                                              }
+                                            onPressed: () {
+                                              _showDialog();
                                             },
                                             child: Row(
                                               children: [
@@ -331,7 +354,7 @@ class _PengumpulanLaporanState extends State<PengumpulanLaporan> {
                                               ),
                                             ]),
                                           ),
-                                        ), // Atau Container() jika tidak ingin menampilkan apa pun
+                                        ),
                                 ),
                                 const SizedBox(height: 35.0),
                               ],

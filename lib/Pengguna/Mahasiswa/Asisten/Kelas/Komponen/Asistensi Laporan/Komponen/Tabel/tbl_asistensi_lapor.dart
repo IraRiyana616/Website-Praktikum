@@ -1,5 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -34,6 +33,7 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
   List<AsistensiLaporan> filteredAsistenLaporan = [];
   late int userNim;
   late String userName;
+  late String selectedRevisi = 'Status Revisi';
 
   @override
   Widget build(BuildContext context) {
@@ -63,15 +63,22 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
                         ),
                         DataColumn(
                           label: Text(
+                            'Status',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
                             'Download File',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                         DataColumn(
-                            label: Text(
-                          'File Asistensi',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
+                          label: Text(
+                            'File Asistensi',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                       ],
                       source: DataSource(filteredAsistenLaporan, context),
                       rowsPerPage:
@@ -104,12 +111,12 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
   }
 
   Future<void> checkAndFetchData() async {
-    final CollectionReference<Map<String, dynamic>> laporanRef =
-        FirebaseFirestore.instance.collection('laporan');
-    final QuerySnapshot<Map<String, dynamic>> laporanSnapshot = await laporanRef
-        .where('kodeKelas', isEqualTo: widget.kodeKelas)
-        .where('nama', isEqualTo: widget.nama)
-        .get();
+    final QuerySnapshot<Map<String, dynamic>> laporanSnapshot =
+        await FirebaseFirestore.instance
+            .collection('laporan')
+            .where('kodeKelas', isEqualTo: widget.kodeKelas)
+            .where('nama', isEqualTo: widget.nama)
+            .get();
 
     if (laporanSnapshot.docs.isNotEmpty) {
       List<AsistensiLaporan> fetchedData =
@@ -122,6 +129,7 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
           file: data['namaFile'] ?? '',
           nim: data['nim'] ?? 0,
           waktu: (data['waktuPengumpulan'] as Timestamp).toDate(),
+          status: data['statusRevisi'] ?? '',
         );
       }).toList();
 
@@ -140,6 +148,7 @@ class AsistensiLaporan {
   String file;
   int nim;
   DateTime waktu;
+  String status;
 
   AsistensiLaporan({
     required this.modul,
@@ -148,11 +157,15 @@ class AsistensiLaporan {
     required this.file,
     required this.nim,
     required this.waktu,
+    required this.status,
   });
 }
 
 DataRow dataFileDataRow(
-    AsistensiLaporan fileInfo, int index, BuildContext context) {
+  AsistensiLaporan fileInfo,
+  int index,
+  BuildContext context,
+) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -167,10 +180,13 @@ DataRow dataFileDataRow(
         ),
       )),
       DataCell(SizedBox(
-        width: 250.0,
+        width: 200.0,
         child: Text(
-          getLimitedText(fileInfo.modul, 40),
+          getLimitedText(fileInfo.modul, 30),
         ),
+      )),
+      DataCell(Text(
+        fileInfo.status,
       )),
       DataCell(Row(
         children: [
@@ -205,7 +221,6 @@ DataRow dataFileDataRow(
                   uploadFile(
                     fileInfo.kode,
                     fileInfo.file,
-                    fileInfo.nama,
                     fileInfo.modul,
                     context,
                   );
@@ -241,88 +256,146 @@ DataRow dataFileDataRow(
 Future<void> showInfoDialog(
     AsistensiLaporan fileInfo, BuildContext context) async {
   try {
-    final CollectionReference<Map<String, dynamic>> asistensiRef =
-        FirebaseFirestore.instance.collection('asistensiLaporan');
-    final QuerySnapshot<Map<String, dynamic>> asistensiSnapshot =
-        await asistensiRef
+    final QuerySnapshot<Map<String, dynamic>> laporanSnapshot =
+        await FirebaseFirestore.instance
+            .collection('laporan')
             .where('kodeKelas', isEqualTo: fileInfo.kode)
             .where('judulMateri', isEqualTo: fileInfo.modul)
+            .where('statusRevisi', isEqualTo: fileInfo.status)
             .get();
 
-    if (asistensiSnapshot.docs.isNotEmpty) {
-      final DocumentSnapshot<Map<String, dynamic>> document =
-          asistensiSnapshot.docs.first;
-      final namaPemeriksa = document['namaPemeriksa'];
-      final waktuPengumpulan = document['waktuPengumpulan'];
+    final QuerySnapshot<Map<String, dynamic>> asistensiSnapshot =
+        await FirebaseFirestore.instance
+            .collection('asistensiLaporan')
+            .where('kodeKelas', isEqualTo: fileInfo.kode)
+            .where('judulMateri', isEqualTo: fileInfo.modul)
+            .where('statusRevisi', isEqualTo: fileInfo.status)
+            .get();
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text(
-              'Data Asisten',
-              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 13.0,
-                ),
-                Row(
-                  children: [
-                    const Text(
-                      'Nama Pemeriksa : ',
-                      style: TextStyle(fontSize: 14.0),
-                    ),
-                    const SizedBox(
-                      width: 5.0,
-                    ),
-                    Text(
-                      '$namaPemeriksa',
-                      style: const TextStyle(fontSize: 14.0),
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 18.0,
-                ),
-                Row(
-                  children: [
-                    const Text(
-                      'Waktu Asistensi   :', // Menggunakan toDate() untuk mengonversi Timestamp menjadi DateTime
-                      style: TextStyle(fontSize: 14.0),
-                    ),
-                    const SizedBox(
-                      width: 5.0,
-                    ),
-                    Text(
-                      ' ${DateFormat('dd-MM-yyyy HH:mm:ss').format(waktuPengumpulan.toDate())}',
-                      style: const TextStyle(fontSize: 14.0),
-                    )
-                  ],
+    if (laporanSnapshot.docs.isNotEmpty && asistensiSnapshot.docs.isNotEmpty) {
+      final DocumentSnapshot<Map<String, dynamic>> laporanDocument =
+          laporanSnapshot.docs.first;
+      final DocumentSnapshot<Map<String, dynamic>> asistensiDocument =
+          asistensiSnapshot.docs.first;
+
+      final String statusRevisiLaporan = laporanDocument['statusRevisi'];
+      final String statusRevisiAsistensi = asistensiDocument['statusRevisi'];
+
+      if (statusRevisiLaporan == statusRevisiAsistensi) {
+        final namaPemeriksa = asistensiDocument['namaPemeriksa'];
+        final waktuPengumpulan = asistensiDocument['waktuPengumpulan'];
+        final statusRevisi = asistensiDocument['statusRevisi'];
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text(
+                'Data Asisten',
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 13.0,
+                  ),
+                  Row(
+                    children: [
+                      const Text(
+                        'Nama Pemeriksa : ',
+                        style: TextStyle(fontSize: 14.0),
+                      ),
+                      const SizedBox(
+                        width: 5.0,
+                      ),
+                      Text(
+                        '$namaPemeriksa',
+                        style: const TextStyle(fontSize: 14.0),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 18.0,
+                  ),
+                  Row(
+                    children: [
+                      const Text(
+                        'Waktu Asistensi   :',
+                        style: TextStyle(fontSize: 14.0),
+                      ),
+                      const SizedBox(
+                        width: 5.0,
+                      ),
+                      Text(
+                        ' ${DateFormat('dd-MM-yyyy HH:mm:ss').format(waktuPengumpulan.toDate())}',
+                        style: const TextStyle(fontSize: 14.0),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 18.0,
+                  ),
+                  Row(
+                    children: [
+                      const Text(
+                        'Status Revisi         : ',
+                        style: TextStyle(fontSize: 14.0),
+                      ),
+                      const SizedBox(
+                        width: 5.0,
+                      ),
+                      Text(
+                        '$statusRevisi',
+                        style: const TextStyle(fontSize: 14.0),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 18.0,
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
                 ),
               ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Data Asisten'),
+              content: const Text(
+                  'Status revisi pada laporan dan asistensi tidak sama.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
     } else {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Data Asisten'),
-            content: const Text('Belum Melakukan Asistensi Laporan'),
+            content: const Text(
+                'Belum Melakukan Asistensi Laporan atau data laporan tidak ditemukan.'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -345,10 +418,72 @@ Future<void> showInfoDialog(
 Future<void> uploadFile(
   String kodeKelas,
   String fileName,
-  String nama,
   String modul,
   BuildContext context,
 ) async {
+  String selectedRevisi = 'Status Asistensi';
+
+  // Menampilkan dialog untuk memilih status revisi
+  await showDialog<String>(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('Pilih Status Revisi'),
+            content: DropdownButton<String>(
+              isExpanded: true,
+              value: selectedRevisi,
+              onChanged: (String? value) {
+                setState(() {
+                  selectedRevisi = value!;
+                });
+              },
+              items: <String>[
+                'Status Asistensi',
+                'Revisi 1',
+                'Revisi 2',
+                'Revisi 3',
+                'Revisi 4',
+                'Revisi 5',
+                'ACC'
+              ].map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Menutup dialog tanpa melanjutkan proses ke upload file
+                  Navigator.pop(context);
+                },
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () {
+                  if (selectedRevisi != 'Status Asistensi') {
+                    Navigator.pop(context, selectedRevisi);
+                  } else {
+                    // Bisa tambahkan feedback untuk user bahwa harus memilih status revisi
+                  }
+                },
+                child: const Text('Simpan'),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+
+  // Jika user membatalkan dialog, maka keluar dari fungsi uploadFile
+  if (selectedRevisi == 'Status Asistensi') {
+    return;
+  }
+
   // Menampilkan loading dialog
   showDialog(
     context: context,
@@ -378,16 +513,14 @@ Future<void> uploadFile(
     if (result != null) {
       PlatformFile file = result.files.first;
       User? user = FirebaseAuth.instance.currentUser;
-      String nama = ''; // Deklarasi variable nama di luar block if
+      String nama = '';
 
-      // Ambil nama dari Firestore
       if (user != null) {
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('akun_mahasiswa')
             .doc(user.uid)
             .get();
-        nama = userDoc[
-            'nama']; // Asumsi field untuk nama di Firestore adalah 'nama'
+        nama = userDoc['nama'];
       }
 
       final firebase_storage.Reference storageRef = firebase_storage
@@ -397,7 +530,6 @@ Future<void> uploadFile(
 
       await storageRef.putData(Uint8List.fromList(file.bytes!));
 
-      // Menggunakan transaksi untuk memastikan increment documentId
       String nextDocumentId = '';
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         DocumentReference counterRef = FirebaseFirestore.instance
@@ -406,12 +538,10 @@ Future<void> uploadFile(
         DocumentSnapshot counterSnapshot = await transaction.get(counterRef);
         int currentCount =
             counterSnapshot.exists ? counterSnapshot.get('count') : 0;
-        nextDocumentId =
-            '${currentCount + 1}'; // Mengubah count menjadi string untuk digunakan sebagai ID
+        nextDocumentId = '${currentCount + 1}';
         transaction.set(counterRef, {'count': currentCount + 1});
       });
 
-      // Menambahkan dokumen dengan ID yang telah ditentukan
       await FirebaseFirestore.instance
           .collection('asistensiLaporan')
           .doc(nextDocumentId)
@@ -421,10 +551,10 @@ Future<void> uploadFile(
         'namaPemeriksa': nama,
         'kodeKelas': kodeKelas,
         'judulMateri': modul,
+        'statusRevisi': selectedRevisi,
       });
 
-      // Menutup dialog loading setelah upload selesai
-      Navigator.pop(context);
+      Navigator.pop(context); // Menutup dialog loading
 
       // Menampilkan dialog sukses setelah file di-upload
       showDialog(
@@ -468,12 +598,11 @@ Future<void> uploadFile(
         },
       );
     } else {
-      // Menutup dialog loading jika tidak ada file yang dipilih
-      Navigator.pop(context);
+      Navigator.pop(
+          context); // Menutup dialog loading jika tidak ada file yang dipilih
     }
   } catch (e) {
-    // Menutup dialog loading jika terjadi error
-    Navigator.pop(context);
+    Navigator.pop(context); // Menutup dialog loading jika terjadi error
 
     // Menampilkan pesan error
     showDialog(
@@ -517,10 +646,7 @@ void downloadFile(String kodeKelas, String fileName, String judulMateri) async {
   }
 }
 
-String getLimitedText(
-  String text,
-  int limit,
-) {
+String getLimitedText(String text, int limit) {
   return text.length <= limit ? text : text.substring(0, limit);
 }
 
