@@ -235,7 +235,7 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.book),
-            label: 'Pre-Test',
+            label: 'Latihan',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.bookmarks),

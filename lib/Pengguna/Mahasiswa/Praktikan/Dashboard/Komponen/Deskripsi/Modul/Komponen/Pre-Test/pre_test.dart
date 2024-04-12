@@ -74,7 +74,7 @@ class _UjianPemahamanState extends State<UjianPemahaman> {
       final firebase_storage.Reference storageRef = firebase_storage
           .FirebaseStorage.instance
           .ref()
-          .child('latihan/${widget.kodeKelas}/$fileName');
+          .child('latihan/${widget.kodeKelas}/${widget.modul}/$fileName');
 
       await storageRef.putData(file.bytes!);
 

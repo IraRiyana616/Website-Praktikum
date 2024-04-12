@@ -1,24 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Screen/kelas_asisten.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Komponen/tabel_absensi_mahasiswa.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_mhs.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Pengumpulan/Latihan/Tabel/tabel_peng_latihan_mhs.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Pengumpulan/Tugas/Screen/peng_tugas_mhs.dart';
 
-import '../../Dashboard/Komponen/Pengumpulan/Latihan/Screen/peng_latihan_mhs.dart';
+import '../../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
 
-class AbsensiPraktikanScreen extends StatefulWidget {
+class DataLatihanPraktikan extends StatefulWidget {
   final String kodeKelas;
 
-  const AbsensiPraktikanScreen({
+  const DataLatihanPraktikan({
     super.key,
     required this.kodeKelas,
   });
 
   @override
-  State<AbsensiPraktikanScreen> createState() => _AbsensiPraktikanScreenState();
+  State<DataLatihanPraktikan> createState() => _DataLatihanPraktikanState();
 }
 
-class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
+class _DataLatihanPraktikanState extends State<DataLatihanPraktikan> {
+  //Fungsi Untuk Bottom Navigation
+  int _selectedIndex = 0; // untuk mengatur index bottom navigation
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      // Memilih halaman sesuai dengan index yang dipilih
+      if (index == 0) {
+        // Tindakan ketika item "Latihan" ditekan
+        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan latihan
+        // Misalnya:
+      } else if (index == 1) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => DataTugasPraktikan(
+                    kodeKelas: widget.kodeKelas,
+                  )),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,11 +141,21 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                               left: 50.0,
                               top: 38.0,
                             ),
-                            child: Text(
-                              'Absensi',
-                              style: GoogleFonts.quicksand(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            AbsensiPraktikanScreen(
+                                                kodeKelas: widget.kodeKelas)));
+                              },
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Text(
+                                  'Absensi',
+                                  style: GoogleFonts.quicksand(fontSize: 16.0),
+                                ),
                               ),
                             ),
                           ),
@@ -132,23 +165,11 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                               left: 50.0,
                               top: 38.0,
                             ),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            DataLatihanPraktikan(
-                                                kodeKelas: widget.kodeKelas)));
-                              },
-                              child: MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: Text(
-                                  'Pengumpulan',
-                                  style: GoogleFonts.quicksand(
-                                    fontSize: 16.0,
-                                  ),
-                                ),
+                            child: Text(
+                              'Pengumpulan',
+                              style: GoogleFonts.quicksand(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
@@ -184,17 +205,32 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                           color: Colors.grey,
                         ),
                       ),
+                      TabelKLatihanPraktikan(kodeKelas: widget.kodeKelas),
+                      const SizedBox(
+                        height: 20.0,
+                      )
                     ],
                   ),
                 ),
               ),
-              //Tampilan Tabel Absensi Praktikan
-              TabelAbsensiPraktikan(
-                kodeKelas: widget.kodeKelas,
-              ),
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book),
+            label: 'Latihan',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmarks),
+            label: 'Tugas',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: const Color(0xFF3CBEA9),
+        onTap: _onItemTapped,
       ),
     );
   }

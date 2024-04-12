@@ -15,8 +15,10 @@ class TabelPengumpulanUjiPemahaman extends StatefulWidget {
 
 class _TabelPengumpulanUjiPemahamanState
     extends State<TabelPengumpulanUjiPemahaman> {
+  final TextEditingController _textController = TextEditingController();
   List<Pengumpulan> demoPengumpulan = [];
   List<Pengumpulan> filteredPengumpulan = [];
+  bool _isTextFieldNotEmpty = false;
   //Judul Materi
   String selectedModul = 'Tampilkan Semua';
   List<String> availableModuls = ['Tampilkan Semua'];
@@ -87,6 +89,39 @@ class _TabelPengumpulanUjiPemahamanState
     }
   }
 
+  void _onTextChanged(String value) {
+    setState(() {
+      _isTextFieldNotEmpty = value.isNotEmpty;
+      filterData(value,
+          selectedModul); // Filter based on both query and selected module
+    });
+  }
+
+  void filterData(String query, String selectedModul) {
+    setState(() {
+      if (selectedModul == 'Tampilkan Semua') {
+        filteredPengumpulan = demoPengumpulan
+            .where((data) => (data.nim.toString().contains(query) ||
+                data.nama.toLowerCase().contains(query.toLowerCase())))
+            .toList();
+      } else {
+        filteredPengumpulan = demoPengumpulan
+            .where((data) =>
+                (data.modul == selectedModul) &&
+                (data.nim.toString().contains(query) ||
+                    data.nama.toLowerCase().contains(query.toLowerCase())))
+            .toList();
+      }
+    });
+  }
+
+  void clearSearchField() {
+    setState(() {
+      _textController.clear();
+      filterData('', selectedModul);
+    });
+  }
+
   void _sortDataByName() {
     setState(() {
       filteredPengumpulan.sort((a, b) => a.nama.compareTo(b.nama));
@@ -129,6 +164,57 @@ class _TabelPengumpulanUjiPemahamanState
                 elevation: 16,
                 isExpanded: true,
                 underline: Container(),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 25.0, right: 80.0),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: SizedBox(
+                width: 250.0,
+                height: 35.0,
+                child: Row(
+                  children: [
+                    const Text("Search :",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(
+                      width: 10.0,
+                    ),
+                    Expanded(
+                      child: TextField(
+                        onChanged: (value) {
+                          filterData(value, selectedModul);
+                        },
+                        controller: _textController,
+                        decoration: InputDecoration(
+                          hintText: '',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(0.0),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 0, horizontal: 10),
+                          suffixIcon: Visibility(
+                            visible: _isTextFieldNotEmpty,
+                            child: IconButton(
+                              onPressed: clearSearchField,
+                              icon: const Icon(Icons.clear),
+                            ),
+                          ),
+                          labelStyle: const TextStyle(
+                            fontSize: 16,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 27.0,
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -247,7 +333,7 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
           ),
           GestureDetector(
             onTap: () {
-              downloadFile(fileInfo.kode, fileInfo.file);
+              downloadFile(fileInfo.kode, fileInfo.file, fileInfo.modul);
             },
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
@@ -264,9 +350,10 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
   );
 }
 
-void downloadFile(String kodeKelas, String fileName) async {
-  final ref =
-      FirebaseStorage.instance.ref().child('pre-test/$kodeKelas/$fileName');
+void downloadFile(String kodeKelas, String fileName, String judulMateri) async {
+  final ref = FirebaseStorage.instance
+      .ref()
+      .child('latihan/$kodeKelas/$judulMateri/$fileName');
 
   try {
     final url = await ref.getDownloadURL();

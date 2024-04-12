@@ -145,7 +145,7 @@ class _KumpulTugasState extends State<KumpulTugas> {
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: Text(
-                                  'Deskripsi',
+                                  'Absensi',
                                   style: GoogleFonts.quicksand(fontSize: 16.0),
                                 ),
                               ),
