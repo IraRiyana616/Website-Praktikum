@@ -3,200 +3,27 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class PenilaianTugasAsisten extends StatefulWidget {
-  const PenilaianTugasAsisten({super.key});
+class PenilaianPercobaanAsisten extends StatefulWidget {
+  final String kodeKelas;
+  const PenilaianPercobaanAsisten({Key? key, required this.kodeKelas})
+      : super(key: key);
 
   @override
-  State<PenilaianTugasAsisten> createState() => _PenilaianTugasAsistenState();
+  State<PenilaianPercobaanAsisten> createState() =>
+      _PenilaianPercobaanAsistenState();
 }
 
-class _PenilaianTugasAsistenState extends State<PenilaianTugasAsisten> {
-  List<NilaiTugas> demoNilaiTugas = [];
-  List<NilaiTugas> filteredNilaiTugas = [];
-
-  @override
-  void initState() {
-    super.initState();
-    getDataFromFirestore();
-    fetchDataFromFirestore();
-  }
-
-  Future<void> fetchDataFromFirestore() async {
-    try {
-      //Fetching data dari 'dataKelas'
-      QuerySnapshot dataKelasSnapshot =
-          await FirebaseFirestore.instance.collection('dataKelas').get();
-
-      //Fetching data dari 'tokenKelas'
-      QuerySnapshot tokenKelasSnapshot =
-          await FirebaseFirestore.instance.collection('tokenKelas').get();
-
-      //Grouping 'tokenKelas' yang berdasarkan 'kodeKelas'
-      Map<String, List<QueryDocumentSnapshot>> groupedTokenData = {};
-      for (var tokenDoc in tokenKelasSnapshot.docs) {
-        String kodeKelas = tokenDoc['kodeKelas'];
-        groupedTokenData.putIfAbsent(kodeKelas, () => []);
-        groupedTokenData[kodeKelas]!.add(tokenDoc);
-      }
-
-      //Menghubungkan data dengan 'kodeKelas'
-      for (QueryDocumentSnapshot dataKelasDoc in dataKelasSnapshot.docs) {
-        String kodeKelas = dataKelasDoc['kodeKelas'];
-
-        //Finding all tokenKelas that match kodeKelas
-        List<QueryDocumentSnapshot>? tokenKelasDocs =
-            groupedTokenData[kodeKelas];
-        if (tokenKelasDocs != null && tokenKelasDocs.isNotEmpty) {
-          //Menambahkan data ke nilai tugas
-          for (QueryDocumentSnapshot tokenKelasDoc in tokenKelasDocs) {
-            int nim = int.parse(tokenKelasDoc['nim'].toString());
-            String nama = tokenKelasDoc['nama'];
-
-            //Checking if data already exists in demoNilaiTugas
-            bool dataExists = demoNilaiTugas
-                .any((data) => data.nim == nim && data.kode == kodeKelas);
-
-            if (!dataExists) {
-              //Membuat Nilai Tugas
-              NilaiTugas nilaiTugas = NilaiTugas(
-                  nim: nim,
-                  nama: nama,
-                  kode: kodeKelas,
-                  //
-                  //Nilai Percobaan
-                  percobaan: 0.0,
-                  percobaan2: 0.0,
-                  percobaan3: 0.0,
-                  percobaan4: 0.0,
-                  percobaan5: 0.0,
-                  //
-                  //Nilai Latihan
-                  // latihan: 0.0,
-                  // latihan2: 0.0,
-                  // latihan3: 0.0,
-                  // latihan4: 0.0,
-                  // latihan5: 0.0,
-                  rata: 0.0);
-              //Menambahkan nilai tugas ke demoNilaiTugas
-              setState(() {
-                demoNilaiTugas.add(nilaiTugas);
-                filteredNilaiTugas = List.from(demoNilaiTugas);
-              });
-              //Menambahkan data ke Firestore 'nilaiTugas'
-              await addDataToFirestore(nilaiTugas);
-            }
-          }
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching data: $e');
-      }
-    }
-  }
-
-  Future<void> addDataToFirestore(NilaiTugas nilaiTugas) async {
-    try {
-      //Mengecheck data jika sudah ada di Firestore
-      bool firestoreDataExists = await checkFirestoreDataExists(nilaiTugas);
-
-      if (!firestoreDataExists) {
-        //Menambahkan data ke Firestore 'nilaiPercobaan'
-        await FirebaseFirestore.instance.collection('nilaiPercobaan').add({
-          'nim': nilaiTugas.nim,
-          'nama': nilaiTugas.nama,
-          'kodeKelas': nilaiTugas.kode,
-          'percobaan': nilaiTugas.percobaan,
-          'percobaan2': nilaiTugas.percobaan2,
-          'percobaan3': nilaiTugas.percobaan3,
-          'percobaan4': nilaiTugas.percobaan4,
-          'percobaan5': nilaiTugas.percobaan5,
-          'rata': calculateAverage(nilaiTugas)
-        });
-        //Mengupdate nilai rata-rata di data list
-        setState(() {
-          int index = demoNilaiTugas.indexWhere((data) =>
-              data.nim == nilaiTugas.nim && data.kode == nilaiTugas.kode);
-          if (index != -1) {
-            demoNilaiTugas[index].rata = calculateAverage(nilaiTugas);
-            filteredNilaiTugas = List.from(demoNilaiTugas);
-          }
-        });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error adding data to Firestore: $e');
-      }
-    }
-  }
-
-  double calculateAverage(NilaiTugas nilaiTugas) {
-    return (((nilaiTugas.percobaan * 0.2) +
-                (nilaiTugas.percobaan2 * 0.2) +
-                (nilaiTugas.percobaan3 * 0.2) +
-                (nilaiTugas.percobaan4 * 0.2) +
-                (nilaiTugas.percobaan5 * 0.2)) /
-            5) *
-        0.05;
-  }
-
-  Future<bool> checkFirestoreDataExists(NilaiTugas nilaiTugas) async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('nilaiPercobaan')
-          .where('nim', isEqualTo: nilaiTugas.nim)
-          .where('kode', isEqualTo: nilaiTugas.kode)
-          .get();
-
-      return querySnapshot.docs.isNotEmpty;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error checking Firestore data existence: $e');
-      }
-      return false;
-    }
-  }
-
-  Future<void> getDataFromFirestore() async {
-    try {
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('nilaiPercobaan').get();
-      setState(() {
-        demoNilaiTugas = querySnapshot.docs
-            .map((DocumentSnapshot doc) => NilaiTugas(
-                nim: doc['nim'],
-                nama: doc['nama'],
-                kode: doc['kodeKelas'],
-                percobaan: doc['percobaan'].toDouble(),
-                percobaan2: doc['percobaan2'].toDouble(),
-                percobaan3: doc['percobaan3'].toDouble(),
-                percobaan4: doc['percobaan4'].toDouble(),
-                percobaan5: doc['percobaan5'].toDouble(),
-                rata: doc['rata'].toDouble()))
-            .toList();
-        filteredNilaiTugas = demoNilaiTugas;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching data: $e');
-      }
-    }
-  }
-
-  void filterData(String query) {
-    setState(() {
-      filteredNilaiTugas = demoNilaiTugas
-          .where(
-              (data) => (data.kode.toLowerCase().contains(query.toLowerCase())))
-          .toList();
-    });
-  }
+class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
+  List<PenilaianPercobaan> demoPenilaianPercobaan = [];
+  List<PenilaianPercobaan> filteredPenilaianPercobaan = [];
 
   Color getRowColor(int index) {
     return index % 2 == 0 ? Colors.grey.shade200 : Colors.transparent;
   }
 
-  void editNilai(NilaiTugas nilai) {
+  void editNilai(PenilaianPercobaan nilai) {
+    //Perhitungan rata-rata
+    double rata = _hitungRataRata(nilai);
     TextEditingController percobaanController =
         TextEditingController(text: nilai.percobaan.toString());
     TextEditingController percobaan2Controller =
@@ -382,144 +209,238 @@ class _PenilaianTugasAsistenState extends State<PenilaianTugasAsisten> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 20.0, right: 20.0),
                 child: TextButton(
-                    onPressed: () async {
-                      try {
-                        //Mencari dokumen dengan Nim yang sama
-                        QuerySnapshot querySnapshot = await FirebaseFirestore
-                            .instance
-                            .collection('nilaiPercobaan')
-                            .where('nim', isEqualTo: nilai.nim)
-                            .get();
+                  onPressed: () async {
+                    try {
+                      //Mencari dokumen dengan Nim yang sama
+                      QuerySnapshot querySnapshot = await FirebaseFirestore
+                          .instance
+                          .collection('nilaiPercobaan')
+                          .where('nim', isEqualTo: nilai.nim)
+                          .get();
 
-                        //Memperbaharui nilai pada dokumen yang ditemukan
-                        if (querySnapshot.docs.isNotEmpty) {
-                          await querySnapshot.docs[0].reference.update({
-                            'percobaan': nilai.percobaan,
-                            'percobaan2': nilai.percobaan2,
-                            'percobaan3': nilai.percobaan3,
-                            'percobaan4': nilai.percobaan4,
-                            'percobaan5': nilai.percobaan5,
-                            'rata': _hitungRataRata(nilai)
-                          });
-                        }
-
-                        //Perbaharui tampilan jika diperlukan
-                        getDataFromFirestore();
-                      } catch (e) {
-                        if (kDebugMode) {
-                          print('Error updating data: $e');
-                        }
+                      //Memperbaharui nilai pada dokumen yang ditemukan
+                      if (querySnapshot.docs.isNotEmpty) {
+                        await querySnapshot.docs[0].reference.update({
+                          'percobaan': nilai.percobaan,
+                          'percobaan2': nilai.percobaan2,
+                          'percobaan3': nilai.percobaan3,
+                          'percobaan4': nilai.percobaan4,
+                          'percobaan5': nilai.percobaan5,
+                          'rata': rata,
+                        });
                       }
-                    },
-                    child: const Text('Simpan')),
+
+                      // Perbarui state dengan nilai yang baru
+                      setState(() {
+                        // Memperbarui nilai yang ada di dalam state
+                        demoPenilaianPercobaan =
+                            demoPenilaianPercobaan.map((item) {
+                          if (item.nim == nilai.nim) {
+                            return nilai;
+                          } else {
+                            return item;
+                          }
+                        }).toList();
+                        // Filter kembali data yang ditampilkan
+                        filteredPenilaianPercobaan =
+                            List.from(demoPenilaianPercobaan);
+                      });
+                    } catch (e) {
+                      if (kDebugMode) {
+                        print('Error updating data: $e');
+                      }
+                    }
+                    // Tutup dialog setelah nilai diperbarui
+                    // ignore: use_build_context_synchronously
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Simpan'),
+                ),
               )
             ],
           );
         });
   }
 
-  double _hitungRataRata(NilaiTugas nilai) {
+  double _hitungRataRata(PenilaianPercobaan nilai) {
     return ((nilai.percobaan * 0.2) +
             (nilai.percobaan2 * 0.2) +
             (nilai.percobaan3 * 0.2) +
             (nilai.percobaan4 * 0.2) +
-            (nilai.percobaan5 * 0.2) / 5) *
-        0.05;
+            (nilai.percobaan5 * 0.2)) /
+        5;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 18.0, right: 25.0),
-            child: SizedBox(
-                width: double.infinity,
-                child: filteredNilaiTugas.isNotEmpty
-                    ? PaginatedDataTable(
-                        columnSpacing: 10,
-                        columns: const [
-                          DataColumn(
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('nilaiPercobaan')
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
+        }
+        demoPenilaianPercobaan.clear();
+        for (var doc in snapshot.data!.docs) {
+          double percobaan1 = doc['percobaan'].toDouble();
+          double percobaan2 = doc['percobaan2'].toDouble();
+          double percobaan3 = doc['percobaan3'].toDouble();
+          double percobaan4 = doc['percobaan4'].toDouble();
+          double percobaan5 = doc['percobaan5'].toDouble();
+
+          double rata =
+              (percobaan1 + percobaan2 + percobaan3 + percobaan4 + percobaan5) /
+                  5;
+
+          demoPenilaianPercobaan.add(PenilaianPercobaan(
+            nim: doc['nim'] ?? 0,
+            nama: doc['nama'] ?? '',
+            kode: doc['kodeKelas'] ?? '',
+            percobaan: percobaan1,
+            percobaan2: percobaan2,
+            percobaan3: percobaan3,
+            percobaan4: percobaan4,
+            percobaan5: percobaan5,
+            rata: rata, // Masukkan rata-rata ke dalam objek PenilaianPercobaan
+          ));
+        }
+
+        filteredPenilaianPercobaan = List.from(demoPenilaianPercobaan);
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 18.0, right: 25.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: filteredPenilaianPercobaan.isNotEmpty
+                      ? PaginatedDataTable(
+                          columnSpacing: 10,
+                          columns: const [
+                            DataColumn(
                               label: Text(
-                            'Kode Kelas',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
+                                'NIM',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
                               label: Text(
-                            'NIM',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
+                                'Nama',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
                               label: Text(
-                            'Nama',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
+                                'Percobaan 1',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
                               label: Text(
-                            'Percobaan 1',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
+                                'Percobaan 2',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
                               label: Text(
-                            'Percobaan 2',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
+                                'Percobaan 3',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
                               label: Text(
-                            'Percobaan 3',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
+                                'Percobaan 4',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
                               label: Text(
-                            'Percobaan 4',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
+                                'Percobaan 5',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
                               label: Text(
-                            'Percobaan 5',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
+                                'Rata-rata',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
                               label: Text(
-                            'Rata-Rata',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
-                              label: Text(
-                            '',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                        ],
-                        source: DataSource(
-                            data: filteredNilaiTugas,
-                            context: context,
-                            editNilai: editNilai),
-                        rowsPerPage:
-                            calculateRowsPerPage(filteredNilaiTugas.length),
-                      )
-                    : const Center(
-                        child: Text(
-                          'No data available',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
+                                '',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                          source: DataSource(
+                              data: filteredPenilaianPercobaan,
+                              context: context,
+                              editNilai: editNilai),
+                          rowsPerPage: calculateRowsPerPage(
+                            filteredPenilaianPercobaan.length,
+                          ),
+                        )
+                      : const Center(
+                          child: Text(
+                            'No data available',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      )),
-          )
-        ],
-      ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
   int calculateRowsPerPage(int rowCount) {
     const int defaultRowsPerPage = 25;
-
     return rowCount <= defaultRowsPerPage ? rowCount : defaultRowsPerPage;
+  }
+
+  Future<void> getDataFromFirestore() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('nilaiPercobaan').get();
+      setState(() {
+        demoPenilaianPercobaan = querySnapshot.docs
+            .map((DocumentSnapshot doc) => PenilaianPercobaan(
+                nim: doc['nim'],
+                nama: doc['nama'],
+                kode: doc['kodeKelas'],
+                percobaan: doc['percobaan'].toDouble(),
+                percobaan2: doc['percobaan2'].toDouble(),
+                percobaan3: doc['percobaan3'].toDouble(),
+                percobaan4: doc['percobaan4'].toDouble(),
+                percobaan5: doc['percobaan5'].toDouble(),
+                rata: doc['rata'].toDouble()))
+            .toList();
+        filteredPenilaianPercobaan = demoPenilaianPercobaan;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching data: $e');
+      }
+    }
   }
 }
 
-class NilaiTugas {
+class PenilaianPercobaan {
   String kode;
   int nim;
   String nama;
@@ -530,21 +451,20 @@ class NilaiTugas {
   double percobaan5;
   double rata;
 
-  NilaiTugas({
-    required this.nim,
-    required this.nama,
-    required this.kode,
-    this.percobaan = 0.0,
-    this.percobaan2 = 0.0,
-    this.percobaan3 = 0.0,
-    this.percobaan4 = 0.0,
-    this.percobaan5 = 0.0,
-    this.rata = 0.0,
-  });
+  PenilaianPercobaan(
+      {required this.nim,
+      required this.nama,
+      required this.kode,
+      this.percobaan = 0.0,
+      this.percobaan2 = 0.0,
+      this.percobaan3 = 0.0,
+      this.percobaan4 = 0.0,
+      this.percobaan5 = 0.0,
+      this.rata = 0.0});
 }
 
-DataRow dataFileDataRow(
-    NilaiTugas fileInfo, int index, VoidCallback editCallback) {
+DataRow dataFileDataRow(PenilaianPercobaan fileInfo, int index,
+    void Function(PenilaianPercobaan) editNilai) {
   return DataRow(
       color: MaterialStateProperty.resolveWith<Color?>(
           (Set<MaterialState> states) {
@@ -552,7 +472,6 @@ DataRow dataFileDataRow(
       }),
       cells: [
         DataCell(Text(fileInfo.nim.toString())),
-        DataCell(Text(fileInfo.kode)),
         DataCell(SizedBox(
             width: 180.0, child: Text(getLimitedText(fileInfo.nama, 30)))),
         DataCell(Text(fileInfo.percobaan.toString())),
@@ -563,7 +482,8 @@ DataRow dataFileDataRow(
         DataCell(Text(getLimitedText(fileInfo.rata.toString(), 6))),
         DataCell(IconButton(
             onPressed: () {
-              editCallback();
+              editNilai(
+                  fileInfo); // Memanggil fungsi editNilai dengan parameter fileInfo
             },
             icon: const Icon(Icons.edit)))
       ]);
@@ -578,15 +498,12 @@ Color getRowColor(int index) {
 }
 
 class DataSource extends DataTableSource {
-  final List<NilaiTugas> data;
+  final List<PenilaianPercobaan> data;
   final BuildContext context;
-  final void Function(NilaiTugas) editNilai;
+  final void Function(PenilaianPercobaan) editNilai;
 
-  DataSource({
-    required this.data,
-    required this.context,
-    required this.editNilai,
-  });
+  DataSource(
+      {required this.data, required this.context, required this.editNilai});
 
   @override
   DataRow? getRow(int index) {
@@ -594,10 +511,7 @@ class DataSource extends DataTableSource {
       return null;
     }
     final fileInfo = data[index];
-    return dataFileDataRow(fileInfo, index, () {
-      // Panggil fungsi editNilai saat tombol edit di tekan
-      editNilai(fileInfo);
-    });
+    return dataFileDataRow(fileInfo, index, editNilai);
   }
 
   @override

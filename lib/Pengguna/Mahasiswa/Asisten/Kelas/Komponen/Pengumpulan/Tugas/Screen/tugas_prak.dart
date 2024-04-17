@@ -228,7 +228,7 @@ class _KumpulTugasState extends State<KumpulTugas> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Pre-Test'),
+          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Latihan'),
           BottomNavigationBarItem(icon: Icon(Icons.bookmarks), label: 'Tugas'),
         ],
         currentIndex: _selectedIndex,

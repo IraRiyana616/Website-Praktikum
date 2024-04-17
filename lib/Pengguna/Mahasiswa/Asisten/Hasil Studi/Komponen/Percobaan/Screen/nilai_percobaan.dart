@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Penulisan%20Laporan/Nilai/penilaian_tugas.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Percobaan/Nilai/penilaian_percobaan.dart';
 
-class NilaiTugas extends StatefulWidget {
-  const NilaiTugas({super.key});
+class NilaiPercobaan extends StatefulWidget {
+  final String kodeKelas;
+  const NilaiPercobaan({super.key, required this.kodeKelas});
 
   @override
-  State<NilaiTugas> createState() => _NilaiTugasState();
+  State<NilaiPercobaan> createState() => _NilaiPercobaanState();
 }
 
-class _NilaiTugasState extends State<NilaiTugas> {
+class _NilaiPercobaanState extends State<NilaiPercobaan> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,9 +85,13 @@ class _NilaiTugasState extends State<NilaiTugas> {
                 child: Container(
                   width: 1500.0,
                   color: Colors.white,
-                  child: const Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [PenilaianTugasAsisten()],
+                    children: [
+                      PenilaianPercobaanAsisten(
+                        kodeKelas: widget.kodeKelas,
+                      )
+                    ],
                   ),
                 ),
               ),

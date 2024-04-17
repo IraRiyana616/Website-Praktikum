@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Penulisan%20Laporan/Screen/nilai_tugas.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Percobaan/Screen/nilai_percobaan.dart';
+import '../Komponen/Percobaan/Nilai/penilaian_percobaan.dart';
 
 class TabelHasilAsisten extends StatefulWidget {
   const TabelHasilAsisten({super.key});
@@ -253,8 +254,12 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
               style: TextStyle(
                   color: Colors.lightBlue[700],
                   fontWeight: FontWeight.bold)), onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const NilaiTugas()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => NilaiPercobaan(
+                      kodeKelas: fileInfo.kode,
+                    )));
       }),
       DataCell(Text(fileInfo.matkul)),
       DataCell(SizedBox(
