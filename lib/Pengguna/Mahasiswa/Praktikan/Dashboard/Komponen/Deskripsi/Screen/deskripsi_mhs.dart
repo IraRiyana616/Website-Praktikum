@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
+import '../../Asistensi/Screen/asistensi_laporan_prak.dart';
 import '../../Pengumpulan/Latihan/Screen/peng_latihan_mhs.dart';
 import '../Modul/Screen/modul_mhs.dart';
 
@@ -191,8 +192,17 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                                     ),
                                   ),
                                   //Asistensi
-                                  //Pengumpulan
+
                                   GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DataAsistensiPraktikan(
+                                                      kodeKelas:
+                                                          widget.kodeKelas)));
+                                    },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                         left: 50.0,

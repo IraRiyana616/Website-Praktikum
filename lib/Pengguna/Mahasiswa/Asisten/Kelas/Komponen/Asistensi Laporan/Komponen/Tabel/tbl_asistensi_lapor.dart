@@ -16,12 +16,14 @@ class TabelAsistensiLaporan extends StatefulWidget {
   final String kodeKelas;
   final String nama;
   final String modul;
+  final int nim;
 
   const TabelAsistensiLaporan({
     Key? key,
     required this.kodeKelas,
     required this.nama,
     required this.modul,
+    required this.nim,
   }) : super(key: key);
 
   @override
@@ -34,64 +36,116 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
   late int userNim;
   late String userName;
   late String selectedRevisi = 'Status Revisi';
+  String selectedModul = 'Tampilkan Semua';
+  List<String> availableModuls = ['Tampilkan Semua'];
+
+  void _filterData(String? modul) {
+    if (modul != null) {
+      setState(() {
+        selectedModul = modul;
+        if (modul == 'Tampilkan Semua') {
+          filteredAsistenLaporan = List.from(demoAsistensiLaporan);
+        } else {
+          filteredAsistenLaporan = demoAsistensiLaporan
+              .where((asistensi) => asistensi.modul == modul)
+              .toList();
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Center(
-          child: Padding(
-            padding: const EdgeInsets.only(
-                left: 18.0, right: 25.0, top: 20.0, bottom: 20.0),
-            child: SizedBox(
-              width: 1195.0,
-              child: filteredAsistenLaporan.isNotEmpty
-                  ? PaginatedDataTable(
-                      columnSpacing: 10,
-                      columns: const [
-                        DataColumn(
-                          label: Text(
-                            'Timestamp',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 35.0),
+                child: Container(
+                  height: 47.0,
+                  width: 1173.0,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: DropdownButton<String>(
+                    value: selectedModul,
+                    onChanged: (modul) => _filterData(modul),
+                    items: availableModuls
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: Text(value),
+                        ),
+                      );
+                    }).toList(),
+                    style: const TextStyle(color: Colors.black),
+                    icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                    iconSize: 24,
+                    elevation: 16,
+                    isExpanded: true,
+                    underline: Container(),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                    left: 18.0, right: 25.0, top: 20.0, bottom: 20.0),
+                child: SizedBox(
+                  width: 1195.0,
+                  child: filteredAsistenLaporan.isNotEmpty
+                      ? PaginatedDataTable(
+                          columnSpacing: 10,
+                          columns: const [
+                            DataColumn(
+                              label: Text(
+                                'Timestamp',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Nama Modul',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Status',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Download File',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'File Asistensi',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                          source: DataSource(filteredAsistenLaporan, context),
+                          rowsPerPage: calculateRowsPerPage(
+                              filteredAsistenLaporan.length),
+                        )
+                      : const Center(
+                          child: Text(
+                            'No data available',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16.0),
                           ),
                         ),
-                        DataColumn(
-                          label: Text(
-                            'Nama Modul',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        DataColumn(
-                          label: Text(
-                            'Status',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        DataColumn(
-                          label: Text(
-                            'Download File',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        DataColumn(
-                          label: Text(
-                            'File Asistensi',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                      source: DataSource(filteredAsistenLaporan, context),
-                      rowsPerPage:
-                          calculateRowsPerPage(filteredAsistenLaporan.length),
-                    )
-                  : const Center(
-                      child: Text(
-                        'No data available',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16.0),
-                      ),
-                    ),
-            ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -116,6 +170,7 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
             .collection('laporan')
             .where('kodeKelas', isEqualTo: widget.kodeKelas)
             .where('nama', isEqualTo: widget.nama)
+            .where('nim', isEqualTo: widget.nim)
             .get();
 
     if (laporanSnapshot.docs.isNotEmpty) {
@@ -125,9 +180,9 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
         return AsistensiLaporan(
           modul: data['judulMateri'] ?? '',
           kode: data['kodeKelas'] ?? '',
-          nama: data['nama'] ?? '',
+          koreksi: data['namaAsisten'] ?? '',
           file: data['namaFile'] ?? '',
-          nim: data['nim'] ?? 0,
+          nim: data['nim'] ?? '',
           waktu: (data['waktuPengumpulan'] as Timestamp).toDate(),
           status: data['statusRevisi'] ?? '',
         );
@@ -135,7 +190,17 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
 
       setState(() {
         demoAsistensiLaporan = fetchedData;
-        filteredAsistenLaporan = fetchedData;
+        availableModuls = ['Tampilkan Semua'] +
+            demoAsistensiLaporan
+                .map((asistensi) => asistensi.modul)
+                .toSet()
+                .toList();
+        // Memastikan selectedModul ada di availableModuls
+        if (!availableModuls.contains(selectedModul)) {
+          selectedModul = 'Tampilkan Semua';
+        }
+        _filterData(
+            selectedModul); // Memanggil _filterData setelah data diambil
       });
     }
   }
@@ -144,20 +209,20 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
 class AsistensiLaporan {
   String modul;
   String kode;
-  String nama;
-  String file;
   int nim;
+  String file;
+  String koreksi;
   DateTime waktu;
   String status;
 
   AsistensiLaporan({
     required this.modul,
     required this.kode,
-    required this.nama,
+    required this.koreksi,
     required this.file,
-    required this.nim,
     required this.waktu,
     required this.status,
+    required this.nim,
   });
 }
 
@@ -222,6 +287,7 @@ DataRow dataFileDataRow(
                     fileInfo.kode,
                     fileInfo.file,
                     fileInfo.modul,
+                    fileInfo.nim,
                     context,
                   );
                 },
@@ -282,7 +348,7 @@ Future<void> showInfoDialog(
       final String statusRevisiAsistensi = asistensiDocument['statusRevisi'];
 
       if (statusRevisiLaporan == statusRevisiAsistensi) {
-        final namaPemeriksa = asistensiDocument['namaPemeriksa'];
+        final namaPemeriksa = asistensiDocument['namaAsisten'];
         final waktuPengumpulan = asistensiDocument['waktuPengumpulan'];
         final statusRevisi = asistensiDocument['statusRevisi'];
 
@@ -368,25 +434,6 @@ Future<void> showInfoDialog(
             );
           },
         );
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Data Asisten'),
-              content: const Text(
-                  'Status revisi pada laporan dan asistensi tidak sama.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
       }
     } else {
       showDialog(
@@ -419,6 +466,7 @@ Future<void> uploadFile(
   String kodeKelas,
   String fileName,
   String modul,
+  int nim,
   BuildContext context,
 ) async {
   String selectedRevisi = 'Status Asistensi';
@@ -548,10 +596,11 @@ Future<void> uploadFile(
           .set({
         'namaFile': fileName,
         'waktuPengumpulan': DateTime.now(),
-        'namaPemeriksa': nama,
+        'namaAsisten': nama,
         'kodeKelas': kodeKelas,
         'judulMateri': modul,
         'statusRevisi': selectedRevisi,
+        'nim': nim
       });
 
       Navigator.pop(context); // Menutup dialog loading

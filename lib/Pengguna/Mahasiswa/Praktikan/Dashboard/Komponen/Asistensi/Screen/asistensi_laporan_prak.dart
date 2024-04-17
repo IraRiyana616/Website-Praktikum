@@ -1,43 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../../Asisten/Kelas/Screen/kelas_asisten.dart';
-import '../../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
-import '../../../Asistensi/Screen/asistensi_laporan_prak.dart';
-import '../../../Deskripsi/Screen/deskripsi_mhs.dart';
-import '../../Latihan/Screen/peng_latihan_mhs.dart';
-import '../Tabel/tabel_peng_tugas_mhs.dart';
 
-class DataTugasPraktikan extends StatefulWidget {
+import '../../../../../Asisten/Kelas/Screen/kelas_asisten.dart';
+import '../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
+import '../../Deskripsi/Screen/deskripsi_mhs.dart';
+import '../../Pengumpulan/Latihan/Screen/peng_latihan_mhs.dart';
+import '../Tabel/tabel_asistensi_laporan_prak.dart';
+
+class DataAsistensiPraktikan extends StatefulWidget {
   final String kodeKelas;
-  const DataTugasPraktikan({super.key, required this.kodeKelas});
+  const DataAsistensiPraktikan({super.key, required this.kodeKelas});
 
   @override
-  State<DataTugasPraktikan> createState() => _DataTugasPraktikanState();
+  State<DataAsistensiPraktikan> createState() => _DataAsistensiPraktikanState();
 }
 
-class _DataTugasPraktikanState extends State<DataTugasPraktikan> {
-  //Fungsi Untuk Bottom Navigation
-  int _selectedIndex = 1; // untuk mengatur index bottom navigation
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      // Memilih halaman sesuai dengan index yang dipilih
-      if (index == 0) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => DataLatihanPraktikan(
-                    kodeKelas: widget.kodeKelas,
-                  )),
-        );
-      } else if (index == 1) {
-        // Tindakan ketika item "Tugas" ditekan
-        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
-        // Misalnya:
-      }
-    });
-  }
-
+class _DataAsistensiPraktikanState extends State<DataAsistensiPraktikan> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,11 +139,20 @@ class _DataTugasPraktikanState extends State<DataTugasPraktikan> {
                               left: 50.0,
                               top: 38.0,
                             ),
-                            child: Text(
-                              'Pengumpulan',
-                              style: GoogleFonts.quicksand(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            DataLatihanPraktikan(
+                                                kodeKelas: widget.kodeKelas)));
+                              },
+                              child: Text(
+                                'Pengumpulan',
+                                style: GoogleFonts.quicksand(
+                                  fontSize: 16.0,
+                                ),
                               ),
                             ),
                           ),
@@ -175,23 +162,11 @@ class _DataTugasPraktikanState extends State<DataTugasPraktikan> {
                               left: 50.0,
                               top: 38.0,
                             ),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            DataAsistensiPraktikan(
-                                                kodeKelas: widget.kodeKelas)));
-                              },
-                              child: MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: Text(
-                                  'Asistensi',
-                                  style: GoogleFonts.quicksand(
-                                    fontSize: 16.0,
-                                  ),
-                                ),
+                            child: Text(
+                              'Asistensi',
+                              style: GoogleFonts.quicksand(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
@@ -208,11 +183,10 @@ class _DataTugasPraktikanState extends State<DataTugasPraktikan> {
                           color: Colors.grey,
                         ),
                       ),
-                      //Tampilan Tabel Absensi Praktikan
-                      TabelKTugasPraktikan(kodeKelas: widget.kodeKelas),
+                      TabelDataAsistensiPraktikan(kodeKelas: widget.kodeKelas),
                       const SizedBox(
                         height: 20.0,
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -220,21 +194,6 @@ class _DataTugasPraktikanState extends State<DataTugasPraktikan> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'Latihan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmarks),
-            label: 'Tugas',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFF3CBEA9),
-        onTap: _onItemTapped,
       ),
     );
   }

@@ -1,141 +1,113 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class TabelKumpulTugas extends StatefulWidget {
+class TabelDataAsistensiPraktikan extends StatefulWidget {
   final String kodeKelas;
-  const TabelKumpulTugas({super.key, required this.kodeKelas});
+
+  const TabelDataAsistensiPraktikan({Key? key, required this.kodeKelas})
+      : super(key: key);
 
   @override
-  State<TabelKumpulTugas> createState() => _TabelKumpulTugasState();
+  State<TabelDataAsistensiPraktikan> createState() =>
+      _TabelDataAsistensiPraktikanState();
 }
 
-class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
-  final TextEditingController _textController = TextEditingController();
-  bool _isTextFieldNotEmpty = false;
-  List<Pengumpulan> demoPengumpulan = [];
-  List<Pengumpulan> filteredPengumpulan = [];
+class _TabelDataAsistensiPraktikanState
+    extends State<TabelDataAsistensiPraktikan> {
+  List<Asistensi> demoAsistensi = [];
+  List<Asistensi> filteredAsistensi = [];
+  int nim = 0;
   //Judul Materi
   String selectedModul = 'Tampilkan Semua';
   List<String> availableModuls = ['Tampilkan Semua'];
-
-  Future<void> deleteDataFromFirestore(String documentId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('tugas')
-          .doc(documentId)
-          .delete();
-      fetchDataFromFirestore();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error deleting document: $e');
-      }
-    }
-  }
-
-  Future<void> fetchDataFromFirestore() async {
-    final QuerySnapshot silabusSnapshot = await FirebaseFirestore.instance
-        .collection('tugas')
-        .where('kodeKelas', isEqualTo: widget.kodeKelas)
-        .get();
-
-    final List<Pengumpulan> dataList = silabusSnapshot.docs.map((doc) {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      final String kodeKelas = data['kodeKelas'];
-      final String judulMateri = data['judulMateri'] ?? '';
-      if (!availableModuls.contains(judulMateri)) {
-        availableModuls.add(judulMateri);
-      }
-      return Pengumpulan(
-        kode: kodeKelas,
-        nama: data['nama'] ?? '',
-        nim: data['nim'] ?? 0,
-        file: data['namaFile'] ?? '',
-        modul: judulMateri,
-        waktu: data['waktuPengumpulan'] != null
-            ? (data['waktuPengumpulan'] as Timestamp).toDate().toString()
-            : '',
-      );
-    }).toList();
-
-    setState(() {
-      demoPengumpulan = dataList;
-      filteredPengumpulan =
-          dataList; // Initialize filteredDataSilabus with all data
-    });
-  }
 
   void _filterData(String? modul) {
     if (modul != null) {
       setState(() {
         selectedModul = modul;
         if (modul == 'Tampilkan Semua') {
-          filteredPengumpulan = demoPengumpulan;
+          filteredAsistensi = List.from(demoAsistensi);
         } else {
-          filteredPengumpulan =
-              demoPengumpulan.where((tugas) => tugas.modul == modul).toList();
+          filteredAsistensi = demoAsistensi
+              .where((asistensi) => asistensi.modul == modul)
+              .toList();
         }
       });
     }
   }
 
-  void _onTextChanged(String value) {
-    setState(() {
-      _isTextFieldNotEmpty = value.isNotEmpty;
-      filterData(value,
-          selectedModul); // Filter based on both query and selected module
-    });
-  }
+  Future<void> fetchData() async {
+    User? user = FirebaseAuth.instance.currentUser;
 
-  void filterData(String query, String selectedModul) {
-    setState(() {
-      if (selectedModul == 'Tampilkan Semua') {
-        filteredPengumpulan = demoPengumpulan
-            .where((data) => (data.nim.toString().contains(query) ||
-                data.nama.toLowerCase().contains(query.toLowerCase())))
-            .toList();
-      } else {
-        filteredPengumpulan = demoPengumpulan
-            .where((data) =>
-                (data.modul == selectedModul) &&
-                (data.nim.toString().contains(query) ||
-                    data.nama.toLowerCase().contains(query.toLowerCase())))
-            .toList();
+    if (user != null) {
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('akun_mahasiswa')
+            .doc(user.uid)
+            .get();
+        nim = userDoc['nim'];
+
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('asistensiLaporan')
+            .where('nim', isEqualTo: nim)
+            .get();
+
+        setState(() {
+          demoAsistensi = querySnapshot.docs.map((doc) {
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+            return Asistensi(
+              kode: data['kodeKelas'] ?? '',
+              asistensi: data['namaAsisten'] ?? '',
+              nim: data['nim'] ?? 0,
+              modul: data['judulMateri'] ?? '',
+              file: data['namaFile'] ?? '',
+              waktu: (data['waktuPengumpulan'] as Timestamp),
+              status: data['statusRevisi'] ?? '',
+            );
+          }).toList();
+
+          filteredAsistensi = List.from(demoAsistensi);
+          // Menambahkan modul ke availableModuls
+          availableModuls = ['Tampilkan Semua'] +
+              demoAsistensi
+                  .map((asistensi) => asistensi.modul)
+                  .toSet()
+                  .toList();
+          // Memastikan selectedModul ada di availableModuls
+          if (!availableModuls.contains(selectedModul)) {
+            selectedModul = 'Tampilkan Semua';
+          }
+          _filterData(
+              selectedModul); // Memanggil _filterData setelah data diambil
+        });
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error fetching data: $e');
+        }
+        // Handle error (show error message, retry, etc.)
       }
-    });
-  }
-
-  void clearSearchField() {
-    setState(() {
-      _textController.clear();
-      filterData('', selectedModul);
-    });
-  }
-
-  void _sortDataByName() {
-    setState(() {
-      filteredPengumpulan.sort((a, b) => a.nama.compareTo(b.nama));
-    });
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    fetchDataFromFirestore();
+    fetchData();
   }
 
   @override
   Widget build(BuildContext context) {
-    _sortDataByName(); // Panggil fungsi untuk mengurutkan data berdasarkan nama
     return Container(
       color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 70.0),
+            padding: const EdgeInsets.only(left: 70.0, top: 20.0),
             child: Container(
               height: 47.0,
               width: 1195.0,
@@ -166,62 +138,10 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 25.0, right: 80.0),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: SizedBox(
-                width: 250.0,
-                height: 35.0,
-                child: Row(
-                  children: [
-                    const Text("Search :",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                    const SizedBox(
-                      width: 10.0,
-                    ),
-                    Expanded(
-                      child: TextField(
-                        onChanged: _onTextChanged,
-                        // (value) {
-                        //   filterData(value, selectedModul);
-                        // },
-                        controller: _textController,
-                        decoration: InputDecoration(
-                          hintText: '',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(0.0),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 0, horizontal: 10),
-                          suffixIcon: Visibility(
-                            visible: _isTextFieldNotEmpty,
-                            child: IconButton(
-                              onPressed: clearSearchField,
-                              icon: const Icon(Icons.clear),
-                            ),
-                          ),
-                          labelStyle: const TextStyle(
-                            fontSize: 16,
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 27.0,
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Padding(
             padding: const EdgeInsets.only(left: 70.0, right: 100.0, top: 20.0),
             child: SizedBox(
               width: double.infinity,
-              child: filteredPengumpulan.isNotEmpty
+              child: filteredAsistensi.isNotEmpty
                   ? PaginatedDataTable(
                       columnSpacing: 10,
                       columns: const [
@@ -233,13 +153,19 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
                         ),
                         DataColumn(
                           label: Text(
-                            'NIM',
+                            'Judul Materi',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                         DataColumn(
                           label: Text(
-                            'Nama',
+                            'Nama Asisten',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Status',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -250,9 +176,9 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
                           ),
                         ),
                       ],
-                      source: DataSource(filteredPengumpulan),
+                      source: DataSource(filteredAsistensi),
                       rowsPerPage:
-                          calculateRowsPerPage(filteredPengumpulan.length),
+                          calculateRowsPerPage(filteredAsistensi.length),
                     )
                   : const Center(
                       child: Padding(
@@ -280,24 +206,27 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
   }
 }
 
-class Pengumpulan {
+class Asistensi {
   final String kode;
-  final String nama;
   final int nim;
+  final String asistensi;
+  final String status;
   final String file;
-  final String waktu;
+  final Timestamp waktu;
   final String modul;
 
-  Pengumpulan(
-      {required this.kode,
-      required this.nama,
-      required this.nim,
-      required this.file,
-      required this.waktu,
-      required this.modul});
+  Asistensi({
+    required this.kode,
+    required this.nim,
+    required this.asistensi,
+    required this.status,
+    required this.file,
+    required this.waktu,
+    required this.modul,
+  });
 }
 
-DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
+DataRow dataFileDataRow(Asistensi fileInfo, int index) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -308,17 +237,26 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
       DataCell(
         SizedBox(
           width: 130.0,
-          child: Text(getLimitedText(fileInfo.waktu, 19,
+          child: Text(getLimitedText(fileInfo.waktu.toDate().toString(), 19,
               style: const TextStyle(color: Colors.black))),
         ),
       ),
-      DataCell(Text(fileInfo.nim.toString())),
       DataCell(
         SizedBox(
-          width: 200.0,
-          child: Text(getLimitedText(fileInfo.nama, 25,
+          width: 230.0,
+          child: Text(getLimitedText(fileInfo.modul, 25,
               style: const TextStyle(color: Colors.black))),
         ),
+      ),
+      DataCell(
+        SizedBox(
+          width: 230.0,
+          child: Text(getLimitedText(fileInfo.asistensi, 25,
+              style: const TextStyle(color: Colors.black))),
+        ),
+      ),
+      DataCell(
+        SizedBox(width: 100.0, child: Text(fileInfo.status)),
       ),
       DataCell(Row(
         children: [
@@ -351,7 +289,7 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
 void downloadFile(String kodeKelas, String fileName, String judulMateri) async {
   final ref = FirebaseStorage.instance
       .ref()
-      .child('tugas/$kodeKelas/$judulMateri/$fileName');
+      .child('latihan/$kodeKelas/$judulMateri/$fileName');
 
   try {
     final url = await ref.getDownloadURL();
@@ -378,7 +316,7 @@ Color getRowColor(int index) {
 }
 
 class DataSource extends DataTableSource {
-  final List<Pengumpulan> data;
+  final List<Asistensi> data;
 
   DataSource(this.data);
 

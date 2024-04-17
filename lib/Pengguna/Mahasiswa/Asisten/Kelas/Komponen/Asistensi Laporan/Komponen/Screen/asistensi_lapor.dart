@@ -7,12 +7,13 @@ class AsistensiLaporan extends StatefulWidget {
   final String kodeKelas;
   final String nama;
   final String modul;
-
+  final int nim;
   const AsistensiLaporan({
     super.key,
     required this.kodeKelas,
     required this.nama,
     required this.modul,
+    required this.nim,
   });
 
   @override
@@ -71,6 +72,7 @@ class _AsistensiLaporanState extends State<AsistensiLaporan> {
                       modul: widget.modul,
                       kodeKelas: widget.kodeKelas,
                       nama: widget.nama,
+                      nim: widget.nim,
                     )),
               ),
             ),

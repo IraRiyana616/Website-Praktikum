@@ -184,9 +184,10 @@ class _TabelPengumpulanUjiPemahamanState
                     ),
                     Expanded(
                       child: TextField(
-                        onChanged: (value) {
-                          filterData(value, selectedModul);
-                        },
+                        onChanged: _onTextChanged,
+                        // (value) {
+                        //   filterData(value, selectedModul);
+                        // },
                         controller: _textController,
                         decoration: InputDecoration(
                           hintText: '',

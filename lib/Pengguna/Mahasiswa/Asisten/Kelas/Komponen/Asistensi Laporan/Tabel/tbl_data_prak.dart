@@ -141,6 +141,7 @@ DataRow dataFileDataRow(
                           kodeKelas: fileInfo.kode,
                           nama: fileInfo.nama,
                           modul: fileInfo.matkul,
+                          nim: fileInfo.nim,
                         )));
           },
           child: const MouseRegion(

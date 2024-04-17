@@ -6,6 +6,7 @@ import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Pengumpula
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Pengumpulan/Tugas/Screen/peng_tugas_mhs.dart';
 
 import '../../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
+import '../../../Asistensi/Screen/asistensi_laporan_prak.dart';
 
 class DataLatihanPraktikan extends StatefulWidget {
   final String kodeKelas;
@@ -180,7 +181,14 @@ class _DataLatihanPraktikanState extends State<DataLatihanPraktikan> {
                               top: 38.0,
                             ),
                             child: GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            DataAsistensiPraktikan(
+                                                kodeKelas: widget.kodeKelas)));
+                              },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: Text(
