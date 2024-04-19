@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Percobaan/Screen/nilai_percobaan.dart';
-import '../Komponen/Percobaan/Nilai/penilaian_percobaan.dart';
 
 class TabelHasilAsisten extends StatefulWidget {
   const TabelHasilAsisten({super.key});

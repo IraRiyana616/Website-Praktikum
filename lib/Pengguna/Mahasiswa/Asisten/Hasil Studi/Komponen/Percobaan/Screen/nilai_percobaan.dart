@@ -4,13 +4,35 @@ import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Percobaa
 
 class NilaiPercobaan extends StatefulWidget {
   final String kodeKelas;
-  const NilaiPercobaan({super.key, required this.kodeKelas});
+  const NilaiPercobaan({Key? key, required this.kodeKelas}) : super(key: key);
 
   @override
   State<NilaiPercobaan> createState() => _NilaiPercobaanState();
 }
 
 class _NilaiPercobaanState extends State<NilaiPercobaan> {
+  //Fungsi Untuk Bottom Navigation
+  int _selectedIndex = 0; // untuk mengatur index bottom navigation
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      // Memilih halaman sesuai dengan index yang dipilih
+      if (index == 0) {
+        // Tindakan ketika item "Latihan" ditekan
+        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan latihan
+        // Misalnya:
+      } else if (index == 1) {
+        // Tindakan ketika item "Tugas" ditekan
+        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
+        // Misalnya:
+      } else if (index == 2) {
+        // Tindakan ketika item "Tugas" ditekan
+        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
+        // Misalnya:
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,13 +41,14 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
         child: AppBar(
           backgroundColor: const Color(0xFFF7F8FA),
           leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-              )),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.black,
+            ),
+          ),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(
@@ -35,31 +58,35 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
                   width: 10.0,
                 ),
                 Expanded(
-                    child: Text(
-                  'Penilaian Praktikum',
-                  style: GoogleFonts.quicksand(
+                  child: Text(
+                    'Penilaian Praktikum',
+                    style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                )),
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
                 const SizedBox(
                   width: 750.0,
                 ),
                 IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.logout,
-                      color: Color(0xFF031F31),
-                    )),
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.logout,
+                    color: Color(0xFF031F31),
+                  ),
+                ),
                 const SizedBox(
                   width: 10.0,
                 ),
                 Text(
                   'Log out',
                   style: GoogleFonts.quicksand(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF031F31)),
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF031F31),
+                  ),
                 ),
                 const SizedBox(
                   width: 50.0,
@@ -101,6 +128,25 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book),
+            label: 'Latihan',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.task),
+            label: 'Tugas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark),
+            label: 'Keaktifan',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: const Color(0xFF3CBEA9),
+        onTap: _onItemTapped,
       ),
     );
   }
