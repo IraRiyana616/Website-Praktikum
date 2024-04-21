@@ -4,6 +4,7 @@ import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Percobaa
 
 class NilaiPercobaan extends StatefulWidget {
   final String kodeKelas;
+
   const NilaiPercobaan({Key? key, required this.kodeKelas}) : super(key: key);
 
   @override
@@ -117,6 +118,9 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
                     children: [
                       PenilaianPercobaanAsisten(
                         kodeKelas: widget.kodeKelas,
+                      ),
+                      const SizedBox(
+                        height: 20.0,
                       )
                     ],
                   ),
@@ -133,15 +137,15 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.book),
-            label: 'Latihan',
+            label: 'Nilai Harian',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.task),
-            label: 'Tugas',
+            label: 'Nilai AKhir',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Keaktifan',
+            icon: Icon(Icons.info),
+            label: 'Details',
           ),
         ],
         currentIndex: _selectedIndex,
