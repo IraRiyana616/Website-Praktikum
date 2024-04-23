@@ -56,11 +56,11 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
             'nim': data.nim,
             'kodeKelas': data.kode,
             //== Nilai Rata-Rata ==
-            'rata1': 0.0,
-            'rata2': 0.0,
-            'rata3': 0.0,
-            'rata4': 0.0,
-            'rata5': 0.0,
+            'modul1': 0.0,
+            'modul2': 0.0,
+            'modul3': 0.0,
+            'modul4': 0.0,
+            'modul5': 0.0,
             //== Laporan ==
             'laporan1': 0.0,
             'laporan2': 0.0,
@@ -1406,7 +1406,7 @@ DataRow dataFileDataRow(PenilaianPercobaan fileInfo, int index,
         Text(getLimitedText(fileInfo.rata1.toString(), 5)),
       ),
       DataCell(
-        Text(getLimitedText(fileInfo.rata1.toString(), 5)),
+        Text(getLimitedText(fileInfo.rata2.toString(), 5)),
       ),
       DataCell(
         Text(getLimitedText(fileInfo.rata3.toString(), 5)),

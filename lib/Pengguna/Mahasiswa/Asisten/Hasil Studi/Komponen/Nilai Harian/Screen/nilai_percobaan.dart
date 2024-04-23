@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Percobaan/Nilai/penilaian_percobaan.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Nilai%20Akhir/Screen/nilai_akhir.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Nilai%20Harian/Nilai/penilaian_percobaan.dart';
 
 class NilaiPercobaan extends StatefulWidget {
   final String kodeKelas;
@@ -23,9 +24,10 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
         // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan latihan
         // Misalnya:
       } else if (index == 1) {
-        // Tindakan ketika item "Tugas" ditekan
-        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
-        // Misalnya:
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => NilaiAkhir(kodeKelas: widget.kodeKelas)));
       } else if (index == 2) {
         // Tindakan ketika item "Tugas" ditekan
         // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
@@ -68,30 +70,6 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  width: 750.0,
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.logout,
-                    color: Color(0xFF031F31),
-                  ),
-                ),
-                const SizedBox(
-                  width: 10.0,
-                ),
-                Text(
-                  'Log out',
-                  style: GoogleFonts.quicksand(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF031F31),
-                  ),
-                ),
-                const SizedBox(
-                  width: 50.0,
-                )
               ],
             ),
           ),
