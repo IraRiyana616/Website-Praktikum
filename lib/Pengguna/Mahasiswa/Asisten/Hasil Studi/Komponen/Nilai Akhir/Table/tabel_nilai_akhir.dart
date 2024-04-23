@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +18,9 @@ class TabelNilaiAkhir extends StatefulWidget {
 class _TabelNilaiAkhirState extends State<TabelNilaiAkhir> {
   List<PenilaianAkhir> demoPenilaianAkhir = [];
   List<PenilaianAkhir> filteredPenilaianAkhir = [];
+  //== Dropdown Button ==
+  String selectedKeterangan = 'Tampilkan Semua';
+
   @override
   void initState() {
     super.initState();
@@ -74,11 +78,21 @@ class _TabelNilaiAkhirState extends State<TabelNilaiAkhir> {
 
   Future<void> getDataFromFirebase() async {
     try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await FirebaseFirestore.instance
-              .collection('nilaiAkhir')
-              .where('kodeKelas', isEqualTo: widget.kodeKelas)
-              .get();
+      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+      if (selectedKeterangan != 'Tampilkan Semua') {
+        // Jika keterangan yang akan difilter tidak kosong, lakukan query dengan filter
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('nilaiAkhir')
+            .where('kodeKelas', isEqualTo: widget.kodeKelas)
+            .where('keterangan', isEqualTo: selectedKeterangan)
+            .get();
+      } else {
+        // Jika keterangan yang akan difilter kosong, ambil semua data
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('nilaiAkhir')
+            .where('kodeKelas', isEqualTo: widget.kodeKelas)
+            .get();
+      }
 
       setState(() {
         demoPenilaianAkhir = querySnapshot.docs.map((docs) {
@@ -293,12 +307,15 @@ class _TabelNilaiAkhirState extends State<TabelNilaiAkhir> {
                         double.tryParse(projectController.text) ?? 0.0;
                     double resmi = double.tryParse(resmiController.text) ?? 0.0;
 
-// Update nilai pretest, project, dan resmi pada objek nilai
+                    // Update nilai pretest, project, dan resmi pada objek nilai
                     nilai.pretest = pretest;
                     nilai.project = project;
                     nilai.resmi = resmi;
 
                     try {
+                      // Dapatkan nama asisten
+                      String? namaAsisten = await getNamaAsisten();
+
                       QuerySnapshot<Map<String, dynamic>> querySnapshot =
                           await FirebaseFirestore.instance
                               .collection('nilaiAkhir')
@@ -321,7 +338,9 @@ class _TabelNilaiAkhirState extends State<TabelNilaiAkhir> {
                           'projectAkhir': project,
                           'laporanResmi': resmi,
                           'keterangan': nilai.status,
-                          'nilaiHuruf': nilai.huruf
+                          'nilaiHuruf': nilai.huruf,
+                          'namaAsisten':
+                              namaAsisten ?? "", // Pastikan tidak null
                         });
                       } else {
                         await querySnapshot.docs[0].reference.update({
@@ -335,6 +354,8 @@ class _TabelNilaiAkhirState extends State<TabelNilaiAkhir> {
                           'laporanResmi': resmi,
                           'keterangan': nilai.status,
                           'nilaiHuruf': nilai.huruf,
+                          'namaAsisten':
+                              namaAsisten ?? "", // Pastikan tidak null
                         });
                       }
 
@@ -378,6 +399,26 @@ class _TabelNilaiAkhirState extends State<TabelNilaiAkhir> {
             ],
           );
         });
+  }
+
+//== Nama Pengoreksi
+  Future<String?> getNamaAsisten() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String uid = user.uid;
+      // Kueri Firestore untuk mendapatkan data mahasiswa
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+          .instance
+          .collection('akun_mahasiswa')
+          .doc(uid)
+          .get();
+      if (snapshot.exists) {
+        // Jika dokumen ditemukan, ambil nilai dari field 'nama'
+        String? namaAsisten = snapshot.data()?['nama'];
+        return namaAsisten;
+      }
+    }
+    return null;
   }
 
   Future<void> _calculateAndSaveNilaiAkhir(PenilaianAkhir nilai) async {
@@ -490,6 +531,55 @@ class _TabelNilaiAkhirState extends State<TabelNilaiAkhir> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 5.0, bottom: 20.0, left: 920.0),
+            child: Row(
+              children: [
+//== Text ==
+                const Text(
+                  'Search :',
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15.0),
+                  child: Container(
+                    width: 260.0,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      style: const TextStyle(color: Colors.black),
+                      icon:
+                          const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                      iconSize: 24,
+                      elevation: 16,
+
+                      value: selectedKeterangan,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedKeterangan = newValue!;
+                          getDataFromFirebase();
+                        });
+                      },
+                      underline: Container(), // Menjadikan garis bawah kosong
+                      items: <String>['Tampilkan Semua', 'Lulus', 'Tidak Lulus']
+                          .map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Text(value),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 25.0),
             child: SizedBox(
@@ -684,14 +774,19 @@ DataRow dataFileDataRow(PenilaianAkhir fileInfo, int index,
         Text(getLimitedText(fileInfo.akhir.toString(), 5)),
       ),
       DataCell(
-        IconButton(
-            onPressed: () {
-              editNilai(fileInfo);
-            },
-            icon: const Icon(
-              Icons.add_box,
-              color: Colors.grey,
-            )),
+        Row(
+          children: [
+            //== Menambahkan data dan edit data
+            IconButton(
+                onPressed: () {
+                  editNilai(fileInfo);
+                },
+                icon: const Icon(
+                  Icons.add_box,
+                  color: Colors.grey,
+                )),
+          ],
+        ),
       )
     ],
   );

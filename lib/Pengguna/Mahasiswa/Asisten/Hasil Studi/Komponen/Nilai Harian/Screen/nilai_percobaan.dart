@@ -28,10 +28,6 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
             context,
             MaterialPageRoute(
                 builder: (context) => NilaiAkhir(kodeKelas: widget.kodeKelas)));
-      } else if (index == 2) {
-        // Tindakan ketika item "Tugas" ditekan
-        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
-        // Misalnya:
       }
     });
   }
@@ -120,10 +116,6 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
           BottomNavigationBarItem(
             icon: Icon(Icons.task),
             label: 'Nilai AKhir',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info),
-            label: 'Details',
           ),
         ],
         currentIndex: _selectedIndex,
