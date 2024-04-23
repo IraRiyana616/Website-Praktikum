@@ -7,6 +7,8 @@ import 'package:laksi/Pengguna/Mahasiswa/Asisten/Pengaturan/Screen/pengaturan.da
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Screen/absensi_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
 
+import '../../../Praktikan/Hasil Studi/Screen/transkrip.dart';
+
 class KelasAsistenNav extends StatefulWidget {
   const KelasAsistenNav({super.key});
 
@@ -84,9 +86,9 @@ class _KelasAsistenNavState extends State<KelasAsistenNav> {
                       icon: const Icon(
                         Icons.score,
                       ),
-                      page: const KelasAsisten(),
+                      page: const TranskripNilai(),
                       updatePage: updatePage,
-                      isActive: currentPage is KelasAsisten,
+                      isActive: currentPage is TranskripNilai,
                     ),
                     //
                     const Padding(
