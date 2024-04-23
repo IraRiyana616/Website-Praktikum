@@ -112,112 +112,115 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 30.0, bottom: 20.0, left: 700.0),
-          child: Row(
-            children: [
-//== Text ==
-              const Text(
-                'Search :',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+    return SizedBox(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding:
+                  const EdgeInsets.only(top: 20.0, left: 25.0, bottom: 20.0),
+              child: Text(
+                'Data Hasil Studi Mahasiswa',
+                style: GoogleFonts.quicksand(
+                    fontSize: 20.0, fontWeight: FontWeight.bold),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 15.0),
-                child: Container(
-                  width: 260.0,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    style: const TextStyle(color: Colors.black),
-                    icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                    iconSize: 24,
-                    elevation: 16,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0, left: 25.0),
+              child: Container(
+                width: 1010.0,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: DropdownButton<String>(
+                  isExpanded: true,
+                  style: const TextStyle(color: Colors.black),
+                  icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                  iconSize: 24,
+                  elevation: 16,
 
-                    value: selectedKeterangan,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedKeterangan = newValue!;
-                        fetchDataFromFirebase();
-                      });
-                    },
-                    underline: Container(), // Menjadikan garis bawah kosong
-                    items: <String>['Tampilkan Semua', 'Lulus', 'Tidak Lulus']
-                        .map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
-                          child: Text(value),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                  value: selectedKeterangan,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedKeterangan = newValue!;
+                      fetchDataFromFirebase();
+                    });
+                  },
+                  underline: Container(), // Menjadikan garis bawah kosong
+                  items: <String>['Tampilkan Semua', 'Lulus', 'Tidak Lulus']
+                      .map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: Text(value),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding:
+                  const EdgeInsets.only(left: 22.0, right: 25.0, bottom: 25.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: filteredTranskripNilai.isNotEmpty
+                    ? PaginatedDataTable(
+                        columnSpacing: 10,
+                        columns: const [
+                          DataColumn(
+                            label: Text(
+                              'Kode Kelas',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Nilai Angka',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Nilai Huruf',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Keterangan',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Nama Pemeriksa',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                        source: DataSource(filteredTranskripNilai),
+                        rowsPerPage:
+                            calculateRowsPerPage(filteredTranskripNilai.length),
+                      )
+                    : const Center(
+                        child: Text(
+                          'No data available',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+              ),
+            ),
+          ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 22.0, right: 25.0),
-          child: SizedBox(
-            width: double.infinity,
-            child: filteredTranskripNilai.isNotEmpty
-                ? PaginatedDataTable(
-                    columnSpacing: 10,
-                    columns: const [
-                      DataColumn(
-                        label: Text(
-                          'Kode Kelas',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Nilai Angka',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Nilai Huruf',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Keterangan',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Nama Pemeriksa',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                    source: DataSource(filteredTranskripNilai),
-                    rowsPerPage:
-                        calculateRowsPerPage(filteredTranskripNilai.length),
-                  )
-                : const Center(
-                    child: Text(
-                      'No data available',
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 

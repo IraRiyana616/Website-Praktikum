@@ -67,9 +67,9 @@ class _TranskripNilaiState extends State<TranskripNilai> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 25.0, top: 20.0),
+                padding: const EdgeInsets.only(left: 37.0, top: 20.0),
                 child: Container(
-                  width: 1055.0,
+                  width: 1090.0,
                   color: Colors.white,
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

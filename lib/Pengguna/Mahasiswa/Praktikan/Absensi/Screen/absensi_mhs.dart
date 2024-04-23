@@ -202,180 +202,175 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
               ),
             ),
           )),
-      body: SingleChildScrollView(
-        child: Container(
-          color: const Color(0xFFE3E8EF),
-          width: 2000,
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 30.0,
-                ),
-                Container(
-                  width: 1055.0,
-                  color: Colors.white,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 40.0, top: 30.0),
-                        child: Text(
-                          "Formulir Absensi Praktikum",
-                          style: GoogleFonts.quicksand(
-                              fontWeight: FontWeight.bold, fontSize: 18.0),
-                        ),
+      body: Container(
+        color: const Color(0xFFE3E8EF),
+        width: 2000,
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 20.0,
+                width: 5.0,
+              ),
+              Container(
+                width: 1055.0,
+                color: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 40.0, top: 30.0),
+                      child: Text(
+                        "Formulir Absensi Praktikum",
+                        style: GoogleFonts.quicksand(
+                            fontWeight: FontWeight.bold, fontSize: 20.0),
                       ),
-                      const Padding(
-                        padding:
-                            EdgeInsets.only(left: 30.0, right: 30.0, top: 10.0),
-                        child: Divider(thickness: 0.5, color: Colors.grey),
-                      ),
+                    ),
+                    const Padding(
+                      padding:
+                          EdgeInsets.only(left: 30.0, right: 30.0, top: 10.0),
+                      child: Divider(thickness: 0.5, color: Colors.grey),
+                    ),
 
-                      /// KODE KELAS
-                      Row(children: [
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(left: 300.0, top: 40.0),
-                          child: Text("Kode Kelas",
-                              style: GoogleFonts.quicksand(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold)),
-                        ),
-                        const SizedBox(width: 30.0),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 40.0),
-                          child: SizedBox(
-                            width: 300.0,
-                            child: TextField(
-                              controller: _kodeEditingController,
-                              decoration: InputDecoration(
-                                  hintText: ' Masukkan Kode Kelas',
-                                  border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                  filled: true,
-                                  fillColor: Colors.white),
-                            ),
-                          ),
-                        )
-                      ]),
-
-                      /// Modul
-                      Row(children: [
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(left: 300.0, top: 10.0),
-                          child: Text("Modul",
-                              style: GoogleFonts.quicksand(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold)),
-                        ),
-                        const SizedBox(width: 68.0),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20.0),
-                          child: SizedBox(
-                            width: 300.0,
-                            child: TextField(
-                              controller: _modulEditingController,
-                              decoration: InputDecoration(
-                                  hintText: ' Masukkan Nama Modul',
-                                  border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                  filled: true,
-                                  fillColor: Colors.white),
-                            ),
-                          ),
-                        )
-                      ]),
-
-                      /// KETERANGAN
-                      Row(children: [
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(left: 300.0, top: 20.0),
-                          child: Text("Keterangan",
-                              style: GoogleFonts.quicksand(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold)),
-                        ),
-                        const SizedBox(width: 25.0),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20.0),
-                          child: SizedBox(
-                              width: 300.0,
-                              child: Container(
-                                height: 47.0,
-                                width: 980.0,
-                                decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.grey.shade700),
-                                    borderRadius: BorderRadius.circular(8.0)),
-                                child: DropdownButton<String>(
-                                  value: selectedAbsen,
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      selectedAbsen = newValue!;
-                                    });
-                                  },
-                                  items: ['Status Kehadiran', 'Hadir', 'Sakit']
-                                      .map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                    return DropdownMenuItem(
-                                        value: value,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 15.0),
-                                          child: Text(
-                                            value,
-                                            style:
-                                                const TextStyle(fontSize: 16.0),
-                                          ),
-                                        ));
-                                  }).toList(),
-                                  style: TextStyle(color: Colors.grey.shade700),
-                                  icon: const Icon(Icons.arrow_drop_down,
-                                      color: Colors.grey),
-                                  iconSize: 24,
-                                  elevation: 16,
-                                  isExpanded: true,
-                                  underline: Container(),
-                                ),
-                              )),
-                        )
-                      ]),
-
+                    /// KODE KELAS
+                    Row(children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 620.0, top: 40.0),
+                        padding: const EdgeInsets.only(left: 300.0, top: 40.0),
+                        child: Text("Kode Kelas",
+                            style: GoogleFonts.quicksand(
+                                fontSize: 16.0, fontWeight: FontWeight.bold)),
+                      ),
+                      const SizedBox(width: 30.0),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 40.0),
                         child: SizedBox(
-                          height: 40.0,
-                          width: 100.0,
-                          child: ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          const Color(0xFF3CBEA9))),
-                              onPressed: () {
-                                saveDataToFirestore();
-                              },
-                              child: Text(
-                                "Simpan",
-                                style: GoogleFonts.quicksand(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.bold),
-                              )),
+                          width: 300.0,
+                          child: TextField(
+                            controller: _kodeEditingController,
+                            decoration: InputDecoration(
+                                hintText: ' Masukkan Kode Kelas',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                filled: true,
+                                fillColor: Colors.white),
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 60.0,
                       )
-                    ],
-                  ),
+                    ]),
+
+                    /// Modul
+                    Row(children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 300.0, top: 10.0),
+                        child: Text("Modul",
+                            style: GoogleFonts.quicksand(
+                                fontSize: 16.0, fontWeight: FontWeight.bold)),
+                      ),
+                      const SizedBox(width: 68.0),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: SizedBox(
+                          width: 300.0,
+                          child: TextField(
+                            controller: _modulEditingController,
+                            decoration: InputDecoration(
+                                hintText: ' Masukkan Nama Modul',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                filled: true,
+                                fillColor: Colors.white),
+                          ),
+                        ),
+                      )
+                    ]),
+
+                    /// KETERANGAN
+                    Row(children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 300.0, top: 20.0),
+                        child: Text("Keterangan",
+                            style: GoogleFonts.quicksand(
+                                fontSize: 16.0, fontWeight: FontWeight.bold)),
+                      ),
+                      const SizedBox(width: 25.0),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: SizedBox(
+                            width: 300.0,
+                            child: Container(
+                              height: 47.0,
+                              width: 980.0,
+                              decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: Colors.grey.shade700),
+                                  borderRadius: BorderRadius.circular(8.0)),
+                              child: DropdownButton<String>(
+                                value: selectedAbsen,
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    selectedAbsen = newValue!;
+                                  });
+                                },
+                                items: [
+                                  'Status Kehadiran',
+                                  'Hadir',
+                                  'Sakit'
+                                ].map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem(
+                                      value: value,
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 15.0),
+                                        child: Text(
+                                          value,
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
+                                        ),
+                                      ));
+                                }).toList(),
+                                style: TextStyle(color: Colors.grey.shade700),
+                                icon: const Icon(Icons.arrow_drop_down,
+                                    color: Colors.grey),
+                                iconSize: 24,
+                                elevation: 16,
+                                isExpanded: true,
+                                underline: Container(),
+                              ),
+                            )),
+                      )
+                    ]),
+
+                    Padding(
+                      padding: const EdgeInsets.only(left: 620.0, top: 40.0),
+                      child: SizedBox(
+                        height: 40.0,
+                        width: 100.0,
+                        child: ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        const Color(0xFF3CBEA9))),
+                            onPressed: () {
+                              saveDataToFirestore();
+                            },
+                            child: Text(
+                              "Simpan",
+                              style: GoogleFonts.quicksand(
+                                  fontSize: 14.0, fontWeight: FontWeight.bold),
+                            )),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 60.0,
+                    )
+                  ],
                 ),
-                const SizedBox(
-                  height: 103.0,
-                )
-              ],
-            ),
+              ),
+              const SizedBox(
+                height: 80.0,
+              )
+            ],
           ),
         ),
       ),
