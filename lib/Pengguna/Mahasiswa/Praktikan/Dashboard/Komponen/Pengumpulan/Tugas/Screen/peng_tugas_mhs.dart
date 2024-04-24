@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../../Asisten/Kelas/Screen/kelas_asisten.dart';
+
 import '../../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
 import '../../../Asistensi/Screen/asistensi_laporan_prak.dart';
 import '../../../Deskripsi/Screen/deskripsi_mhs.dart';
@@ -47,10 +47,7 @@ class _DataTugasPraktikanState extends State<DataTugasPraktikan> {
           backgroundColor: const Color(0xFFF7F8FA),
           leading: IconButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const KelasAsisten()));
+                Navigator.pop(context);
               },
               icon: const Icon(
                 Icons.arrow_back,

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Pengaturan/Screen/pengaturan.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Screen/hasilstudi_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Screen/absensi_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Hasil%20Studi/Screen/transkrip.dart';
+import '../../../Asisten/Absensi/Form/Screen/absensi_ass.dart';
+import '../../../Asisten/Kelas/Screen/kelas_asisten.dart';
+import '../../../Asisten/Pengaturan/Screen/pengaturan.dart';
 
-import '../../Absensi/Form/Screen/absensi_ass.dart';
-import '../../Kelas/Screen/kelas_asisten.dart';
-
-class PengaturanNav extends StatefulWidget {
-  const PengaturanNav({super.key});
+class DashboardPraktikanNav extends StatefulWidget {
+  const DashboardPraktikanNav({super.key});
 
   @override
-  State<PengaturanNav> createState() => _PengaturanNavState();
+  State<DashboardPraktikanNav> createState() => _DashboardPraktikanNavState();
 }
 
-class _PengaturanNavState extends State<PengaturanNav> {
-  Widget currentPage = const Pengaturan(); // Halaman awal
+class _DashboardPraktikanNavState extends State<DashboardPraktikanNav> {
+  Widget currentPage = const DashboardPraktikan(); // Halaman awal
 
   @override
   Widget build(BuildContext context) {
@@ -117,22 +117,10 @@ class _PengaturanNavState extends State<PengaturanNav> {
                       updatePage: updatePage,
                       isActive: currentPage is KelasAsisten,
                     ),
+
                     const SizedBox(
                       height: 10,
                     ),
-                    // DashboardListTile(
-                    //   title: 'Mahasiswa',
-                    //   icon: const Icon(
-                    //     Icons.people,
-                    //   ),
-                    //   page: const DataMahasiswaAss(),
-                    //   updatePage: updatePage,
-                    //   isActive: currentPage is DataMahasiswaAss,
-                    // ),
-
-                    // const SizedBox(
-                    //   height: 10,
-                    // ),
                     DashboardListTile(
                       title: 'Absensi',
                       icon: const Icon(
@@ -143,20 +131,19 @@ class _PengaturanNavState extends State<PengaturanNav> {
                       isActive: currentPage is AbsensiAsisten,
                     ),
                     const SizedBox(
-                      height: 10.0,
+                      height: 10,
                     ),
-
                     DashboardListTile(
                       title: 'Hasil Studi',
                       icon: const Icon(
                         Icons.score,
                       ),
-                      page: const KelasAsisten(),
+                      page: const HasilStudiAsisten(),
                       updatePage: updatePage,
-                      isActive: currentPage is KelasAsisten,
+                      isActive: currentPage is HasilStudiAsisten,
                     ),
                     const SizedBox(
-                      height: 10,
+                      height: 10.0,
                     ),
                     DashboardListTile(
                       title: 'Settings',

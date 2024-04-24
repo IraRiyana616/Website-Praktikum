@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Landing%20Page/Komponen/Mahasiswa/Register/register_mhs.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Navigation/kelas_assnav.dart';
+import '../../../../Pengguna/Mahasiswa/Praktikan/Dashboard/Navigasi/dasboard_nav.dart';
 
 class LoginMahasiswa extends StatefulWidget {
   const LoginMahasiswa({super.key});
@@ -154,7 +154,7 @@ class _LoginMahasiswaState extends State<LoginMahasiswa> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   // const TestWaktu()
-                                                  const KelasAsistenNav()));
+                                                  const DashboardPraktikanNav()));
                                     } else {
                                       if (kDebugMode) {
                                         print(

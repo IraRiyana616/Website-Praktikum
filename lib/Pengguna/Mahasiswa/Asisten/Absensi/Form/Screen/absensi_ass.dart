@@ -15,6 +15,22 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
   final TextEditingController _kodeEditingController = TextEditingController();
   final TextEditingController _modulEditingController = TextEditingController();
   String selectedAbsen = 'Status Kehadiran';
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Fungsi untuk logout dari akun Firebase
+  Future<void> _logout() async {
+    try {
+      await _auth.signOut();
+      // Navigasi kembali ke halaman login atau halaman lain setelah logout berhasil
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushReplacementNamed('/login');
+    } catch (e) {
+      // Tangani kesalahan logout
+      if (kDebugMode) {
+        print('Error during logout: $e');
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -181,7 +197,7 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
                     width: 750.0,
                   ),
                   IconButton(
-                      onPressed: () {},
+                      onPressed: _logout,
                       icon: const Icon(
                         Icons.logout,
                         color: Color(0xFF031F31),

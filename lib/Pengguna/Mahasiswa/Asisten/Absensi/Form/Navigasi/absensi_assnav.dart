@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Data%20Mahasiswa/Screen/datamahasiswa_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Screen/hasilstudi_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Screen/absensi_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Hasil%20Studi/Screen/transkrip.dart';
 import '../../../Kelas/Screen/kelas_asisten.dart';
 import '../../../Pengaturan/Screen/pengaturan.dart';
 import '../Screen/absensi_ass.dart';
@@ -84,9 +84,9 @@ class _AbsensiAsistenNavState extends State<AbsensiAsistenNav> {
                       icon: const Icon(
                         Icons.score,
                       ),
-                      page: const KelasAsisten(),
+                      page: const TranskripNilai(),
                       updatePage: updatePage,
-                      isActive: currentPage is KelasAsisten,
+                      isActive: currentPage is TranskripNilai,
                     ),
                     //
                     const Padding(
@@ -117,18 +117,18 @@ class _AbsensiAsistenNavState extends State<AbsensiAsistenNav> {
                       updatePage: updatePage,
                       isActive: currentPage is KelasAsisten,
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    DashboardListTile(
-                      title: 'Mahasiswa',
-                      icon: const Icon(
-                        Icons.people,
-                      ),
-                      page: const DataMahasiswaAss(),
-                      updatePage: updatePage,
-                      isActive: currentPage is DataMahasiswaAss,
-                    ),
+                    // const SizedBox(
+                    //   height: 10,
+                    // ),
+                    // DashboardListTile(
+                    //   title: 'Mahasiswa',
+                    //   icon: const Icon(
+                    //     Icons.people,
+                    //   ),
+                    //   page: const DataMahasiswaAss(),
+                    //   updatePage: updatePage,
+                    //   isActive: currentPage is DataMahasiswaAss,
+                    // ),
 
                     const SizedBox(
                       height: 10,

@@ -25,10 +25,7 @@ class _DataAsistensiPraktikanState extends State<DataAsistensiPraktikan> {
           backgroundColor: const Color(0xFFF7F8FA),
           leading: IconButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const KelasAsisten()));
+                Navigator.pop(context);
               },
               icon: const Icon(
                 Icons.arrow_back,

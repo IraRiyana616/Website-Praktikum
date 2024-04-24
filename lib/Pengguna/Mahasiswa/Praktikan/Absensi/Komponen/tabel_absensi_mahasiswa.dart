@@ -67,7 +67,8 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 70.0, right: 100.0),
+            padding:
+                const EdgeInsets.only(left: 70.0, right: 100.0, bottom: 20.0),
             child: SizedBox(
               width: double.infinity,
               child: filteredAbsensiPraktikan.isNotEmpty

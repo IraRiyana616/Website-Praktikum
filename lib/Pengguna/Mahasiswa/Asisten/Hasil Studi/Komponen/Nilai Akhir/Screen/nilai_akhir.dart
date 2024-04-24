@@ -51,10 +51,12 @@ class _NilaiAkhirState extends State<NilaiAkhir> {
         child: AppBar(
           backgroundColor: const Color(0xFFF7F8FA),
           leading: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context);
+            },
             icon: const Icon(
               Icons.arrow_back,
-              color: Colors.transparent,
+              color: Colors.black,
             ),
           ),
           title: Padding(

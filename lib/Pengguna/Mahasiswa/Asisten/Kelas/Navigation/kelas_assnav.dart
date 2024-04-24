@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Absensi/Form/Screen/absensi_ass.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Data%20Mahasiswa/Screen/datamahasiswa_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Screen/hasilstudi_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Screen/kelas_asisten.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Pengaturan/Screen/pengaturan.dart';
@@ -122,19 +121,19 @@ class _KelasAsistenNavState extends State<KelasAsistenNav> {
                     const SizedBox(
                       height: 10,
                     ),
-                    DashboardListTile(
-                      title: 'Mahasiswa',
-                      icon: const Icon(
-                        Icons.people,
-                      ),
-                      page: const DataMahasiswaAss(),
-                      updatePage: updatePage,
-                      isActive: currentPage is DataMahasiswaAss,
-                    ),
+                    // DashboardListTile(
+                    //   title: 'Mahasiswa',
+                    //   icon: const Icon(
+                    //     Icons.people,
+                    //   ),
+                    //   page: const DataMahasiswaAss(),
+                    //   updatePage: updatePage,
+                    //   isActive: currentPage is DataMahasiswaAss,
+                    // ),
 
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    // const SizedBox(
+                    //   height: 10,
+                    // ),
                     DashboardListTile(
                       title: 'Absensi',
                       icon: const Icon(

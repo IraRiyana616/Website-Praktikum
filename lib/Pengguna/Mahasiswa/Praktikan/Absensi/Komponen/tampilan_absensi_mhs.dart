@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Screen/kelas_asisten.dart';
+
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Komponen/tabel_absensi_mahasiswa.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_mhs.dart';
 
+import '../../Dashboard/Komponen/Asistensi/Screen/asistensi_laporan_prak.dart';
 import '../../Dashboard/Komponen/Pengumpulan/Latihan/Screen/peng_latihan_mhs.dart';
 
 class AbsensiPraktikanScreen extends StatefulWidget {
@@ -28,10 +29,7 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
           backgroundColor: const Color(0xFFF7F8FA),
           leading: IconButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const KelasAsisten()));
+                Navigator.pop(context);
               },
               icon: const Icon(
                 Icons.arrow_back,
@@ -159,7 +157,15 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                               top: 38.0,
                             ),
                             child: GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            DataAsistensiPraktikan(
+                                              kodeKelas: widget.kodeKelas,
+                                            )));
+                              },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: Text(

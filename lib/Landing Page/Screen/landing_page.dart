@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Landing%20Page/Komponen/Mahasiswa/Login/login_mhs.dart';
+import 'package:laksi/Landing%20Page/Komponen/Non%20Mahasiswa/Dosen/Login/login_dosen.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -117,7 +119,13 @@ class _LandingPageState extends State<LandingPage> {
                       children: [
                         //Halaman Mahasiswa
                         InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const LoginMahasiswa()));
+                          },
                           child: Padding(
                             padding: const EdgeInsets.only(left: 200.0),
                             child: Material(
@@ -153,7 +161,12 @@ class _LandingPageState extends State<LandingPage> {
                         ),
                         //Halaman Non Mahasiswa
                         InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const LoginDosen()));
+                          },
                           child: Padding(
                             padding: const EdgeInsets.only(right: 200.0),
                             child: Material(

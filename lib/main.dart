@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:laksi/Landing%20Page/Komponen/Mahasiswa/Login/login_mhs.dart';
+import 'package:laksi/Landing%20Page/Screen/landing_page.dart';
 
 import 'dart:core';
 
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/dashboard': (context) => const DashboardPraktikan(),
-        '/login': (context) => const LoginMahasiswa(),
+        '/login': (context) => const LandingPage(),
       },
     );
   }

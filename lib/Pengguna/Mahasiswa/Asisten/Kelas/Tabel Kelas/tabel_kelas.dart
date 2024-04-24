@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Data%20Mahasiswa/Screen/data_mahasiswa.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Form%20Komponen/Deskripsi/form_deskripsi.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Tabel%20Kelas/Komponen/token_asisten.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
@@ -17,28 +19,77 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
   List<DataKelas> demoDataKelas = [];
   List<DataKelas> filteredDataKelas = [];
 
-  CollectionReference dataKelasCollection =
-      FirebaseFirestore.instance.collection('tokenAsisten');
-
-  //TahunAjaran
+  //== Dropdown Button Tahun Ajaran ==
   String selectedYear = 'Tampilkan Semua';
   List<String> availableYears = [];
 
-  Future<void> fetchAvailableYears() async {
+  String nim = '';
+  User? user = FirebaseAuth.instance.currentUser;
+
+  Future<void> fetchUserNIMFromDatabase(
+      String userUid, String? selectedYear) async {
     try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await FirebaseFirestore.instance.collection('tokenAsisten').get();
+      if (userUid.isNotEmpty) {
+        DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+            await FirebaseFirestore.instance
+                .collection('akun_mahasiswa')
+                .doc(userUid)
+                .get();
+        if (userSnapshot.exists) {
+          int userNim = userSnapshot['nim'] as int;
+          nim = userNim.toString();
 
-      Set<String> years = querySnapshot.docs
-          .map((doc) => doc['tahunAjaran'].toString())
-          .toSet();
+          QuerySnapshot<Map<String, dynamic>> querySnapshot =
+              await FirebaseFirestore.instance.collection('tokenAsisten').get();
+          Set<String> years = querySnapshot.docs
+              .map((doc) => doc['tahunAjaran'].toString())
+              .toSet();
+          setState(() {
+            availableYears = ['Tampilkan Semua', ...years.toList()];
+          });
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching user data from Firebase: $e');
+      }
+    }
+  }
 
+  Future<void> fetchDataFromFirebase(String? selectedYear) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> tokenQuerySnapshot;
+      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+        tokenQuerySnapshot = await FirebaseFirestore.instance
+            .collection('tokenAsisten')
+            .where('tahunAjaran', isEqualTo: selectedYear)
+            .get();
+      } else {
+        tokenQuerySnapshot =
+            await FirebaseFirestore.instance.collection('tokenAsisten').get();
+      }
+      List<DataKelas> data = [];
+      for (var tokenDoc in tokenQuerySnapshot.docs) {
+        int tokenNim = tokenDoc['nim'] as int;
+
+        if (tokenNim.toString() == nim) {
+          Map<String, dynamic> tokenData = tokenDoc.data();
+          data.add(DataKelas(
+              kode: tokenData['kodeKelas'] ?? '',
+              tahun: tokenData['tahunAjaran'] ?? '',
+              matkul: tokenData['mataKuliah'] ?? '',
+              dosenpengampu: tokenData['dosenPengampu'] ?? '',
+              dosenpengampu2: tokenData['dosenPengampu2'] ?? '',
+              asisten: tokenData['kodeAsisten'] ?? ''));
+        }
+      }
       setState(() {
-        availableYears = ['Tampilkan Semua', ...years.toList()];
+        demoDataKelas = data;
+        filteredDataKelas = demoDataKelas;
       });
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching availbale years from Firebase: $e');
+        print('Error fetching data from Firebase:$e');
       }
     }
   }
@@ -46,49 +97,27 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
   @override
   void initState() {
     super.initState();
-    fetchAvailableYears().then((_) {
-      fetchDataFromFirebase(selectedYear);
-    });
-  }
 
-  Future<void> fetchDataFromFirebase(String? selectedYear) async {
-    try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot;
-
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
-        querySnapshot = await FirebaseFirestore.instance
-            .collection('tokenAsisten')
-            .where('tahunAjaran', isEqualTo: selectedYear)
-            .get();
-      } else {
-        querySnapshot =
-            await FirebaseFirestore.instance.collection('tokenAsisten').get();
-      }
-      List<DataKelas> data = querySnapshot.docs.map((doc) {
-        Map<String, dynamic> data = doc.data();
-        return DataKelas(
-          asisten: data['kodeAsisten'] ?? '',
-          kode: data['kodeKelas'] ?? '',
-          tahun: data['tahunAjaran'] ?? '',
-          matkul: data['mataKuliah'] ?? '',
-          dosenpengampu: data['dosenPengampu'] ?? '',
-          dosenpengampu2: data['dosenPengampu2'] ?? '',
-        );
-      }).toList();
-
-      setState(() {
-        demoDataKelas = data;
-        filteredDataKelas = demoDataKelas;
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userUid = user.uid;
+      fetchUserNIMFromDatabase(userUid, selectedYear).then((_) {
+        fetchDataFromFirebase(selectedYear);
       });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching data: $e');
-      }
     }
   }
 
   Future<void> _onRefresh() async {
     await fetchDataFromFirebase(selectedYear);
+  }
+
+  void filterData(String query) {
+    setState(() {
+      filteredDataKelas = demoDataKelas
+          .where((data) =>
+              (data.tahun.toLowerCase().contains(query.toLowerCase())))
+          .toList();
+    });
   }
 
   Color getRowColor(int index) {
@@ -221,7 +250,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "",
+                                  "     Aksi",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -306,28 +335,37 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
           width: 180.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
       DataCell(Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.edit,
-            color: Colors.grey,
-          ),
-          const SizedBox(
-            width: 5.0,
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const FormDeskripsiKelas()));
-            },
-            child: const Text(
-              'Edit Data',
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
-            ),
-          )
+          //== Tambah Data ==
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const FormDeskripsiKelas()));
+              },
+              icon: const Icon(
+                Icons.add_box,
+                color: Colors.grey,
+              )),
+          //== Informasi ==
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DataMahasiswaKelas(
+                              kodeKelas: fileInfo.kode,
+                            )));
+              },
+              icon: const Icon(
+                Icons.info,
+                color: Colors.grey,
+              ))
         ],
-      )),
+      ))
     ],
   );
 }
