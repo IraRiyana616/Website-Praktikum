@@ -1,6 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,73 +17,6 @@ class _FormEvaluasiDosenState extends State<FormEvaluasiDosen> {
   final TextEditingController _tidakController = TextEditingController();
   final TextEditingController _hasilEvaluasiController =
       TextEditingController();
-  Future<void> _saveEvaluation() async {
-    String kodeKelas = _kodeKelasController.text;
-
-    if (kodeKelas.isNotEmpty) {
-      var querySnapshot = await FirebaseFirestore.instance
-          .collection('dataEvaluasi')
-          .where('kodeKelas',
-              isEqualTo:
-                  kodeKelas) // Memeriksa apakah kode kelas sudah ada di koleksi 'data_evaluasi'
-          .get();
-
-      // Jika tidak ada dokumen dengan kode kelas yang sama
-      if (querySnapshot.docs.isEmpty) {
-        var kelasQuerySnapshot = await FirebaseFirestore.instance
-            .collection('dataKelas')
-            .where('kodeKelas', isEqualTo: kodeKelas)
-            .get();
-
-        if (kelasQuerySnapshot.docs.isNotEmpty) {
-          await FirebaseFirestore.instance.collection('dataEvaluasi').add({
-            'kodeKelas': kodeKelas,
-            'tahunAjaran': _tahunAjaranController.text,
-            'jumlahLulus': _lulusController.text,
-            'jumlahTidak_lulus': _tidakController.text,
-            'hasilEvaluasi': _hasilEvaluasiController.text,
-          });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Data berhasil disimpan'),
-              duration: Duration(seconds: 2),
-            ),
-          );
-
-          _kodeKelasController.clear();
-          _tahunAjaranController.clear();
-          _lulusController.clear();
-          _tidakController.clear();
-          _hasilEvaluasiController.clear();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Kode kelas tidak ditemukan'),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 2),
-            ),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Kode kelas sudah terdapat pada database'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Masukkan kode kelas'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -390,7 +321,7 @@ class _FormEvaluasiDosenState extends State<FormEvaluasiDosen> {
                                             backgroundColor:
                                                 const Color(0xFF3CBEA9),
                                           ),
-                                          onPressed: _saveEvaluation,
+                                          onPressed: () {},
                                           child: Text(
                                             'Simpan Data',
                                             style: GoogleFonts.quicksand(

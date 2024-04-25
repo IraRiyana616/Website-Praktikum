@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../../../../Asisten/Kelas/Screen/kelas_asisten.dart';
 import '../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
 import '../../Deskripsi/Screen/deskripsi_mhs.dart';
 import '../../Pengumpulan/Latihan/Screen/peng_latihan_mhs.dart';
@@ -23,6 +21,7 @@ class _DataAsistensiPraktikanState extends State<DataAsistensiPraktikan> {
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
           backgroundColor: const Color(0xFFF7F8FA),
+          automaticallyImplyLeading: false,
           leading: IconButton(
               onPressed: () {
                 Navigator.pop(context);

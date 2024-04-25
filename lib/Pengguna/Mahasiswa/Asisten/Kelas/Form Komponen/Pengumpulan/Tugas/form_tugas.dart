@@ -207,6 +207,7 @@ class _FormPengumpulanTugasState extends State<FormPengumpulanTugas> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
+          automaticallyImplyLeading: false,
           leading: IconButton(
               onPressed: () {
                 Navigator.push(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Tabel/tblhasilstudi.dart';
+import '../Tabel/tbl_hasilstudi.dart';
 
 class HasilStudiDosen extends StatefulWidget {
   const HasilStudiDosen({super.key});
@@ -16,6 +16,7 @@ class _HasilStudiDosenState extends State<HasilStudiDosen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: const Color(0xFFF7F8FA),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
@@ -77,10 +78,7 @@ class _HasilStudiDosenState extends State<HasilStudiDosen> {
                   color: Colors.white,
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      //Tabel Evaluasi Praktikum
-                      TabelHasilStudi()
-                    ],
+                    children: [TabelStudiKelasDosen()],
                   ),
                 ),
               ),

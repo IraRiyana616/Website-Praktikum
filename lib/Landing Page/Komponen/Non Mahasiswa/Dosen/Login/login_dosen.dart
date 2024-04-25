@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../Pengguna/Dosen/Pengaturan/Navigasi/pengaturan_nav.dart';
+import '../../../../../Pengguna/Dosen/Dashboard/Navigasi/dasboardnav_ds.dart';
 import '../../Admin/Login/login_admin.dart';
 import '../Register/register_dosen.dart';
 
@@ -254,7 +254,7 @@ class _LoginDosenState extends State<LoginDosen> {
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    const PengaturanDosenNav(),
+                                                    const DashboardDosenNav(),
                                               ),
                                             );
                                           } else {

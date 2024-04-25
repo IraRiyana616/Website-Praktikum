@@ -207,6 +207,7 @@ class _FormPengumpulanLaporanState extends State<FormPengumpulanLaporan> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
+          automaticallyImplyLeading: false,
           leading: IconButton(
               onPressed: () {
                 Navigator.push(

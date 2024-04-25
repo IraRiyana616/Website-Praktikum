@@ -20,9 +20,11 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
       _selectedIndex = index;
       // Memilih halaman sesuai dengan index yang dipilih
       if (index == 0) {
-        // Tindakan ketika item "Latihan" ditekan
-        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan latihan
-        // Misalnya:
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    NilaiPercobaan(kodeKelas: widget.kodeKelas)));
       } else if (index == 1) {
         Navigator.push(
             context,
@@ -39,6 +41,7 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
           backgroundColor: const Color(0xFFF7F8FA),
+          automaticallyImplyLeading: false,
           leading: IconButton(
             onPressed: () {
               Navigator.pop(context);

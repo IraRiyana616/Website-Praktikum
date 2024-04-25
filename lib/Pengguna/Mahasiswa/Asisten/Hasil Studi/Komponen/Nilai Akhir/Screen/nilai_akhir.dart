@@ -50,6 +50,7 @@ class _NilaiAkhirState extends State<NilaiAkhir> {
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
           backgroundColor: const Color(0xFFF7F8FA),
+          automaticallyImplyLeading: false,
           leading: IconButton(
             onPressed: () {
               Navigator.pop(context);

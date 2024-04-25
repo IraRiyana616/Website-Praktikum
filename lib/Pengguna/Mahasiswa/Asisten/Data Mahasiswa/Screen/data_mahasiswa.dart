@@ -20,6 +20,7 @@ class _DataMahasiswaKelasState extends State<DataMahasiswaKelas> {
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
           backgroundColor: const Color(0xFFF7F8FA),
+          automaticallyImplyLeading: false,
           leading: IconButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -31,7 +32,7 @@ class _DataMahasiswaKelasState extends State<DataMahasiswaKelas> {
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
-              'Data Mahasiswa Praktikum',
+              widget.kodeKelas,
               style: GoogleFonts.quicksand(
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,

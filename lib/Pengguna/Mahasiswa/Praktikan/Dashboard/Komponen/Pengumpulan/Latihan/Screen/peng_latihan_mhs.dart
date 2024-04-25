@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Screen/kelas_asisten.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Pengumpulan/Latihan/Tabel/tabel_peng_latihan_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Pengumpulan/Tugas/Screen/peng_tugas_mhs.dart';

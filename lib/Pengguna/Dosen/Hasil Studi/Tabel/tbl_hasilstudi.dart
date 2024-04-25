@@ -2,28 +2,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Komponen/Penulisan%20Laporan/Screen/penulisanlaporan_ds.dart';
+import '../Komponen/Nilai Harian/nilai_harian_ds.dart';
 
-class TabelHasilStudi extends StatefulWidget {
-  const TabelHasilStudi({super.key});
+class TabelStudiKelasDosen extends StatefulWidget {
+  const TabelStudiKelasDosen({Key? key}) : super(key: key);
 
   @override
-  State<TabelHasilStudi> createState() => _TabelHasilStudiState();
+  State<TabelStudiKelasDosen> createState() => _TabelStudiKelasDosenState();
 }
 
-class _TabelHasilStudiState extends State<TabelHasilStudi> {
-  List<DataHasilStudi> demoDataHasilStudi = [];
-  List<DataHasilStudi> filteredDataHasilStudi = [];
-  final TextEditingController _textController = TextEditingController();
+class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
+  List<DataClass> demoClassData = [];
+  List<DataClass> filteredClassData = [];
+
   String selectedYear = 'Tampilkan Semua';
   List<String> availableYears = [];
 
   Future<void> fetchAvailableYears() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await FirebaseFirestore.instance.collection('data_kelas').get();
+          await FirebaseFirestore.instance.collection('dataKelas').get();
       Set<String> years = querySnapshot.docs
-          .map((doc) => doc['tahun_ajaran'].toString())
+          .map((doc) => doc['tahunAjaran'].toString())
           .toSet();
 
       setState(() {
@@ -42,29 +42,29 @@ class _TabelHasilStudiState extends State<TabelHasilStudi> {
 
       if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
         querySnapshot = await FirebaseFirestore.instance
-            .collection('data_kelas')
-            .where('tahun_ajaran', isEqualTo: selectedYear)
+            .collection('dataKelas')
+            .where('tahunAjaran', isEqualTo: selectedYear)
             .get();
       } else {
         querySnapshot =
-            await FirebaseFirestore.instance.collection('data_kelas').get();
+            await FirebaseFirestore.instance.collection('dataKelas').get();
       }
 
-      List<DataHasilStudi> data = querySnapshot.docs.map((doc) {
+      List<DataClass> data = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
-        return DataHasilStudi(
-          documentId: doc.id,
-          kelas: data['kode_kelas'],
-          asisten: data['kode_asisten'],
-          tahun: data['tahun_ajaran'],
-          matkul: data['matakuliah'],
-          jmlhasisten: data['jumlah_asisten'],
-          jmlhmhs: data['jumlah_mahasiswa'],
+        return DataClass(
+          id: doc.id,
+          kelas: data['kodeKelas'],
+          asisten: data['kodeAsisten'],
+          tahun: data['tahunAjaran'],
+          matkul: data['mataKuliah'],
+          dosenpengampu: data['dosenPengampu'],
+          dosenpengampu2: data['dosenPengampu2'],
         );
       }).toList();
       setState(() {
-        demoDataHasilStudi = data;
-        filteredDataHasilStudi = demoDataHasilStudi;
+        demoClassData = data;
+        filteredClassData = demoClassData;
       });
     } catch (error) {
       if (kDebugMode) {
@@ -76,10 +76,8 @@ class _TabelHasilStudiState extends State<TabelHasilStudi> {
   @override
   void initState() {
     super.initState();
-    _textController.addListener(_onTextChanged);
-    // Ambil tahun ajaran yang tersedia
+
     fetchAvailableYears().then((_) {
-      // Mengambil data dari Firebase
       fetchDataFromFirebase(selectedYear);
     });
   }
@@ -88,28 +86,12 @@ class _TabelHasilStudiState extends State<TabelHasilStudi> {
     await fetchDataFromFirebase(selectedYear);
   }
 
-  void _onTextChanged() {
-    setState(() {
-      filterData(_textController.text);
-    });
-  }
-
   void filterData(String query) {
     setState(() {
-      filteredDataHasilStudi = demoDataHasilStudi
+      filteredClassData = demoClassData
           .where((data) =>
-              (data.kelas.toLowerCase().contains(query.toLowerCase()) ||
-                  data.asisten.toLowerCase().contains(query.toLowerCase()) ||
-                  data.tahun.toLowerCase().contains(query.toLowerCase()) ||
-                  data.matkul.toLowerCase().contains(query.toLowerCase())))
+              (data.tahun.toLowerCase().contains(query.toLowerCase())))
           .toList();
-    });
-  }
-
-  void clearSearchField() {
-    setState(() {
-      _textController.clear();
-      filterData('');
     });
   }
 
@@ -130,7 +112,7 @@ class _TabelHasilStudiState extends State<TabelHasilStudi> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Hasil Studi',
+            child: Text('Data Kelas Praktikum',
                 style: GoogleFonts.quicksand(
                     fontSize: 18, fontWeight: FontWeight.bold)),
           ),
@@ -175,14 +157,11 @@ class _TabelHasilStudiState extends State<TabelHasilStudi> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
                 Padding(
                   padding: const EdgeInsets.only(left: 18.0, right: 25.0),
                   child: SizedBox(
                     width: double.infinity,
-                    child: filteredDataHasilStudi.isNotEmpty
+                    child: filteredClassData.isNotEmpty
                         ? PaginatedDataTable(
                             columnSpacing: 10,
                             columns: const [
@@ -200,20 +179,20 @@ class _TabelHasilStudiState extends State<TabelHasilStudi> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Jumlah Asisten",
+                                  "Dosen Pengampu 1",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Jumlah Mahasiswa",
+                                  "Dosen Pengampu 2",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ],
-                            source: DataSource(filteredDataHasilStudi, context),
-                            rowsPerPage: calculateRowsPerPage(
-                                filteredDataHasilStudi.length),
+                            source: DataSource(filteredClassData, context),
+                            rowsPerPage:
+                                calculateRowsPerPage(filteredClassData.length),
                           )
                         : const Center(
                             child: Text(
@@ -235,7 +214,7 @@ class _TabelHasilStudiState extends State<TabelHasilStudi> {
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 50;
+    const int defaultRowsPerPage = 25;
 
     if (rowCount <= defaultRowsPerPage) {
       return rowCount;
@@ -245,26 +224,26 @@ class _TabelHasilStudiState extends State<TabelHasilStudi> {
   }
 }
 
-class DataHasilStudi {
+class DataClass {
+  String id;
   String kelas;
   String asisten;
   String tahun;
   String matkul;
-  String jmlhasisten;
-  String jmlhmhs;
-  String documentId;
-  DataHasilStudi(
-      {required this.kelas,
-      required this.asisten,
-      required this.tahun,
-      required this.matkul,
-      required this.jmlhasisten,
-      required this.jmlhmhs,
-      required this.documentId});
+  String dosenpengampu;
+  String dosenpengampu2;
+  DataClass({
+    required this.id,
+    required this.kelas,
+    required this.asisten,
+    required this.tahun,
+    required this.matkul,
+    required this.dosenpengampu,
+    required this.dosenpengampu2,
+  });
 }
 
-DataRow dataFileDataRow(
-    DataHasilStudi fileInfo, int index, BuildContext context) {
+DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -273,37 +252,57 @@ DataRow dataFileDataRow(
     ),
     cells: [
       DataCell(
-          Text(
-            fileInfo.kelas,
-            style: TextStyle(
-                color: Colors.lightBlue[700], fontWeight: FontWeight.bold),
-          ), onTap: () {
+          Text(fileInfo.kelas,
+              style: TextStyle(
+                  color: Colors.lightBlue[700],
+                  fontWeight: FontWeight.bold)), onTap: () {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => PenulisanLaporanDosen(
-                      documentId: fileInfo.documentId,
+                builder: (context) => NilaiPercobaanDosen(
+                      kodeKelas: fileInfo.kelas,
                     )));
       }),
-      DataCell(Text(fileInfo.matkul)),
-      DataCell(Text(fileInfo.jmlhasisten)),
-      DataCell(Text(fileInfo.jmlhmhs)),
+      DataCell(
+        Text(
+          fileInfo.matkul,
+        ),
+      ),
+      DataCell(
+        SizedBox(
+          width: 180.0,
+          child: Text(
+            getLimitedText(fileInfo.dosenpengampu, 30),
+          ),
+        ),
+      ),
+      DataCell(
+        SizedBox(
+          width: 180.0,
+          child: Text(
+            getLimitedText(fileInfo.dosenpengampu2, 30),
+          ),
+        ),
+      ),
     ],
   );
 }
 
+String getLimitedText(String text, int limit) {
+  return text.length <= limit ? text : text.substring(0, limit);
+}
+
 Color getRowColor(int index) {
-  if (index % 2 == 0) {
-    return Colors.grey.shade200;
-  } else {
-    return Colors.transparent;
-  }
+  return index % 2 == 0 ? Colors.grey.shade200 : Colors.transparent;
 }
 
 class DataSource extends DataTableSource {
-  final List<DataHasilStudi> data;
+  final List<DataClass> data;
+
   final BuildContext context;
+
   DataSource(this.data, this.context);
+
   @override
   DataRow? getRow(int index) {
     if (index >= data.length) {
@@ -315,8 +314,10 @@ class DataSource extends DataTableSource {
 
   @override
   int get rowCount => data.length;
+
   @override
   bool get isRowCountApproximate => false;
+
   @override
   int get selectedRowCount => 0;
 }

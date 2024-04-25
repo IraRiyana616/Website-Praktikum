@@ -36,6 +36,7 @@ class _TranskripNilaiState extends State<TranskripNilai> {
           preferredSize: const Size.fromHeight(70.0),
           child: AppBar(
             backgroundColor: const Color(0xFFF7F8FA),
+            automaticallyImplyLeading: false,
             title: Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Row(

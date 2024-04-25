@@ -21,6 +21,7 @@ class _DataPraktikanAsistensiState extends State<DataPraktikanAsistensi> {
       appBar: PreferredSize(
           preferredSize: const Size.fromHeight(70.0),
           child: AppBar(
+            automaticallyImplyLeading: false,
             leading: IconButton(
                 onPressed: () {
                   Navigator.pop(context);

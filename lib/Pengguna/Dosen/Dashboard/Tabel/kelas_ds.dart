@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../../Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
-import '../Komponen/form_kelas.dart';
+import 'package:laksi/Pengguna/Dosen/Dashboard/Komponen/Deskripsi/Screen/deskripsi_dosen.dart';
+import '../Form Komponen/form_kelas.dart';
+import '../Komponen/Data Mahasiswa Praktikum/Praktikan/data_praktikan.dart';
 
 class TabelKelasDosen extends StatefulWidget {
   const TabelKelasDosen({Key? key}) : super(key: key);
@@ -298,7 +298,7 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Aksi",
+                                  "     Aksi",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -386,8 +386,8 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
       DataCell(
         Text(
           fileInfo.matkul,
-          style: const TextStyle(
-            color: Colors.lightBlue,
+          style: TextStyle(
+            color: Colors.lightBlue[700],
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -395,7 +395,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DeskripsiKelas(
+              builder: (context) => DeskripsiKelasDosen(
                 kodeKelas: fileInfo.kelas,
               ),
             ),
@@ -419,9 +419,33 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
         ),
       ),
       DataCell(
-        IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: () => onDelete(fileInfo.id),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            //== Tampilan Icon Delete ==
+            IconButton(
+              icon: const Icon(
+                Icons.delete,
+                color: Colors.grey,
+              ),
+              onPressed: () => onDelete(fileInfo.id),
+            ),
+            //== Tampilan Icon Informasi Data Mahasiswa ==
+            IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DataPraktikanKelas(
+                                kodeKelas: fileInfo.kelas,
+                              )));
+                },
+                icon: const Icon(
+                  Icons.info,
+                  color: Colors.grey,
+                ))
+          ],
         ),
       ),
     ],

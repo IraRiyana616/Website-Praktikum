@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:laksi/Pengguna/Dosen/Absensi/Screen/absensi_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Dashboard/Screen/dashboard_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Evaluasi/Screen/evaluasi_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Screen/hasilstudi_ds.dart';
@@ -74,18 +73,6 @@ class _DataMahasiswaNavState extends State<DataMahasiswaNav> {
                   page: const DataMahasiswa(),
                   updatePage: updatePage,
                   isActive: currentPage is DataMahasiswa,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                DashboardListTile(
-                  title: 'Absensi',
-                  icon: const Icon(
-                    Icons.check_circle_rounded,
-                  ),
-                  page: const AbsensiDosen(),
-                  updatePage: updatePage,
-                  isActive: currentPage is AbsensiDosen,
                 ),
                 const SizedBox(
                   height: 10,
