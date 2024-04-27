@@ -2,16 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../Komponen/Nilai Harian/nilai_harian_ds.dart';
+import '../Komponen/Grafik/Penilaian Huruf/detail_evaluasi.dart';
 
-class TabelStudiKelasDosen extends StatefulWidget {
-  const TabelStudiKelasDosen({Key? key}) : super(key: key);
+class TabelEvaluasiDosen extends StatefulWidget {
+  const TabelEvaluasiDosen({Key? key}) : super(key: key);
 
   @override
-  State<TabelStudiKelasDosen> createState() => _TabelStudiKelasDosenState();
+  State<TabelEvaluasiDosen> createState() => _TabelEvaluasiDosenState();
 }
 
-class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
+class _TabelEvaluasiDosenState extends State<TabelEvaluasiDosen> {
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
 
@@ -112,7 +112,7 @@ class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Hasil Praktikum',
+            child: Text('Data Evaluasi Praktikum',
                 style: GoogleFonts.quicksand(
                     fontSize: 18, fontWeight: FontWeight.bold)),
           ),
@@ -189,6 +189,10 @@ class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
+                              DataColumn(
+                                  label: Text('Aksi',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)))
                             ],
                             source: DataSource(filteredClassData, context),
                             rowsPerPage:
@@ -259,9 +263,8 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => NilaiPercobaanDosen(
-                      kodeKelas: fileInfo.kelas,
-                    )));
+                builder: (context) =>
+                    PieChartNilaiHuruf(kodeKelas: fileInfo.kelas)));
       }),
       DataCell(
         Text(
@@ -284,6 +287,167 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
           ),
         ),
       ),
+      DataCell(
+        IconButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Padding(
+                    padding: EdgeInsets.only(left: 20.0),
+                    child: Text(
+                      "Evaluasi Kegiatan Praktikum",
+                      style: TextStyle(
+                        fontSize: 25.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  content: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                      child: SizedBox(
+                        width: 650.0,
+                        height: 750.0,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.only(top: 5.0),
+                              child: Text(
+                                "Masukkan evaluasi dari kegiatan praktikum yang telah berlangsung",
+                                style: TextStyle(fontSize: 14.0),
+                              ),
+                            ),
+                            //== Mulai dan Berakhir ==//
+                            const Padding(
+                              padding: EdgeInsets.only(top: 35.0),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Mulai Praktikum',
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 350.0),
+                                    child: Text(
+                                      'Berakhir Praktikum',
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Padding(
+                            //   padding: const EdgeInsets.only(top: 15.0),
+                            //   child: SizedBox(
+                            //     width: 220.0,
+                            //     child: TextField(
+                            //       decoration: InputDecoration(
+                            //         hintText: 'Waktu Praktikum dimulai',
+                            //         border: OutlineInputBorder(
+                            //           borderRadius: BorderRadius.circular(10.0),
+                            //         ),
+                            //         fillColor: Colors.white,
+                            //         filled: true,
+                            //       ),
+                            //       style: const TextStyle(
+                            //         fontSize: 16.0,
+                            //         color: Colors.black,
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
+                            // //== Tanggal Praktikum berakhir ==//
+                            // const Padding(
+                            //   padding: EdgeInsets.only(top: 25.0),
+                            //   child: Text(
+                            //     'Praktikum berakhir',
+                            //     style: TextStyle(
+                            //       fontSize: 16.0,
+                            //       fontWeight: FontWeight.bold,
+                            //     ),
+                            //   ),
+                            // ),
+                            // Padding(
+                            //   padding: const EdgeInsets.only(top: 15.0),
+                            //   child: SizedBox(
+                            //     width: 420.0,
+                            //     child: TextField(
+                            //       decoration: InputDecoration(
+                            //         hintText: 'Waktu Praktikum berakhir',
+                            //         border: OutlineInputBorder(
+                            //           borderRadius: BorderRadius.circular(10.0),
+                            //         ),
+                            //         fillColor: Colors.white,
+                            //         filled: true,
+                            //       ),
+                            //       style: const TextStyle(
+                            //         fontSize: 16.0,
+                            //         color: Colors.black,
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
+                            //== Evaluasi Praktikum ==//
+                            const Padding(
+                              padding: EdgeInsets.only(top: 25.0),
+                              child: Text(
+                                'Evaluasi Praktikum',
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 15.0),
+                              child: TextField(
+                                maxLines: 10,
+                                decoration: InputDecoration(
+                                  hintText: 'Evaluasi',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                ),
+                                style: const TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("Close"),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+          icon: const Icon(
+            Icons.add_box,
+            color: Colors.grey,
+          ),
+        ),
+      )
     ],
   );
 }

@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:laksi/Pengguna/Dosen/Dashboard/Screen/dashboard_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Evaluasi/Screen/evaluasi_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Screen/hasilstudi_ds.dart';
-import 'package:laksi/Pengguna/Dosen/Mahasiswa/Screen/mahasiswa_ds.dart';
-import '../../Pengaturan/Screen/pengaturan_ds.dart';
+import 'package:laksi/Pengguna/Dosen/Pengaturan/Screen/pengaturan_ds.dart';
+import '../../Absensi/Screen/absensi_ds.dart';
 
-class DataMahasiswaNav extends StatefulWidget {
-  const DataMahasiswaNav({super.key});
+class AbsensiDosenNav extends StatefulWidget {
+  const AbsensiDosenNav({super.key});
 
   @override
-  State<DataMahasiswaNav> createState() => _DataMahasiswaNavState();
+  State<AbsensiDosenNav> createState() => _AbsensiDosenNavState();
 }
 
-class _DataMahasiswaNavState extends State<DataMahasiswaNav> {
-  Widget currentPage = const DataMahasiswa();
+class _AbsensiDosenNavState extends State<AbsensiDosenNav> {
+  Widget currentPage = const AbsensiDosen();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,13 +66,13 @@ class _DataMahasiswaNavState extends State<DataMahasiswaNav> {
                   height: 10,
                 ),
                 DashboardListTile(
-                  title: 'Mahasiswa',
+                  title: 'Absensi',
                   icon: const Icon(
                     Icons.people,
                   ),
-                  page: const DataMahasiswa(),
+                  page: const AbsensiDosen(),
                   updatePage: updatePage,
-                  isActive: currentPage is DataMahasiswa,
+                  isActive: currentPage is AbsensiDosen,
                 ),
                 const SizedBox(
                   height: 10,

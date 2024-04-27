@@ -1,11 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:laksi/Landing%20Page/Screen/landing_page.dart';
-
-import 'dart:core';
-
+import 'dart:async';
 import 'package:laksi/firebase_options.dart';
-
+import 'Landing Page/Screen/landing_page.dart';
 import 'Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
 
 Future<void> main() async {

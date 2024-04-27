@@ -2,16 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../Komponen/Nilai Harian/nilai_harian_ds.dart';
+import '../Komponen/Praktikan/Screen/praktikan_ds.dart';
 
-class TabelStudiKelasDosen extends StatefulWidget {
-  const TabelStudiKelasDosen({Key? key}) : super(key: key);
+class TabelDataAbsensiDosen extends StatefulWidget {
+  const TabelDataAbsensiDosen({Key? key}) : super(key: key);
 
   @override
-  State<TabelStudiKelasDosen> createState() => _TabelStudiKelasDosenState();
+  State<TabelDataAbsensiDosen> createState() => _TabelDataAbsensiDosenState();
 }
 
-class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
+class _TabelDataAbsensiDosenState extends State<TabelDataAbsensiDosen> {
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
 
@@ -112,7 +112,7 @@ class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Hasil Praktikum',
+            child: Text('Data Absensi Praktikum',
                 style: GoogleFonts.quicksand(
                     fontSize: 18, fontWeight: FontWeight.bold)),
           ),
@@ -259,8 +259,9 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => NilaiPercobaanDosen(
+                builder: (context) => AbsensiPraktikanDosen(
                       kodeKelas: fileInfo.kelas,
+                      kodeAsisten: fileInfo.asisten,
                     )));
       }),
       DataCell(

@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../Tabel/tabel_evaluasi_ds.dart';
+import '../Tabel/tabel_absensi_ds.dart';
 
-class EvaluasiDosen extends StatefulWidget {
-  const EvaluasiDosen({super.key});
+class AbsensiDosen extends StatefulWidget {
+  const AbsensiDosen({super.key});
 
   @override
-  State<EvaluasiDosen> createState() => _EvaluasiDosenState();
+  State<AbsensiDosen> createState() => _AbsensiDosenState();
 }
 
-class _EvaluasiDosenState extends State<EvaluasiDosen> {
+class _AbsensiDosenState extends State<AbsensiDosen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
-          backgroundColor: const Color(0xFFF7F8FA),
           automaticallyImplyLeading: false,
+          backgroundColor: const Color(0xFFF7F8FA),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(
@@ -28,7 +28,7 @@ class _EvaluasiDosenState extends State<EvaluasiDosen> {
                 ),
                 Expanded(
                     child: Text(
-                  "Evaluasi Praktikum",
+                  "Absensi Mahasiswa",
                   style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -76,13 +76,9 @@ class _EvaluasiDosenState extends State<EvaluasiDosen> {
                 child: Container(
                   width: 1055.0,
                   color: Colors.white,
-                  // ignore: prefer_const_constructors
-                  child: Column(
+                  child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      //Tabel Evaluasi Praktikum
-                      TabelEvaluasiDosen()
-                    ],
+                    children: [TabelDataAbsensiDosen()],
                   ),
                 ),
               ),

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:laksi/Pengguna/Dosen/Dashboard/Screen/dashboard_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Evaluasi/Screen/evaluasi_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Screen/hasilstudi_ds.dart';
-import 'package:laksi/Pengguna/Dosen/Mahasiswa/Screen/mahasiswa_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Pengaturan/Screen/pengaturan_ds.dart';
+import '../../Absensi/Screen/absensi_ds.dart';
 
 class DashboardDosenNav extends StatefulWidget {
   const DashboardDosenNav({super.key});
@@ -70,9 +70,9 @@ class _DashboardDosenNavState extends State<DashboardDosenNav> {
                   icon: const Icon(
                     Icons.people,
                   ),
-                  page: const DataMahasiswa(),
+                  page: const AbsensiDosen(),
                   updatePage: updatePage,
-                  isActive: currentPage is DataMahasiswa,
+                  isActive: currentPage is AbsensiDosen,
                 ),
                 const SizedBox(
                   height: 10,
