@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../Tabel/tabel_evaluasi_ds.dart';
@@ -10,6 +12,23 @@ class EvaluasiDosen extends StatefulWidget {
 }
 
 class _EvaluasiDosenState extends State<EvaluasiDosen> {
+  //== Fungsi untuk authentikasi ==//
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  //== Fungsi Keluar dari akun ==//
+  Future<void> _logout() async {
+    try {
+      await _auth.signOut();
+      // Navigasi kembali ke halaman login atau halaman lain setelah logout berhasil
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushReplacementNamed('/login');
+    } catch (e) {
+      // Tangani kesalahan logout
+      if (kDebugMode) {
+        print('Error during logout: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +57,7 @@ class _EvaluasiDosenState extends State<EvaluasiDosen> {
                   width: 750.0,
                 ),
                 IconButton(
-                    onPressed: () {},
+                    onPressed: _logout,
                     icon: const Icon(
                       Icons.logout,
                       color: Color(0xFF031F31),
@@ -87,7 +106,7 @@ class _EvaluasiDosenState extends State<EvaluasiDosen> {
                 ),
               ),
               const SizedBox(
-                height: 1000.0,
+                height: 221.0,
               )
             ],
           ),

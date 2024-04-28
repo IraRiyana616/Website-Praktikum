@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -11,12 +12,16 @@ class PengaturanDosen extends StatefulWidget {
 }
 
 class _PengaturanDosenState extends State<PengaturanDosen> {
+  //== Fungsi untuk textfield ==
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final TextEditingController _newPhoneNumberController =
       TextEditingController();
+  //== Fungsi untuk authentikasi ==//
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
+//== Update Password ==//
   Future<void> _updatePassword() async {
     try {
       //Retrieve user ID From FirebaseAuth
@@ -38,6 +43,9 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
           backgroundColor: Colors.green,
           duration: Duration(seconds: 3),
         ));
+        // Clear the text fields after successful update
+        _newPasswordController.clear();
+        _confirmPasswordController.clear();
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -48,6 +56,7 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
     }
   }
 
+//== Update Nomor Hp ==//
   Future<void> _updatePhoneNumber() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
@@ -66,6 +75,8 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
           backgroundColor: Colors.green,
           duration: Duration(seconds: 3),
         ));
+        // Clear the text field after successful update
+        _newPhoneNumberController.clear();
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -73,6 +84,21 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 3),
       ));
+    }
+  }
+
+  //== Fungsi Keluar dari akun ==//
+  Future<void> _logout() async {
+    try {
+      await _auth.signOut();
+      // Navigasi kembali ke halaman login atau halaman lain setelah logout berhasil
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushReplacementNamed('/login');
+    } catch (e) {
+      // Tangani kesalahan logout
+      if (kDebugMode) {
+        print('Error during logout: $e');
+      }
     }
   }
 
@@ -101,7 +127,7 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
                     width: 750,
                   ),
                   IconButton(
-                      onPressed: () {},
+                      onPressed: _logout,
                       icon: const Icon(
                         Icons.logout,
                         color: Color(0xFF031F31),

@@ -82,9 +82,9 @@ class _EvaluasiNavDosenState extends State<EvaluasiNavDosen> {
                   icon: const Icon(
                     Icons.check_circle_rounded,
                   ),
-                  page: const LoginPage(),
+                  page: const AbsensiDosen(),
                   updatePage: updatePage,
-                  isActive: currentPage is LoginPage,
+                  isActive: currentPage is AbsensiDosen,
                 ),
                 const SizedBox(
                   height: 10,
@@ -140,34 +140,6 @@ class _EvaluasiNavDosenState extends State<EvaluasiNavDosen> {
     setState(() {
       currentPage = newPage;
     });
-  }
-}
-
-class HasilStudiPage extends StatelessWidget {
-  const HasilStudiPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white, // Ganti sesuai kebutuhan
-      child: const Center(
-        child: Text('Hasil Studi Page'),
-      ),
-    );
-  }
-}
-
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white, // Ganti sesuai kebutuhan
-      child: const Center(
-        child: Text('Login Page'),
-      ),
-    );
   }
 }
 

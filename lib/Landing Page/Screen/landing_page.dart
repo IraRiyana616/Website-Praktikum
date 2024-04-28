@@ -69,7 +69,7 @@ class _LandingPageState extends State<LandingPage> {
                             padding:
                                 const EdgeInsets.only(top: 20.0, left: 90.0),
                             child: Text(
-                              'Memulai kegiatan praktikum secara online',
+                              'Website penunjang kegiatan praktikum',
                               style: GoogleFonts.inter(fontSize: 20.0),
                             ),
                           )

@@ -212,7 +212,7 @@ class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(
-                                      left: 95.0, top: 50.0),
+                                      left: 65.0, top: 50.0),
                                   child: Text(
                                     'Grafik Nilai Akhir',
                                     style: GoogleFonts.quicksand(
@@ -248,7 +248,7 @@ class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
                           ),
                           Padding(
                             padding:
-                                const EdgeInsets.only(left: 30.0, top: 105.0),
+                                const EdgeInsets.only(left: 80.0, top: 105.0),
                             child: SizedBox(
                               height: 250.0,
                               width: 280.0,
