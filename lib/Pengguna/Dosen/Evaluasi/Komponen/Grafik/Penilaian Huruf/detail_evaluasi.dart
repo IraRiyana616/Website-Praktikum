@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PieChartNilaiHuruf extends StatefulWidget {
   final String kodeKelas;
@@ -15,6 +18,7 @@ class PieChartNilaiHuruf extends StatefulWidget {
 class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
   List<PieChartSectionData> _pieChartSections = [];
   List<PieChartSectionData> _pieChartKelulusanSections = [];
+  bool _dataLoaded = false;
 
   @override
   void initState() {
@@ -71,8 +75,7 @@ class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
   Future<void> _loadDataFromFirestore() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('nilaiAkhir')
-        .where('kodeKelas',
-            isEqualTo: widget.kodeKelas) // Add filter by kodeKelas
+        .where('kodeKelas', isEqualTo: widget.kodeKelas)
         .get();
 
     Map<String, int> nilaiHurufCount = {};
@@ -99,6 +102,7 @@ class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
     }).toList();
     setState(() {
       _pieChartSections = sections;
+      _dataLoaded = true;
     });
   }
 
@@ -114,6 +118,28 @@ class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
         return Colors.red.shade400;
       default:
         return Colors.grey.shade400;
+    }
+  }
+
+//== Fungsi Download File ==//
+  Future<void> downloadFile(String kodeKelas, String fileName) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('Data Evaluasi/$kodeKelas/$fileName');
+
+    try {
+      final url = await ref.getDownloadURL();
+      // ignore: deprecated_member_use
+      if (await canLaunch(url)) {
+        // ignore: deprecated_member_use
+        await launch(url);
+      } else {
+        throw 'Could not launch $url';
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error downloading file: $e');
+      }
     }
   }
 
@@ -178,23 +204,25 @@ class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
                         width: 25.0,
                       ),
                       Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 50.0),
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 95.0, top: 30.0),
-                                    child: Text(
-                                      'Grafik Nilai Akhir',
-                                      style: GoogleFonts.quicksand(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 50.0),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 95.0, top: 50.0),
+                                  child: Text(
+                                    'Grafik Nilai Akhir',
+                                    style: GoogleFonts.quicksand(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold),
                                   ),
-                                  Padding(
+                                ),
+                                Visibility(
+                                  visible: _dataLoaded,
+                                  child: Padding(
                                     padding: const EdgeInsets.only(
                                         left: 80.0, top: 65.0),
                                     child: SizedBox(
@@ -214,166 +242,68 @@ class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
                                       ),
                                     ),
                                   ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 30.0, top: 105.0),
+                            child: SizedBox(
+                              height: 250.0,
+                              width: 280.0,
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 3.5),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _buildLegendItem(
+                                          'Presentase Nilai A',
+                                          Colors.green,
+                                        ),
+                                        _buildLegendItem(
+                                          'Presentase  Nilai B',
+                                          Colors.blue,
+                                        ),
+                                        _buildLegendItem(
+                                          'Presentase Nilai C',
+                                          Colors.orange,
+                                        ),
+                                        _buildLegendItem(
+                                          'Presentase Nilai D',
+                                          Colors.red,
+                                        ),
+                                        _buildLegendItem(
+                                          'Presentase Nilai E',
+                                          Colors.grey,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 30.0, top: 105.0),
-                              child: SizedBox(
-                                  height: 250.0,
-                                  width: 280.0,
-                                  child: Row(
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 3.5),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              width: 12.0,
-                                              height: 12.0,
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          50.0),
-                                                  color: Colors.green),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 30.0),
-                                              child: Container(
-                                                width: 12.0,
-                                                height: 12.0,
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50.0),
-                                                    color: Colors.blue),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 30.0),
-                                              child: Container(
-                                                width: 12.0,
-                                                height: 12.0,
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50.0),
-                                                    color: Colors.orange),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 30.0),
-                                              child: Container(
-                                                width: 12.0,
-                                                height: 12.0,
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50.0),
-                                                    color: Colors.red),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 30.0),
-                                              child: Container(
-                                                width: 12.0,
-                                                height: 12.0,
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50.0),
-                                                    color: Colors.grey),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 10.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Presentase Nilai A',
-                                              style: GoogleFonts.quicksand(
-                                                  fontSize: 15.0,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 23.0),
-                                              child: Text(
-                                                'Presentase  Nilai B',
-                                                style: GoogleFonts.quicksand(
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 23.0),
-                                              child: Text(
-                                                'Presentase Nilai C',
-                                                style: GoogleFonts.quicksand(
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 23.0),
-                                              child: Text(
-                                                'Presentase Nilai D',
-                                                style: GoogleFonts.quicksand(
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 23.0),
-                                              child: Text(
-                                                'Presentase Nilai E',
-                                                style: GoogleFonts.quicksand(
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  )),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 50.0),
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 80.0, top: 30.0),
-                                    child: Text(
-                                      'Grafik Mahasiswa Lulus dan Tidak Lulus',
-                                      style: GoogleFonts.quicksand(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 50.0),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 80.0, top: 50.0),
+                                  child: Text(
+                                    'Grafik Mahasiswa Lulus dan Tidak Lulus',
+                                    style: GoogleFonts.quicksand(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold),
                                   ),
-                                  Padding(
+                                ),
+                                Visibility(
+                                  visible: _dataLoaded,
+                                  child: Padding(
                                     padding: const EdgeInsets.only(
                                         left: 80.0, top: 65.0),
                                     child: SizedBox(
@@ -393,65 +323,158 @@ class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
                                       ),
                                     ),
                                   ),
-                                ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      //== Tampilan Waktu Kegiatan Praktikum ==//
+                      StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('dataEvaluasi')
+                            .where('kodeKelas', isEqualTo: widget.kodeKelas)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          if (!snapshot.hasData ||
+                              snapshot.data!.docs.isEmpty) {
+                            return const Center(
+                              child: Text("No Data"),
+                            );
+                          }
+                          var data = snapshot.data!.docs.first.data();
+                          //== Awal Kegiatan Praktikum ==//
+                          var tanggalAwal = data['awalPraktikum'] != null
+                              ? data['awalPraktikum'].toString()
+                              : 'Data tidak ditemukan';
+                          //== Berakhir Kegiatan Praktikum ==//
+                          var tanggalAkhir = data['akhirPraktikum'] != null
+                              ? data['akhirPraktikum'].toString()
+                              : 'Data tidak ditemukan';
+                          //== Nama File ==//
+                          var namaFile = data['fileDokumentasi'] != null
+                              ? data['fileDokumentasi'].toString()
+                              : 'Data tidak ditemukan';
+                          //== Ringkasan Evaluasi Kegiatan Praktikum ==//
+                          var evaluasiPraktikum =
+                              data['evaluasiPraktikum'] != null
+                                  ? data['evaluasiPraktikum'].toString()
+                                  : 'Data tidak ditemukan';
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(top: 35.0, left: 65.0),
+                                child: Text(
+                                  'Waktu Kegiatan Praktikum',
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ]),
-                      //== Tampilan Nama Dosen ==//
-                      Padding(
-                        padding: const EdgeInsets.only(top: 25.0, left: 65.0),
-                        child: Text(
-                          'Nama Dosen',
-                          style: GoogleFonts.quicksand(
-                              fontSize: 18.0, fontWeight: FontWeight.bold),
-                        ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 20.0, left: 65.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        tanggalAwal,
+                                        style: const TextStyle(fontSize: 14.0),
+                                      ),
+                                    ),
+                                    const Padding(
+                                      padding:
+                                          EdgeInsets.only(left: 20.0, top: 8.0),
+                                      child: Text(
+                                        'Sampai',
+                                        style: TextStyle(
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20.0, top: 8.0),
+                                      child: Text(
+                                        tanggalAkhir,
+                                        style: const TextStyle(fontSize: 14.0),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              //== Tampilan Dokumentasi Kegiatan Praktikum ==//
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 25.0, left: 65.0),
+                                child: Text(
+                                  'File Dokumentasi Kegiatan Praktikum',
+                                  style: GoogleFonts.quicksand(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 25.0, left: 65.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      namaFile,
+                                      style: const TextStyle(
+                                          fontSize: 14.0, color: Colors.blue),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          downloadFile(
+                                              widget.kodeKelas, namaFile);
+                                        },
+                                        icon: const Icon(
+                                          Icons.download,
+                                          color: Colors.grey,
+                                        ))
+                                  ],
+                                ),
+                              ),
+                              //== Tampilan Data Hasil Evaluasi Kegiatan Praktikum ==//
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 35.0, left: 65.0),
+                                child: Text(
+                                  'Hasil Evaluasi Kegiatan Praktikum',
+                                  style: GoogleFonts.quicksand(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 25.0, left: 65.0, right: 67.0),
+                                child: Text(
+                                  evaluasiPraktikum,
+                                  style: const TextStyle(
+                                      fontSize: 14.0, height: 2.0),
+                                ),
+                              ),
+
+                              const SizedBox(
+                                height: 50.0,
+                              )
+                            ],
+                          );
+                        },
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 25.0, left: 65.0),
-                        child: Text(
-                          'Ira Riyana',
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                      ),
-                      //== Tampilan Dokumentasi Kegiatan Praktikum ==//
-                      Padding(
-                        padding: const EdgeInsets.only(top: 25.0, left: 65.0),
-                        child: Text(
-                          'File Dokumentasi Kegiatan Praktikum',
-                          style: GoogleFonts.quicksand(
-                              fontSize: 18.0, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 25.0, left: 65.0),
-                        child: Row(
-                          children: [
-                            const Text(
-                              'Nama File ',
-                              style:
-                                  TextStyle(fontSize: 16.0, color: Colors.blue),
-                            ),
-                            IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.download,
-                                  color: Colors.grey,
-                                ))
-                          ],
-                        ),
-                      ),
-                      //== Tampilan Data Hasil Evaluasi Kegiatan Praktikum ==//
-                      Padding(
-                        padding: const EdgeInsets.only(top: 35.0, left: 65.0),
-                        child: Text(
-                          'Hasil Evaluasi Kegiatan Praktikum',
-                          style: GoogleFonts.quicksand(
-                              fontSize: 18.0, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 80.0,
-                      )
                     ],
                   ),
                 ),
@@ -462,6 +485,34 @@ class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLegendItem(String text, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 30.0),
+      child: Row(
+        children: [
+          Container(
+            width: 12.0,
+            height: 12.0,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50.0),
+              color: color,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Text(
+              text,
+              style: GoogleFonts.quicksand(
+                fontSize: 15.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
