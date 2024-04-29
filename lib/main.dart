@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:laksi/firebase_options.dart';
 import 'Landing Page/Screen/landing_page.dart';
+import 'Pengguna/Admin/Kelas/Navigasi/kelas_admin_nav.dart';
+import 'Pengguna/Admin/Kelas/Screen/kelas_admin.dart';
 import 'Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
 
 Future<void> main() async {
@@ -19,12 +21,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
-      routes: {
-        '/dashboard': (context) => const DashboardPraktikan(),
-        '/login': (context) => const LandingPage(),
-      },
-      //   home: EvaluasiNavDosen(),
+      // initialRoute: '/login',
+      // routes: {
+      //   '/dashboard': (context) => const DashboardPraktikan(),
+      //   '/login': (context) => const LandingPage(),
+      // },
+      home: KelasAdminNav(),
     );
   }
 }

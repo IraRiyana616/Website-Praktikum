@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:laksi/Pengguna/Dosen/Dashboard/Screen/dashboard_ds.dart';
-import 'package:laksi/Pengguna/Dosen/Evaluasi/Screen/evaluasi_ds.dart';
-import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Screen/hasilstudi_ds.dart';
-import 'package:laksi/Pengguna/Dosen/Pengaturan/Screen/pengaturan_ds.dart';
+import '../../Absensi/Screen/absensi_admin.dart';
+import '../../Evaluasi/Screen/evaluasi_admin.dart';
+import '../../Hasil Studi/Screen/hasil_studi_admin.dart';
+import '../../Settings/pengaturan_admin.dart';
+import '../Screen/kelas_admin.dart';
 
-import '../../Absensi/Screen/absensi_ds.dart';
-
-class PengaturanDosenNav extends StatefulWidget {
-  const PengaturanDosenNav({super.key});
+class KelasAdminNav extends StatefulWidget {
+  const KelasAdminNav({super.key});
 
   @override
-  State<PengaturanDosenNav> createState() => _PengaturanDosenNavState();
+  State<KelasAdminNav> createState() => _KelasAdminNavState();
 }
 
-class _PengaturanDosenNavState extends State<PengaturanDosenNav> {
-  Widget currentPage = const PengaturanDosen();
+class _KelasAdminNavState extends State<KelasAdminNav> {
+  Widget currentPage = const KelasAdmin();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,9 +58,9 @@ class _PengaturanDosenNavState extends State<PengaturanDosenNav> {
                   icon: const Icon(
                     Icons.grid_view_outlined,
                   ),
-                  page: const DashboardDosen(),
+                  page: const KelasAdmin(),
                   updatePage: updatePage,
-                  isActive: currentPage is DashboardDosen,
+                  isActive: currentPage is KelasAdmin,
                 ),
                 const SizedBox(
                   height: 20,
@@ -71,9 +70,9 @@ class _PengaturanDosenNavState extends State<PengaturanDosenNav> {
                   icon: const Icon(
                     Icons.people,
                   ),
-                  page: const AbsensiDosen(),
+                  page: const AbsensiAdmin(),
                   updatePage: updatePage,
-                  isActive: currentPage is AbsensiDosen,
+                  isActive: currentPage is AbsensiAdmin,
                 ),
                 const SizedBox(
                   height: 20,
@@ -83,9 +82,9 @@ class _PengaturanDosenNavState extends State<PengaturanDosenNav> {
                   icon: const Icon(
                     Icons.score,
                   ),
-                  page: const HasilStudiDosen(),
+                  page: const HasilStudiAdmin(),
                   updatePage: updatePage,
-                  isActive: currentPage is HasilStudiDosen,
+                  isActive: currentPage is HasilStudiAdmin,
                 ),
                 const SizedBox(
                   height: 20,
@@ -95,21 +94,21 @@ class _PengaturanDosenNavState extends State<PengaturanDosenNav> {
                   icon: const Icon(
                     Icons.fact_check_sharp,
                   ),
-                  page: const EvaluasiDosen(),
+                  page: const EvaluasiAdmin(),
                   updatePage: updatePage,
-                  isActive: currentPage is EvaluasiDosen,
+                  isActive: currentPage is EvaluasiAdmin,
                 ),
                 const SizedBox(
-                  height: 10,
+                  height: 20,
                 ),
                 DashboardListTile(
                   title: 'Settings',
                   icon: const Icon(
                     Icons.settings,
                   ),
-                  page: const PengaturanDosen(),
+                  page: const PengaturanAdminScreen(),
                   updatePage: updatePage,
-                  isActive: currentPage is PengaturanDosen,
+                  isActive: currentPage is PengaturanAdminScreen,
                 ),
                 const SizedBox(
                   height: 10,

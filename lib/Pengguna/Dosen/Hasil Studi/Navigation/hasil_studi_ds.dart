@@ -63,7 +63,7 @@ class _HasilStudiDosenNavState extends State<HasilStudiDosenNav> {
                   isActive: currentPage is DashboardDosen,
                 ),
                 const SizedBox(
-                  height: 10,
+                  height: 20,
                 ),
                 DashboardListTile(
                   title: 'Absensi',
@@ -75,7 +75,7 @@ class _HasilStudiDosenNavState extends State<HasilStudiDosenNav> {
                   isActive: currentPage is AbsensiDosen,
                 ),
                 const SizedBox(
-                  height: 10,
+                  height: 20,
                 ),
                 DashboardListTile(
                   title: 'Hasil Studi',
@@ -87,7 +87,7 @@ class _HasilStudiDosenNavState extends State<HasilStudiDosenNav> {
                   isActive: currentPage is HasilStudiDosen,
                 ),
                 const SizedBox(
-                  height: 10,
+                  height: 20,
                 ),
                 DashboardListTile(
                   title: 'Evaluasi',
@@ -99,7 +99,7 @@ class _HasilStudiDosenNavState extends State<HasilStudiDosenNav> {
                   isActive: currentPage is EvaluasiDosen,
                 ),
                 const SizedBox(
-                  height: 10,
+                  height: 20,
                 ),
                 DashboardListTile(
                   title: 'Settings',
@@ -111,7 +111,7 @@ class _HasilStudiDosenNavState extends State<HasilStudiDosenNav> {
                   isActive: currentPage is PengaturanDosen,
                 ),
                 const SizedBox(
-                  height: 10,
+                  height: 20,
                 ),
               ],
             ),
