@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:laksi/firebase_options.dart';
 import 'Landing Page/Screen/landing_page.dart';
-import 'Pengguna/Admin/Kelas/Navigasi/kelas_admin_nav.dart';
-import 'Pengguna/Admin/Kelas/Screen/kelas_admin.dart';
 import 'Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
+import 'Test memperbaiki hasil studi/memperbaiki.dart';
+import 'Test memperbaiki hasil studi/tabel_memperbaiki.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,14 +19,14 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       // initialRoute: '/login',
       // routes: {
       //   '/dashboard': (context) => const DashboardPraktikan(),
       //   '/login': (context) => const LandingPage(),
       // },
-      home: KelasAdminNav(),
+      home: DynamicTable(),
     );
   }
 }

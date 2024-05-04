@@ -183,96 +183,98 @@ class _TokenAsistenState extends State<TokenAsisten> {
           ),
         ),
       ),
-      body: Container(
-        color: const Color(0xFFE3E8EF),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 100.0,
-            ),
-            Center(
-              child: Container(
-                width: 650.0,
-                height: 350.0,
-                color: Colors.white,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      height: 40.0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 30.0, left: 50.0),
-                      child: Text(
-                        "Kode Kelas Asisten",
-                        style: GoogleFonts.quicksand(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.0,
-                        ),
+      body: SingleChildScrollView(
+        child: Container(
+          color: const Color(0xFFE3E8EF),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 100.0,
+              ),
+              Center(
+                child: Container(
+                  width: 650.0,
+                  height: 350.0,
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 40.0,
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 50.0,
-                        right: 30.0,
-                        top: 30.0,
-                      ),
-                      child: SizedBox(
-                        width: 550.0,
-                        child: TextField(
-                          controller: _classCodeController,
-                          decoration: InputDecoration(
-                            hintText: 'Masukkan Kode Kelas Asisten',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 30.0, left: 50.0),
+                        child: Text(
+                          "Kode Kelas Asisten",
+                          style: GoogleFonts.quicksand(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0,
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 25.0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 500.0),
-                      child: SizedBox(
-                        height: 35.0,
-                        width: 100.0,
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              const Color(0xFF3CBEA9),
-                            ),
-                          ),
-                          onPressed: _getData,
-                          child: const Text(
-                            "Simpan",
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 50.0,
+                          right: 30.0,
+                          top: 30.0,
+                        ),
+                        child: SizedBox(
+                          width: 550.0,
+                          child: TextField(
+                            controller: _classCodeController,
+                            decoration: InputDecoration(
+                              hintText: 'Masukkan Kode Kelas Asisten',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 16.0,
-                    ),
-                    const SizedBox(
-                      height: 40.0,
-                    ),
-                  ],
+                      const SizedBox(
+                        height: 25.0,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 500.0),
+                        child: SizedBox(
+                          height: 35.0,
+                          width: 100.0,
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                const Color(0xFF3CBEA9),
+                              ),
+                            ),
+                            onPressed: _getData,
+                            child: const Text(
+                              "Simpan",
+                              style: TextStyle(
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 16.0,
+                      ),
+                      const SizedBox(
+                        height: 40.0,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 130.0,
-            ),
-          ],
+              const SizedBox(
+                height: 130.0,
+              ),
+            ],
+          ),
         ),
       ),
     );

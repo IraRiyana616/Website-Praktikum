@@ -202,7 +202,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                                         const TokenAsisten()));
                           },
                           child: const Text(
-                            "+ Tambah Kelas",
+                            "+ Token Kelas",
                             style: TextStyle(
                               fontSize: 14.0,
                               fontWeight: FontWeight.bold,

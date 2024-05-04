@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Landing%20Page/Komponen/Non%20Mahasiswa/Dosen/Login/login_dosen.dart';
+import 'package:laksi/Pengguna/Admin/Kelas/Navigasi/kelas_admin_nav.dart';
 
 class LoginAdmin extends StatefulWidget {
   const LoginAdmin({super.key});
@@ -228,11 +229,11 @@ class _LoginAdminState extends State<LoginAdmin> {
                                                   'User signed in:${userCredential.user?.email}');
                                             }
                                             // ignore: use_build_context_synchronously
-                                            // Navigator.pushReplacement(
-                                            //     context,
-                                            //     MaterialPageRoute(
-                                            //         builder: (context) =>
-                                            //             const MyAdminScreen()));
+                                            Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const KelasAdminNav()));
                                           } else {
                                             if (kDebugMode) {
                                               print(
