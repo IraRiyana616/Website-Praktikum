@@ -20,6 +20,8 @@ class _TabelNilaiAkhirState extends State<TabelNilaiAkhir> {
   List<PenilaianAkhir> filteredPenilaianAkhir = [];
   //== Dropdown Button ==
   String selectedKeterangan = 'Tampilkan Semua';
+  //== Untuk bagian scroll ==//
+  final ScrollController _controller = ScrollController();
 
   @override
   void initState() {
@@ -535,7 +537,7 @@ class _TabelNilaiAkhirState extends State<TabelNilaiAkhir> {
             padding: const EdgeInsets.only(top: 5.0, bottom: 20.0, left: 920.0),
             child: Row(
               children: [
-//== Text ==
+                //== Text ==
                 const Text(
                   'Search :',
                   style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
@@ -632,6 +634,24 @@ class _TabelNilaiAkhirState extends State<TabelNilaiAkhir> {
                         ),
                         DataColumn(
                           label: Text(
+                            'Modul 6',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Modul 7',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Modul 8',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
                             'Projek Akhir',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
@@ -661,7 +681,8 @@ class _TabelNilaiAkhirState extends State<TabelNilaiAkhir> {
                         editNilai: editNilai,
                       ),
                       rowsPerPage:
-                          calculateRowsPerPage(filteredPenilaianAkhir.length))
+                          calculateRowsPerPage(filteredPenilaianAkhir.length),
+                    )
                   : const Center(
                       child: Text(
                         'No data available',
@@ -672,7 +693,7 @@ class _TabelNilaiAkhirState extends State<TabelNilaiAkhir> {
                       ),
                     ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -696,6 +717,9 @@ class PenilaianAkhir {
   double modul3;
   double modul4;
   double modul5;
+  double modul6;
+  double modul7;
+  double modul8;
   //== Final Project ==
   double project;
   // //== Laporan Resmi ==
@@ -720,6 +744,9 @@ class PenilaianAkhir {
     this.modul3 = 0.0,
     this.modul4 = 0.0,
     this.modul5 = 0.0,
+    this.modul6 = 0.0,
+    this.modul7 = 0.0,
+    this.modul8 = 0.0,
     //== Final Project ==
     this.project = 0.0,
     //== Laporan Resmi ==
@@ -743,35 +770,68 @@ DataRow dataFileDataRow(PenilaianAkhir fileInfo, int index,
     ),
     cells: [
       DataCell(SizedBox(
-        width: 160.0,
+        width: 200.0,
         child: Text(getLimitedText(fileInfo.nama, 30)),
       )),
       DataCell(
-        Text(getLimitedText(fileInfo.pretest.toString(), 5)),
+        SizedBox(
+            width: 80.0,
+            child: Text(getLimitedText(fileInfo.pretest.toString(), 5))),
       ),
       DataCell(
-        Text(getLimitedText(fileInfo.modul1.toString(), 5)),
+        SizedBox(
+            width: 80.0,
+            child: Text(getLimitedText(fileInfo.modul1.toString(), 5))),
       ),
       DataCell(
-        Text(getLimitedText(fileInfo.modul2.toString(), 5)),
+        SizedBox(
+            width: 80.0,
+            child: Text(getLimitedText(fileInfo.modul2.toString(), 5))),
       ),
       DataCell(
-        Text(getLimitedText(fileInfo.modul3.toString(), 5)),
+        SizedBox(
+            width: 80.0,
+            child: Text(getLimitedText(fileInfo.modul3.toString(), 5))),
       ),
       DataCell(
-        Text(getLimitedText(fileInfo.modul4.toString(), 5)),
+        SizedBox(
+            width: 80.0,
+            child: Text(getLimitedText(fileInfo.modul4.toString(), 5))),
       ),
       DataCell(
-        Text(getLimitedText(fileInfo.modul5.toString(), 5)),
+        SizedBox(
+            width: 80.0,
+            child: Text(getLimitedText(fileInfo.modul5.toString(), 5))),
       ),
       DataCell(
-        Text(getLimitedText(fileInfo.project.toString(), 5)),
+        SizedBox(
+            width: 80.0,
+            child: Text(getLimitedText(fileInfo.modul6.toString(), 5))),
       ),
       DataCell(
-        Text(getLimitedText(fileInfo.resmi.toString(), 5)),
+        SizedBox(
+            width: 80.0,
+            child: Text(getLimitedText(fileInfo.modul7.toString(), 5))),
       ),
       DataCell(
-        Text(getLimitedText(fileInfo.akhir.toString(), 5)),
+        SizedBox(
+            width: 80.0,
+            child: Text(getLimitedText(fileInfo.modul8.toString(), 5))),
+      ),
+      DataCell(
+        SizedBox(
+            width: 80.0,
+            child: Text(getLimitedText(fileInfo.project.toString(), 5))),
+      ),
+      DataCell(
+        SizedBox(
+            width: 80.0,
+            child: Text(getLimitedText(fileInfo.resmi.toString(), 5))),
+      ),
+      DataCell(
+        SizedBox(
+            width: 80.0,
+            child: Text(getLimitedText(fileInfo.akhir.toString(), 5))),
       ),
       DataCell(
         Row(

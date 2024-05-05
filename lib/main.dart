@@ -19,14 +19,14 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      // initialRoute: '/login',
-      // routes: {
-      //   '/dashboard': (context) => const DashboardPraktikan(),
-      //   '/login': (context) => const LandingPage(),
-      // },
-      home: DynamicTable(),
+      initialRoute: '/login',
+      routes: {
+        '/dashboard': (context) => const DashboardPraktikan(),
+        '/login': (context) => const LandingPage(),
+      },
+      // home: MyHomePage(kodeKelas: 'TEPM23'),
     );
   }
 }

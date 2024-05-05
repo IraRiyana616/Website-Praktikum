@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Nilai%20Harian/Screen/nilai_percobaan.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Tabel/Form%20Tabel%20Penilaian/form_penialain.dart';
 
 class TabelHasilAsisten extends StatefulWidget {
   const TabelHasilAsisten({super.key});
@@ -213,6 +214,12 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
+                              DataColumn(
+                                label: Text(
+                                  "  Aksi",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
                             ],
                             source: DataSource(filteredDataKelas, context),
                             rowsPerPage:
@@ -293,6 +300,18 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
       DataCell(SizedBox(
           width: 180.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
+      DataCell(IconButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        FormPenilaian(kodeKelas: fileInfo.kode)));
+          },
+          icon: const Icon(
+            Icons.add_box,
+            color: Colors.grey,
+          )))
     ],
   );
 }

@@ -1268,6 +1268,24 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                         ),
                         DataColumn(
                           label: Text(
+                            'Modul 6',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Modul 7',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Modul 8',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
                             'Aksi',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
@@ -1312,6 +1330,9 @@ class PenilaianPercobaan {
   double rata3;
   double rata4;
   double rata5;
+  double rata6;
+  double rata7;
+  double rata8;
 
   //== Fungsi Per Modul ==
   //== Modul 1 ==
@@ -1354,6 +1375,9 @@ class PenilaianPercobaan {
     this.rata3 = 0.0,
     this.rata4 = 0.0,
     this.rata5 = 0.0,
+    this.rata6 = 0.0,
+    this.rata7 = 0.0,
+    this.rata8 = 0.0,
     //
     //== Fungsi Per Modul ==
     //== Modul 1 ==
@@ -1416,6 +1440,15 @@ DataRow dataFileDataRow(PenilaianPercobaan fileInfo, int index,
       ),
       DataCell(
         Text(getLimitedText(fileInfo.rata5.toString(), 5)),
+      ),
+      DataCell(
+        Text(getLimitedText(fileInfo.rata6.toString(), 5)),
+      ),
+      DataCell(
+        Text(getLimitedText(fileInfo.rata7.toString(), 5)),
+      ),
+      DataCell(
+        Text(getLimitedText(fileInfo.rata8.toString(), 5)),
       ),
       DataCell(
         IconButton(
