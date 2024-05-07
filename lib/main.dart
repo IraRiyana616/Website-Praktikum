@@ -4,8 +4,6 @@ import 'dart:async';
 import 'package:laksi/firebase_options.dart';
 import 'Landing Page/Screen/landing_page.dart';
 import 'Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
-import 'Test memperbaiki hasil studi/memperbaiki.dart';
-import 'Test memperbaiki hasil studi/tabel_memperbaiki.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

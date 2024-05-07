@@ -779,44 +779,28 @@ DataRow dataFileDataRow(PenilaianAkhir fileInfo, int index,
             child: Text(getLimitedText(fileInfo.pretest.toString(), 5))),
       ),
       DataCell(
-        SizedBox(
-            width: 80.0,
-            child: Text(getLimitedText(fileInfo.modul1.toString(), 5))),
+        Text(getLimitedText(fileInfo.modul1.toString(), 5)),
       ),
       DataCell(
-        SizedBox(
-            width: 80.0,
-            child: Text(getLimitedText(fileInfo.modul2.toString(), 5))),
+        Text(getLimitedText(fileInfo.modul2.toString(), 5)),
       ),
       DataCell(
-        SizedBox(
-            width: 80.0,
-            child: Text(getLimitedText(fileInfo.modul3.toString(), 5))),
+        Text(getLimitedText(fileInfo.modul3.toString(), 5)),
       ),
       DataCell(
-        SizedBox(
-            width: 80.0,
-            child: Text(getLimitedText(fileInfo.modul4.toString(), 5))),
+        Text(getLimitedText(fileInfo.modul4.toString(), 5)),
       ),
       DataCell(
-        SizedBox(
-            width: 80.0,
-            child: Text(getLimitedText(fileInfo.modul5.toString(), 5))),
+        Text(getLimitedText(fileInfo.modul5.toString(), 5)),
       ),
       DataCell(
-        SizedBox(
-            width: 80.0,
-            child: Text(getLimitedText(fileInfo.modul6.toString(), 5))),
+        Text(getLimitedText(fileInfo.modul6.toString(), 5)),
       ),
       DataCell(
-        SizedBox(
-            width: 80.0,
-            child: Text(getLimitedText(fileInfo.modul7.toString(), 5))),
+        Text(getLimitedText(fileInfo.modul7.toString(), 5)),
       ),
       DataCell(
-        SizedBox(
-            width: 80.0,
-            child: Text(getLimitedText(fileInfo.modul8.toString(), 5))),
+        Text(getLimitedText(fileInfo.modul8.toString(), 5)),
       ),
       DataCell(
         SizedBox(

@@ -61,30 +61,45 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
             'modul3': 0.0,
             'modul4': 0.0,
             'modul5': 0.0,
+            'modul6': 0.0,
+            'modul7': 0.0,
+            'modul8': 0.0,
             //== Laporan ==
             'laporan1': 0.0,
             'laporan2': 0.0,
             'laporan3': 0.0,
             'laporan4': 0.0,
             'laporan5': 0.0,
+            'laporan6': 0.0,
+            'laporan7': 0.0,
+            'laporan8': 0.0,
             //== Afektif ===
             'afektif1': 0.0,
             'afektif2': 0.0,
             'afektif3': 0.0,
             'afektif4': 0.0,
             'afektif5': 0.0,
+            'afektif6': 0.0,
+            'afektif7': 0.0,
+            'afektif8': 0.0,
             //== Tugas ===
             'tugas1': 0.0,
             'tugas2': 0.0,
             'tugas3': 0.0,
             'tugas4': 0.0,
             'tugas5': 0.0,
+            'tugas6': 0.0,
+            'tugas7': 0.0,
+            'tugas8': 0.0,
             //== Latihan ==
             'latihan1': 0.0,
             'latihan2': 0.0,
             'latihan3': 0.0,
             'latihan4': 0.0,
             'latihan5': 0.0,
+            'latihan6': 0.0,
+            'latihan7': 0.0,
+            'latihan8': 0.0,
           });
         }
       });
@@ -118,6 +133,9 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
             rata3: data['modul3'] ?? 0.0,
             rata4: data['modul4'] ?? 0.0,
             rata5: data['modul5'] ?? 0.0,
+            rata6: data['modul6'] ?? 0.0,
+            rata7: data['modul7'] ?? 0.0,
+            rata8: data['modul8'] ?? 0.0,
           );
         }).toList();
 
@@ -179,6 +197,27 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
         nilai.afektif5 = data['afektif5'] ?? 0.0;
         nilai.laporan5 = data['laporan5'] ?? 0.0;
         nilai.rata5 = data['modul5'] ?? 0.0;
+        //
+        //== Modul 6 ==
+        nilai.latihan6 = data['latihan6'] ?? 0.0;
+        nilai.tugas6 = data['tugas6'] ?? 0.0;
+        nilai.afektif6 = data['afektif6'] ?? 0.0;
+        nilai.laporan6 = data['laporan6'] ?? 0.0;
+        nilai.rata6 = data['modul6'] ?? 0.0;
+        //
+        //== Modul 7 ==
+        nilai.latihan7 = data['latihan7'] ?? 0.0;
+        nilai.tugas7 = data['tugas7'] ?? 0.0;
+        nilai.afektif7 = data['afektif7'] ?? 0.0;
+        nilai.laporan7 = data['laporan7'] ?? 0.0;
+        nilai.rata7 = data['modul7'] ?? 0.0;
+        //
+        //== Modul 8 ==
+        nilai.latihan8 = data['latihan8'] ?? 0.0;
+        nilai.tugas8 = data['tugas8'] ?? 0.0;
+        nilai.afektif8 = data['afektif8'] ?? 0.0;
+        nilai.laporan8 = data['laporan8'] ?? 0.0;
+        nilai.rata8 = data['modul8'] ?? 0.0;
       }
     } catch (e) {
       // Handle errors if any
@@ -245,7 +284,42 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
         TextEditingController(text: nilai.laporan5.toString());
     TextEditingController rata5Controller =
         TextEditingController(text: nilai.rata5.toString());
-
+    //
+    //== Modul 6 ==
+    TextEditingController latihan6Controller =
+        TextEditingController(text: nilai.latihan6.toString());
+    TextEditingController tugas6Controller =
+        TextEditingController(text: nilai.tugas6.toString());
+    TextEditingController afektif6Controller =
+        TextEditingController(text: nilai.afektif6.toString());
+    TextEditingController laporan6Controller =
+        TextEditingController(text: nilai.laporan6.toString());
+    TextEditingController rata6Controller =
+        TextEditingController(text: nilai.rata6.toString());
+//
+    //== Modul 7 ==
+    TextEditingController latihan7Controller =
+        TextEditingController(text: nilai.latihan7.toString());
+    TextEditingController tugas7Controller =
+        TextEditingController(text: nilai.tugas7.toString());
+    TextEditingController afektif7Controller =
+        TextEditingController(text: nilai.afektif7.toString());
+    TextEditingController laporan7Controller =
+        TextEditingController(text: nilai.laporan7.toString());
+    TextEditingController rata7Controller =
+        TextEditingController(text: nilai.rata7.toString());
+    //
+    //== Modul 8 ==
+    TextEditingController latihan8Controller =
+        TextEditingController(text: nilai.latihan8.toString());
+    TextEditingController tugas8Controller =
+        TextEditingController(text: nilai.tugas8.toString());
+    TextEditingController afektif8Controller =
+        TextEditingController(text: nilai.afektif8.toString());
+    TextEditingController laporan8Controller =
+        TextEditingController(text: nilai.laporan8.toString());
+    TextEditingController rata8Controller =
+        TextEditingController(text: nilai.rata8.toString());
     //==
     // ignore: use_build_context_synchronously
     showDialog(
@@ -272,757 +346,1214 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
             ],
           ),
           content: SizedBox(
-            height: 320.0,
+            height: 370.0,
             width: 800.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                //== Modul 1 ==
-                Row(
-                  children: [
-                    //== Nama Modul ==
-                    const Padding(
-                      padding: EdgeInsets.only(top: 12.0, left: 20.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Modul 1',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  //== Modul 1 ==
+                  Row(
+                    children: [
+                      //== Nama Modul ==
+                      const Padding(
+                        padding: EdgeInsets.only(top: 12.0, left: 20.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Modul 1',
+                            style: TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Latihan ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: latihan1Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.latihan1 = parsedValue;
+                      // == Latihan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: latihan1Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.latihan1 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata1 = _hitungRataRata1(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata1 = _hitungRataRata1(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata1 = newRata1;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata1 = newRata1;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata1Controller.text = newRata1.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Latihan'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata1Controller.text = newRata1.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Latihan'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Tugas ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: tugas1Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.tugas1 = parsedValue;
+                      // == Tugas ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: tugas1Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.tugas1 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata1 = _hitungRataRata1(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata1 = _hitungRataRata1(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata1 = newRata1;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata1 = newRata1;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata1Controller.text = newRata1.toString();
-                              }
-                            });
-                          },
-                          decoration: const InputDecoration(hintText: 'Tugas'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata1Controller.text = newRata1.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Tugas'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Afektif ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: afektif1Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.afektif1 = parsedValue;
+                      // == Afektif ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: afektif1Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.afektif1 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata1 = _hitungRataRata1(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata1 = _hitungRataRata1(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata1 = newRata1;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata1 = newRata1;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata1Controller.text = newRata1.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Afektif'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata1Controller.text = newRata1.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Afektif'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Laporan ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: laporan1Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.laporan1 = parsedValue;
+                      // == Laporan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: laporan1Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.laporan1 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata1 = _hitungRataRata1(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata1 = _hitungRataRata1(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata1 = newRata1;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata1 = newRata1;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata1Controller.text = newRata1.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Laporan'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata1Controller.text = newRata1.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Laporan'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Rata - rata ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: rata1Controller,
-                          readOnly: true,
-                          decoration:
-                              const InputDecoration(hintText: 'Rata-Rata'),
+                      // == Rata - rata ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: rata1Controller,
+                            readOnly: true,
+                            decoration:
+                                const InputDecoration(hintText: 'Rata-Rata'),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                // == Modul 2 ==
-                Row(
-                  children: [
-                    //== Nama Modul ==
-                    const Padding(
-                      padding: EdgeInsets.only(top: 12.0, left: 20.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Modul 2',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
+                    ],
+                  ),
+                  // == Modul 2 ==
+                  Row(
+                    children: [
+                      //== Nama Modul ==
+                      const Padding(
+                        padding: EdgeInsets.only(top: 12.0, left: 20.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Modul 2',
+                            style: TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Latihan ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: latihan2Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.latihan2 = parsedValue;
+                      // == Latihan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: latihan2Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.latihan2 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata2 = _hitungRataRata2(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata2 = _hitungRataRata2(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata2 = newRata2;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata2 = newRata2;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata2Controller.text = newRata2.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Latihan'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata2Controller.text = newRata2.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Latihan'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Tugas ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: tugas2Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.tugas2 = parsedValue;
+                      // == Tugas ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: tugas2Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.tugas2 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata2 = _hitungRataRata2(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata2 = _hitungRataRata2(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata2 = newRata2;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata2 = newRata2;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata2Controller.text = newRata2.toString();
-                              }
-                            });
-                          },
-                          decoration: const InputDecoration(hintText: 'Tugas'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata2Controller.text = newRata2.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Tugas'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Afektif ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: afektif2Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.afektif2 = parsedValue;
+                      // == Afektif ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: afektif2Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.afektif2 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata2 = _hitungRataRata2(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata2 = _hitungRataRata2(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata2 = newRata2;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata2 = newRata2;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata2Controller.text = newRata2.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Afektif'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata2Controller.text = newRata2.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Afektif'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Laporan ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: laporan2Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.laporan2 = parsedValue;
+                      // == Laporan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: laporan2Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.laporan2 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata2 = _hitungRataRata2(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata2 = _hitungRataRata2(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata2 = newRata2;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata2 = newRata2;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata2Controller.text = newRata2.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Laporan'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata2Controller.text = newRata2.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Laporan'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Rata - rata ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: rata2Controller,
-                          readOnly: true,
-                          decoration:
-                              const InputDecoration(hintText: 'Rata-Rata'),
+                      // == Rata - rata ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: rata2Controller,
+                            readOnly: true,
+                            decoration:
+                                const InputDecoration(hintText: 'Rata-Rata'),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                // == Modul 3 ==
-                Row(
-                  children: [
-                    //== Nama Modul ==
-                    const Padding(
-                      padding: EdgeInsets.only(top: 12.0, left: 20.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Modul 3',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
+                    ],
+                  ),
+                  // == Modul 3 ==
+                  Row(
+                    children: [
+                      //== Nama Modul ==
+                      const Padding(
+                        padding: EdgeInsets.only(top: 12.0, left: 20.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Modul 3',
+                            style: TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Latihan ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: latihan3Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.latihan3 = parsedValue;
+                      // == Latihan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: latihan3Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.latihan3 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata3 = _hitungRataRata3(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata3 = _hitungRataRata3(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata3 = newRata3;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata3 = newRata3;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata3Controller.text = newRata3.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Latihan'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata3Controller.text = newRata3.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Latihan'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Tugas ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: tugas3Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.tugas3 = parsedValue;
+                      // == Tugas ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: tugas3Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.tugas3 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata3 = _hitungRataRata3(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata3 = _hitungRataRata3(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata3 = newRata3;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata3 = newRata3;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata3Controller.text = newRata3.toString();
-                              }
-                            });
-                          },
-                          decoration: const InputDecoration(hintText: 'Tugas'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata3Controller.text = newRata3.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Tugas'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Afektif ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: afektif3Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.afektif3 = parsedValue;
+                      // == Afektif ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: afektif3Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.afektif3 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata3 = _hitungRataRata2(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata3 = _hitungRataRata2(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata3 = newRata3;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata3 = newRata3;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata3Controller.text = newRata3.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Afektif'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata3Controller.text = newRata3.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Afektif'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Laporan ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: laporan3Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.laporan3 = parsedValue;
+                      // == Laporan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: laporan3Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.laporan3 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata3 = _hitungRataRata3(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata3 = _hitungRataRata3(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata3 = newRata3;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata3 = newRata3;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata3Controller.text = newRata3.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Laporan'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata3Controller.text = newRata3.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Laporan'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Rata - rata ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: rata3Controller,
-                          readOnly: true,
-                          decoration:
-                              const InputDecoration(hintText: 'Rata-Rata'),
+                      // == Rata - rata ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: rata3Controller,
+                            readOnly: true,
+                            decoration:
+                                const InputDecoration(hintText: 'Rata-Rata'),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                // == Modul 4 ==
-                Row(
-                  children: [
-                    //== Nama Modul ==
-                    const Padding(
-                      padding: EdgeInsets.only(top: 12.0, left: 20.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Modul 3',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
+                    ],
+                  ),
+                  // == Modul 4 ==
+                  Row(
+                    children: [
+                      //== Nama Modul ==
+                      const Padding(
+                        padding: EdgeInsets.only(top: 12.0, left: 20.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Modul 4',
+                            style: TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Latihan ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: latihan4Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.latihan4 = parsedValue;
+                      // == Latihan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: latihan4Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.latihan4 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata4 = _hitungRataRata4(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata4 = _hitungRataRata4(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata4 = newRata4;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata4 = newRata4;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata4Controller.text = newRata4.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Latihan'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata4Controller.text = newRata4.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Latihan'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Tugas ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: tugas4Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.tugas4 = parsedValue;
+                      // == Tugas ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: tugas4Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.tugas4 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata4 = _hitungRataRata4(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata4 = _hitungRataRata4(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata4 = newRata4;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata4 = newRata4;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata4Controller.text = newRata4.toString();
-                              }
-                            });
-                          },
-                          decoration: const InputDecoration(hintText: 'Tugas'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata4Controller.text = newRata4.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Tugas'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Afektif ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: afektif4Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.afektif4 = parsedValue;
+                      // == Afektif ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: afektif4Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.afektif4 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata4 = _hitungRataRata4(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata4 = _hitungRataRata4(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata4 = newRata4;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata4 = newRata4;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata4Controller.text = newRata4.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Afektif'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata4Controller.text = newRata4.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Afektif'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Laporan ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: laporan4Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.laporan4 = parsedValue;
+                      // == Laporan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: laporan4Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.laporan4 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata4 = _hitungRataRata4(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata4 = _hitungRataRata4(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata4 = newRata4;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata4 = newRata4;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata4Controller.text = newRata4.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Laporan'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata4Controller.text = newRata4.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Laporan'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Rata - rata ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: rata4Controller,
-                          readOnly: true,
-                          decoration:
-                              const InputDecoration(hintText: 'Rata-Rata'),
+                      // == Rata - rata ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: rata4Controller,
+                            readOnly: true,
+                            decoration:
+                                const InputDecoration(hintText: 'Rata-Rata'),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                // == Modul 5 ==
-                Row(
-                  children: [
-                    //== Nama Modul ==
-                    const Padding(
-                      padding: EdgeInsets.only(top: 12.0, left: 20.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Modul 3',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
+                    ],
+                  ),
+                  // == Modul 5 ==
+                  Row(
+                    children: [
+                      //== Nama Modul ==
+                      const Padding(
+                        padding: EdgeInsets.only(top: 12.0, left: 20.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Modul 5',
+                            style: TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Latihan ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: latihan5Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.latihan5 = parsedValue;
+                      // == Latihan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: latihan5Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.latihan5 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata5 = _hitungRataRata5(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata5 = _hitungRataRata5(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata5 = newRata5;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata5 = newRata5;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata5Controller.text = newRata5.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Latihan'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata5Controller.text = newRata5.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Latihan'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Tugas ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: tugas5Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.tugas5 = parsedValue;
+                      // == Tugas ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: tugas5Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.tugas5 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata5 = _hitungRataRata5(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata5 = _hitungRataRata5(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata5 = newRata5;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata5 = newRata5;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata5Controller.text = newRata5.toString();
-                              }
-                            });
-                          },
-                          decoration: const InputDecoration(hintText: 'Tugas'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata5Controller.text = newRata5.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Tugas'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Afektif ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: afektif5Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.afektif5 = parsedValue;
+                      // == Afektif ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: afektif5Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.afektif5 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata5 = _hitungRataRata5(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata5 = _hitungRataRata5(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata5 = newRata5;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata5 = newRata5;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata5Controller.text = newRata5.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Afektif'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata5Controller.text = newRata5.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Afektif'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Laporan ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: laporan5Controller,
-                          onChanged: (newValue) {
-                            setState(() {
-                              double? parsedValue = double.tryParse(newValue);
-                              if (parsedValue != null) {
-                                // Perbarui nilai dalam objek PenilaianPercobaan
-                                nilai.laporan5 = parsedValue;
+                      // == Laporan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: laporan5Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.laporan5 = parsedValue;
 
-                                // Hitung ulang nilai rata-rata
-                                double newRata5 = _hitungRataRata5(nilai);
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata5 = _hitungRataRata5(nilai);
 
-                                // Perbarui nilai rata1 dalam objek PenilaianPercobaan
-                                nilai.rata5 = newRata5;
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata5 = newRata5;
 
-                                // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
-                                rata5Controller.text = newRata5.toString();
-                              }
-                            });
-                          },
-                          decoration:
-                              const InputDecoration(hintText: 'Laporan'),
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata5Controller.text = newRata5.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Laporan'),
+                          ),
                         ),
                       ),
-                    ),
-                    // == Rata - rata ==
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 40.0),
-                      child: SizedBox(
-                        width: 95.0,
-                        child: TextField(
-                          controller: rata5Controller,
-                          readOnly: true,
-                          decoration:
-                              const InputDecoration(hintText: 'Rata-Rata'),
+                      // == Rata - rata ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: rata5Controller,
+                            readOnly: true,
+                            decoration:
+                                const InputDecoration(hintText: 'Rata-Rata'),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  // == Modul 6 ==
+                  Row(
+                    children: [
+                      //== Nama Modul ==
+                      const Padding(
+                        padding: EdgeInsets.only(top: 12.0, left: 20.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Modul 6',
+                            style: TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      // == Latihan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: latihan6Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.latihan6 = parsedValue;
+
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata6 = _hitungRataRata6(nilai);
+
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata6 = newRata6;
+
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata6Controller.text = newRata6.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Latihan'),
+                          ),
+                        ),
+                      ),
+                      // == Tugas ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: tugas6Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.tugas6 = parsedValue;
+
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata6 = _hitungRataRata6(nilai);
+
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata6 = newRata6;
+
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata6Controller.text = newRata6.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Tugas'),
+                          ),
+                        ),
+                      ),
+                      // == Afektif ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: afektif6Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.afektif6 = parsedValue;
+
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata6 = _hitungRataRata6(nilai);
+
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata6 = newRata6;
+
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata6Controller.text = newRata6.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Afektif'),
+                          ),
+                        ),
+                      ),
+                      // == Laporan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: laporan6Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.laporan6 = parsedValue;
+
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata6 = _hitungRataRata6(nilai);
+
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata6 = newRata6;
+
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata6Controller.text = newRata6.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Laporan'),
+                          ),
+                        ),
+                      ),
+                      // == Rata - rata ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: rata6Controller,
+                            readOnly: true,
+                            decoration:
+                                const InputDecoration(hintText: 'Rata-Rata'),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // == Modul 7 ==
+                  Row(
+                    children: [
+                      //== Nama Modul ==
+                      const Padding(
+                        padding: EdgeInsets.only(top: 12.0, left: 20.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Modul 7',
+                            style: TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      // == Latihan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: latihan7Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.latihan7 = parsedValue;
+
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata7 = _hitungRataRata7(nilai);
+
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata7 = newRata7;
+
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata7Controller.text = newRata7.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Latihan'),
+                          ),
+                        ),
+                      ),
+                      // == Tugas ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: tugas7Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.tugas7 = parsedValue;
+
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata7 = _hitungRataRata7(nilai);
+
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata7 = newRata7;
+
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata7Controller.text = newRata7.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Tugas'),
+                          ),
+                        ),
+                      ),
+                      // == Afektif ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: afektif7Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.afektif7 = parsedValue;
+
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata7 = _hitungRataRata7(nilai);
+
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata7 = newRata7;
+
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata7Controller.text = newRata7.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Afektif'),
+                          ),
+                        ),
+                      ),
+                      // == Laporan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: laporan7Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.laporan7 = parsedValue;
+
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata7 = _hitungRataRata7(nilai);
+
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata7 = newRata7;
+
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata7Controller.text = newRata7.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Laporan'),
+                          ),
+                        ),
+                      ),
+                      // == Rata - rata ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: rata7Controller,
+                            readOnly: true,
+                            decoration:
+                                const InputDecoration(hintText: 'Rata-Rata'),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // == Modul 8 ==
+                  Row(
+                    children: [
+                      //== Nama Modul ==
+                      const Padding(
+                        padding: EdgeInsets.only(top: 12.0, left: 20.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Modul 8',
+                            style: TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      // == Latihan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: latihan8Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.latihan8 = parsedValue;
+
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata8 = _hitungRataRata8(nilai);
+
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata8 = newRata8;
+
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata8Controller.text = newRata8.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Latihan'),
+                          ),
+                        ),
+                      ),
+                      // == Tugas ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: tugas8Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.tugas8 = parsedValue;
+
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata8 = _hitungRataRata8(nilai);
+
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata8 = newRata8;
+
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata8Controller.text = newRata8.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Tugas'),
+                          ),
+                        ),
+                      ),
+                      // == Afektif ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: afektif8Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.afektif8 = parsedValue;
+
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata8 = _hitungRataRata8(nilai);
+
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata8 = newRata8;
+
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata8Controller.text = newRata8.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Afektif'),
+                          ),
+                        ),
+                      ),
+                      // == Laporan ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: laporan8Controller,
+                            onChanged: (newValue) {
+                              setState(() {
+                                double? parsedValue = double.tryParse(newValue);
+                                if (parsedValue != null) {
+                                  // Perbarui nilai dalam objek PenilaianPercobaan
+                                  nilai.laporan8 = parsedValue;
+
+                                  // Hitung ulang nilai rata-rata
+                                  double newRata8 = _hitungRataRata8(nilai);
+
+                                  // Perbarui nilai rata1 dalam objek PenilaianPercobaan
+                                  nilai.rata8 = newRata8;
+
+                                  // Perbarui nilai dalam TextField rata1Controller untuk menampilkan hasil perhitungan yang baru
+                                  rata8Controller.text = newRata8.toString();
+                                }
+                              });
+                            },
+                            decoration:
+                                const InputDecoration(hintText: 'Laporan'),
+                          ),
+                        ),
+                      ),
+                      // == Rata - rata ==
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, left: 40.0),
+                        child: SizedBox(
+                          width: 95.0,
+                          child: TextField(
+                            controller: rata8Controller,
+                            readOnly: true,
+                            decoration:
+                                const InputDecoration(hintText: 'Rata-Rata'),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -1079,6 +1610,27 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                         'afektif5': nilai.afektif5,
                         'laporan5': nilai.laporan5,
                         'modul5': nilai.rata5,
+                        //
+                        //== Modul 6 ==
+                        'latihan6': nilai.latihan6,
+                        'tugas6': nilai.tugas6,
+                        'afektif6': nilai.afektif6,
+                        'laporan6': nilai.laporan6,
+                        'modul6': nilai.rata6,
+                        //
+                        //== Modul 7 ==
+                        'latihan7': nilai.latihan7,
+                        'tugas7': nilai.tugas7,
+                        'afektif7': nilai.afektif7,
+                        'laporan7': nilai.laporan7,
+                        'modul7': nilai.rata7,
+                        //
+                        //== Modul 8 ==
+                        'latihan8': nilai.latihan8,
+                        'tugas8': nilai.tugas8,
+                        'afektif8': nilai.afektif8,
+                        'laporan8': nilai.laporan8,
+                        'modul8': nilai.rata8,
                       });
                     } else {
                       // If data exists, update it
@@ -1117,6 +1669,27 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                         'afektif5': nilai.afektif5,
                         'laporan5': nilai.laporan5,
                         'modul5': nilai.rata5,
+                        //
+                        //== Modul 6 ==
+                        'latihan6': nilai.latihan6,
+                        'tugas6': nilai.tugas6,
+                        'afektif6': nilai.afektif6,
+                        'laporan6': nilai.laporan6,
+                        'modul6': nilai.rata6,
+                        //
+                        //== Modul 7 ==
+                        'latihan7': nilai.latihan7,
+                        'tugas7': nilai.tugas7,
+                        'afektif7': nilai.afektif7,
+                        'laporan7': nilai.laporan7,
+                        'modul7': nilai.rata7,
+                        //
+                        //== Modul 8 ==
+                        'latihan8': nilai.latihan8,
+                        'tugas8': nilai.tugas8,
+                        'afektif8': nilai.afektif8,
+                        'laporan8': nilai.laporan8,
+                        'modul8': nilai.rata8,
                       });
                     }
 
@@ -1165,45 +1738,72 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
   //== Rumus menghitung rata-rata
   //== Modul 1 ==
   double _hitungRataRata1(PenilaianPercobaan nilai) {
-    return ((nilai.latihan1 * 0.2) +
-        (nilai.tugas1 * 0.2) +
-        (nilai.afektif1 * 0.3) +
-        (nilai.laporan1 * 0.3));
+    return ((nilai.latihan1 * 0.25) +
+        (nilai.tugas1 * 0.35) +
+        (nilai.afektif1 * 0.2) +
+        (nilai.laporan1 * 0.2));
   }
 
   //
   //== Modul 2 ==
   double _hitungRataRata2(PenilaianPercobaan nilai) {
-    return ((nilai.latihan2 * 0.2) +
-        (nilai.tugas2 * 0.2) +
-        (nilai.afektif2 * 0.3) +
-        (nilai.laporan2 * 0.3));
+    return ((nilai.latihan2 * 0.25) +
+        (nilai.tugas2 * 0.35) +
+        (nilai.afektif2 * 0.2) +
+        (nilai.laporan2 * 0.2));
   }
 
 //== Modul 3 ==
   double _hitungRataRata3(PenilaianPercobaan nilai) {
-    return ((nilai.latihan3 * 0.2) +
-        (nilai.tugas3 * 0.2) +
-        (nilai.afektif3 * 0.3) +
-        (nilai.laporan3 * 0.3));
+    return ((nilai.latihan3 * 0.25) +
+        (nilai.tugas3 * 0.35) +
+        (nilai.afektif3 * 0.2) +
+        (nilai.laporan3 * 0.2));
   }
 
   //
   //== Modul 4 ==
   double _hitungRataRata4(PenilaianPercobaan nilai) {
-    return ((nilai.latihan4 * 0.2) +
-        (nilai.tugas4 * 0.2) +
-        (nilai.afektif4 * 0.3) +
-        (nilai.laporan4 * 0.3));
+    return ((nilai.latihan4 * 0.25) +
+        (nilai.tugas4 * 0.35) +
+        (nilai.afektif4 * 0.2) +
+        (nilai.laporan4 * 0.2));
   }
 
   //
   //== Modul 5 ==
   double _hitungRataRata5(PenilaianPercobaan nilai) {
-    return ((nilai.latihan5 * 0.2) +
-        (nilai.tugas5 * 0.2) +
-        (nilai.afektif5 * 0.3) +
-        (nilai.laporan5 * 0.3));
+    return ((nilai.latihan5 * 0.25) +
+        (nilai.tugas5 * 0.35) +
+        (nilai.afektif5 * 0.2) +
+        (nilai.laporan5 * 0.2));
+  }
+
+//
+  //== Modul 6 ==
+  double _hitungRataRata6(PenilaianPercobaan nilai) {
+    return ((nilai.latihan6 * 0.25) +
+        (nilai.tugas6 * 0.35) +
+        (nilai.afektif6 * 0.2) +
+        (nilai.laporan6 * 0.2));
+  }
+
+  //
+  //== Modul 7 ==
+  double _hitungRataRata7(PenilaianPercobaan nilai) {
+    return ((nilai.latihan7 * 0.25) +
+        (nilai.tugas7 * 0.35) +
+        (nilai.afektif7 * 0.2) +
+        (nilai.laporan7 * 0.2));
+  }
+
+  //
+  //== Modul 8 ==
+  double _hitungRataRata8(PenilaianPercobaan nilai) {
+    return ((nilai.latihan8 * 0.25) +
+        (nilai.tugas8 * 0.35) +
+        (nilai.afektif8 * 0.2) +
+        (nilai.laporan8 * 0.2));
   }
 
   Color getRowColor(int index) {
@@ -1365,6 +1965,24 @@ class PenilaianPercobaan {
   double afektif5;
   double laporan5;
   //
+  //== Modul 6 ==
+  double latihan6;
+  double tugas6;
+  double afektif6;
+  double laporan6;
+  //
+  //== Modul 7 ==
+  double latihan7;
+  double tugas7;
+  double afektif7;
+  double laporan7;
+//
+  //== Modul 8 ==
+  double latihan8;
+  double tugas8;
+  double afektif8;
+  double laporan8;
+  //
   PenilaianPercobaan({
     required this.nim,
     required this.nama,
@@ -1409,6 +2027,25 @@ class PenilaianPercobaan {
     this.tugas5 = 0.0,
     this.afektif5 = 0.0,
     this.laporan5 = 0.0,
+    //
+    //== Modul 6 ==
+    this.latihan6 = 0.0,
+    this.tugas6 = 0.0,
+    this.afektif6 = 0.0,
+    this.laporan6 = 0.0,
+    //
+    //== Modul 7 ==
+    this.latihan7 = 0.0,
+    this.tugas7 = 0.0,
+    this.afektif7 = 0.0,
+    this.laporan7 = 0.0,
+    //
+    //== Modul 8 ==
+    this.latihan8 = 0.0,
+    this.tugas8 = 0.0,
+    this.afektif8 = 0.0,
+    this.laporan8 = 0.0,
+    //
   });
 }
 
