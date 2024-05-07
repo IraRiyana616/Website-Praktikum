@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -17,10 +19,17 @@ class _MyHomePageState extends State<MyHomePage> {
   final ScrollController _controller = ScrollController();
 
   String selectedKeterangan = 'Tampilkan Semua';
-  late Stream<List<PenilaianAkhir>> penilaianStream = Stream.value([]);
+  late final StreamController<List<PenilaianAkhir>> _penilaianStreamController =
+      StreamController<List<PenilaianAkhir>>();
 
   List<PenilaianAkhir> demoPenilaianAkhir = [];
   List<PenilaianAkhir> filteredPenilaianAkhir = [];
+
+  @override
+  void dispose() {
+    _penilaianStreamController.close();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -41,7 +50,15 @@ class _MyHomePageState extends State<MyHomePage> {
           final nilaiAkhirData = calculateHuruf(
             data['modul1'] ?? 0.0,
             data['modul2'] ?? 0.0,
+            data['modul3'] ?? 0.0,
+            data['modul4'] ?? 0.0,
+            data['modul5'] ?? 0.0,
+            data['modul6'] ?? 0.0,
+            data['modul7'] ?? 0.0,
+            data['modul8'] ?? 0.0,
             data['pretest'] ?? 0.0,
+            data['projectAkhir'] ?? 0.0,
+            data['laporanResmi'] ?? 0.0,
           );
           return PenilaianAkhir(
             nim: data['nim'] ?? '',
@@ -49,19 +66,34 @@ class _MyHomePageState extends State<MyHomePage> {
             kode: widget.kodeKelas,
             modul1: data['modul1'] ?? 0.0,
             modul2: data['modul2'] ?? 0.0,
+            modul3: data['modul3'] ?? 0.0,
+            modul4: data['modul4'] ?? 0.0,
+            modul5: data['modul5'] ?? 0.0,
+            modul6: data['modul6'] ?? 0.0,
+            modul7: data['modul7'] ?? 0.0,
+            modul8: data['modul8'] ?? 0.0,
             pretest: data['pretest'] ?? 0.0,
+            project: data['projectAkhir'] ?? 0.0,
+            resmi: data['laporanResmi'] ?? 0.0,
             akhir: calculateNilaiAkhir(
-              data['modul1'] ?? 0.0,
-              data['modul2'] ?? 0.0,
-              data['pretest'] ?? 0.0,
-            ),
+                data['modul1'] ?? 0.0,
+                data['modul2'] ?? 0.0,
+                data['modul3'] ?? 0.0,
+                data['modul4'] ?? 0.0,
+                data['modul5'] ?? 0.0,
+                data['modul6'] ?? 0.0,
+                data['modul7'] ?? 0.0,
+                data['modul8'] ?? 0.0,
+                data['pretest'] ?? 0.0,
+                data['projectAkhir'] ?? 0.0,
+                data['laporanResmi'] ?? 0.0),
             huruf: nilaiAkhirData['huruf'] ?? '',
             status: nilaiAkhirData['status'] ?? '',
           );
         }).toList();
 
         setState(() {
-          penilaianStream = Stream.value(data);
+          _penilaianStreamController.add(data);
         });
       } else {
         await addDataFromNilaiHarian();
@@ -80,66 +112,156 @@ class _MyHomePageState extends State<MyHomePage> {
         .get();
 
     if (nilaiHarianSnapshot.docs.isNotEmpty) {
-      // Ambil data dari nilaiHarian dan tambahkan ke nilaiAkhir
       final batch = FirebaseFirestore.instance.batch();
 
       for (var doc in nilaiHarianSnapshot.docs) {
         final data = doc.data();
         final nilaiAkhirData = calculateHuruf(
-          data['modul1'] ?? 0.0,
-          data['modul2'] ?? 0.0,
-          data['pretest'] ?? 0.0,
-        );
+            data['modul1'] ?? 0.0,
+            data['modul2'] ?? 0.0,
+            data['modul3'] ?? 0.0,
+            data['modul4'] ?? 0.0,
+            data['modul5'] ?? 0.0,
+            data['modul6'] ?? 0.0,
+            data['modul7'] ?? 0.0,
+            data['modul8'] ?? 0.0,
+            data['pretest'] ?? 0.0,
+            data['projectAkhir'] ?? 0.0,
+            data['laporanResmi'] ?? 0.0);
         final nilaiAkhir = calculateNilaiAkhir(
-          data['modul1'] ?? 0.0,
-          data['modul2'] ?? 0.0,
-          data['pretest'] ?? 0.0,
-        );
-        final penilaianAkhirRef =
-            FirebaseFirestore.instance.collection('nilaiAkhir').doc();
-        batch.set(penilaianAkhirRef, {
-          'nim': data['nim'] ?? 0,
-          'nama': data['nama'] ?? '',
-          'kodeKelas': widget.kodeKelas,
-          'modul1': data['modul1'] ?? 0.0,
-          'modul2': data['modul2'] ?? 0.0,
-          'pretest': data['pretest'] ?? 0.0,
-          'status': nilaiAkhirData['status'] ?? '',
-          'nilaiAkhir': nilaiAkhir,
-          'huruf': nilaiAkhirData['huruf'] ?? '',
-        });
-      }
+            data['modul1'] ?? 0.0,
+            data['modul2'] ?? 0.0,
+            data['modul3'] ?? 0.0,
+            data['modul4'] ?? 0.0,
+            data['modul5'] ?? 0.0,
+            data['modul6'] ?? 0.0,
+            data['modul7'] ?? 0.0,
+            data['modul8'] ?? 0.0,
+            data['pretest'] ?? 0.0,
+            data['projectAkhir'] ?? 0.0,
+            data['laporanResmi'] ?? 0.0);
 
+        // Check if there is existing data in nilaiAkhir for this nim
+        final existingData = await FirebaseFirestore.instance
+            .collection('nilaiAkhir')
+            .where('nim', isEqualTo: data['nim'])
+            .limit(1)
+            .get();
+
+        if (existingData.docs.isNotEmpty) {
+          // Update existing entry
+          final docId = existingData.docs.first.id;
+          batch.update(
+            FirebaseFirestore.instance.collection('nilaiAkhir').doc(docId),
+            {
+              'modul1': data['modul1'] ?? 0.0,
+              'modul2': data['modul2'] ?? 0.0,
+              'modul3': data['modul3'] ?? 0.0,
+              'modul4': data['modul4'] ?? 0.0,
+              'modul5': data['modul5'] ?? 0.0,
+              'modul6': data['modul6'] ?? 0.0,
+              'modul7': data['modul7'] ?? 0.0,
+              'modul8': data['modul8'] ?? 0.0,
+              'pretest': data['pretest'] ?? 0.0,
+              'projectAkhir': data['projectAkhir'] ?? 0.0,
+              'laporanResmi': data['laporanResmi'] ?? 0.0,
+              'status': nilaiAkhirData['status'] ?? '',
+              'nilaiAkhir': nilaiAkhir,
+              'huruf': nilaiAkhirData['huruf'] ?? '',
+            },
+          );
+        } else {
+          // Add new entry
+          final penilaianAkhirRef =
+              FirebaseFirestore.instance.collection('nilaiAkhir').doc();
+          batch.set(penilaianAkhirRef, {
+            'nim': data['nim'] ?? 0,
+            'nama': data['nama'] ?? '',
+            'kodeKelas': widget.kodeKelas,
+            'modul1': data['modul1'] ?? 0.0,
+            'modul2': data['modul2'] ?? 0.0,
+            'modul3': data['modul3'] ?? 0.0,
+            'modul4': data['modul4'] ?? 0.0,
+            'modul5': data['modul5'] ?? 0.0,
+            'modul6': data['modul6'] ?? 0.0,
+            'modul7': data['modul7'] ?? 0.0,
+            'modul8': data['modul8'] ?? 0.0,
+            'pretest': data['pretest'] ?? 0.0,
+            'projectAkhir': data['projectAkhir'] ?? 0.0,
+            'laporanResmi': data['laporanResmi'] ?? 0.0,
+            'status': nilaiAkhirData['status'] ?? '',
+            'nilaiAkhir': nilaiAkhir,
+            'huruf': nilaiAkhirData['huruf'] ?? '',
+          });
+        }
+      }
+      await getDataFromFirebase();
       await batch.commit();
     }
   }
 
   Future<void> getDataFromFirebase() async {
     try {
-      penilaianStream = FirebaseFirestore.instance
+      final penilaianStream = FirebaseFirestore.instance
           .collection('nilaiHarian')
           .where('kodeKelas', isEqualTo: widget.kodeKelas)
           .snapshots()
           .map((snapshot) => snapshot.docs.map((doc) {
                 final data = doc.data();
-                final nilaiAkhirData = calculateHuruf(data['modul1'] ?? 0.0,
-                    data['modul2'] ?? 0.0, data['pretest'] ?? 0.0);
+                final nilaiAkhirData = calculateHuruf(
+                  data['modul1'] ?? 0.0,
+                  data['modul2'] ?? 0.0,
+                  data['modul3'] ?? 0.0,
+                  data['modul4'] ?? 0.0,
+                  data['modul5'] ?? 0.0,
+                  data['modul6'] ?? 0.0,
+                  data['modul7'] ?? 0.0,
+                  data['modul8'] ?? 0.0,
+                  data['pretest'] ?? 0.0,
+                  data['projectAkhir'] ?? 0.0,
+                  data['laporanResmi'] ?? 0.0,
+                );
                 return PenilaianAkhir(
-                  nim: data['nim'] ?? 0,
+                  nim: data['nim'] ?? '',
                   nama: data['nama'] ?? '',
                   kode: widget.kodeKelas,
                   modul1: data['modul1'] ?? 0.0,
                   modul2: data['modul2'] ?? 0.0,
+                  modul3: data['modul3'] ?? 0.0,
+                  modul4: data['modul4'] ?? 0.0,
+                  modul5: data['modul5'] ?? 0.0,
+                  modul6: data['modul6'] ?? 0.0,
+                  modul7: data['modul7'] ?? 0.0,
+                  modul8: data['modul8'] ?? 0.0,
                   pretest: data['pretest'] ?? 0.0,
-                  akhir: calculateNilaiAkhir(data['modul1'] ?? 0.0,
-                      data['modul2'] ?? 0.0, data['pretest'] ?? 0.0),
+                  project: data['projectAkhir'] ?? 0.0,
+                  resmi: data['laporanResmi'] ?? 0.0,
+                  akhir: calculateNilaiAkhir(
+                    data['modul1'] ?? 0.0,
+                    data['modul2'] ?? 0.0,
+                    data['modul3'] ?? 0.0,
+                    data['modul4'] ?? 0.0,
+                    data['modul5'] ?? 0.0,
+                    data['modul6'] ?? 0.0,
+                    data['modul7'] ?? 0.0,
+                    data['modul8'] ?? 0.0,
+                    data['pretest'] ?? 0.0,
+                    data['projectAkhir'] ?? 0.0,
+                    data['laporanResmi'] ?? 0.0,
+                  ),
                   huruf: nilaiAkhirData['huruf'] ?? '',
                   status: nilaiAkhirData['status'] ?? '',
                 );
               }).toList());
+
+      // Clear previous data before adding new one
+      _penilaianStreamController.sink.add([]);
+
+      // Add the stream to the StreamController
+      _penilaianStreamController.addStream(penilaianStream);
     } catch (e) {
       if (kDebugMode) {
-        print('Error:$e');
+        print('Error: $e');
       }
     }
   }
@@ -273,7 +395,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               controller: _controller,
                               scrollDirection: Axis.horizontal,
                               child: StreamBuilder<List<PenilaianAkhir>>(
-                                stream: penilaianStream,
+                                stream: _penilaianStreamController.stream,
                                 builder: (context, snapshot) {
                                   if (snapshot.hasError) {
                                     return Text('Error: ${snapshot.error}');
@@ -330,6 +452,46 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 fontWeight: FontWeight.bold)),
                                       ),
                                       DataColumn(
+                                        label: Text('Modul 3',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 4',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 5',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 6',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 7',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 8',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Project Akhir',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Laporan Resmi',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
                                         label: Text('Nilai Akhir',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold)),
@@ -363,6 +525,62 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   width: 200.0,
                                                   child: Text(
                                                       'No data Available',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
                                                       style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold)),
@@ -447,6 +665,62 @@ class _MyHomePageState extends State<MyHomePage> {
                                                       child: Text(
                                                           getLimitedText(
                                                               data.modul2
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul3
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul4
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul5
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul6
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul7
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul8
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 150.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.project
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 150.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.resmi
                                                                   .toString(),
                                                               5)))),
                                                   DataCell(SizedBox(
@@ -539,10 +813,32 @@ class _MyHomePageState extends State<MyHomePage> {
   void editNilai(PenilaianAkhir nilai) {
     TextEditingController pretestController =
         TextEditingController(text: nilai.pretest.toString());
+    //== Rata-rata
     TextEditingController modul1Controller =
         TextEditingController(text: nilai.modul1.toString());
     TextEditingController modul2Controller =
         TextEditingController(text: nilai.modul2.toString());
+    TextEditingController modul3Controller =
+        TextEditingController(text: nilai.modul3.toString());
+    TextEditingController modul4Controller =
+        TextEditingController(text: nilai.modul4.toString());
+    TextEditingController modul5Controller =
+        TextEditingController(text: nilai.modul5.toString());
+    TextEditingController modul6Controller =
+        TextEditingController(text: nilai.modul6.toString());
+    TextEditingController modul7Controller =
+        TextEditingController(text: nilai.modul7.toString());
+    TextEditingController modul8Controller =
+        TextEditingController(text: nilai.modul8.toString());
+    //== Project Akhir
+    TextEditingController projectController =
+        TextEditingController(text: nilai.project.toString());
+    //== Laporan Resmi
+    TextEditingController resmiController =
+        TextEditingController(text: nilai.resmi.toString());
+    //== Nilai Akhir
+    TextEditingController akhirController =
+        TextEditingController(text: nilai.akhir.toString());
 
     showDialog(
       context: context,
@@ -625,6 +921,163 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                     ),
+                    //== Modul 3
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul3Controller,
+                          onChanged: (value) {
+                            nilai.modul3 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 3'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //=== Modul 4, Modul 5, Modul 6, Modul 7
+//== Modul 4
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul4Controller,
+                          onChanged: (value) {
+                            nilai.modul4 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 4'),
+                        ),
+                      ),
+                    ),
+                    //== Modul 5
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul5Controller,
+                          onChanged: (value) {
+                            nilai.modul5 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 5'),
+                        ),
+                      ),
+                    ),
+                    //== Modul 6
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul6Controller,
+                          onChanged: (value) {
+                            nilai.modul6 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 6'),
+                        ),
+                      ),
+                    ),
+                    //== Modul 7
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul7Controller,
+                          onChanged: (value) {
+                            nilai.modul7 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 7'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //=== Modul 8, Project Resmi, Laporan Resmi dan Nilai Akhir
+//== Modul 8
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul8Controller,
+                          onChanged: (value) {
+                            nilai.modul8 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 8'),
+                        ),
+                      ),
+                    ),
+                    //== Project Akhir
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: projectController,
+                          onChanged: (value) {
+                            nilai.project = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Project Ahir'),
+                        ),
+                      ),
+                    ),
+                    //== Laporan Resmi
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: resmiController,
+                          onChanged: (value) {
+                            nilai.resmi = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Laporan Resmi'),
+                        ),
+                      ),
+                    ),
+                    //== Nilai Akhir
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: akhirController,
+                          onChanged: (value) {
+                            nilai.akhir = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          readOnly: true,
+                          decoration:
+                              const InputDecoration(labelText: 'Nilai Akhir'),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -638,9 +1091,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   try {
                     String? namaAsisten = await getNamaAsisten();
                     final nilaiAkhirData = calculateHuruf(
-                        nilai.modul1,
-                        nilai.modul2,
-                        nilai.pretest); // Hitung kembali huruf dan status
+                      nilai.modul1,
+                      nilai.modul2,
+                      nilai.modul3,
+                      nilai.modul4,
+                      nilai.modul5,
+                      nilai.modul6,
+                      nilai.modul7,
+                      nilai.modul8,
+                      nilai.pretest,
+                      nilai.project,
+                      nilai.resmi,
+                    ); // Hitung kembali huruf dan status
 
                     QuerySnapshot<Map<String, dynamic>> querySnapshot =
                         await FirebaseFirestore.instance
@@ -659,7 +1121,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         'kodeKelas': widget.kodeKelas,
                         'modul1': nilai.modul1,
                         'modul2': nilai.modul2,
+                        'modul3': nilai.modul3,
+                        'modul4': nilai.modul4,
+                        'modul5': nilai.modul5,
+                        'modul6': nilai.modul6,
+                        'modul7': nilai.modul7,
+                        'modul8': nilai.modul8,
                         'pretest': nilai.pretest,
+                        'projectAkhir': nilai.project,
+                        'laporanResmi': nilai.resmi,
                         'status': nilaiAkhirData[
                             'status'], // Gunakan nilai status yang baru
                         'huruf': nilaiAkhirData[
@@ -670,7 +1140,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       await querySnapshot.docs[0].reference.update({
                         'modul1': nilai.modul1,
                         'modul2': nilai.modul2,
+                        'modul3': nilai.modul3,
+                        'modul4': nilai.modul4,
+                        'modul5': nilai.modul5,
+                        'modul6': nilai.modul6,
+                        'modul7': nilai.modul7,
+                        'modul8': nilai.modul8,
                         'pretest': nilai.pretest,
+                        'projectAkhir': nilai.project,
+                        'laporanResmi': nilai.resmi,
                         'status': nilaiAkhirData[
                             'status'], // Gunakan nilai status yang baru
                         'huruf': nilaiAkhirData[
@@ -692,6 +1170,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     await getDataFromFirebase();
 
+                    // ignore: use_build_context_synchronously
                     Navigator.of(context).pop();
                   } catch (e) {
                     if (kDebugMode) {
@@ -734,13 +1213,45 @@ class _MyHomePageState extends State<MyHomePage> {
     return null;
   }
 
-  double calculateNilaiAkhir(double modul1, double modul2, double pretest) {
-    return ((modul1 * 0.3) + (modul2 * 0.3) + (pretest * 0.4));
+  double calculateNilaiAkhir(
+      double modul1,
+      double modul2,
+      double modul3,
+      double modul4,
+      double modul5,
+      double modul6,
+      double modul7,
+      double modul8,
+      double pretest,
+      double project,
+      double resmi) {
+    return ((modul1 * 0.08) +
+        (modul2 * 0.08) +
+        (modul3 * 0.08) +
+        (modul4 * 0.08) +
+        (modul5 * 0.08) +
+        (modul6 * 0.08) +
+        (modul7 * 0.08) +
+        (modul8 * 0.08) +
+        (pretest * 0.05) +
+        (resmi * 0.05) +
+        (project * 0.1));
   }
 
   Map<String, String> calculateHuruf(
-      double modul1, double modul2, double pretest) {
-    double nilaiAkhir = calculateNilaiAkhir(modul1, modul2, pretest);
+      double modul1,
+      double modul2,
+      double modul3,
+      double modul4,
+      double modul5,
+      double modul6,
+      double modul7,
+      double modul8,
+      double pretest,
+      double project,
+      double resmi) {
+    double nilaiAkhir = calculateNilaiAkhir(modul1, modul2, modul3, modul4,
+        modul5, modul6, modul7, modul8, pretest, project, resmi);
     String huruf;
     String status;
     if (nilaiAkhir >= 80) {
@@ -768,9 +1279,24 @@ class PenilaianAkhir {
   final int nim;
   final String nama;
   final String kode;
+
+  //=== Rata - Rata
   double modul1;
   double modul2;
+  double modul3;
+  double modul4;
+  double modul5;
+  double modul6;
+  double modul7;
+  double modul8;
+
+  //==Pretest
   double pretest;
+  //== Project Akhir
+  double project;
+  //== Laporan Resmi
+  double resmi;
+  //== Hasil Akhir
   late double akhir;
   late String status;
   late String huruf;
@@ -779,9 +1305,22 @@ class PenilaianAkhir {
     required this.nim,
     required this.nama,
     required this.kode,
+    //== Rata-Rata
     required this.modul1,
     required this.modul2,
+    required this.modul3,
+    required this.modul4,
+    required this.modul5,
+    required this.modul6,
+    required this.modul7,
+    required this.modul8,
+    //== PreTest
     this.pretest = 0.0,
+    //== Project Akhir
+    this.project = 0.0,
+    //== Laporan Resmi
+    this.resmi = 0.0,
+    //== Hasil Akhir
     this.akhir = 0.0,
     this.status = '',
     this.huruf = '',
