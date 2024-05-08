@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Nilai%20Akhir/Screen/nilai_akhir.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Nilai%20Harian/Nilai/penilaian_percobaan.dart';
-import 'package:laksi/Test%20memperbaiki%20hasil%20studi/memperbaiki.dart';
 
 class NilaiPercobaan extends StatefulWidget {
   final String kodeKelas;
@@ -30,7 +29,7 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => MyHomePage(kodeKelas: widget.kodeKelas)));
+                builder: (context) => NilaiAkhir(kodeKelas: widget.kodeKelas)));
       }
     });
   }

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../Dosen/Dashboard/Form Komponen/form_kelas.dart';
 import '../../Data Mahasiswa/Praktikan/data_mahasiswa_admin.dart';
 import '../Komponen/Deskripsi/deskripsi_admin.dart';
 
@@ -224,6 +225,34 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
                         ),
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 25.0, top: 10.0),
+                      child: SizedBox(
+                        height: 40.0,
+                        width: 140.0,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF3CBEA9),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const FormKelasDosen(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            "+ Tambah Kelas",
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
                   ],
                 ),
                 const SizedBox(

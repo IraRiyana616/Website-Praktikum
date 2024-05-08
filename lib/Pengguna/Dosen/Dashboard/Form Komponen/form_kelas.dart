@@ -123,25 +123,6 @@ class _FormKelasDosenState extends State<FormKelasDosen> {
                   const SizedBox(
                     width: 800.0,
                   ),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.logout,
-                        color: Colors.black,
-                      )),
-                  const SizedBox(
-                    width: 10.0,
-                  ),
-                  Text(
-                    'Log out',
-                    style: GoogleFonts.quicksand(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF031F31)),
-                  ),
-                  const SizedBox(
-                    width: 50.0,
-                  )
                 ],
               ),
             ),
