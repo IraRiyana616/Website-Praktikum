@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../Data Mahasiswa/Praktikan/data_mahasiswa_admin.dart';
+import '../Data Asisten/data_asisten_admin.dart';
 import '../Form Komponen/form_kelas_admin.dart';
 import '../Komponen/Deskripsi/deskripsi_admin.dart';
 
@@ -246,7 +247,7 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
                           },
                           child: const Hero(
                             tag:
-                                "tambah_kelas_button", // Tag untuk mengidentifikasi Hero widget
+                                "Tambah Kelas", // Tag untuk mengidentifikasi Hero widget
                             child: Material(
                               color: Colors.transparent,
                               child: Text(
@@ -451,21 +452,54 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
             ),
             tooltip: 'Data Mahasiswa',
           ),
+
           //== EDIT DATA ==//
           IconButton(
             onPressed: () {
-              // Tambahkan logika yang sesuai di sini
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DataAsistenAdmin(
+                            kodeKelas: fileInfo.kelas,
+                            mataKuliah: fileInfo.matkul,
+                          )));
             },
-            icon: const Icon(
-              Icons.add_box,
-              color: Colors.grey,
-            ),
+            icon: const Hero(
+                tag: 'Tambah Data Asisten',
+                child: Icon(
+                  Icons.add_box,
+                  color: Colors.grey,
+                )),
             tooltip: 'Tambah Data Asisten',
           ),
           //== REMOVE DATA ==//
           IconButton(
             onPressed: () {
-              // Tambahkan logika yang sesuai di sini
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Hapus Kelas',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16.0)),
+                      content:
+                          const Text('Apakah Anda yakin ingin menghapusnya?'),
+                      actions: [
+                        TextButton(
+                            onPressed: () {
+                              onDelete(fileInfo.id);
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Hapus')),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Batal'),
+                        )
+                      ],
+                    );
+                  });
             },
             icon: const Icon(
               Icons.delete,

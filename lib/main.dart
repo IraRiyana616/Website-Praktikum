@@ -2,9 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:laksi/firebase_options.dart';
-
 import 'Landing Page/Screen/landing_page.dart';
-import 'Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,9 +18,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
+      initialRoute: '/.',
       routes: {
-        '/dashboard': (context) => const DashboardPraktikan(),
+        // '/dashboard': (context) => const DashboardPraktikan(),
         '/login': (context) => const LandingPage(),
       },
     );
