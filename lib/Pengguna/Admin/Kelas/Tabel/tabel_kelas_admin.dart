@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../Dosen/Dashboard/Form Komponen/form_kelas.dart';
 import '../../Data Mahasiswa/Praktikan/data_mahasiswa_admin.dart';
+import '../Form Komponen/form_kelas_admin.dart';
 import '../Komponen/Deskripsi/deskripsi_admin.dart';
 
 class TabelKelasAdmin extends StatefulWidget {
@@ -18,7 +18,7 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
   List<DataClass> filteredClassData = [];
   final TextEditingController _textController = TextEditingController();
   bool _isTextFieldNotEmpty = false;
-  String selectedYear = 'Tampilkan Semua';
+  String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
   Future<void> fetchAvailableYears() async {
@@ -30,7 +30,7 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
           .toSet();
 
       setState(() {
-        availableYears = ['Tampilkan Semua', ...years.toList()];
+        availableYears = ['Tahun Ajaran', ...years.toList()];
       });
     } catch (e) {
       if (kDebugMode) {
@@ -43,7 +43,7 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
 
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         querySnapshot = await FirebaseFirestore.instance
             .collection('dataKelas')
             .where('tahunAjaran', isEqualTo: selectedYear)
@@ -146,7 +146,7 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
                   padding: const EdgeInsets.only(bottom: 15.0, left: 0.0),
                   child: Container(
                     height: 47.0,
-                    width: 1000.0,
+                    width: 1020.0,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
@@ -182,10 +182,11 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    //== Search ==//
                     Padding(
                       padding: const EdgeInsets.only(top: 10.0, left: 25.0),
                       child: SizedBox(
-                        width: 250.0,
+                        width: 300.0,
                         height: 35.0,
                         child: Row(
                           children: [
@@ -225,6 +226,7 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
                         ),
                       ),
                     ),
+                    //== ElevatedButton Tambah Kelas ==//
                     Padding(
                       padding: const EdgeInsets.only(right: 25.0, top: 10.0),
                       child: SizedBox(
@@ -238,21 +240,30 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const FormKelasDosen(),
+                                builder: (context) => const FormKelasAdmin(),
                               ),
                             );
                           },
-                          child: const Text(
-                            "+ Tambah Kelas",
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          child: const Hero(
+                            tag:
+                                "tambah_kelas_button", // Tag untuk mengidentifikasi Hero widget
+                            child: Material(
+                              color: Colors.transparent,
+                              child: Text(
+                                "+ Tambah Kelas",
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    )
+                    ),
+
+                    //== == == ==//
                   ],
                 ),
                 const SizedBox(
@@ -268,7 +279,7 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
                             columns: const [
                               DataColumn(
                                 label: Text(
-                                  "Kode Kelas",
+                                  "Kode Praktikum",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -298,7 +309,7 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "  Aksi",
+                                  "          Aksi",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -418,19 +429,52 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
           ),
         ),
       ),
-      DataCell(IconButton(
-          onPressed: () {
-            Navigator.push(
+      DataCell(Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          //== INFORMASI ==//
+          IconButton(
+            onPressed: () {
+              Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => DataPraktikanKelasAdmin(
-                          kodeKelas: fileInfo.kelas,
-                        )));
-          },
-          icon: const Icon(
-            Icons.info,
-            color: Colors.grey,
-          ))),
+                  builder: (context) => DataPraktikanKelasAdmin(
+                    kodeKelas: fileInfo.kelas,
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.info,
+              color: Colors.grey,
+            ),
+            tooltip: 'Data Mahasiswa',
+          ),
+          //== EDIT DATA ==//
+          IconButton(
+            onPressed: () {
+              // Tambahkan logika yang sesuai di sini
+            },
+            icon: const Icon(
+              Icons.add_box,
+              color: Colors.grey,
+            ),
+            tooltip: 'Tambah Data Asisten',
+          ),
+          //== REMOVE DATA ==//
+          IconButton(
+            onPressed: () {
+              // Tambahkan logika yang sesuai di sini
+            },
+            icon: const Icon(
+              Icons.delete,
+              color: Colors.grey,
+            ),
+            tooltip: 'Hapus Data',
+          ),
+        ],
+      )),
     ],
   );
 }

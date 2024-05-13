@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Komponen%20Percobaan%20Untuk%20Revisi/gambar.dart';
 import 'package:laksi/Landing%20Page/Komponen/Mahasiswa/Register/register_mhs.dart';
+import '../../../../Komponen Percobaan Untuk Revisi/profil.dart';
 import '../../../../Pengguna/Mahasiswa/Praktikan/Dashboard/Navigasi/dasboard_nav.dart';
 
 class LoginMahasiswa extends StatefulWidget {
@@ -153,8 +155,9 @@ class _LoginMahasiswaState extends State<LoginMahasiswa> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  // const TestWaktu()
-                                                  const DashboardPraktikanNav()));
+                                                  const Avatar()
+                                              // const DashboardPraktikanNav()
+                                              ));
                                     } else {
                                       if (kDebugMode) {
                                         print(

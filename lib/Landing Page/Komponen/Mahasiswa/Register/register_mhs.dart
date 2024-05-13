@@ -86,7 +86,7 @@ class _RegisterMahasiswaState extends State<RegisterMahasiswa> {
         'email': _emailController.text,
         'password': _passwordController.text,
         'no_hp': phoneNumber,
-        'angkatan': _angkatanController.text
+        'angkatan': _angkatanController.text,
       });
 
       //Rest textfields to empty after successful registration
