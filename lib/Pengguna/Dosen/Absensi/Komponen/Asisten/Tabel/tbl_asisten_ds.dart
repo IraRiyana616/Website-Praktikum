@@ -17,8 +17,8 @@ class _TabelAbsensiAsistenDosenState extends State<TabelAbsensiAsistenDosen> {
   List<AbsensiMahasiswa> filteredAbsensiMahasiswa = [];
 
   //Judul Materi
-  String selectedModul = 'Tampilkan Semua';
-  List<String> availableModuls = ['Tampilkan Semua'];
+  String selectedModul = 'Judul Modul';
+  List<String> availableModuls = ['Judul Modul'];
 
   @override
   void initState() {
@@ -68,7 +68,7 @@ class _TabelAbsensiAsistenDosenState extends State<TabelAbsensiAsistenDosen> {
     if (modul != null) {
       setState(() {
         selectedModul = modul;
-        if (modul == 'Tampilkan Semua') {
+        if (modul == 'Judul Modul') {
           filteredAbsensiMahasiswa = demoAbsensiMahasiswa;
         } else {
           filteredAbsensiMahasiswa = demoAbsensiMahasiswa

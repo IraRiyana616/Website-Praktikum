@@ -16,7 +16,7 @@ class _TabelStudiKelasAdminState extends State<TabelStudiKelasAdmin> {
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
 
-  String selectedYear = 'Tampilkan Semua';
+  String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
   Future<void> fetchAvailableYears() async {
@@ -28,7 +28,7 @@ class _TabelStudiKelasAdminState extends State<TabelStudiKelasAdmin> {
           .toSet();
 
       setState(() {
-        availableYears = ['Tampilkan Semua', ...years.toList()];
+        availableYears = ['Tahun Ajaran', ...years.toList()];
       });
     } catch (e) {
       if (kDebugMode) {
@@ -41,7 +41,7 @@ class _TabelStudiKelasAdminState extends State<TabelStudiKelasAdmin> {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
 
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         querySnapshot = await FirebaseFirestore.instance
             .collection('dataKelas')
             .where('tahunAjaran', isEqualTo: selectedYear)
@@ -253,7 +253,12 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
     ),
     cells: [
       DataCell(
-          Text(fileInfo.kelas,
+        Text(
+          fileInfo.kelas,
+        ),
+      ),
+      DataCell(
+          Text(fileInfo.matkul,
               style: TextStyle(
                   color: Colors.lightBlue[700],
                   fontWeight: FontWeight.bold)), onTap: () {
@@ -264,11 +269,6 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
                       kodeKelas: fileInfo.kelas,
                     )));
       }),
-      DataCell(
-        Text(
-          fileInfo.matkul,
-        ),
-      ),
       DataCell(
         SizedBox(
           width: 180.0,

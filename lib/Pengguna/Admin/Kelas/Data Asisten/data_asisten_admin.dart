@@ -138,7 +138,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
               ),
               Center(
                 child: Container(
-                  width: 900.0,
+                  width: 950.0,
                   height: 620.0,
                   color: Colors.white,
                   child: Column(
@@ -173,7 +173,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                             children: [
                               SizedBox(
                                 height: 420.0,
-                                width: 450.0,
+                                width: 475.0,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -337,7 +337,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                               //=== Nama Asisten 3 dan 4, serta NIM Asisten 3 dan 4 ===//
                               SizedBox(
                                 height: 420.0,
-                                width: 450.0,
+                                width: 475.0,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -346,7 +346,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                     //==============//
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                          top: 18.0, left: 60.0),
+                                          top: 18.0, left: 70.0),
                                       child: Text(
                                         "Nama Asisten ",
                                         style: GoogleFonts.quicksand(
@@ -359,7 +359,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 60.0, right: 30.0),
+                                          left: 70.0, right: 30.0),
                                       child: SizedBox(
                                         width: 330.0,
                                         child: TextField(
@@ -382,7 +382,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                     //==================//
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 60.0, top: 15.0),
+                                          left: 70.0, top: 15.0),
                                       child: Text(
                                         "NIM Asisten ",
                                         style: GoogleFonts.quicksand(
@@ -395,7 +395,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 60.0, right: 30.0),
+                                          left: 70.0, right: 30.0),
                                       child: SizedBox(
                                         width: 330.0,
                                         child: TextField(
@@ -423,7 +423,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                     //==================//
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 60.0, top: 15.0),
+                                          left: 70.0, top: 15.0),
                                       child: Text(
                                         "Nama Asisten ",
                                         style: GoogleFonts.quicksand(
@@ -436,7 +436,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 60.0, right: 30.0),
+                                          left: 70.0, right: 30.0),
                                       child: SizedBox(
                                         width: 330.0,
                                         child: TextField(
@@ -458,7 +458,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                     //===============//
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 60.0, top: 15.0),
+                                          left: 70.0, top: 15.0),
                                       child: Text(
                                         "NIM Asisten ",
                                         style: GoogleFonts.quicksand(
@@ -471,7 +471,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 60.0, right: 30.0),
+                                          left: 70.0, right: 30.0),
                                       child: SizedBox(
                                         width: 330.0,
                                         child: TextField(
@@ -501,7 +501,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                           //== ElevatedButton 'SIMPAN DATA' ==//
                           Padding(
                             padding:
-                                const EdgeInsets.only(top: 15.0, left: 600.0),
+                                const EdgeInsets.only(top: 15.0, left: 610.0),
                             child: SizedBox(
                                 height: 45.0,
                                 width: 180.0,

@@ -15,7 +15,7 @@ class _TabelDataAbsensiDosenState extends State<TabelDataAbsensiDosen> {
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
 
-  String selectedYear = 'Tampilkan Semua';
+  String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
   Future<void> fetchAvailableYears() async {
@@ -27,7 +27,7 @@ class _TabelDataAbsensiDosenState extends State<TabelDataAbsensiDosen> {
           .toSet();
 
       setState(() {
-        availableYears = ['Tampilkan Semua', ...years.toList()];
+        availableYears = ['Tahun Ajaran', ...years.toList()];
       });
     } catch (e) {
       if (kDebugMode) {
@@ -40,7 +40,7 @@ class _TabelDataAbsensiDosenState extends State<TabelDataAbsensiDosen> {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
 
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         querySnapshot = await FirebaseFirestore.instance
             .collection('dataKelas')
             .where('tahunAjaran', isEqualTo: selectedYear)
@@ -124,7 +124,7 @@ class _TabelDataAbsensiDosenState extends State<TabelDataAbsensiDosen> {
                   padding: const EdgeInsets.only(bottom: 15.0, left: 0.0),
                   child: Container(
                     height: 47.0,
-                    width: 1000.0,
+                    width: 1010.0,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
@@ -167,7 +167,7 @@ class _TabelDataAbsensiDosenState extends State<TabelDataAbsensiDosen> {
                             columns: const [
                               DataColumn(
                                 label: Text(
-                                  "Kode Kelas",
+                                  "Kode Praktikum",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -251,8 +251,11 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
+      DataCell(Text(
+        fileInfo.kelas,
+      )),
       DataCell(
-          Text(fileInfo.kelas,
+          Text(fileInfo.matkul,
               style: TextStyle(
                   color: Colors.lightBlue[700],
                   fontWeight: FontWeight.bold)), onTap: () {
@@ -264,11 +267,6 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
                       kodeAsisten: fileInfo.asisten,
                     )));
       }),
-      DataCell(
-        Text(
-          fileInfo.matkul,
-        ),
-      ),
       DataCell(
         SizedBox(
           width: 180.0,

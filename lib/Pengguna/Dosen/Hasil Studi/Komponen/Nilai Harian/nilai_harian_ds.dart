@@ -6,8 +6,9 @@ import '../Nilai Akhir/nilai_akhir_ds.dart';
 
 class NilaiPercobaanDosen extends StatefulWidget {
   final String kodeKelas;
-
-  const NilaiPercobaanDosen({Key? key, required this.kodeKelas})
+  final String matkul;
+  const NilaiPercobaanDosen(
+      {Key? key, required this.kodeKelas, required this.matkul})
       : super(key: key);
 
   @override
@@ -25,14 +26,18 @@ class _NilaiPercobaanDosenState extends State<NilaiPercobaanDosen> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    NilaiPercobaanDosen(kodeKelas: widget.kodeKelas)));
+                builder: (context) => NilaiPercobaanDosen(
+                      kodeKelas: widget.kodeKelas,
+                      matkul: widget.matkul,
+                    )));
       } else if (index == 1) {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    NilaiAkhirDosen(kodeKelas: widget.kodeKelas)));
+                builder: (context) => NilaiAkhirDosen(
+                      kodeKelas: widget.kodeKelas,
+                      matkul: widget.matkul,
+                    )));
       }
     });
   }
@@ -67,7 +72,7 @@ class _NilaiPercobaanDosenState extends State<NilaiPercobaanDosen> {
                 ),
                 Expanded(
                   child: Text(
-                    'Penilaian Praktikum',
+                    widget.matkul,
                     style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,

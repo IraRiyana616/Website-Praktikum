@@ -261,6 +261,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
             MaterialPageRoute(
                 builder: (context) => NilaiPercobaanDosen(
                       kodeKelas: fileInfo.kelas,
+                      matkul: fileInfo.matkul,
                     )));
       }),
       DataCell(

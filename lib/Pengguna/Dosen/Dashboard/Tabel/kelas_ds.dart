@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Dosen/Dashboard/Komponen/Deskripsi/Screen/deskripsi_dosen.dart';
-import '../Form Komponen/form_kelas.dart';
 import '../Komponen/Data Mahasiswa Praktikum/Praktikan/data_praktikan.dart';
 
 class TabelKelasDosen extends StatefulWidget {
@@ -18,7 +17,7 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
   List<DataClass> filteredClassData = [];
   final TextEditingController _textController = TextEditingController();
   bool _isTextFieldNotEmpty = false;
-  String selectedYear = 'Tampilkan Semua';
+  String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
   Future<void> fetchAvailableYears() async {
@@ -30,7 +29,7 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
           .toSet();
 
       setState(() {
-        availableYears = ['Tampilkan Semua', ...years.toList()];
+        availableYears = ['Tahun Ajaran', ...years.toList()];
       });
     } catch (e) {
       if (kDebugMode) {
@@ -43,7 +42,7 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
 
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         querySnapshot = await FirebaseFirestore.instance
             .collection('dataKelas')
             .where('tahunAjaran', isEqualTo: selectedYear)
@@ -146,7 +145,7 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
                   padding: const EdgeInsets.only(bottom: 15.0, left: 0.0),
                   child: Container(
                     height: 47.0,
-                    width: 1000.0,
+                    width: 1010.0,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
@@ -225,34 +224,6 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 25.0, top: 10.0),
-                      child: SizedBox(
-                        height: 40.0,
-                        width: 140.0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3CBEA9),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const FormKelasDosen(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "+ Tambah Kelas",
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
                   ],
                 ),
                 const SizedBox(
@@ -268,7 +239,7 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
                             columns: const [
                               DataColumn(
                                 label: Text(
-                                  "Kode Kelas",
+                                  "Kode Praktikum",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -298,13 +269,12 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "     Aksi",
+                                  " Aksi",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ],
-                            source: DataSource(
-                                filteredClassData, deleteData, context),
+                            source: DataSource(filteredClassData, context),
                             rowsPerPage:
                                 calculateRowsPerPage(filteredClassData.length),
                           )
@@ -336,17 +306,6 @@ class _TabelKelasDosenState extends State<TabelKelasDosen> {
       return defaultRowsPerPage;
     }
   }
-
-  void deleteData(String id) async {
-    try {
-      await FirebaseFirestore.instance.collection('dataKelas').doc(id).delete();
-      fetchDataFromFirebase(selectedYear);
-    } catch (error) {
-      if (kDebugMode) {
-        print('Error deleting data: $error');
-      }
-    }
-  }
 }
 
 class DataClass {
@@ -368,8 +327,7 @@ class DataClass {
   });
 }
 
-DataRow dataFileDataRow(DataClass fileInfo, int index,
-    Function(String) onDelete, BuildContext context) {
+DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -419,33 +377,20 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
         ),
       ),
       DataCell(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            //== Tampilan Icon Delete ==
-            IconButton(
-              icon: const Icon(
-                Icons.delete,
-                color: Colors.grey,
-              ),
-              onPressed: () => onDelete(fileInfo.id),
-            ),
-            //== Tampilan Icon Informasi Data Mahasiswa ==
-            IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DataPraktikanKelas(
-                                kodeKelas: fileInfo.kelas,
-                              )));
-                },
-                icon: const Icon(
-                  Icons.info,
-                  color: Colors.grey,
-                ))
-          ],
+        IconButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DataPraktikanKelas(
+                          kodeKelas: fileInfo.kelas,
+                        )));
+          },
+          icon: const Icon(
+            Icons.info,
+            color: Colors.grey,
+          ),
+          tooltip: 'Data Mahasiswa',
         ),
       ),
     ],
@@ -462,10 +407,9 @@ Color getRowColor(int index) {
 
 class DataSource extends DataTableSource {
   final List<DataClass> data;
-  final Function(String) onDelete;
   final BuildContext context;
 
-  DataSource(this.data, this.onDelete, this.context);
+  DataSource(this.data, this.context);
 
   @override
   DataRow? getRow(int index) {
@@ -473,7 +417,7 @@ class DataSource extends DataTableSource {
       return null;
     }
     final fileInfo = data[index];
-    return dataFileDataRow(fileInfo, index, onDelete, context);
+    return dataFileDataRow(fileInfo, index, context);
   }
 
   @override

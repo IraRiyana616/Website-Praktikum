@@ -436,7 +436,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
         children: [
           //== INFORMASI ==//
           IconButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.push(
                 context,
                 MaterialPageRoute(

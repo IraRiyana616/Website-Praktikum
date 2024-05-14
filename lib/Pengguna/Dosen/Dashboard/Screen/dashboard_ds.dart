@@ -90,7 +90,7 @@ class _DashboardDosenState extends State<DashboardDosen> {
               Padding(
                 padding: const EdgeInsets.only(left: 25.0, top: 20.0),
                 child: Container(
-                  width: 1055.0,
+                  width: 1095.0,
                   color: Colors.white,
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
