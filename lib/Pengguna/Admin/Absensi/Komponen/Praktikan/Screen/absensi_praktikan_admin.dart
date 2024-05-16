@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Dosen/Absensi/Komponen/Praktikan/Tabel/tabel_praktikan_ds.dart';
-import '../../Navigasi/absensi_admin_nav.dart';
-import '../Asisten/absensi_asistensi_admin.dart';
+import '../../../Navigasi/absensi_admin_nav.dart';
+import '../../Asisten/Screen/absensi_asisten_admin.dart';
+import '../Tabel/absensi_praktikan_admin.dart';
 
 class AbsensiPraktikanAdmin extends StatefulWidget {
   final String kodeKelas;
+  final String mataKuliah;
   final String kodeAsisten;
 
-  const AbsensiPraktikanAdmin(
-      {Key? key, required this.kodeKelas, required this.kodeAsisten})
-      : super(key: key);
+  const AbsensiPraktikanAdmin({
+    Key? key,
+    required this.kodeKelas,
+    required this.mataKuliah,
+    required this.kodeAsisten,
+  }) : super(key: key);
 
   @override
   State<AbsensiPraktikanAdmin> createState() => _AbsensiPraktikanAdminState();
@@ -29,6 +33,7 @@ class _AbsensiPraktikanAdminState extends State<AbsensiPraktikanAdmin> {
             MaterialPageRoute(
                 builder: (context) => AbsensiPraktikanAdmin(
                       kodeKelas: widget.kodeKelas,
+                      mataKuliah: widget.mataKuliah,
                       kodeAsisten: widget.kodeAsisten,
                     )));
       } else if (index == 1) {
@@ -37,6 +42,7 @@ class _AbsensiPraktikanAdminState extends State<AbsensiPraktikanAdmin> {
             MaterialPageRoute(
                 builder: (context) => AbsensiAsistenAdmin(
                       kodeKelas: widget.kodeKelas,
+                      mataKuliah: widget.mataKuliah,
                       kodeAsisten: widget.kodeAsisten,
                     )));
       }
@@ -68,12 +74,9 @@ class _AbsensiPraktikanAdminState extends State<AbsensiPraktikanAdmin> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const SizedBox(
-                  width: 10.0,
-                ),
                 Expanded(
                   child: Text(
-                    widget.kodeKelas,
+                    widget.mataKuliah,
                     style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -93,19 +96,19 @@ class _AbsensiPraktikanAdminState extends State<AbsensiPraktikanAdmin> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 20.0,
-              ),
               Padding(
                 padding:
-                    const EdgeInsets.only(left: 25.0, top: 5.0, right: 25.0),
+                    const EdgeInsets.only(left: 65.0, top: 20.0, right: 45.0),
                 child: Container(
-                  width: 1500.0,
+                  width: 1260.0,
                   color: Colors.white,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TabelAbsensiPraktikanDosen(kodeKelas: widget.kodeKelas),
+                      TabelAbsensiPraktikanAdmin(
+                        kodeKelas: widget.kodeKelas,
+                        mataKuliah: widget.mataKuliah,
+                      ),
                       const SizedBox(
                         height: 20.0,
                       )
@@ -114,7 +117,7 @@ class _AbsensiPraktikanAdminState extends State<AbsensiPraktikanAdmin> {
                 ),
               ),
               const SizedBox(
-                height: 1000.0,
+                height: 200.0,
               )
             ],
           ),

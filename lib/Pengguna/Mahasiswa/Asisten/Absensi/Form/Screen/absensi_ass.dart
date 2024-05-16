@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AbsensiAsisten extends StatefulWidget {
@@ -266,6 +267,10 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
                           child: SizedBox(
                             width: 300.0,
                             child: TextField(
+                              inputFormatters: [
+                                UpperCaseTextFormatter(),
+                                LengthLimitingTextInputFormatter(6)
+                              ],
                               controller: _kodeEditingController,
                               decoration: InputDecoration(
                                   hintText: ' Masukkan Kode Asisten',
@@ -397,6 +402,18 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
           ),
         ),
       ),
+    );
+  }
+}
+
+//== UpperCaseTextFormatter ==//
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return newValue.copyWith(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
     );
   }
 }

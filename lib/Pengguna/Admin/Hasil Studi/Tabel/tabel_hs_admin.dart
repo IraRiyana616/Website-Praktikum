@@ -3,16 +3,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Komponen/Nilai Harian/Screen/nilai_harian_admin.dart';
+import '../../../Dosen/Hasil Studi/Komponen/Nilai Harian/nilai_harian_ds.dart';
 
-class TabelStudiKelasAdmin extends StatefulWidget {
-  const TabelStudiKelasAdmin({Key? key}) : super(key: key);
+class TabelHasilStudiAdmin extends StatefulWidget {
+  const TabelHasilStudiAdmin({Key? key}) : super(key: key);
 
   @override
-  State<TabelStudiKelasAdmin> createState() => _TabelStudiKelasAdminState();
+  State<TabelHasilStudiAdmin> createState() => _TabelHasilStudiAdminState();
 }
 
-class _TabelStudiKelasAdminState extends State<TabelStudiKelasAdmin> {
+class _TabelHasilStudiAdminState extends State<TabelHasilStudiAdmin> {
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
 
@@ -125,7 +125,7 @@ class _TabelStudiKelasAdminState extends State<TabelStudiKelasAdmin> {
                   padding: const EdgeInsets.only(bottom: 15.0, left: 0.0),
                   child: Container(
                     height: 47.0,
-                    width: 1000.0,
+                    width: 1020.0,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
@@ -168,7 +168,7 @@ class _TabelStudiKelasAdminState extends State<TabelStudiKelasAdmin> {
                             columns: const [
                               DataColumn(
                                 label: Text(
-                                  "Kode Kelas",
+                                  "Kode Praktikum",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -252,26 +252,25 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
+      DataCell(Text(fileInfo.kelas)),
       DataCell(
-        Text(
-          fileInfo.kelas,
-        ),
-      ),
-      DataCell(
-          Text(fileInfo.matkul,
-              style: TextStyle(
-                  color: Colors.lightBlue[700],
-                  fontWeight: FontWeight.bold)), onTap: () {
+          SizedBox(
+            width: 170.0,
+            child: Text(fileInfo.matkul,
+                style: TextStyle(
+                    color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
+          ), onTap: () {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => NilaiPercobaanAdmin(
+                builder: (context) => NilaiPercobaanDosen(
                       kodeKelas: fileInfo.kelas,
+                      matkul: fileInfo.matkul,
                     )));
       }),
       DataCell(
         SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(
             getLimitedText(fileInfo.dosenpengampu, 30),
           ),
@@ -279,7 +278,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
       ),
       DataCell(
         SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(
             getLimitedText(fileInfo.dosenpengampu2, 30),
           ),

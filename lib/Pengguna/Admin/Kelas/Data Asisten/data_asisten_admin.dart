@@ -7,10 +7,10 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class DataAsistenAdmin extends StatefulWidget {
-  final String kodeKelas;
+  final String kodeAsisten;
   final String mataKuliah;
   const DataAsistenAdmin(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.kodeAsisten, required this.mataKuliah});
 
   @override
   State<DataAsistenAdmin> createState() => _DataAsistenAdminState();
@@ -49,7 +49,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
       } else {
         // Validasi untuk memastikan tidak ada data yang sama pada kode kelas yang sama.
         var existingData = await _dataAsistenCollection
-            .where('kodeKelas', isEqualTo: widget.kodeKelas)
+            .where('kodeAsisten', isEqualTo: widget.kodeAsisten)
             .get();
         if (existingData.docs.isNotEmpty) {
           //== Tampilka pesan jika data telah terdapat pada database ==//
@@ -113,7 +113,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                   ),
                   Expanded(
                       child: Text(
-                    'Data Asisten Praktikum',
+                    widget.mataKuliah,
                     style: GoogleFonts.quicksand(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -511,7 +511,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                             const Color(0xFF3CBEA9)),
                                     onPressed: () {
                                       _saveDataToFirestore({
-                                        'kodeKelas': widget.kodeKelas,
+                                        'kodeAsisten': widget.kodeAsisten,
                                         'mataKuliah': widget.mataKuliah,
                                         'namaAsisten':
                                             namaAsistenController.text,

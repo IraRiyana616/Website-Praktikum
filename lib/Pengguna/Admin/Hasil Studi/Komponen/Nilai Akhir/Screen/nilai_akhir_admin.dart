@@ -19,11 +19,11 @@ class _NilaiAkhirAdminState extends State<NilaiAkhirAdmin> {
       _selectedIndex = index;
 
       if (index == 0) {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    NilaiPercobaanAdmin(kodeKelas: widget.kodeKelas)));
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) =>
+        //             NilaiPercobaanAdmin(kodeKelas: widget.kodeKelas)));
       } else if (index == 1) {
         Navigator.push(
             context,

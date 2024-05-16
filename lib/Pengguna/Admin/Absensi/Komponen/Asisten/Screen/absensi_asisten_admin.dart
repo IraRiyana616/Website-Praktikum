@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../Dosen/Absensi/Komponen/Asisten/Tabel/tbl_asisten_ds.dart';
-import '../../Navigasi/absensi_admin_nav.dart';
-import '../Praktikan/absensi_praktikan_admin.dart';
+
+import '../../../Navigasi/absensi_admin_nav.dart';
+import '../../Praktikan/Screen/absensi_praktikan_admin.dart';
+import '../Tabel/absensi_asisten_admin_tabel.dart';
 
 class AbsensiAsistenAdmin extends StatefulWidget {
   final String kodeKelas;
+  final String mataKuliah;
   final String kodeAsisten;
-
   const AbsensiAsistenAdmin(
-      {Key? key, required this.kodeKelas, required this.kodeAsisten})
-      : super(key: key);
+      {super.key,
+      required this.kodeKelas,
+      required this.mataKuliah,
+      required this.kodeAsisten});
 
   @override
   State<AbsensiAsistenAdmin> createState() => _AbsensiAsistenAdminState();
@@ -29,6 +32,7 @@ class _AbsensiAsistenAdminState extends State<AbsensiAsistenAdmin> {
             MaterialPageRoute(
                 builder: (context) => AbsensiPraktikanAdmin(
                       kodeKelas: widget.kodeKelas,
+                      mataKuliah: widget.mataKuliah,
                       kodeAsisten: widget.kodeAsisten,
                     )));
       } else if (index == 1) {
@@ -36,8 +40,10 @@ class _AbsensiAsistenAdminState extends State<AbsensiAsistenAdmin> {
             context,
             MaterialPageRoute(
                 builder: (context) => AbsensiAsistenAdmin(
-                    kodeKelas: widget.kodeKelas,
-                    kodeAsisten: widget.kodeAsisten)));
+                      kodeAsisten: widget.kodeAsisten,
+                      mataKuliah: widget.mataKuliah,
+                      kodeKelas: widget.kodeKelas,
+                    )));
       }
     });
   }
@@ -67,12 +73,9 @@ class _AbsensiAsistenAdminState extends State<AbsensiAsistenAdmin> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const SizedBox(
-                  width: 10.0,
-                ),
                 Expanded(
                   child: Text(
-                    widget.kodeKelas,
+                    widget.mataKuliah,
                     style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -92,19 +95,19 @@ class _AbsensiAsistenAdminState extends State<AbsensiAsistenAdmin> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 20.0,
-              ),
               Padding(
                 padding:
-                    const EdgeInsets.only(left: 25.0, top: 5.0, right: 25.0),
+                    const EdgeInsets.only(left: 65.0, top: 20.0, right: 45.0),
                 child: Container(
-                  width: 1500.0,
+                  width: 1260.0,
                   color: Colors.white,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TabelAbsensiAsistenDosen(kodeAsisten: widget.kodeAsisten),
+                      TabelAbsensiAsistenAdmin(
+                        kodeAsisten: widget.kodeAsisten,
+                        mataKuliah: widget.mataKuliah,
+                      ),
                       const SizedBox(
                         height: 20.0,
                       )
@@ -113,7 +116,7 @@ class _AbsensiAsistenAdminState extends State<AbsensiAsistenAdmin> {
                 ),
               ),
               const SizedBox(
-                height: 1000.0,
+                height: 200.0,
               )
             ],
           ),

@@ -54,7 +54,29 @@ class _AbsensiAdminState extends State<AbsensiAdmin> {
                       color: Colors.black),
                 )),
                 const SizedBox(
-                  width: 750.0,
+                  width: 700.0,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: Text(
+                    'Admin',
+                    style: GoogleFonts.quicksand(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                ),
+                Container(
+                  width: 37.0,
+                  height: 37.0,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50.0),
+                  ),
+                  child: const CircleAvatar(
+                      backgroundImage: AssetImage('assets/images/admin.jpg')),
+                ),
+                const SizedBox(
+                  width: 8.0,
                 ),
                 IconButton(
                     onPressed: _logout,
@@ -64,16 +86,6 @@ class _AbsensiAdminState extends State<AbsensiAdmin> {
                     )),
                 const SizedBox(
                   width: 10.0,
-                ),
-                Text(
-                  'Log out',
-                  style: GoogleFonts.quicksand(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF031F31)),
-                ),
-                const SizedBox(
-                  width: 50.0,
                 )
               ],
             ),
@@ -87,13 +99,10 @@ class _AbsensiAdminState extends State<AbsensiAdmin> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 20.0,
-              ),
               Padding(
-                padding: const EdgeInsets.only(left: 25.0, top: 5.0),
+                padding: const EdgeInsets.only(left: 25.0, top: 20.0),
                 child: Container(
-                  width: 1055.0,
+                  width: 1095.0,
                   color: Colors.white,
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

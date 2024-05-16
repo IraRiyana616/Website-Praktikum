@@ -203,7 +203,7 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
                                 decoration: InputDecoration(
                                   hintText: '',
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(0.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 0, horizontal: 10),
@@ -389,18 +389,17 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
       },
     ),
     cells: [
-      DataCell(Text(fileInfo.kelas)),
+      DataCell(SizedBox(width: 115.0, child: Text(fileInfo.kelas))),
+      DataCell(SizedBox(width: 115.0, child: Text(fileInfo.asisten))),
       DataCell(
-        Text(
-          fileInfo.asisten,
-        ),
-      ),
-      DataCell(
-        Text(
-          fileInfo.matkul,
-          style: TextStyle(
-            color: Colors.lightBlue[700],
-            fontWeight: FontWeight.bold,
+        SizedBox(
+          width: 185.0,
+          child: Text(
+            fileInfo.matkul,
+            style: TextStyle(
+              color: Colors.lightBlue[700],
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         onTap: () {
@@ -416,7 +415,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
       ),
       DataCell(
         SizedBox(
-          width: 180.0,
+          width: 195.0,
           child: Text(
             getLimitedText(fileInfo.dosenpengampu, 30),
           ),
@@ -424,7 +423,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
       ),
       DataCell(
         SizedBox(
-          width: 180.0,
+          width: 195.0,
           child: Text(
             getLimitedText(fileInfo.dosenpengampu2, 30),
           ),
@@ -460,7 +459,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
                   context,
                   MaterialPageRoute(
                       builder: (context) => DataAsistenAdmin(
-                            kodeKelas: fileInfo.kelas,
+                            kodeAsisten: fileInfo.asisten,
                             mataKuliah: fileInfo.matkul,
                           )));
             },

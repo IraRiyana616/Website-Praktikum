@@ -19,6 +19,36 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
   List<PenilaianPercobaan> demoPenilaianPercobaan = [];
   List<PenilaianPercobaan> filteredPenilaianPercobaan = [];
 
+//== TextField Search ==//
+  final TextEditingController _textController = TextEditingController();
+  bool _isTextFieldNotEmpty = false;
+
+  //== clearSearchField ==//
+  void clearSearchField() {
+    setState(() {
+      _textController.clear();
+      filterData('');
+    });
+  }
+
+  void _onTextChanged() {
+    setState(() {
+      _isTextFieldNotEmpty = _textController.text.isNotEmpty;
+      filterData(_textController.text);
+    });
+  }
+
+  void filterData(String query) {
+    setState(() {
+      filteredPenilaianPercobaan = demoPenilaianPercobaan
+          .where((data) => (data.nama
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              data.nim.toString().toLowerCase().contains(query.toLowerCase())))
+          .toList();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -225,6 +255,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
         print('Error fetching data: $e');
       }
     }
+
     //== Modul 1 ==
     TextEditingController latihan1Controller =
         TextEditingController(text: nilai.latihan1.toString());
@@ -393,7 +424,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Latihan'),
+                                const InputDecoration(labelText: 'Latihan'),
                           ),
                         ),
                       ),
@@ -423,7 +454,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Tugas'),
+                                const InputDecoration(labelText: 'Tugas'),
                           ),
                         ),
                       ),
@@ -453,7 +484,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Afektif'),
+                                const InputDecoration(labelText: 'Afektif'),
                           ),
                         ),
                       ),
@@ -483,7 +514,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Laporan'),
+                                const InputDecoration(labelText: 'Laporan'),
                           ),
                         ),
                       ),
@@ -496,7 +527,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                             controller: rata1Controller,
                             readOnly: true,
                             decoration:
-                                const InputDecoration(hintText: 'Rata-Rata'),
+                                const InputDecoration(labelText: 'Rata-Rata'),
                           ),
                         ),
                       ),
@@ -543,7 +574,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Latihan'),
+                                const InputDecoration(labelText: 'Latihan'),
                           ),
                         ),
                       ),
@@ -573,7 +604,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Tugas'),
+                                const InputDecoration(labelText: 'Tugas'),
                           ),
                         ),
                       ),
@@ -603,7 +634,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Afektif'),
+                                const InputDecoration(labelText: 'Afektif'),
                           ),
                         ),
                       ),
@@ -633,7 +664,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Laporan'),
+                                const InputDecoration(labelText: 'Laporan'),
                           ),
                         ),
                       ),
@@ -646,7 +677,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                             controller: rata2Controller,
                             readOnly: true,
                             decoration:
-                                const InputDecoration(hintText: 'Rata-Rata'),
+                                const InputDecoration(labelText: 'Rata-Rata'),
                           ),
                         ),
                       ),
@@ -693,7 +724,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Latihan'),
+                                const InputDecoration(labelText: 'Latihan'),
                           ),
                         ),
                       ),
@@ -723,7 +754,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Tugas'),
+                                const InputDecoration(labelText: 'Tugas'),
                           ),
                         ),
                       ),
@@ -753,7 +784,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Afektif'),
+                                const InputDecoration(labelText: 'Afektif'),
                           ),
                         ),
                       ),
@@ -783,7 +814,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Laporan'),
+                                const InputDecoration(labelText: 'Laporan'),
                           ),
                         ),
                       ),
@@ -796,7 +827,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                             controller: rata3Controller,
                             readOnly: true,
                             decoration:
-                                const InputDecoration(hintText: 'Rata-Rata'),
+                                const InputDecoration(labelText: 'Rata-Rata'),
                           ),
                         ),
                       ),
@@ -843,7 +874,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Latihan'),
+                                const InputDecoration(labelText: 'Latihan'),
                           ),
                         ),
                       ),
@@ -873,7 +904,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Tugas'),
+                                const InputDecoration(labelText: 'Tugas'),
                           ),
                         ),
                       ),
@@ -903,7 +934,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Afektif'),
+                                const InputDecoration(labelText: 'Afektif'),
                           ),
                         ),
                       ),
@@ -933,7 +964,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Laporan'),
+                                const InputDecoration(labelText: 'Laporan'),
                           ),
                         ),
                       ),
@@ -946,7 +977,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                             controller: rata4Controller,
                             readOnly: true,
                             decoration:
-                                const InputDecoration(hintText: 'Rata-Rata'),
+                                const InputDecoration(labelText: 'Rata-Rata'),
                           ),
                         ),
                       ),
@@ -993,7 +1024,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Latihan'),
+                                const InputDecoration(labelText: 'Latihan'),
                           ),
                         ),
                       ),
@@ -1023,7 +1054,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Tugas'),
+                                const InputDecoration(labelText: 'Tugas'),
                           ),
                         ),
                       ),
@@ -1053,7 +1084,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Afektif'),
+                                const InputDecoration(labelText: 'Afektif'),
                           ),
                         ),
                       ),
@@ -1083,7 +1114,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Laporan'),
+                                const InputDecoration(labelText: 'Laporan'),
                           ),
                         ),
                       ),
@@ -1096,7 +1127,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                             controller: rata5Controller,
                             readOnly: true,
                             decoration:
-                                const InputDecoration(hintText: 'Rata-Rata'),
+                                const InputDecoration(labelText: 'Rata-Rata'),
                           ),
                         ),
                       ),
@@ -1143,7 +1174,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Latihan'),
+                                const InputDecoration(labelText: 'Latihan'),
                           ),
                         ),
                       ),
@@ -1173,7 +1204,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Tugas'),
+                                const InputDecoration(labelText: 'Tugas'),
                           ),
                         ),
                       ),
@@ -1203,7 +1234,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Afektif'),
+                                const InputDecoration(labelText: 'Afektif'),
                           ),
                         ),
                       ),
@@ -1233,7 +1264,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Laporan'),
+                                const InputDecoration(labelText: 'Laporan'),
                           ),
                         ),
                       ),
@@ -1246,7 +1277,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                             controller: rata6Controller,
                             readOnly: true,
                             decoration:
-                                const InputDecoration(hintText: 'Rata-Rata'),
+                                const InputDecoration(labelText: 'Rata-Rata'),
                           ),
                         ),
                       ),
@@ -1293,7 +1324,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Latihan'),
+                                const InputDecoration(labelText: 'Latihan'),
                           ),
                         ),
                       ),
@@ -1323,7 +1354,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Tugas'),
+                                const InputDecoration(labelText: 'Tugas'),
                           ),
                         ),
                       ),
@@ -1353,7 +1384,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Afektif'),
+                                const InputDecoration(labelText: 'Afektif'),
                           ),
                         ),
                       ),
@@ -1383,7 +1414,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Laporan'),
+                                const InputDecoration(labelText: 'Laporan'),
                           ),
                         ),
                       ),
@@ -1396,7 +1427,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                             controller: rata7Controller,
                             readOnly: true,
                             decoration:
-                                const InputDecoration(hintText: 'Rata-Rata'),
+                                const InputDecoration(labelText: 'Rata-Rata'),
                           ),
                         ),
                       ),
@@ -1443,7 +1474,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Latihan'),
+                                const InputDecoration(labelText: 'Latihan'),
                           ),
                         ),
                       ),
@@ -1473,7 +1504,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Tugas'),
+                                const InputDecoration(labelText: 'Tugas'),
                           ),
                         ),
                       ),
@@ -1503,7 +1534,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Afektif'),
+                                const InputDecoration(labelText: 'Afektif'),
                           ),
                         ),
                       ),
@@ -1533,7 +1564,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                               });
                             },
                             decoration:
-                                const InputDecoration(hintText: 'Laporan'),
+                                const InputDecoration(labelText: 'Laporan'),
                           ),
                         ),
                       ),
@@ -1546,7 +1577,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
                             controller: rata8Controller,
                             readOnly: true,
                             decoration:
-                                const InputDecoration(hintText: 'Rata-Rata'),
+                                const InputDecoration(labelText: 'Rata-Rata'),
                           ),
                         ),
                       ),
@@ -1816,6 +1847,38 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
+          //== Search ==//
+          Padding(
+              padding:
+                  const EdgeInsets.only(top: 10.0, left: 930.0, bottom: 15.0),
+              child: SizedBox(
+                  width: 300.0,
+                  height: 45.0,
+                  child: Row(children: [
+                    const Text('Search :',
+                        style: TextStyle(
+                            fontSize: 16.0, fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 10.0),
+                    Expanded(
+                        child: TextField(
+                            onChanged: (value) {
+                              filterData(value);
+                            },
+                            decoration: InputDecoration(
+                                hintText: '',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 10),
+                                suffixIcon: Visibility(
+                                    visible: _isTextFieldNotEmpty,
+                                    child: IconButton(
+                                        onPressed: clearSearchField,
+                                        icon: const Icon(Icons.clear))),
+                                labelStyle: const TextStyle(fontSize: 16.0),
+                                filled: true,
+                                fillColor: Colors.white))),
+                  ]))),
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 25.0),
             child: SizedBox(
@@ -2063,40 +2126,21 @@ DataRow dataFileDataRow(PenilaianPercobaan fileInfo, int index,
         width: 200.0,
         child: Text(getLimitedText(fileInfo.nama, 30)),
       )),
-      DataCell(
-        Text(getLimitedText(fileInfo.rata1.toString(), 5)),
-      ),
-      DataCell(
-        Text(getLimitedText(fileInfo.rata2.toString(), 5)),
-      ),
-      DataCell(
-        Text(getLimitedText(fileInfo.rata3.toString(), 5)),
-      ),
-      DataCell(
-        Text(getLimitedText(fileInfo.rata4.toString(), 5)),
-      ),
-      DataCell(
-        Text(getLimitedText(fileInfo.rata5.toString(), 5)),
-      ),
-      DataCell(
-        Text(getLimitedText(fileInfo.rata6.toString(), 5)),
-      ),
-      DataCell(
-        Text(getLimitedText(fileInfo.rata7.toString(), 5)),
-      ),
-      DataCell(
-        Text(getLimitedText(fileInfo.rata8.toString(), 5)),
-      ),
-      DataCell(
-        IconButton(
-            onPressed: () {
-              editNilai(fileInfo);
-            },
-            icon: const Icon(
-              Icons.add_box,
-              color: Colors.grey,
-            )),
-      )
+      DataCell(Text(getLimitedText(fileInfo.rata1.toString(), 5))),
+      DataCell(Text(getLimitedText(fileInfo.rata2.toString(), 5))),
+      DataCell(Text(getLimitedText(fileInfo.rata3.toString(), 5))),
+      DataCell(Text(getLimitedText(fileInfo.rata4.toString(), 5))),
+      DataCell(Text(getLimitedText(fileInfo.rata5.toString(), 5))),
+      DataCell(Text(getLimitedText(fileInfo.rata6.toString(), 5))),
+      DataCell(Text(getLimitedText(fileInfo.rata7.toString(), 5))),
+      DataCell(Text(getLimitedText(fileInfo.rata8.toString(), 5))),
+      DataCell(IconButton(
+        onPressed: () {
+          editNilai(fileInfo);
+        },
+        icon: const Icon(Icons.add_box, color: Colors.grey),
+        tooltip: 'Tambah Data',
+      )),
     ],
   );
 }

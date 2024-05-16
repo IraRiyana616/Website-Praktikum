@@ -52,9 +52,16 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
           int nim = data['nim'];
           double modul1 = (data['modul1'] ?? 0).toDouble();
           double modul2 = (data['modul2'] ?? 0).toDouble();
+          double modul3 = (data['modul3'] ?? 0).toDouble();
+          double modul4 = (data['modul4'] ?? 0).toDouble();
+          double modul5 = (data['modul5'] ?? 0).toDouble();
+          double modul6 = (data['modul6'] ?? 0).toDouble();
+          double modul7 = (data['modul7'] ?? 0).toDouble();
+          double modul8 = (data['modul8'] ?? 0).toDouble();
 
           // Update nilaiAkhir berdasarkan perubahan di nilaiHarian
-          await _updateNilaiAkhir(modul1, modul2, kodeKelas, nim);
+          await _updateNilaiAkhir(modul1, modul2, modul3, modul4, modul5,
+              modul6, modul7, modul8, kodeKelas, nim);
         }
       } catch (e) {
         if (kDebugMode) {
@@ -65,7 +72,16 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
   }
 
   Future<void> _updateNilaiAkhir(
-      double newModul1, double newModul2, String kodeKelas, int nim) async {
+      double newModul1,
+      double newModul2,
+      double newModul3,
+      double newModul4,
+      double newModul5,
+      double newModul6,
+      double newModul7,
+      double newModul8,
+      String kodeKelas,
+      int nim) async {
     try {
       var querySnapshot = await FirebaseFirestore.instance
           .collection('nilaiAkhir')
@@ -83,6 +99,12 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
           kode: kodeKelas,
           modul1: newModul1,
           modul2: newModul2,
+          modul3: newModul3,
+          modul4: newModul4,
+          modul5: newModul5,
+          modul6: newModul6,
+          modul7: newModul7,
+          modul8: newModul8,
           pretest: (data['pretest'] ?? 0).toDouble(),
           project: (data['projectAkhir'] ?? 0).toDouble(),
           resmi: (data['laporanResmi'] ?? 0).toDouble(),
@@ -91,11 +113,27 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
           status: data['status'] ?? '',
         );
 
-        var hasil = calculateHuruf(penilaian.modul1, penilaian.modul2,
-            penilaian.pretest, penilaian.project, penilaian.resmi);
+        var hasil = calculateHuruf(
+            penilaian.modul1,
+            penilaian.modul2,
+            penilaian.modul3,
+            penilaian.modul4,
+            penilaian.modul5,
+            penilaian.modul6,
+            penilaian.modul7,
+            penilaian.modul8,
+            penilaian.pretest,
+            penilaian.project,
+            penilaian.resmi);
         penilaian.akhir = calculateNilaiAkhir(
             penilaian.modul1,
             penilaian.modul2,
+            penilaian.modul3,
+            penilaian.modul4,
+            penilaian.modul5,
+            penilaian.modul6,
+            penilaian.modul7,
+            penilaian.modul8,
             penilaian.pretest,
             penilaian.project,
             penilaian.resmi);
@@ -105,6 +143,12 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
         await documentSnapshot.reference.update({
           'modul1': penilaian.modul1,
           'modul2': penilaian.modul2,
+          'modul3': penilaian.modul3,
+          'modul4': penilaian.modul4,
+          'modul5': penilaian.modul5,
+          'modul6': penilaian.modul6,
+          'modul7': penilaian.modul7,
+          'modul8': penilaian.modul8,
           'nilaiAkhir': penilaian.akhir,
           'nilaiHuruf': penilaian.huruf,
           'status': penilaian.status,
@@ -138,14 +182,30 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
           var data = document.data();
           var modul1 = (data['modul1'] ?? 0).toDouble();
           var modul2 = (data['modul2'] ?? 0).toDouble();
-          var nilaiAkhir = (modul1 + modul2) / 2; // Hitung nilaiAkhir
+          var modul3 = (data['modul3'] ?? 0).toDouble();
+          var modul4 = (data['modul4'] ?? 0).toDouble();
+          var modul5 = (data['modul5'] ?? 0).toDouble();
+          var modul6 = (data['modul6'] ?? 0).toDouble();
+          var modul7 = (data['modul7'] ?? 0).toDouble();
+          var modul8 = (data['modul8'] ?? 0).toDouble();
+          var project = (data['projectAkhir'] ?? 0).toDouble();
+          var resmi = (data['laporanResmi'] ?? 0).toDouble();
+          var pretest = (data['pretest'] ?? 0).toDouble();
 
+          var nilaiAkhir = calculateNilaiAkhir(modul1, modul2, modul3, modul4,
+              modul5, modul6, modul7, modul8, pretest, project, resmi);
           var penilaian = PenilaianAkhir(
               nim: data['nim'] ?? 0,
               nama: data['nama'] ?? '',
               kode: data['kodeKelas'] ?? '',
               modul1: modul1,
               modul2: modul2,
+              modul3: modul3,
+              modul4: modul4,
+              modul5: modul5,
+              modul6: modul6,
+              modul7: modul7,
+              modul8: modul8,
               pretest: (data['pretest'] ?? 0).toDouble(),
               project: (data['projectAkhir'] ?? 0).toDouble(),
               resmi: (data['laporanResmi'] ?? 0).toDouble(),
@@ -195,12 +255,24 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
             kode: kodeKelas,
             modul1: (data['modul1'] ?? 0).toDouble(),
             modul2: (data['modul2'] ?? 0).toDouble(),
+            modul3: (data['modul3'] ?? 0).toDouble(),
+            modul4: (data['modul4'] ?? 0).toDouble(),
+            modul5: (data['modul5'] ?? 0).toDouble(),
+            modul6: (data['modul6'] ?? 0).toDouble(),
+            modul7: (data['modul7'] ?? 0).toDouble(),
+            modul8: (data['modul8'] ?? 0).toDouble(),
             pretest: newPretest,
             project: newProject,
             resmi: newResmi,
             akhir: calculateNilaiAkhir(
                 (data['modul1'] ?? 0).toDouble(),
                 (data['modul2'] ?? 0).toDouble(),
+                (data['modul3'] ?? 0).toDouble(),
+                (data['modul4'] ?? 0).toDouble(),
+                (data['modul5'] ?? 0).toDouble(),
+                (data['modul6'] ?? 0).toDouble(),
+                (data['modul7'] ?? 0).toDouble(),
+                (data['modul8'] ?? 0).toDouble(),
                 newPretest,
                 newProject,
                 newResmi),
@@ -208,8 +280,18 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
             status: data['status'] ?? '',
           );
 
-          var hasil = calculateHuruf(penilaian.modul1, penilaian.modul2,
-              penilaian.pretest, penilaian.project, penilaian.resmi);
+          var hasil = calculateHuruf(
+              penilaian.modul1,
+              penilaian.modul2,
+              penilaian.modul3,
+              penilaian.modul4,
+              penilaian.modul5,
+              penilaian.modul6,
+              penilaian.modul7,
+              penilaian.modul8,
+              penilaian.pretest,
+              penilaian.project,
+              penilaian.resmi);
           penilaian.huruf = hasil['nilaiHuruf']!;
           penilaian.status = hasil['status']!;
 
@@ -219,6 +301,12 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
             'kodeKelas': penilaian.kode,
             'modul1': penilaian.modul1,
             'modul2': penilaian.modul2,
+            'modul3': penilaian.modul3,
+            'modul4': penilaian.modul4,
+            'modul5': penilaian.modul5,
+            'modul6': penilaian.modul6,
+            'modul7': penilaian.modul7,
+            'modul8': penilaian.modul8,
             'pretest': penilaian.pretest,
             'projectAkhir': penilaian.project,
             'laporanResmi': penilaian.resmi,
@@ -327,7 +415,8 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
                 height: 20.0,
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 25.0, right: 45.0),
+                padding:
+                    const EdgeInsets.only(left: 25.0, top: 5.0, right: 25.0),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -347,6 +436,7 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
                                 bottom: 30.0,
                                 left: 8.0), // Ubah left menjadi 8.0
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 const Text(
                                   'Search :',
@@ -434,6 +524,36 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
                                             fontWeight: FontWeight.bold)),
                                   ),
                                   DataColumn(
+                                    label: Text('Modul 3',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  DataColumn(
+                                    label: Text('Modul 4',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  DataColumn(
+                                    label: Text('Modul 5',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  DataColumn(
+                                    label: Text('Modul 6',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  DataColumn(
+                                    label: Text('Modul 7',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  DataColumn(
+                                    label: Text('Modul 8',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  DataColumn(
                                     label: Text('Project Akhir',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold)),
@@ -504,6 +624,36 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
                                         width: 80.0,
                                         child: Text(getLimitedText(
                                             penilaian.modul2.toString(), 5)),
+                                      )),
+                                      DataCell(SizedBox(
+                                        width: 80.0,
+                                        child: Text(getLimitedText(
+                                            penilaian.modul3.toString(), 5)),
+                                      )),
+                                      DataCell(SizedBox(
+                                        width: 80.0,
+                                        child: Text(getLimitedText(
+                                            penilaian.modul4.toString(), 5)),
+                                      )),
+                                      DataCell(SizedBox(
+                                        width: 80.0,
+                                        child: Text(getLimitedText(
+                                            penilaian.modul5.toString(), 5)),
+                                      )),
+                                      DataCell(SizedBox(
+                                        width: 80.0,
+                                        child: Text(getLimitedText(
+                                            penilaian.modul6.toString(), 5)),
+                                      )),
+                                      DataCell(SizedBox(
+                                        width: 80.0,
+                                        child: Text(getLimitedText(
+                                            penilaian.modul7.toString(), 5)),
+                                      )),
+                                      DataCell(SizedBox(
+                                        width: 80.0,
+                                        child: Text(getLimitedText(
+                                            penilaian.modul8.toString(), 5)),
                                       )),
                                       DataCell(SizedBox(
                                         width: 120.0,
@@ -727,9 +877,29 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
     );
   }
 
-  Map<String, String> calculateHuruf(double modul1, double modul2,
-      double pretest, double resmi, double project) {
-    double rataRata = (modul1 + modul2 + pretest + resmi + project) / 5;
+  Map<String, String> calculateHuruf(
+      double modul1,
+      double modul2,
+      double modul3,
+      double modul4,
+      double modul5,
+      double modul6,
+      double modul7,
+      double modul8,
+      double pretest,
+      double resmi,
+      double project) {
+    double rataRata = (modul1 * 0.08) +
+        (modul2 * 0.08) +
+        (modul3 * 0.08) +
+        (modul4 * 0.08) +
+        (modul5 * 0.08) +
+        (modul6 * 0.08) +
+        (modul7 * 0.08) +
+        (modul8 * 0.08) +
+        (pretest * 0.05) +
+        (resmi * 0.11) +
+        (project * 0.2);
     String nilaiHuruf;
     String status;
 
@@ -753,9 +923,29 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
     return {'nilaiHuruf': nilaiHuruf, 'status': status};
   }
 
-  double calculateNilaiAkhir(double modul1, double modul2, double pretest,
-      double project, double resmi) {
-    return (modul1 + modul2 + pretest + resmi + project) / 5;
+  double calculateNilaiAkhir(
+      double modul1,
+      double modul2,
+      double modul3,
+      double modul4,
+      double modul5,
+      double modul6,
+      double modul7,
+      double modul8,
+      double pretest,
+      double project,
+      double resmi) {
+    return (modul1 * 0.08) +
+        (modul2 * 0.08) +
+        (modul3 * 0.08) +
+        (modul4 * 0.08) +
+        (modul5 * 0.08) +
+        (modul6 * 0.08) +
+        (modul7 * 0.08) +
+        (modul8 * 0.08) +
+        (pretest * 0.05) +
+        (resmi * 0.11) +
+        (project * 0.2);
   }
 }
 
@@ -773,6 +963,12 @@ class PenilaianAkhir {
   final String kode;
   final double modul1;
   final double modul2;
+  final double modul3;
+  final double modul4;
+  final double modul5;
+  final double modul6;
+  final double modul7;
+  final double modul8;
   final double pretest;
   final double project;
   final double resmi;
@@ -786,6 +982,12 @@ class PenilaianAkhir {
       required this.kode,
       required this.modul1,
       required this.modul2,
+      required this.modul3,
+      required this.modul4,
+      required this.modul5,
+      required this.modul6,
+      required this.modul7,
+      required this.modul8,
       required this.pretest,
       required this.project,
       required this.resmi,

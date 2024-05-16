@@ -7,8 +7,10 @@ import '../Tabel/tabel_harian_admin.dart';
 
 class NilaiPercobaanAdmin extends StatefulWidget {
   final String kodeKelas;
+  final String matkul;
 
-  const NilaiPercobaanAdmin({Key? key, required this.kodeKelas})
+  const NilaiPercobaanAdmin(
+      {Key? key, required this.kodeKelas, required this.matkul})
       : super(key: key);
 
   @override
@@ -26,8 +28,10 @@ class _NilaiPercobaanAdminState extends State<NilaiPercobaanAdmin> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    NilaiPercobaanAdmin(kodeKelas: widget.kodeKelas)));
+                builder: (context) => NilaiPercobaanAdmin(
+                      kodeKelas: widget.kodeKelas,
+                      matkul: widget.matkul,
+                    )));
       } else if (index == 1) {
         Navigator.push(
             context,
@@ -102,6 +106,7 @@ class _NilaiPercobaanAdminState extends State<NilaiPercobaanAdmin> {
                     children: [
                       PenilaianPercobaanAdmin(
                         kodeKelas: widget.kodeKelas,
+                        matkul: widget.matkul,
                       ),
                       const SizedBox(
                         height: 20.0,

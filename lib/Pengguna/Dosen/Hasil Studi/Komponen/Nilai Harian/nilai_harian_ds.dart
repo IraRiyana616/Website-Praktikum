@@ -104,6 +104,9 @@ class _NilaiPercobaanDosenState extends State<NilaiPercobaanDosen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(
+                        height: 25.0,
+                      ),
                       PenilaianPercobaanAsisten(
                         kodeKelas: widget.kodeKelas,
                       ),

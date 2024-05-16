@@ -1,8 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../Asisten/Absensi/Form/Screen/absensi_ass.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class AbsensiPraktikan extends StatefulWidget {
   const AbsensiPraktikan({Key? key}) : super(key: key);
@@ -15,23 +20,9 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
   final TextEditingController _kodeEditingController = TextEditingController();
   final TextEditingController _modulEditingController = TextEditingController();
   String selectedAbsen = 'Status Kehadiran';
-  //== Logout akun fungsi ==
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String _fileName = "";
 
-  // Fungsi untuk logout dari akun Firebase
-  Future<void> _logout() async {
-    try {
-      await _auth.signOut();
-      // Navigasi kembali ke halaman login atau halaman lain setelah logout berhasil
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/login');
-    } catch (e) {
-      // Tangani kesalahan logout
-      if (kDebugMode) {
-        print('Error during logout: $e');
-      }
-    }
-  }
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -39,13 +30,44 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
     fetchDataFromFirestore();
   }
 
+  Future<void> _logout() async {
+    try {
+      await _auth.signOut();
+
+      Navigator.of(context).pushReplacementNamed('/login');
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error during logout: $e');
+      }
+    }
+  }
+
+  Future<void> fetchDataFromFirestore() async {
+    try {
+      String userUid = FirebaseAuth.instance.currentUser!.uid;
+      DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+          await FirebaseFirestore.instance
+              .collection('akun_mahasiswa')
+              .doc(userUid)
+              .get();
+
+      if (userSnapshot.exists) {
+        setState(() {});
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching data: $e');
+      }
+    }
+  }
+
   Future<void> saveDataToFirestore() async {
     DateTime currentDate = DateTime.now();
     String formattedDate =
         '${currentDate.year}-${currentDate.month}-${currentDate.day}';
+
     try {
       String userUid = FirebaseAuth.instance.currentUser!.uid;
-
       DocumentSnapshot<Map<String, dynamic>> userSnapshot =
           await FirebaseFirestore.instance
               .collection('akun_mahasiswa')
@@ -54,23 +76,20 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
 
       if (userSnapshot.exists) {
         int userNim = userSnapshot['nim'];
-
-        // Memeriksa apakah judulMateri sesuai dengan yang ada di Firestore
         bool isModulValid =
             await checkModulInFirestore(_modulEditingController.text);
 
         if (isModulValid) {
-          // Memeriksa apakah data dengan tanggal yang sama telah ada dalam database
           bool isDataExists = await checkDataExists(formattedDate);
           if (isDataExists) {
-            // Data dengan tanggal yang sama telah ada dalam database
-            // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text('Data telah terdapat pada database'),
               backgroundColor: Colors.red,
             ));
           } else {
-            // Data belum ada dalam database, simpan data baru
+            // Panggil fungsi untuk mengunggah file sebelum menyimpan data
+            _uploadFile();
+            // Setelah file diunggah, lanjutkan dengan menyimpan data
             Map<String, dynamic> updatedAbsenData = {
               'kodeKelas': _kodeEditingController.text,
               'judulMateri': _modulEditingController.text,
@@ -78,27 +97,14 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
               'nim': userNim,
               'tanggal': formattedDate,
               'timestamp': FieldValue.serverTimestamp(),
-              'keterangan': selectedAbsen
+              'keterangan': selectedAbsen,
+              'namaFile': _fileName,
             };
             await FirebaseFirestore.instance
                 .collection('absensiMahasiswa')
                 .add(updatedAbsenData);
-
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Data berhasil disimpan'),
-              backgroundColor: Colors.green,
-            ));
-
-            _kodeEditingController.clear();
-            _modulEditingController.clear();
-            setState(() {
-              selectedAbsen = 'Status Kehadiran';
-            });
           }
         } else {
-          // JudulMateri tidak sesuai dengan yang ada di Firestore
-          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Data tidak terdapat pada database'),
             backgroundColor: Colors.red,
@@ -116,6 +122,61 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
     }
   }
 
+  void _uploadFile() async {
+    String kodeKelas = _kodeEditingController.text;
+    String namaModul = _modulEditingController.text;
+
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      PlatformFile file = result.files.first;
+
+      try {
+        String userUid = FirebaseAuth.instance.currentUser!.uid;
+        DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+            await FirebaseFirestore.instance
+                .collection('akun_mahasiswa')
+                .doc(userUid)
+                .get();
+
+        if (userSnapshot.exists) {
+          int userNim = userSnapshot['nim'];
+
+          firebase_storage.Reference ref =
+              firebase_storage.FirebaseStorage.instance.ref().child(
+                  'Absensi Mahasiswa/$kodeKelas/$namaModul/$userNim/${file.name}');
+
+          // Upload file
+          await ref.putData(file.bytes!);
+
+          setState(() {
+            _fileName = file.name;
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('User data not found'),
+            backgroundColor: Colors.red,
+          ));
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print("Error during upload or getting download URL: $e");
+        }
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Error uploading image'),
+          backgroundColor: Colors.red,
+        ));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('No file selected'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  //== Fungsi untuk mengecheck data terdapat pada database ==//
+
   Future<bool> checkModulInFirestore(String judulMateri) async {
     try {
       QuerySnapshot<Map<String, dynamic>> modulSnapshot =
@@ -132,6 +193,7 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
       return false;
     }
   }
+  //== Fungsi kode untuk mengecheck data ==//
 
   Future<bool> checkDataExists(String formattedDate) async {
     try {
@@ -147,26 +209,6 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
         print('Error checking data existence: $e');
       }
       return false;
-    }
-  }
-
-  Future<void> fetchDataFromFirestore() async {
-    try {
-      String userUid = FirebaseAuth.instance.currentUser!.uid;
-
-      DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-          await FirebaseFirestore.instance
-              .collection('akun_mahasiswa')
-              .doc(userUid)
-              .get();
-
-      if (userSnapshot.exists) {
-        setState(() {});
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching data: $e');
-      }
     }
   }
 
@@ -222,17 +264,15 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
           )),
       body: Container(
         color: const Color(0xFFE3E8EF),
-        width: 2000,
         child: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(
-                height: 20.0,
-                width: 5.0,
+                height: 25.0,
               ),
               Container(
-                width: 1055.0,
+                width: 1075.0,
                 color: Colors.white,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,11 +291,11 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                       child: Divider(thickness: 0.5, color: Colors.grey),
                     ),
 
-                    /// KODE KELAS
+                    //== Kode Kelas ==//
                     Row(children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 300.0, top: 40.0),
-                        child: Text("Kode Kelas",
+                        padding: const EdgeInsets.only(left: 270.0, top: 40.0),
+                        child: Text("Kode Praktikum",
                             style: GoogleFonts.quicksand(
                                 fontSize: 16.0, fontWeight: FontWeight.bold)),
                       ),
@@ -263,11 +303,15 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                       Padding(
                         padding: const EdgeInsets.only(top: 40.0),
                         child: SizedBox(
-                          width: 300.0,
+                          width: 325.0,
                           child: TextField(
+                            inputFormatters: [
+                              UpperCaseTextFormatter(),
+                              LengthLimitingTextInputFormatter(6)
+                            ],
                             controller: _kodeEditingController,
                             decoration: InputDecoration(
-                                hintText: ' Masukkan Kode Kelas',
+                                hintText: ' Masukkan Kode Praktikum',
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0)),
                                 filled: true,
@@ -277,23 +321,23 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                       )
                     ]),
 
-                    /// Modul
+                    //== Nama Modul ==//
                     Row(children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 300.0, top: 10.0),
-                        child: Text("Modul",
+                        padding: const EdgeInsets.only(left: 270.0, top: 10.0),
+                        child: Text("Judul Modul",
                             style: GoogleFonts.quicksand(
                                 fontSize: 16.0, fontWeight: FontWeight.bold)),
                       ),
-                      const SizedBox(width: 68.0),
+                      const SizedBox(width: 60.0),
                       Padding(
                         padding: const EdgeInsets.only(top: 20.0),
                         child: SizedBox(
-                          width: 300.0,
+                          width: 325.0,
                           child: TextField(
                             controller: _modulEditingController,
                             decoration: InputDecoration(
-                                hintText: ' Masukkan Nama Modul',
+                                hintText: ' Masukkan Judul Modul',
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0)),
                                 filled: true,
@@ -303,19 +347,19 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                       )
                     ]),
 
-                    /// KETERANGAN
+                    //== Keterangan ==//
                     Row(children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 300.0, top: 20.0),
+                        padding: const EdgeInsets.only(left: 270.0, top: 20.0),
                         child: Text("Keterangan",
                             style: GoogleFonts.quicksand(
                                 fontSize: 16.0, fontWeight: FontWeight.bold)),
                       ),
-                      const SizedBox(width: 25.0),
+                      const SizedBox(width: 60.0),
                       Padding(
                         padding: const EdgeInsets.only(top: 20.0),
                         child: SizedBox(
-                            width: 300.0,
+                            width: 325.0,
                             child: Container(
                               height: 47.0,
                               width: 980.0,
@@ -358,12 +402,66 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                             )),
                       )
                     ]),
+                    //== Bukti Foto ==//
+                    Row(children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 270.0, top: 20.0),
+                        child: Text("Foto Absensi",
+                            style: GoogleFonts.quicksand(
+                                fontSize: 16.0, fontWeight: FontWeight.bold)),
+                      ),
+                      const SizedBox(width: 53.0),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: SizedBox(
+                          width: 325.0,
+                          child: Stack(
+                            children: [
+                              TextField(
+                                controller:
+                                    TextEditingController(text: _fileName),
+                                decoration: InputDecoration(
+                                    hintText: ' Nama File',
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0)),
+                                    filled: true,
+                                    fillColor: Colors.white),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 5.0, left: 200.0),
+                                child: SizedBox(
+                                    height: 40.0,
+                                    width: 120.0,
+                                    child: ElevatedButton(
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all<Color>(
+                                                  const Color(0xFF3CBEA9))),
+                                      onPressed: () async {
+                                        _uploadFile();
+                                        setState(() {});
+                                      },
+                                      child: Text('Upload Foto',
+                                          style: GoogleFonts.quicksand(
+                                              fontSize: 13.0,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white)),
+                                    )),
+                              )
+                            ],
+                          ),
+                        ),
+                      )
+                    ]),
 
+                    //== ElevatedButton 'SIMPAN' ==//
                     Padding(
-                      padding: const EdgeInsets.only(left: 620.0, top: 40.0),
+                      padding: const EdgeInsets.only(left: 617.0, top: 25.0),
                       child: SizedBox(
                         height: 40.0,
-                        width: 100.0,
+                        width: 130.0,
                         child: ElevatedButton(
                             style: ButtonStyle(
                                 backgroundColor:
@@ -386,7 +484,7 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                 ),
               ),
               const SizedBox(
-                height: 80.0,
+                height: 35.0,
               )
             ],
           ),
