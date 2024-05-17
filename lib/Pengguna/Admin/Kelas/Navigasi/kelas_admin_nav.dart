@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../Absensi/Screen/absensi_admin.dart';
 import '../../Evaluasi/Screen/evaluasi_admin.dart';
 import '../../Hasil Studi/Screen/hasil_studi_admin.dart';
+import '../../Jadwal Praktikum/Screen/jadwal_praktikum.dart';
 import '../../Settings/pengaturan_admin.dart';
 import '../Screen/kelas_admin.dart';
 
@@ -61,6 +62,18 @@ class _KelasAdminNavState extends State<KelasAdminNav> {
                   page: const KelasAdmin(),
                   updatePage: updatePage,
                   isActive: currentPage is KelasAdmin,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                DashboardListTile(
+                  title: 'Jadwal',
+                  icon: const Icon(
+                    Icons.calendar_month,
+                  ),
+                  page: const JadwalPraktikumAdmin(),
+                  updatePage: updatePage,
+                  isActive: currentPage is JadwalPraktikumAdmin,
                 ),
                 const SizedBox(
                   height: 20,

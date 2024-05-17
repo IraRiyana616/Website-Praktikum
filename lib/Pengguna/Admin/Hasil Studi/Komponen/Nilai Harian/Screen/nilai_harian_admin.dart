@@ -2,22 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../Navigasi/hs_admin.dart';
-import '../../Nilai Akhir/Screen/nilai_akhir_admin.dart';
-import '../Tabel/tabel_harian_admin.dart';
+import '../../Nilai Akhir/tabel_nilai_akhir_admin.dart';
+import '../Tabel/tabel_nilai_harian_admin.dart';
 
-class NilaiPercobaanAdmin extends StatefulWidget {
+class NilaiHarianAdminScreen extends StatefulWidget {
   final String kodeKelas;
-  final String matkul;
-
-  const NilaiPercobaanAdmin(
-      {Key? key, required this.kodeKelas, required this.matkul})
-      : super(key: key);
+  final String mataKuliah;
+  const NilaiHarianAdminScreen(
+      {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
-  State<NilaiPercobaanAdmin> createState() => _NilaiPercobaanAdminState();
+  State<NilaiHarianAdminScreen> createState() => _NilaiHarianAdminScreenState();
 }
 
-class _NilaiPercobaanAdminState extends State<NilaiPercobaanAdmin> {
+class _NilaiHarianAdminScreenState extends State<NilaiHarianAdminScreen> {
   //Fungsi Untuk Bottom Navigation
   int _selectedIndex = 0; // untuk mengatur index bottom navigation
   void _onItemTapped(int index) {
@@ -28,16 +26,18 @@ class _NilaiPercobaanAdminState extends State<NilaiPercobaanAdmin> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => NilaiPercobaanAdmin(
+                builder: (context) => NilaiHarianAdminScreen(
                       kodeKelas: widget.kodeKelas,
-                      matkul: widget.matkul,
+                      mataKuliah: widget.mataKuliah,
                     )));
       } else if (index == 1) {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    NilaiAkhirAdmin(kodeKelas: widget.kodeKelas)));
+                builder: (context) => TabelNilaiAkhirAdmin(
+                      kodeKelas: widget.kodeKelas,
+                      mataKuliah: widget.mataKuliah,
+                    )));
       }
     });
   }
@@ -52,10 +52,7 @@ class _NilaiPercobaanAdminState extends State<NilaiPercobaanAdmin> {
           automaticallyImplyLeading: false,
           leading: IconButton(
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const HasilStudiAdminNav()));
+              Navigator.pop(context);
             },
             icon: const Icon(
               Icons.arrow_back,
@@ -72,7 +69,7 @@ class _NilaiPercobaanAdminState extends State<NilaiPercobaanAdmin> {
                 ),
                 Expanded(
                   child: Text(
-                    'Penilaian Praktikum',
+                    widget.mataKuliah,
                     style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -104,9 +101,8 @@ class _NilaiPercobaanAdminState extends State<NilaiPercobaanAdmin> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      PenilaianPercobaanAdmin(
+                      TabelNilaiHarianAdmin(
                         kodeKelas: widget.kodeKelas,
-                        matkul: widget.matkul,
                       ),
                       const SizedBox(
                         height: 20.0,

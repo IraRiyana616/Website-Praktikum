@@ -2,33 +2,35 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Pengguna/Admin/Jadwal%20Praktikum/Form%20Jadwal/form_jadwal_praktikum_admin.dart';
+import '../../Kelas/Komponen/Deskripsi/deskripsi_admin.dart';
 
-import '../Detail/detail_evaluasi_admin.dart';
-
-class TabelEvaluasiAdmin extends StatefulWidget {
-  const TabelEvaluasiAdmin({Key? key}) : super(key: key);
+class TabelJadwalPraktikumAdmin extends StatefulWidget {
+  const TabelJadwalPraktikumAdmin({super.key});
 
   @override
-  State<TabelEvaluasiAdmin> createState() => _TabelEvaluasiAdminState();
+  State<TabelJadwalPraktikumAdmin> createState() =>
+      _TabelJadwalPraktikumAdminState();
 }
 
-class _TabelEvaluasiAdminState extends State<TabelEvaluasiAdmin> {
+class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
-
-  String selectedYear = 'Tampilkan Semua';
+  final TextEditingController _textController = TextEditingController();
+  bool _isTextFieldNotEmpty = false;
+  String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
   Future<void> fetchAvailableYears() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await FirebaseFirestore.instance.collection('dataKelas').get();
+          await FirebaseFirestore.instance.collection('jadwalPraktikum').get();
       Set<String> years = querySnapshot.docs
           .map((doc) => doc['tahunAjaran'].toString())
           .toSet();
 
       setState(() {
-        availableYears = ['Tampilkan Semua', ...years.toList()];
+        availableYears = ['Tahun Ajaran', ...years.toList()];
       });
     } catch (e) {
       if (kDebugMode) {
@@ -41,14 +43,15 @@ class _TabelEvaluasiAdminState extends State<TabelEvaluasiAdmin> {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
 
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         querySnapshot = await FirebaseFirestore.instance
-            .collection('dataKelas')
+            .collection('jadwalPraktikum')
             .where('tahunAjaran', isEqualTo: selectedYear)
             .get();
       } else {
-        querySnapshot =
-            await FirebaseFirestore.instance.collection('dataKelas').get();
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('jadwalPraktikum')
+            .get();
       }
 
       List<DataClass> data = querySnapshot.docs.map((doc) {
@@ -56,11 +59,10 @@ class _TabelEvaluasiAdminState extends State<TabelEvaluasiAdmin> {
         return DataClass(
           id: doc.id,
           kelas: data['kodeKelas'],
-          asisten: data['kodeAsisten'],
           tahun: data['tahunAjaran'],
           matkul: data['mataKuliah'],
-          dosenpengampu: data['dosenPengampu'],
-          dosenpengampu2: data['dosenPengampu2'],
+          jadwal: data['hariPraktikum'],
+          waktu: data['waktuPraktikum'],
         );
       }).toList();
       setState(() {
@@ -77,7 +79,7 @@ class _TabelEvaluasiAdminState extends State<TabelEvaluasiAdmin> {
   @override
   void initState() {
     super.initState();
-
+    _textController.addListener(_onTextChanged);
     fetchAvailableYears().then((_) {
       fetchDataFromFirebase(selectedYear);
     });
@@ -87,12 +89,27 @@ class _TabelEvaluasiAdminState extends State<TabelEvaluasiAdmin> {
     await fetchDataFromFirebase(selectedYear);
   }
 
+  void _onTextChanged() {
+    setState(() {
+      _isTextFieldNotEmpty = _textController.text.isNotEmpty;
+      filterData(_textController.text);
+    });
+  }
+
   void filterData(String query) {
     setState(() {
       filteredClassData = demoClassData
           .where((data) =>
-              (data.tahun.toLowerCase().contains(query.toLowerCase())))
+              (data.jadwal.toLowerCase().contains(query.toLowerCase()) ||
+                  data.matkul.toLowerCase().contains(query.toLowerCase())))
           .toList();
+    });
+  }
+
+  void clearSearchField() {
+    setState(() {
+      _textController.clear();
+      filterData('');
     });
   }
 
@@ -113,7 +130,7 @@ class _TabelEvaluasiAdminState extends State<TabelEvaluasiAdmin> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Evaluasi Praktikum',
+            child: Text('Data Jadwal Praktikum',
                 style: GoogleFonts.quicksand(
                     fontSize: 18, fontWeight: FontWeight.bold)),
           ),
@@ -158,6 +175,92 @@ class _TabelEvaluasiAdminState extends State<TabelEvaluasiAdmin> {
                     ),
                   ),
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, left: 25.0),
+                      child: SizedBox(
+                        width: 300.0,
+                        height: 35.0,
+                        child: Row(
+                          children: [
+                            const Text("Search :",
+                                style: TextStyle(fontSize: 16)),
+                            const SizedBox(width: 10.0),
+                            Expanded(
+                              child: TextField(
+                                onChanged: (value) {
+                                  filterData(value);
+                                },
+                                controller: _textController,
+                                decoration: InputDecoration(
+                                  hintText: '',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 10),
+                                  suffixIcon: Visibility(
+                                    visible: _isTextFieldNotEmpty,
+                                    child: IconButton(
+                                      onPressed: clearSearchField,
+                                      icon: const Icon(Icons.clear),
+                                    ),
+                                  ),
+                                  labelStyle: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 27.0),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 25.0, top: 10.0),
+                      child: SizedBox(
+                        height: 40.0,
+                        width: 170.0,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF3CBEA9),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const FormJadwalPraktikumAdmin(),
+                              ),
+                            );
+                          },
+                          child: const Hero(
+                            tag: "Tambah Jadwal",
+                            child: Material(
+                              color: Colors.transparent,
+                              child: Text(
+                                "+ Tambah Jadwal",
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
                 Padding(
                   padding: const EdgeInsets.only(left: 18.0, right: 25.0),
                   child: SizedBox(
@@ -174,24 +277,25 @@ class _TabelEvaluasiAdminState extends State<TabelEvaluasiAdmin> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "MataKuliah",
+                                  "Matakuliah",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Dosen Pengampu 1",
+                                  "Hari Praktikum",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Dosen Pengampu 2",
+                                  "Waktu Praktikum",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ],
-                            source: DataSource(filteredClassData, context),
+                            source: DataSource(
+                                filteredClassData, deleteData, context),
                             rowsPerPage:
                                 calculateRowsPerPage(filteredClassData.length),
                           )
@@ -223,28 +327,42 @@ class _TabelEvaluasiAdminState extends State<TabelEvaluasiAdmin> {
       return defaultRowsPerPage;
     }
   }
+
+  void deleteData(String id) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('jadwalPraktikum')
+          .doc(id)
+          .delete();
+      fetchDataFromFirebase(selectedYear);
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error deleting data: $error');
+      }
+    }
+  }
 }
 
 class DataClass {
   String id;
   String kelas;
-  String asisten;
+  String jadwal;
+  String waktu; // Updated from Timestamp to String
   String tahun;
   String matkul;
-  String dosenpengampu;
-  String dosenpengampu2;
+
   DataClass({
     required this.id,
     required this.kelas,
-    required this.asisten,
+    required this.jadwal,
+    required this.waktu, // Updated from Timestamp to String
     required this.tahun,
     required this.matkul,
-    required this.dosenpengampu,
-    required this.dosenpengampu2,
   });
 }
 
-DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
+DataRow dataFileDataRow(DataClass fileInfo, int index,
+    Function(String) onDelete, BuildContext context) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -252,12 +370,10 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
-      DataCell(
-        Text(fileInfo.kelas),
-      ),
+      DataCell(SizedBox(width: 115.0, child: Text(fileInfo.kelas))),
       DataCell(
         SizedBox(
-          width: 170.0,
+          width: 185.0,
           child: Text(
             fileInfo.matkul,
             style: TextStyle(
@@ -266,86 +382,35 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
             ),
           ),
         ),
-        onTap: () async {
-          bool exists = await checkKodeKelasExist(fileInfo.kelas);
-          if (exists) {
-            // ignore: use_build_context_synchronously
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    PieChartNilaiHurufAdmin(kodeKelas: fileInfo.kelas),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DeskripsiKelasAdmin(
+                kodeKelas: fileInfo.kelas,
               ),
-            );
-          } else {
-            // ignore: use_build_context_synchronously
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                content: SizedBox(
-                  height: 195.0,
-                  width: 300.0,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                          width: 150.0,
-                          height: 150.0,
-                          child: Image.asset(
-                            'assets/images/9169206.jpg',
-                            fit: BoxFit.cover,
-                          )),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20.0),
-                        child: Text(
-                          'Masukkan data evaluasi terlebih dahulu',
-                          style: GoogleFonts.quicksand(
-                              fontSize: 15.0, fontWeight: FontWeight.bold),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                //const Text('Kode kelas tidak ditemukan.'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              ),
-            );
-          }
+            ),
+          );
         },
       ),
       DataCell(
         SizedBox(
-          width: 220.0,
+          width: 195.0,
           child: Text(
-            getLimitedText(fileInfo.dosenpengampu, 30),
+            getLimitedText(fileInfo.jadwal, 6),
           ),
         ),
       ),
       DataCell(
         SizedBox(
-          width: 220.0,
+          width: 195.0,
           child: Text(
-            getLimitedText(fileInfo.dosenpengampu2, 30),
+            getLimitedText(fileInfo.waktu, 30),
           ),
         ),
       ),
     ],
   );
-}
-
-Future<bool> checkKodeKelasExist(String kelas) async {
-  QuerySnapshot snapshot = await FirebaseFirestore.instance
-      .collection('dataEvaluasi')
-      .where('kodeKelas', isEqualTo: kelas)
-      .get();
-
-  return snapshot.docs.isNotEmpty;
 }
 
 String getLimitedText(String text, int limit) {
@@ -358,10 +423,10 @@ Color getRowColor(int index) {
 
 class DataSource extends DataTableSource {
   final List<DataClass> data;
-
+  final Function(String) onDelete;
   final BuildContext context;
 
-  DataSource(this.data, this.context);
+  DataSource(this.data, this.onDelete, this.context);
 
   @override
   DataRow? getRow(int index) {
@@ -369,7 +434,7 @@ class DataSource extends DataTableSource {
       return null;
     }
     final fileInfo = data[index];
-    return dataFileDataRow(fileInfo, index, context);
+    return dataFileDataRow(fileInfo, index, onDelete, context);
   }
 
   @override

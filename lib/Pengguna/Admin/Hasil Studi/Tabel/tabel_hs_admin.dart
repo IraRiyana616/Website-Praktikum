@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../Dosen/Hasil Studi/Komponen/Nilai Harian/nilai_harian_ds.dart';
+import '../Komponen/Nilai Harian/Screen/nilai_harian_admin.dart';
 
 class TabelHasilStudiAdmin extends StatefulWidget {
   const TabelHasilStudiAdmin({Key? key}) : super(key: key);
@@ -263,9 +264,9 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => NilaiPercobaanDosen(
+                builder: (context) => NilaiHarianAdminScreen(
                       kodeKelas: fileInfo.kelas,
-                      matkul: fileInfo.matkul,
+                      mataKuliah: fileInfo.matkul,
                     )));
       }),
       DataCell(

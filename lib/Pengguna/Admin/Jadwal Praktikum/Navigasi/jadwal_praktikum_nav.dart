@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:laksi/Pengguna/Admin/Jadwal%20Praktikum/Screen/jadwal_praktikum.dart';
+
 import '../../Absensi/Screen/absensi_admin.dart';
 import '../../Evaluasi/Screen/evaluasi_admin.dart';
 import '../../Hasil Studi/Screen/hasil_studi_admin.dart';
-import '../../Jadwal Praktikum/Screen/jadwal_praktikum.dart';
 import '../../Kelas/Screen/kelas_admin.dart';
 import '../../Settings/pengaturan_admin.dart';
 
-class HasilStudiAdminNav extends StatefulWidget {
-  const HasilStudiAdminNav({super.key});
+class JadwalPraktikumNav extends StatefulWidget {
+  const JadwalPraktikumNav({super.key});
 
   @override
-  State<HasilStudiAdminNav> createState() => _HasilStudiAdminNavState();
+  State<JadwalPraktikumNav> createState() => _JadwalPraktikumNavState();
 }
 
-class _HasilStudiAdminNavState extends State<HasilStudiAdminNav> {
-  Widget currentPage = const HasilStudiAdmin();
+class _JadwalPraktikumNavState extends State<JadwalPraktikumNav> {
+  Widget currentPage = const JadwalPraktikumAdmin();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
