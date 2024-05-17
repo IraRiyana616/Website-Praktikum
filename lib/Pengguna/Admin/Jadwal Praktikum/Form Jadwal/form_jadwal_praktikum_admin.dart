@@ -5,11 +5,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 import '../../../Mahasiswa/Asisten/Absensi/Form/Screen/absensi_ass.dart';
 
 class FormJadwalPraktikumAdmin extends StatefulWidget {
-  const FormJadwalPraktikumAdmin({super.key});
+  const FormJadwalPraktikumAdmin({Key? key}) : super(key: key);
 
   @override
   State<FormJadwalPraktikumAdmin> createState() =>
@@ -22,12 +23,12 @@ class _FormJadwalPraktikumAdminState extends State<FormJadwalPraktikumAdmin> {
   TextEditingController mataKuliahController = TextEditingController();
   TextEditingController waktuPraktikumController = TextEditingController();
   TextEditingController tahunAjaranController = TextEditingController();
+  TextEditingController semesterController = TextEditingController();
 
   //== Koleksi dari Database ==//
-  final CollectionReference _dataJadwalCollection =
-      FirebaseFirestore.instance.collection('jadwalPraktikum');
 
-  Future<void> _saveDataToFirestore(Map<String, dynamic> data) async {
+  Future<void> _saveDataToFirestore(
+      BuildContext context, Map<String, dynamic> data) async {
     try {
       //== Validasi untuk Memastikan Tidak Ada TextField yang Kosong ==//
       if (kodeKelasController.text.isEmpty ||
@@ -43,13 +44,13 @@ class _FormJadwalPraktikumAdminState extends State<FormJadwalPraktikumAdmin> {
         ));
       } else {
         //== Cek apakah kodeKelas terdapat dalam database dataKelas ==//
-        var kodeKelasExists = await FirebaseFirestore.instance
+        var kodeKelasSnapshot = await FirebaseFirestore.instance
             .collection('dataKelas')
-            .doc(kodeKelasController.text)
+            .where('kodeKelas', isEqualTo: kodeKelasController.text)
             .get();
 
-        if (!kodeKelasExists.exists) {
-          //== Tampilkan Pesan Kesalahan Jika kodeKelas tidak ditemukan di database ==
+        if (kodeKelasSnapshot.docs.isEmpty) {
+          //== Tampilkan Pesan Kesalahan Jika kodeKelas tidak ditemukan di database ==//
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Kode praktikum tidak terdapat pada database'),
             backgroundColor: Colors.red,
@@ -57,9 +58,11 @@ class _FormJadwalPraktikumAdminState extends State<FormJadwalPraktikumAdmin> {
           ));
         } else {
           //== Validasi untuk Memastikan Tidak Ada Data yang Sama Pada Kode Kelas yang Sama.
-          var existingData = await _dataJadwalCollection
+          var existingData = await FirebaseFirestore.instance
+              .collection('dataJadwalPraktikum')
               .where('kodeKelas', isEqualTo: kodeKelasController.text)
               .get();
+
           if (existingData.docs.isNotEmpty) {
             //== Tampilkan Pesan Kesalahan Jika Data Sudah Ada di Database
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -69,7 +72,9 @@ class _FormJadwalPraktikumAdminState extends State<FormJadwalPraktikumAdmin> {
             ));
           } else {
             //== Jika Tidak Ada Kesalahan, Simpan Data ke Firestore
-            await _dataJadwalCollection.add(data);
+            await FirebaseFirestore.instance
+                .collection('dataJadwalPraktikum')
+                .add(data);
             //== Tampilkan Pesan Sukses ==//
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text('Data berhasil disimpan'),
@@ -84,6 +89,7 @@ class _FormJadwalPraktikumAdminState extends State<FormJadwalPraktikumAdmin> {
             });
             waktuPraktikumController.clear();
             tahunAjaranController.clear();
+            semesterController.clear();
           }
         }
       }
@@ -105,15 +111,48 @@ class _FormJadwalPraktikumAdminState extends State<FormJadwalPraktikumAdmin> {
     'Jum\'at'
   ];
   //== Memilih Waktu ==//
-  Future<void> _selectTime(BuildContext context) async {
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
+  Future<void> _selectTime(BuildContext context,
+      {required bool isStartTime}) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: isStartTime
+          ? (startTime ?? TimeOfDay.now())
+          : (endTime ?? TimeOfDay.now()),
     );
+
     if (picked != null) {
       setState(() {
-        waktuPraktikumController.text = picked.format(context);
+        if (isStartTime) {
+          startTime = picked;
+        } else {
+          endTime = picked;
+        }
+        _updateTimeText();
       });
+    }
+  }
+
+  void _updateTimeText() {
+    if (startTime != null && endTime != null) {
+      final format = DateFormat('hh:mm a');
+      final startTimeFormatted = format.format(DateTime(
+        0,
+        0,
+        0,
+        startTime!.hour,
+        startTime!.minute,
+      ));
+      final endTimeFormatted = format.format(DateTime(
+        0,
+        0,
+        0,
+        endTime!.hour,
+        endTime!.minute,
+      ));
+
+      waktuPraktikumController.text = '$startTimeFormatted - $endTimeFormatted';
     }
   }
 
@@ -314,42 +353,6 @@ class _FormJadwalPraktikumAdminState extends State<FormJadwalPraktikumAdmin> {
                                               fillColor: Colors.white),
                                         )),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 30.0, left: 70.0),
-                                    child: SizedBox(
-                                      height: 40.0,
-                                      width: 130.0,
-                                      child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  const Color(0xFF3CBEA9)),
-                                          onPressed: () {
-                                            _saveDataToFirestore({
-                                              'kodeKelas':
-                                                  kodeKelasController.text,
-                                              'mataKuliah':
-                                                  mataKuliahController.text,
-                                              'hariPraktikum': selectedDay,
-                                              'waktuPraktikum':
-                                                  waktuPraktikumController.text,
-                                              'tahunAjaran':
-                                                  tahunAjaranController.text
-                                            });
-                                            kodeKelasController.clear();
-                                            mataKuliahController.clear();
-                                            setState(() {
-                                              selectedDay = null;
-                                            });
-                                            waktuPraktikumController.clear();
-                                            tahunAjaranController.clear();
-                                          },
-                                          child: Text('Simpan Data',
-                                              style: GoogleFonts.quicksand(
-                                                  fontWeight:
-                                                      FontWeight.bold))),
-                                    ),
-                                  )
                                 ],
                               ),
                             ),
@@ -376,31 +379,60 @@ class _FormJadwalPraktikumAdminState extends State<FormJadwalPraktikumAdmin> {
                                       padding: const EdgeInsets.only(
                                           right: 70.0, left: 30.0),
                                       child: SizedBox(
-                                        width: 430.0,
-                                        child: TextField(
-                                          controller: waktuPraktikumController,
-                                          readOnly: true,
-                                          decoration: InputDecoration(
-                                            hintText: 'Pilih Waktu Praktikum',
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
-                                            ),
-                                            filled: true,
-                                            fillColor: Colors.white,
-                                            suffixIcon: IconButton(
-                                              icon:
-                                                  const Icon(Icons.access_time),
-                                              onPressed: () {
-                                                _selectTime(context);
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                          width: 430.0,
+                                          child: TextField(
+                                              readOnly: true,
+                                              controller:
+                                                  waktuPraktikumController,
+                                              decoration: InputDecoration(
+                                                  hintText:
+                                                      'Masukkan Waktu Praktikum',
+                                                  border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10.0)),
+                                                  filled: true,
+                                                  fillColor: Colors.white,
+                                                  suffixIcon: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                            Icons.access_time),
+                                                        onPressed: () =>
+                                                            _selectTime(context,
+                                                                isStartTime:
+                                                                    true),
+                                                        tooltip: 'Waktu Awal',
+                                                      ),
+                                                      const Padding(
+                                                        padding: EdgeInsets.all(
+                                                            10.0),
+                                                        child: Text(
+                                                          '-',
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Colors.grey),
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                            Icons.access_time),
+                                                        onPressed: () =>
+                                                            _selectTime(context,
+                                                                isStartTime:
+                                                                    false),
+                                                        tooltip:
+                                                            'Waktu Berakhir',
+                                                      ),
+                                                    ],
+                                                  )))),
                                     ),
                                     //== Tahun Ajaran ==//
-                                    //== Waktu Praktikum ==//
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           left: 30.0, top: 15.0),
@@ -430,6 +462,82 @@ class _FormJadwalPraktikumAdminState extends State<FormJadwalPraktikumAdmin> {
                                         ),
                                       ),
                                     ),
+                                    //== Semester ==//
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 30.0, top: 15.0),
+                                      child: Text('Semester',
+                                          style: GoogleFonts.quicksand(
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
+                                    const SizedBox(
+                                      height: 15.0,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          right: 70.0, left: 30.0),
+                                      child: SizedBox(
+                                        width: 430.0,
+                                        child: TextField(
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [
+                                            LengthLimitingTextInputFormatter(2),
+                                          ],
+                                          controller: semesterController,
+                                          decoration: InputDecoration(
+                                              hintText: 'Masukkan Semester',
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0)),
+                                              filled: true,
+                                              fillColor: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 30.0, left: 320.0),
+                                      child: SizedBox(
+                                        height: 40.0,
+                                        width: 130.0,
+                                        child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    const Color(0xFF3CBEA9)),
+                                            onPressed: () {
+                                              int semester;
+                                              try {
+                                                semester = int.parse(
+                                                    semesterController.text);
+                                              } catch (e) {
+                                                // Penanganan jika input bukan angka
+                                                if (kDebugMode) {
+                                                  print('Input tidak valid');
+                                                }
+                                                return;
+                                              }
+                                              _saveDataToFirestore(context, {
+                                                'kodeKelas':
+                                                    kodeKelasController.text,
+                                                'mataKuliah':
+                                                    mataKuliahController.text,
+                                                'hariPraktikum': selectedDay,
+                                                'waktuPraktikum':
+                                                    waktuPraktikumController
+                                                        .text,
+                                                'tahunAjaran':
+                                                    tahunAjaranController.text,
+                                                'semester': semester,
+                                              });
+                                            },
+                                            child: Text('Simpan Data',
+                                                style: GoogleFonts.quicksand(
+                                                    fontWeight:
+                                                        FontWeight.bold))),
+                                      ),
+                                    )
                                   ],
                                 ))
                           ],
