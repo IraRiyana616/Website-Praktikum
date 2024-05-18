@@ -1,12 +1,13 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../Navigation/kelas_assnav.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:intl/intl.dart';
+
 import '../../Deskripsi/form_deskripsi.dart';
-import '../Laporan/form_laporan.dart';
-import '../Tugas/form_tugas.dart';
 
 class FormPengumpulanLatihan extends StatefulWidget {
   final String kodeKelas;
@@ -167,8 +168,12 @@ class _FormPengumpulanLatihanState extends State<FormPengumpulanLatihan> {
         picked.minute,
       );
 
+      // Format tanggal dan waktu menggunakan intl
+      String formattedDateTime =
+          DateFormat('d MMMM y, hh:mm a', 'id_ID').format(selectedDateTime);
+
       setState(() {
-        controller.text = selectedDateTime.toString();
+        controller.text = formattedDateTime;
       });
     }
   }
@@ -209,6 +214,39 @@ class _FormPengumpulanLatihanState extends State<FormPengumpulanLatihan> {
       if (kDebugMode) {
         print('Error fetching nama mahasiswa: $e');
       }
+    }
+  }
+
+  //== Fungsi Untuk Upload File ==//
+  String _fileName = "";
+  void _uploadFile() async {
+    //== Upload file to Firebase Storage ==//
+    String kodeKelas = widget.kodeKelas;
+
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      PlatformFile file = result.files.first;
+
+      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('$kodeKelas/${file.name}');
+
+      try {
+        //== Upload file ==//
+        await ref.putData(file.bytes!);
+        setState(() {
+          _fileName = file.name;
+        });
+      } catch (e) {
+        // Handle error during upload or getting download URL
+        if (kDebugMode) {
+          print("Error during upload or getting download URL: $e");
+        }
+        // Show error message or snackbar
+      }
+    } else {
+      // Show error message or snackbar
     }
   }
 
@@ -283,20 +321,23 @@ class _FormPengumpulanLatihanState extends State<FormPengumpulanLatihan> {
                           Padding(
                             padding:
                                 const EdgeInsets.only(top: 38.0, left: 95.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            FormDeskripsiKelas(
-                                                kodeKelas: widget.kodeKelas,
-                                                mataKuliah:
-                                                    widget.mataKuliah)));
-                              },
-                              child: Text(
-                                'Deskripsi Kelas',
-                                style: GoogleFonts.quicksand(fontSize: 16.0),
+                            child: MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              FormDeskripsiKelas(
+                                                  kodeKelas: widget.kodeKelas,
+                                                  mataKuliah:
+                                                      widget.mataKuliah)));
+                                },
+                                child: Text(
+                                  'Deskripsi Kelas',
+                                  style: GoogleFonts.quicksand(fontSize: 16.0),
+                                ),
                               ),
                             ),
                           ),
@@ -338,7 +379,7 @@ class _FormPengumpulanLatihanState extends State<FormPengumpulanLatihan> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            //Judul Modul
+                                            //== Judul Modul ==//
                                             Text(
                                               'Judul Modul',
                                               style: GoogleFonts.quicksand(
@@ -368,11 +409,86 @@ class _FormPengumpulanLatihanState extends State<FormPengumpulanLatihan> {
                                                 ),
                                               ),
                                             ),
+                                            //== Upload File ==//
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 15.0),
+                                              child: Text(
+                                                'Upload File',
+                                                style: GoogleFonts.quicksand(
+                                                  fontSize: 20.0,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 20.0),
+                                              child: SizedBox(
+                                                width: 580.0,
+                                                child: Stack(
+                                                  children: [
+                                                    TextField(
+                                                      decoration:
+                                                          InputDecoration(
+                                                        hintText:
+                                                            'Nama File Modul',
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      10.0),
+                                                        ),
+                                                        filled: true,
+                                                        fillColor: Colors.white,
+                                                      ),
+                                                      controller:
+                                                          TextEditingController(
+                                                              text: _fileName),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 5.0,
+                                                              left: 455.0),
+                                                      child: SizedBox(
+                                                        height: 40.0,
+                                                        width: 120.0,
+                                                        child: ElevatedButton(
+                                                          style: ButtonStyle(
+                                                            backgroundColor:
+                                                                MaterialStateProperty.all<
+                                                                        Color>(
+                                                                    const Color(
+                                                                        0xFF3CBEA9)),
+                                                          ),
+                                                          onPressed: () async {
+                                                            _uploadFile();
+                                                            setState(() {});
+                                                          },
+                                                          child: Text(
+                                                            'Upload File',
+                                                            style: GoogleFonts
+                                                                .quicksand(
+                                                              fontSize: 13,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
-
-                                      // Judul Modul
                                       Padding(
                                         padding: const EdgeInsets.only(
                                             top: 20.0, left: 40.0),

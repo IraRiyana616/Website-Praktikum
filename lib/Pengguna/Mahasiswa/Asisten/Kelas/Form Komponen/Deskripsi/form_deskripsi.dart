@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import '../../Navigation/kelas_assnav.dart';
 import '../Pengumpulan/Latihan/form_latihan.dart';
 
@@ -126,6 +128,10 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
 
   //== Fungsi untuk database SilabusPraktikum ==//
   final TextEditingController _judulMateriController = TextEditingController();
+  final TextEditingController _waktuPraktikumController =
+      TextEditingController();
+  final TextEditingController _tanggalPraktikumController =
+      TextEditingController();
   String _fileName = "";
 
   void _saveSilabus() async {
@@ -134,6 +140,8 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
         firestore.collection('silabusPraktikum');
 
     String judulMateri = _judulMateriController.text;
+    String tanggalPraktikum = _tanggalPraktikumController.text;
+    String waktuPraktikum = _waktuPraktikumController.text;
     String modulPraktikum = _fileName;
 
     if (judulMateri.isEmpty || modulPraktikum.isEmpty) {
@@ -182,6 +190,8 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
       'kodeKelas': widget.kodeKelas,
       'judulMateri': judulMateri,
       'modulPraktikum': modulPraktikum,
+      'tanggalPraktikum': tanggalPraktikum,
+      'waktuPraktikum': waktuPraktikum
     });
 
     // ignore: use_build_context_synchronously
@@ -197,6 +207,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
     });
   }
 
+//== Fungsi Untuk Upload File ==//
   void _uploadFile() async {
     //== Upload file to Firebase Storage ==//
     String kodeKelas = widget.kodeKelas;
@@ -264,6 +275,75 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
       if (kDebugMode) {
         print('Error fetching nama mahasiswa: $e');
       }
+    }
+  }
+
+  //== Memilih Waktu ==//
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
+  Future<void> _selectTime(BuildContext context,
+      {required bool isStartTime}) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: isStartTime
+          ? (startTime ?? TimeOfDay.now())
+          : (endTime ?? TimeOfDay.now()),
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isStartTime) {
+          startTime = picked;
+        } else {
+          endTime = picked;
+        }
+        _updateTimeText();
+      });
+    }
+  }
+
+  void _updateTimeText() {
+    if (startTime != null && endTime != null) {
+      final format = DateFormat('hh:mm a');
+      final startTimeFormatted = format.format(DateTime(
+        0,
+        0,
+        0,
+        startTime!.hour,
+        startTime!.minute,
+      ));
+      final endTimeFormatted = format.format(DateTime(
+        0,
+        0,
+        0,
+        endTime!.hour,
+        endTime!.minute,
+      ));
+
+      _waktuPraktikumController.text =
+          '$startTimeFormatted - $endTimeFormatted';
+    }
+  }
+
+  //== Memilih Tanggal ==//
+  DateTime? selectedDate;
+  Future<void> _selectDate(BuildContext context) async {
+    // Initialize the locale for Indonesian
+    await initializeDateFormatting('id', null);
+
+    // ignore: use_build_context_synchronously
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        _tanggalPraktikumController.text =
+            DateFormat('EEEE, dd MMMM yyyy', 'id').format(picked);
+      });
     }
   }
 
@@ -361,7 +441,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                               ),
                             ),
 
-                            //Pengumpulan
+                            //== Pengumpulan ==//
                             Padding(
                               padding:
                                   const EdgeInsets.only(left: 50.0, top: 38.0),
@@ -674,21 +754,8 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                                                   ),
                                                 ),
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 70.0),
-                                        child: Container(
-                                          color: Colors.white,
-                                          width: 526.0,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              //== Upload Modul ==//
+                                              //== Upload File ==//
+
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     top: 20.0),
@@ -700,6 +767,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                                                   ),
                                                 ),
                                               ),
+
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     top: 20.0),
@@ -769,6 +837,131 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
                                                   ),
                                                 ),
                                               ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 70.0),
+                                        child: Container(
+                                          color: Colors.white,
+                                          width: 526.0,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              //== Tanggal Praktikum ==//
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 20.0),
+                                                child: Text(
+                                                  'Tanggal Praktikum',
+                                                  style: GoogleFonts.quicksand(
+                                                    fontSize: 20.0,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 20.0),
+                                                child: SizedBox(
+                                                  width: 600.0,
+                                                  child: TextField(
+                                                    readOnly: true,
+                                                    controller:
+                                                        _tanggalPraktikumController,
+                                                    decoration: InputDecoration(
+                                                        hintText:
+                                                            'Masukkan Tanggal Praktikum',
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      10.0),
+                                                        ),
+                                                        filled: true,
+                                                        fillColor: Colors.white,
+                                                        suffixIcon: IconButton(
+                                                            onPressed: () =>
+                                                                _selectDate(
+                                                                    context),
+                                                            icon: const Icon(Icons
+                                                                .calendar_month))),
+                                                  ),
+                                                ),
+                                              ),
+
+                                              //== Waktu Praktikum ==//
+
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 20.0),
+                                                child: Text(
+                                                  'Waktu Praktikum',
+                                                  style: GoogleFonts.quicksand(
+                                                    fontSize: 20.0,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 20.0),
+                                                child: SizedBox(
+                                                    width: 600.0,
+                                                    child: TextField(
+                                                        readOnly: true,
+                                                        controller:
+                                                            _waktuPraktikumController,
+                                                        decoration:
+                                                            InputDecoration(
+                                                                hintText:
+                                                                    'Masukkan Waktu Praktikum',
+                                                                border: OutlineInputBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10.0)),
+                                                                filled: true,
+                                                                fillColor:
+                                                                    Colors
+                                                                        .white,
+                                                                suffixIcon: Row(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .min,
+                                                                    children: [
+                                                                      IconButton(
+                                                                        onPressed: () => _selectTime(
+                                                                            context,
+                                                                            isStartTime:
+                                                                                true),
+                                                                        icon: const Icon(
+                                                                            Icons.access_time),
+                                                                        tooltip:
+                                                                            'Waktu Awal',
+                                                                      ),
+                                                                      const Padding(
+                                                                          padding: EdgeInsets.all(
+                                                                              10.0),
+                                                                          child: Text(
+                                                                              '-',
+                                                                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
+                                                                      IconButton(
+                                                                          onPressed: () => _selectTime(
+                                                                              context,
+                                                                              isStartTime:
+                                                                                  false),
+                                                                          icon: const Icon(Icons
+                                                                              .access_time),
+                                                                          tooltip:
+                                                                              'Waktu Berakhir')
+                                                                    ])))),
+                                              ),
+                                              //== ElevatedButton 'SIMPAN DATA' ==//
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     left: 370.0, top: 30.0),
