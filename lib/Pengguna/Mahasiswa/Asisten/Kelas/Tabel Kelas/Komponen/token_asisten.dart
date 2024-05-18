@@ -148,7 +148,7 @@ class _TokenAsistenState extends State<TokenAsisten> {
               children: [
                 Expanded(
                   child: Text(
-                    "Token Kelas",
+                    "Token Praktikum Asisten",
                     style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -156,28 +156,6 @@ class _TokenAsistenState extends State<TokenAsisten> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  width: 750.0,
-                ),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.logout,
-                      color: Color(0xFF031F31),
-                    )),
-                const SizedBox(
-                  width: 10.0,
-                ),
-                Text(
-                  'Log out',
-                  style: GoogleFonts.quicksand(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF031F31)),
-                ),
-                const SizedBox(
-                  width: 50.0,
-                )
               ],
             ),
           ),
@@ -206,7 +184,7 @@ class _TokenAsistenState extends State<TokenAsisten> {
                       Padding(
                         padding: const EdgeInsets.only(top: 30.0, left: 50.0),
                         child: Text(
-                          "Kode Kelas Asisten",
+                          "Kode Praktikum Asisten",
                           style: GoogleFonts.quicksand(
                             fontWeight: FontWeight.bold,
                             fontSize: 18.0,

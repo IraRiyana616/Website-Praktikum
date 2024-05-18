@@ -266,6 +266,7 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
                 // Fetch data ulang setelah update
                 fetchDataFromFirebase(selectedYear);
 
+                // ignore: use_build_context_synchronously
                 Navigator.of(context).pop();
               },
               child: const Text("Simpan"),

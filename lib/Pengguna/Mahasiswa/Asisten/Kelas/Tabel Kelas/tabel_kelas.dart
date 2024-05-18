@@ -16,13 +16,36 @@ class TabelKelasAsisten extends StatefulWidget {
 }
 
 class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
+  //== List Tabel ==//
   List<DataKelas> demoDataKelas = [];
   List<DataKelas> filteredDataKelas = [];
 
   //== Dropdown Button Tahun Ajaran ==
-  String selectedYear = 'Tampilkan Semua';
+  String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
+  //== Fungsi Controller pada Search ==//
+  final TextEditingController textController = TextEditingController();
+  bool _isTextFieldNotEmpty = false;
+
+  //== Fungsi dari Filtering Search ==//
+  void filterData(String query) {
+    setState(() {
+      filteredDataKelas = demoDataKelas
+          .where((data) =>
+              (data.matkul.toLowerCase().contains(query.toLowerCase())))
+          .toList();
+    });
+  }
+
+  void clearSearchField() {
+    setState(() {
+      textController.clear();
+      filterData('');
+    });
+  }
+
+//== Fungsi dari Authentikasi ==//
   String nim = '';
   User? user = FirebaseAuth.instance.currentUser;
 
@@ -45,7 +68,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
               .map((doc) => doc['tahunAjaran'].toString())
               .toSet();
           setState(() {
-            availableYears = ['Tampilkan Semua', ...years.toList()];
+            availableYears = ['Tahun Ajaran', ...years.toList()];
           });
         }
       }
@@ -59,7 +82,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
   Future<void> fetchDataFromFirebase(String? selectedYear) async {
     try {
       QuerySnapshot<Map<String, dynamic>> tokenQuerySnapshot;
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         tokenQuerySnapshot = await FirebaseFirestore.instance
             .collection('tokenAsisten')
             .where('tahunAjaran', isEqualTo: selectedYear)
@@ -111,12 +134,10 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
     await fetchDataFromFirebase(selectedYear);
   }
 
-  void filterData(String query) {
+  void _onTextChanged() {
     setState(() {
-      filteredDataKelas = demoDataKelas
-          .where((data) =>
-              (data.tahun.toLowerCase().contains(query.toLowerCase())))
-          .toList();
+      _isTextFieldNotEmpty = textController.text.isNotEmpty;
+      filterData(textController.text);
     });
   }
 
@@ -149,7 +170,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                   padding: const EdgeInsets.only(bottom: 15.0, left: 0.0),
                   child: Container(
                     height: 47.0,
-                    width: 1000.0,
+                    width: 1020.0,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
@@ -183,13 +204,56 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                   ),
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    //== Search ==//
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, left: 25.0),
+                      child: SizedBox(
+                        width: 300.0,
+                        height: 35.0,
+                        child: Row(children: [
+                          const Text(
+                            'Search :',
+                            style: TextStyle(fontSize: 16.0),
+                          ),
+                          const SizedBox(
+                            width: 10.0,
+                          ),
+                          Expanded(
+                              child: TextField(
+                            onChanged: (value) {
+                              filterData(value);
+                            },
+                            controller: textController,
+                            decoration: InputDecoration(
+                                hintText: '',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 10.0),
+                                suffixIcon: Visibility(
+                                    visible: _isTextFieldNotEmpty,
+                                    child: IconButton(
+                                        onPressed: clearSearchField,
+                                        icon: const Icon(Icons.clear))),
+                                labelStyle: const TextStyle(fontSize: 16.0),
+                                filled: true,
+                                fillColor: Colors.white),
+                          )),
+                          const SizedBox(
+                            width: 27.0,
+                          )
+                        ]),
+                      ),
+                    ),
+                    //== ElevatedButton Token Asisten ==//
                     Padding(
                       padding: const EdgeInsets.only(right: 25.0, top: 10.0),
                       child: SizedBox(
                         height: 40.0,
-                        width: 140.0,
+                        width: 165.0,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF3CBEA9),
@@ -202,7 +266,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                                         const TokenAsisten()));
                           },
                           child: const Text(
-                            "+ Token Kelas",
+                            "+ Token Praktikum",
                             style: TextStyle(
                               fontSize: 14.0,
                               fontWeight: FontWeight.bold,
@@ -315,12 +379,14 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
-      DataCell(Text(fileInfo.asisten)),
+      DataCell(SizedBox(width: 140.0, child: Text(fileInfo.asisten))),
       DataCell(
-          Text(fileInfo.matkul,
-              style: TextStyle(
-                  color: Colors.lightBlue[700],
-                  fontWeight: FontWeight.bold)), onTap: () {
+          SizedBox(
+            width: 170.0,
+            child: Text(fileInfo.matkul,
+                style: TextStyle(
+                    color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
+          ), onTap: () {
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -329,10 +395,10 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
                     )));
       }),
       DataCell(SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu, 30)))),
       DataCell(SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
       DataCell(Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -340,30 +406,37 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
         children: [
           //== Tambah Data ==
           IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const FormDeskripsiKelas()));
-              },
-              icon: const Icon(
-                Icons.add_box,
-                color: Colors.grey,
-              )),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => FormDeskripsiKelas(
+                            kodeKelas: fileInfo.kode,
+                            mataKuliah: fileInfo.matkul,
+                          )));
+            },
+            icon: const Icon(
+              Icons.add_box,
+              color: Colors.grey,
+            ),
+            tooltip: 'Tambah Data',
+          ),
           //== Informasi ==
           IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DataMahasiswaKelas(
-                              kodeKelas: fileInfo.kode,
-                            )));
-              },
-              icon: const Icon(
-                Icons.info,
-                color: Colors.grey,
-              ))
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DataMahasiswaKelas(
+                            kodeKelas: fileInfo.kode,
+                          )));
+            },
+            icon: const Icon(
+              Icons.info,
+              color: Colors.grey,
+            ),
+            tooltip: 'Data Mahasiswa',
+          )
         ],
       ))
     ],
