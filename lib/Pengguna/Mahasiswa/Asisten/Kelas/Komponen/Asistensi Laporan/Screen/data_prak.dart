@@ -7,8 +7,9 @@ import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Pengumpulan/Tuga
 
 class DataPraktikanAsistensi extends StatefulWidget {
   final String kodeKelas;
-
-  const DataPraktikanAsistensi({super.key, required this.kodeKelas});
+  final String mataKuliah;
+  const DataPraktikanAsistensi(
+      {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
   State<DataPraktikanAsistensi> createState() => _DataPraktikanAsistensiState();
@@ -86,7 +87,8 @@ class _DataPraktikanAsistensiState extends State<DataPraktikanAsistensi> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => DeskripsiKelas(
-                                            kodeKelas: widget.kodeKelas)));
+                                            kodeKelas: widget.kodeKelas,
+                                            mataKuliah: widget.mataKuliah)));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -110,6 +112,7 @@ class _DataPraktikanAsistensiState extends State<DataPraktikanAsistensi> {
                                     MaterialPageRoute(
                                         builder: (context) => AbsenKu(
                                               kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
                                             )));
                               },
                               child: MouseRegion(
@@ -133,7 +136,9 @@ class _DataPraktikanAsistensiState extends State<DataPraktikanAsistensi> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => KumpulTugas(
-                                            kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -158,6 +163,7 @@ class _DataPraktikanAsistensiState extends State<DataPraktikanAsistensi> {
                                         builder: (context) =>
                                             DataPraktikanAsistensi(
                                               kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
                                             )));
                               },
                               child: MouseRegion(

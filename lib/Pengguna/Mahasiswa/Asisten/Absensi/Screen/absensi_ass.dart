@@ -240,6 +240,7 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
             _fileName = file.name;
           });
         } else {
+          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('User data not found'),
             backgroundColor: Colors.red,
@@ -249,12 +250,14 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
         if (kDebugMode) {
           print("Error during upload or getting download URL: $e");
         }
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Error uploading image'),
           backgroundColor: Colors.red,
         ));
       }
     } else {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('No file selected'),
         backgroundColor: Colors.red,

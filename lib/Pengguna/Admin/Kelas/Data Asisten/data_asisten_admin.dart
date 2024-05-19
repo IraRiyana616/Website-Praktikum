@@ -9,8 +9,12 @@ import 'package:google_fonts/google_fonts.dart';
 class DataAsistenAdmin extends StatefulWidget {
   final String kodeAsisten;
   final String mataKuliah;
+  final String kodeKelas;
   const DataAsistenAdmin(
-      {super.key, required this.kodeAsisten, required this.mataKuliah});
+      {super.key,
+      required this.kodeAsisten,
+      required this.mataKuliah,
+      required this.kodeKelas});
 
   @override
   State<DataAsistenAdmin> createState() => _DataAsistenAdminState();
@@ -33,8 +37,8 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
   final CollectionReference _dataAsistenCollection =
       FirebaseFirestore.instance.collection('dataAsisten');
 
-  //== Fungsi untuk menyimpan data ==//
-  Future<void> _saveDataToFirestore(Map<String, dynamic> data) async {
+  Future<void> _saveDataToFirestore(
+      Map<String, dynamic> data1, Map<String, dynamic> data2) async {
     try {
       //== Validasi untuk memastikan tidak ada TextField yang kosong ==//
       if (namaAsistenController.text.isEmpty ||
@@ -60,7 +64,8 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
           ));
         } else {
           //== Jika tida ada kesalahan, simpan data ke Firestore
-          await _dataAsistenCollection.add(data);
+          await _dataAsistenCollection.add(data1);
+          await _dataAsistenCollection.add(data2);
 
           //== Tampilkan Pesan Sukses ==
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -512,23 +517,40 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                     onPressed: () {
                                       _saveDataToFirestore({
                                         'kodeAsisten': widget.kodeAsisten,
+                                        'kodeKelas': widget.kodeKelas,
                                         'mataKuliah': widget.mataKuliah,
-                                        'namaAsisten':
-                                            namaAsistenController.text,
-                                        'nimAsisten': nimAsistenController.text,
-                                        'namaAsisten2':
-                                            namaAsisten2Controller.text,
-                                        'nimAsisten2':
-                                            nimAsisten2Controller.text,
-                                        'namaAsisten3':
-                                            namaAsisten3Controller.text,
-                                        'nimAsisten3':
-                                            nimAsisten3Controller.text,
-                                        'namaAsisten4':
-                                            namaAsisten4Controller.text,
-                                        'nimAsisten4':
-                                            nimAsisten4Controller.text,
+                                        'nama': namaAsistenController.text,
+                                        'nim': int.tryParse(
+                                                nimAsistenController.text) ??
+                                            0, // Konversi nim menjadi integer
+                                      }, {
+                                        'kodeAsisten': widget.kodeAsisten,
+                                        'mataKuliah': widget.mataKuliah,
+                                        'kodeKelas': widget.kodeKelas,
+                                        'nama': namaAsisten2Controller.text,
+                                        'nim': int.tryParse(
+                                                nimAsisten2Controller.text) ??
+                                            0, // Konversi nim menjadi integer
                                       });
+
+                                      _saveDataToFirestore({
+                                        'kodeAsisten': widget.kodeAsisten,
+                                        'mataKuliah': widget.mataKuliah,
+                                        'kodeKelas': widget.kodeKelas,
+                                        'nama': namaAsisten3Controller.text,
+                                        'nim': int.tryParse(
+                                                nimAsisten3Controller.text) ??
+                                            0, // Konversi nim menjadi integer
+                                      }, {
+                                        'kodeAsisten': widget.kodeAsisten,
+                                        'mataKuliah': widget.mataKuliah,
+                                        'kodeKelas': widget.kodeKelas,
+                                        'nama': namaAsisten4Controller.text,
+                                        'nim': int.tryParse(
+                                                nimAsisten4Controller.text) ??
+                                            0, // Konversi nim menjadi integer
+                                      });
+
                                       namaAsistenController.clear();
                                       namaAsisten2Controller.clear();
                                       namaAsisten3Controller.clear();
@@ -536,7 +558,7 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                       nimAsistenController.clear();
                                       nimAsisten2Controller.clear();
                                       nimAsisten3Controller.clear();
-                                      nimAsistenController.clear();
+                                      nimAsisten4Controller.clear();
                                     },
                                     child: Text('Simpan Data',
                                         style: GoogleFonts.quicksand(

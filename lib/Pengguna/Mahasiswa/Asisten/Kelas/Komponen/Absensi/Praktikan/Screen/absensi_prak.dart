@@ -8,8 +8,9 @@ import '../../Asisten/Screen/absensi_ass_sc.dart';
 
 class AbsensiMahasiswaScreen extends StatefulWidget {
   final String kodeKelas;
-
-  const AbsensiMahasiswaScreen({super.key, required this.kodeKelas});
+  final String mataKuliah;
+  const AbsensiMahasiswaScreen(
+      {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
   State<AbsensiMahasiswaScreen> createState() => _AbsensiMahasiswaScreenState();
@@ -31,6 +32,7 @@ class _AbsensiMahasiswaScreenState extends State<AbsensiMahasiswaScreen> {
           MaterialPageRoute(
               builder: (context) => AbsenKu(
                     kodeKelas: widget.kodeKelas,
+                    mataKuliah: widget.mataKuliah,
                   )),
         );
       } else if (index == 1) {
@@ -42,6 +44,7 @@ class _AbsensiMahasiswaScreenState extends State<AbsensiMahasiswaScreen> {
           MaterialPageRoute(
               builder: (context) => AbsensiMahasiswaScreen(
                     kodeKelas: widget.kodeKelas,
+                    mataKuliah: widget.mataKuliah,
                   )),
         );
       }
@@ -129,7 +132,9 @@ class _AbsensiMahasiswaScreenState extends State<AbsensiMahasiswaScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => DeskripsiKelas(
-                                            kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -164,7 +169,9 @@ class _AbsensiMahasiswaScreenState extends State<AbsensiMahasiswaScreen> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           KumpulUjianPemahaman(
-                                              kodeKelas: widget.kodeKelas)));
+                                            kodeKelas: widget.kodeKelas,
+                                            mataKuliah: widget.mataKuliah,
+                                          )));
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(
@@ -191,6 +198,7 @@ class _AbsensiMahasiswaScreenState extends State<AbsensiMahasiswaScreen> {
                                       builder: (context) =>
                                           DataPraktikanAsistensi(
                                             kodeKelas: widget.kodeKelas,
+                                            mataKuliah: widget.mataKuliah,
                                           )));
                             },
                             child: Padding(

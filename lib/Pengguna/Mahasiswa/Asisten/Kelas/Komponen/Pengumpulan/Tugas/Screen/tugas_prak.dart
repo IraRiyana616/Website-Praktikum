@@ -9,7 +9,9 @@ import '../../Pre-Test/Screen/pre_test_prak.dart';
 
 class KumpulTugas extends StatefulWidget {
   final String kodeKelas;
-  const KumpulTugas({super.key, required this.kodeKelas});
+  final String mataKuliah;
+  const KumpulTugas(
+      {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
   State<KumpulTugas> createState() => _KumpulTugasState();
@@ -31,6 +33,7 @@ class _KumpulTugasState extends State<KumpulTugas> {
           MaterialPageRoute(
               builder: (context) => KumpulUjianPemahaman(
                     kodeKelas: widget.kodeKelas,
+                    mataKuliah: widget.mataKuliah,
                   )),
         );
       } else if (index == 1) {
@@ -42,6 +45,7 @@ class _KumpulTugasState extends State<KumpulTugas> {
           MaterialPageRoute(
               builder: (context) => KumpulTugas(
                     kodeKelas: widget.kodeKelas,
+                    mataKuliah: widget.mataKuliah,
                   )),
         );
       }
@@ -120,7 +124,9 @@ class _KumpulTugasState extends State<KumpulTugas> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => DeskripsiKelas(
-                                            kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -141,7 +147,9 @@ class _KumpulTugasState extends State<KumpulTugas> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => AbsenKu(
-                                            kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -162,7 +170,9 @@ class _KumpulTugasState extends State<KumpulTugas> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => KumpulTugas(
-                                            kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -184,6 +194,7 @@ class _KumpulTugasState extends State<KumpulTugas> {
                                       builder: (context) =>
                                           DataPraktikanAsistensi(
                                             kodeKelas: widget.kodeKelas,
+                                            mataKuliah: widget.mataKuliah,
                                           )));
                             },
                             child: Padding(

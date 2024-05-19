@@ -16,7 +16,7 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
   List<TranskripNilai> filteredTranskripNilai = [];
   //==
   //Dropdown Button Tahun Ajaran
-  String selectedKeterangan = 'Tampilkan Semua';
+  String selectedKeterangan = 'Tampilkan Semua Status Praktikum';
   List<String> availableKeterangans = [];
   //==
   String nim = ''; // Deklarasi variable nim di luar block if
@@ -40,7 +40,10 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
               .map((doc) => doc['keterangan'].toString())
               .toSet();
           setState(() {
-            availableKeterangans = ['Tampilkan Semua', ...status.toList()];
+            availableKeterangans = [
+              'Tampilkan Semua Status Praktikum',
+              ...status.toList()
+            ];
           });
         }
       }
@@ -68,14 +71,13 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
         if (transkripNim.toString() == nim) {
           // Check kesamaan NIM dengan pengguna yang sedang login
           Map<String, dynamic> transkripData = transkripDoc.data();
-          if (selectedKeterangan == 'Tampilkan Semua' ||
+          if (selectedKeterangan == 'Tampilkan Semua Status Praktikum' ||
               transkripData['keterangan'] == selectedKeterangan) {
             data.add(TranskripNilai(
               kode: transkripData['kodeKelas'] ?? '',
               nama: transkripData['nama'] ?? '',
               huruf: transkripData['nilaiHuruf'] ?? '',
-              keterangan: transkripData['keterangan'] ?? '',
-              pemeriksa: transkripData['namaAsisten'] ?? '',
+              keterangan: transkripData['status'] ?? '',
               nim: transkripData['nim'] ?? 0,
               akhir: (transkripData['nilaiAkhir'] ?? 0.0).toDouble(),
             ));
@@ -150,8 +152,11 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
                     });
                   },
                   underline: Container(), // Menjadikan garis bawah kosong
-                  items: <String>['Tampilkan Semua', 'Lulus', 'Tidak Lulus']
-                      .map((String value) {
+                  items: [
+                    'Tampilkan Semua Status Praktikum',
+                    'Lulus',
+                    'Tidak Lulus'
+                  ].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Padding(
@@ -180,7 +185,7 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
                           ),
                           DataColumn(
                             label: Text(
-                              'Nilai Angka',
+                              'Nilai Akhir',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -193,12 +198,6 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
                           DataColumn(
                             label: Text(
                               'Keterangan',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Nama Pemeriksa',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -239,7 +238,7 @@ class TranskripNilai {
   String nama;
   String huruf;
   String keterangan;
-  String pemeriksa;
+
   int nim;
   double akhir;
   TranskripNilai({
@@ -247,7 +246,6 @@ class TranskripNilai {
     required this.nama,
     required this.huruf,
     required this.keterangan,
-    required this.pemeriksa,
     required this.nim,
     this.akhir = 0.0,
   });
@@ -262,12 +260,15 @@ DataRow dataFileDataRow(TranskripNilai fileInfo, int index) {
     ),
     cells: [
       DataCell(Text(fileInfo.kode)),
-      DataCell(Text(fileInfo.akhir.toString())),
+      DataCell(Text(getLimitedText(fileInfo.akhir.toString(), 6))),
       DataCell(Text(fileInfo.huruf)),
       DataCell(Text(fileInfo.keterangan)),
-      DataCell(Text(fileInfo.pemeriksa)),
     ],
   );
+}
+
+String getLimitedText(String text, int limit) {
+  return text.length <= limit ? text : text.substring(0, limit);
 }
 
 Color getRowColor(int index) {

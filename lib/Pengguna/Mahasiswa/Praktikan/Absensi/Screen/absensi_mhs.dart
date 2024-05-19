@@ -28,6 +28,7 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
   void initState() {
     super.initState();
     fetchDataFromFirestore();
+    _getCurrentUser();
   }
 
   Future<void> _logout() async {
@@ -212,6 +213,38 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
     }
   }
 
+  //== Nama Akun ==//
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  User? _currentUser;
+  String _namaMahasiswa = '';
+
+  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
+  void _getCurrentUser() async {
+    setState(() {
+      _currentUser = _auth.currentUser;
+    });
+    if (_currentUser != null) {
+      await _getNamaMahasiswa(_currentUser!.uid);
+    }
+  }
+
+  // Fungsi untuk mengambil nama mahasiswa dari database
+  Future<void> _getNamaMahasiswa(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('akun_mahasiswa').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          _namaMahasiswa = doc.get('nama');
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching nama mahasiswa: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -237,27 +270,28 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                         color: Colors.black),
                   )),
                   const SizedBox(
-                    width: 750.0,
+                    width: 400.0,
                   ),
-                  IconButton(
-                      onPressed: _logout,
-                      icon: const Icon(
-                        Icons.logout,
-                        color: Color(0xFF031F31),
-                      )),
-                  const SizedBox(
-                    width: 10.0,
-                  ),
-                  Text(
-                    'Log out',
-                    style: GoogleFonts.quicksand(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF031F31)),
-                  ),
-                  const SizedBox(
-                    width: 50.0,
-                  )
+                  if (_currentUser != null) ...[
+                    Text(
+                      _namaMahasiswa.isNotEmpty
+                          ? _namaMahasiswa
+                          : (_currentUser!.email ?? ''),
+                      style: GoogleFonts.quicksand(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                    ),
+                    IconButton(
+                        onPressed: _logout,
+                        icon: const Icon(
+                          Icons.logout,
+                          color: Color(0xFF031F31),
+                        )),
+                    const SizedBox(
+                      width: 10.0,
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -268,219 +302,225 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 25.0,
-              ),
-              Container(
-                width: 1075.0,
-                color: Colors.white,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 40.0, top: 30.0),
-                      child: Text(
-                        "Formulir Absensi Praktikum",
-                        style: GoogleFonts.quicksand(
-                            fontWeight: FontWeight.bold, fontSize: 20.0),
-                      ),
-                    ),
-                    const Padding(
-                      padding:
-                          EdgeInsets.only(left: 30.0, right: 30.0, top: 10.0),
-                      child: Divider(thickness: 0.5, color: Colors.grey),
-                    ),
-
-                    //== Kode Kelas ==//
-                    Row(children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: Container(
+                  width: 1095.0,
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 270.0, top: 40.0),
-                        child: Text("Kode Praktikum",
-                            style: GoogleFonts.quicksand(
-                                fontSize: 16.0, fontWeight: FontWeight.bold)),
-                      ),
-                      const SizedBox(width: 30.0),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 40.0),
-                        child: SizedBox(
-                          width: 325.0,
-                          child: TextField(
-                            inputFormatters: [
-                              UpperCaseTextFormatter(),
-                              LengthLimitingTextInputFormatter(6)
-                            ],
-                            controller: _kodeEditingController,
-                            decoration: InputDecoration(
-                                hintText: ' Masukkan Kode Praktikum',
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0)),
-                                filled: true,
-                                fillColor: Colors.white),
-                          ),
+                        padding: const EdgeInsets.only(left: 40.0, top: 30.0),
+                        child: Text(
+                          "Formulir Absensi Praktikum",
+                          style: GoogleFonts.quicksand(
+                              fontWeight: FontWeight.bold, fontSize: 20.0),
                         ),
-                      )
-                    ]),
-
-                    //== Nama Modul ==//
-                    Row(children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 270.0, top: 10.0),
-                        child: Text("Judul Modul",
-                            style: GoogleFonts.quicksand(
-                                fontSize: 16.0, fontWeight: FontWeight.bold)),
                       ),
-                      const SizedBox(width: 60.0),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20.0),
-                        child: SizedBox(
-                          width: 325.0,
-                          child: TextField(
-                            controller: _modulEditingController,
-                            decoration: InputDecoration(
-                                hintText: ' Masukkan Judul Modul',
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0)),
-                                filled: true,
-                                fillColor: Colors.white),
-                          ),
-                        ),
-                      )
-                    ]),
-
-                    //== Keterangan ==//
-                    Row(children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 270.0, top: 20.0),
-                        child: Text("Keterangan",
-                            style: GoogleFonts.quicksand(
-                                fontSize: 16.0, fontWeight: FontWeight.bold)),
+                      const Padding(
+                        padding:
+                            EdgeInsets.only(left: 30.0, right: 30.0, top: 10.0),
+                        child: Divider(thickness: 0.5, color: Colors.grey),
                       ),
-                      const SizedBox(width: 60.0),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20.0),
-                        child: SizedBox(
-                            width: 325.0,
-                            child: Container(
-                              height: 47.0,
-                              width: 980.0,
-                              decoration: BoxDecoration(
-                                  border:
-                                      Border.all(color: Colors.grey.shade700),
-                                  borderRadius: BorderRadius.circular(8.0)),
-                              child: DropdownButton<String>(
-                                value: selectedAbsen,
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    selectedAbsen = newValue!;
-                                  });
-                                },
-                                items: [
-                                  'Status Kehadiran',
-                                  'Hadir',
-                                  'Sakit'
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem(
-                                      value: value,
-                                      child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 15.0),
-                                        child: Text(
-                                          value,
-                                          style:
-                                              const TextStyle(fontSize: 16.0),
-                                        ),
-                                      ));
-                                }).toList(),
-                                style: TextStyle(color: Colors.grey.shade700),
-                                icon: const Icon(Icons.arrow_drop_down,
-                                    color: Colors.grey),
-                                iconSize: 24,
-                                elevation: 16,
-                                isExpanded: true,
-                                underline: Container(),
-                              ),
-                            )),
-                      )
-                    ]),
-                    //== Bukti Foto ==//
-                    Row(children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 270.0, top: 20.0),
-                        child: Text("Foto Absensi",
-                            style: GoogleFonts.quicksand(
-                                fontSize: 16.0, fontWeight: FontWeight.bold)),
-                      ),
-                      const SizedBox(width: 53.0),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20.0),
-                        child: SizedBox(
-                          width: 325.0,
-                          child: Stack(
-                            children: [
-                              TextField(
-                                controller:
-                                    TextEditingController(text: _fileName),
-                                decoration: InputDecoration(
-                                    hintText: ' Nama File',
-                                    border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0)),
-                                    filled: true,
-                                    fillColor: Colors.white),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 5.0, left: 200.0),
-                                child: SizedBox(
-                                    height: 40.0,
-                                    width: 120.0,
-                                    child: ElevatedButton(
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all<Color>(
-                                                  const Color(0xFF3CBEA9))),
-                                      onPressed: () async {
-                                        _uploadFile();
-                                        setState(() {});
-                                      },
-                                      child: Text('Upload Foto',
-                                          style: GoogleFonts.quicksand(
-                                              fontSize: 13.0,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white)),
-                                    )),
-                              )
-                            ],
-                          ),
-                        ),
-                      )
-                    ]),
 
-                    //== ElevatedButton 'SIMPAN' ==//
-                    Padding(
-                      padding: const EdgeInsets.only(left: 617.0, top: 25.0),
-                      child: SizedBox(
-                        height: 40.0,
-                        width: 130.0,
-                        child: ElevatedButton(
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        const Color(0xFF3CBEA9))),
-                            onPressed: () {
-                              saveDataToFirestore();
-                            },
-                            child: Text(
-                              "Simpan",
+                      //== Kode Kelas ==//
+                      Row(children: [
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(left: 270.0, top: 40.0),
+                          child: Text("Kode Praktikum",
                               style: GoogleFonts.quicksand(
-                                  fontSize: 14.0, fontWeight: FontWeight.bold),
-                            )),
+                                  fontSize: 16.0, fontWeight: FontWeight.bold)),
+                        ),
+                        const SizedBox(width: 30.0),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 40.0),
+                          child: SizedBox(
+                            width: 325.0,
+                            child: TextField(
+                              inputFormatters: [
+                                UpperCaseTextFormatter(),
+                                LengthLimitingTextInputFormatter(6)
+                              ],
+                              controller: _kodeEditingController,
+                              decoration: InputDecoration(
+                                  hintText: ' Masukkan Kode Praktikum',
+                                  border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(10.0)),
+                                  filled: true,
+                                  fillColor: Colors.white),
+                            ),
+                          ),
+                        )
+                      ]),
+
+                      //== Nama Modul ==//
+                      Row(children: [
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(left: 270.0, top: 10.0),
+                          child: Text("Judul Modul",
+                              style: GoogleFonts.quicksand(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold)),
+                        ),
+                        const SizedBox(width: 60.0),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20.0),
+                          child: SizedBox(
+                            width: 325.0,
+                            child: TextField(
+                              controller: _modulEditingController,
+                              decoration: InputDecoration(
+                                  hintText: ' Masukkan Judul Modul',
+                                  border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(10.0)),
+                                  filled: true,
+                                  fillColor: Colors.white),
+                            ),
+                          ),
+                        )
+                      ]),
+
+                      //== Keterangan ==//
+                      Row(children: [
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(left: 270.0, top: 20.0),
+                          child: Text("Keterangan",
+                              style: GoogleFonts.quicksand(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold)),
+                        ),
+                        const SizedBox(width: 60.0),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20.0),
+                          child: SizedBox(
+                              width: 325.0,
+                              child: Container(
+                                height: 47.0,
+                                width: 980.0,
+                                decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade700),
+                                    borderRadius: BorderRadius.circular(8.0)),
+                                child: DropdownButton<String>(
+                                  value: selectedAbsen,
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectedAbsen = newValue!;
+                                    });
+                                  },
+                                  items: ['Status Kehadiran', 'Hadir', 'Sakit']
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem(
+                                        value: value,
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 15.0),
+                                          child: Text(
+                                            value,
+                                            style:
+                                                const TextStyle(fontSize: 16.0),
+                                          ),
+                                        ));
+                                  }).toList(),
+                                  style: TextStyle(color: Colors.grey.shade700),
+                                  icon: const Icon(Icons.arrow_drop_down,
+                                      color: Colors.grey),
+                                  iconSize: 24,
+                                  elevation: 16,
+                                  isExpanded: true,
+                                  underline: Container(),
+                                ),
+                              )),
+                        )
+                      ]),
+                      //== Bukti Foto ==//
+                      Row(children: [
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(left: 270.0, top: 20.0),
+                          child: Text("Foto Absensi",
+                              style: GoogleFonts.quicksand(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold)),
+                        ),
+                        const SizedBox(width: 53.0),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20.0),
+                          child: SizedBox(
+                            width: 325.0,
+                            child: Stack(
+                              children: [
+                                TextField(
+                                  controller:
+                                      TextEditingController(text: _fileName),
+                                  decoration: InputDecoration(
+                                      hintText: ' Nama File',
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0)),
+                                      filled: true,
+                                      fillColor: Colors.white),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 5.0, left: 200.0),
+                                  child: SizedBox(
+                                      height: 40.0,
+                                      width: 120.0,
+                                      child: ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all<
+                                                        Color>(
+                                                    const Color(0xFF3CBEA9))),
+                                        onPressed: () async {
+                                          _uploadFile();
+                                          setState(() {});
+                                        },
+                                        child: Text('Upload Foto',
+                                            style: GoogleFonts.quicksand(
+                                                fontSize: 13.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white)),
+                                      )),
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ]),
+
+                      //== ElevatedButton 'SIMPAN' ==//
+                      Padding(
+                        padding: const EdgeInsets.only(left: 617.0, top: 25.0),
+                        child: SizedBox(
+                          height: 40.0,
+                          width: 130.0,
+                          child: ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          const Color(0xFF3CBEA9))),
+                              onPressed: () {
+                                saveDataToFirestore();
+                              },
+                              child: Text(
+                                "Simpan",
+                                style: GoogleFonts.quicksand(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.bold),
+                              )),
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 60.0,
-                    )
-                  ],
+                      const SizedBox(
+                        height: 60.0,
+                      )
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(

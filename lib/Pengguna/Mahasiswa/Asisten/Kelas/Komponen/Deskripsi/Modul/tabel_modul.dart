@@ -56,7 +56,8 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
       return DataSilabus(
         kode: kodeKelas,
         modul: data['judulMateri'],
-        jadwal: data['waktuPraktikum'],
+        hari: data['hariPraktikum'],
+        waktu: data['waktuPraktikum'],
         file: data['modulPraktikum'],
         deskripsiKelas: kodeKelasMap[kodeKelas] ?? '',
         documentId: doc.id, // Add documentId to DataSilabus
@@ -100,19 +101,19 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
                         ),
                         DataColumn(
                           label: Text(
-                            'Jadwal Praktikum',
+                            'Hari Praktikum',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                         DataColumn(
                           label: Text(
-                            'File Modul',
+                            'Waktu Praktikum',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                         DataColumn(
                           label: Text(
-                            '',
+                            'Aksi',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -154,14 +155,16 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
 class DataSilabus {
   String kode;
   String modul;
-  String jadwal;
+  String hari;
+  String waktu;
   String file;
   String deskripsiKelas;
   String documentId; // Added documentId field
 
   DataSilabus({
     required this.modul,
-    required this.jadwal,
+    required this.hari,
+    required this.waktu,
     required this.kode,
     required this.file,
     required this.deskripsiKelas,
@@ -180,18 +183,18 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
     ),
     cells: [
       DataCell(
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => LatihanAsisten(
-                          kodeKelas: fileInfo.kode,
-                          modul: fileInfo.modul,
-                        )));
-          },
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => LatihanAsisten(
+                            kodeKelas: fileInfo.kode,
+                            modul: fileInfo.modul,
+                          )));
+            },
             child: SizedBox(
               width: 250.0,
               child: Text(getLimitedText(fileInfo.modul, 50)),
@@ -199,35 +202,36 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
           ),
         ),
       ),
-      DataCell(Text(fileInfo.jadwal)),
-      DataCell(Row(
-        children: [
-          const Icon(
-            Icons.download,
-            color: Colors.grey,
-          ),
-          const SizedBox(
-            width: 5.0,
-          ),
-          GestureDetector(
-            onTap: () {
-              downloadFile(fileInfo.kode, fileInfo.file);
-            },
-            child: const Text(
-              'Download',
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
-            ),
-          )
-        ],
+      DataCell(SizedBox(width: 85.0, child: Text(fileInfo.hari))),
+      DataCell(SizedBox(
+        width: 100.0,
+        child: Text(fileInfo.waktu),
       )),
       DataCell(Row(
         children: [
-          const Icon(Icons.delete, color: Colors.grey),
-          const SizedBox(
-            width: 5.0,
+          //== Download ==//
+          IconButton(
+            onPressed: () {
+              downloadFile(fileInfo.kode, fileInfo.file);
+            },
+            icon: const Icon(
+              Icons.download,
+              color: Colors.grey,
+            ),
+            tooltip: 'Download Modul',
           ),
-          GestureDetector(
-            onTap: () {
+          //== Edit Data ==//
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(
+              Icons.edit_document,
+              color: Colors.grey,
+            ),
+            tooltip: 'Edit Data',
+          ),
+          //== Delete ==//
+          IconButton(
+            onPressed: () {
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -255,12 +259,14 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
                     );
                   });
             },
-            child: const Text('Hapus Data',
-                style:
-                    TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+            icon: const Icon(
+              Icons.delete,
+              color: Colors.grey,
+            ),
+            tooltip: 'Hapus Data',
           )
         ],
-      ))
+      )),
     ],
   );
 }

@@ -9,8 +9,8 @@ import '../../../Pengumpulan/Pre-Test/Screen/pre_test_prak.dart';
 
 class AbsenKu extends StatefulWidget {
   final String kodeKelas;
-
-  const AbsenKu({super.key, required this.kodeKelas});
+  final String mataKuliah;
+  const AbsenKu({super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
   State<AbsenKu> createState() => _AbsenKuState();
@@ -32,6 +32,7 @@ class _AbsenKuState extends State<AbsenKu> {
           MaterialPageRoute(
               builder: (context) => AbsenKu(
                     kodeKelas: widget.kodeKelas,
+                    mataKuliah: widget.mataKuliah,
                   )),
         );
       } else if (index == 1) {
@@ -43,6 +44,7 @@ class _AbsenKuState extends State<AbsenKu> {
           MaterialPageRoute(
               builder: (context) => AbsensiMahasiswaScreen(
                     kodeKelas: widget.kodeKelas,
+                    mataKuliah: widget.mataKuliah,
                   )),
         );
       }
@@ -130,7 +132,9 @@ class _AbsenKuState extends State<AbsenKu> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => DeskripsiKelas(
-                                            kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -171,8 +175,9 @@ class _AbsenKuState extends State<AbsenKu> {
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               KumpulUjianPemahaman(
-                                                  kodeKelas:
-                                                      widget.kodeKelas)));
+                                                kodeKelas: widget.kodeKelas,
+                                                mataKuliah: widget.mataKuliah,
+                                              )));
                                 },
                                 child: MouseRegion(
                                   cursor: SystemMouseCursors.click,
@@ -195,6 +200,7 @@ class _AbsenKuState extends State<AbsenKu> {
                                       builder: (context) =>
                                           DataPraktikanAsistensi(
                                             kodeKelas: widget.kodeKelas,
+                                            mataKuliah: widget.mataKuliah,
                                           )));
                             },
                             child: Padding(

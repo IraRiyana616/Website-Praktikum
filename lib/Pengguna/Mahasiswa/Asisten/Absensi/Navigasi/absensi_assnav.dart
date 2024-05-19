@@ -34,7 +34,8 @@ class _AbsensiAsistenNavState extends State<AbsensiAsistenNav> {
                     SizedBox(
                       child: Image.asset(
                         "assets/images/logo_laksi.png",
-                        height: 150,
+                        height: 100,
+                        fit: BoxFit.cover,
                       ),
                     ),
                     const Padding(

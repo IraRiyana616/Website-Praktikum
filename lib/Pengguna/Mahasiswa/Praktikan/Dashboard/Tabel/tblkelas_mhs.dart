@@ -18,8 +18,39 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
   List<DataToken> demoTokenData = [];
   List<DataToken> filteredTokenData = [];
 
+  //== Fungsi Controller pada Search ==//
+  final TextEditingController textController = TextEditingController();
+  bool _isTextFieldNotEmpty = false;
+
+  //== Fungsi dari Filtering Search ==//
+  void filterData(String query) {
+    setState(() {
+      filteredTokenData = demoTokenData
+          .where((data) => (data.matkul
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              data.dosenpengampu.toLowerCase().contains(query.toLowerCase()) ||
+              data.dosenpengampu2.toLowerCase().contains(query.toLowerCase())))
+          .toList();
+    });
+  }
+
+  void clearSearchField() {
+    setState(() {
+      textController.clear();
+      filterData('');
+    });
+  }
+
+  void _onTextChanged() {
+    setState(() {
+      _isTextFieldNotEmpty = textController.text.isNotEmpty;
+      filterData(textController.text);
+    });
+  }
+
   //Dropdown Button Tahun Ajaran
-  String selectedYear = 'Tampilkan Semua';
+  String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
   String nim = ''; // Deklarasi variable nim di luar block if
@@ -44,7 +75,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
               .map((doc) => doc['tahunAjaran'].toString())
               .toSet();
           setState(() {
-            availableYears = ['Tampilkan Semua', ...years.toList()];
+            availableYears = ['Tahun Ajaran', ...years.toList()];
           });
         }
       }
@@ -58,7 +89,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
   Future<void> fetchDataFromFirebase(String? selectedYear) async {
     try {
       QuerySnapshot<Map<String, dynamic>> tokenQuerySnapshot;
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         tokenQuerySnapshot = await FirebaseFirestore.instance
             .collection('tokenKelas')
             .where('tahunAjaran', isEqualTo: selectedYear)
@@ -119,15 +150,6 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
     await fetchDataFromFirebase(selectedYear);
   }
 
-  void filterData(String query) {
-    setState(() {
-      filteredTokenData = demoTokenData
-          .where((data) =>
-              (data.tahun.toLowerCase().contains(query.toLowerCase())))
-          .toList();
-    });
-  }
-
   Color getRowColor(int index) {
     if (index % 2 == 0) {
       return Colors.grey.shade200;
@@ -157,7 +179,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
                   padding: const EdgeInsets.only(bottom: 15.0, left: 0.0),
                   child: Container(
                     height: 47.0,
-                    width: 1000.0,
+                    width: 1020.0,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
@@ -191,13 +213,56 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
                   ),
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    //== Search ==//
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, left: 25.0),
+                      child: SizedBox(
+                        width: 300.0,
+                        height: 35.0,
+                        child: Row(children: [
+                          const Text(
+                            'Search :',
+                            style: TextStyle(fontSize: 16.0),
+                          ),
+                          const SizedBox(
+                            width: 10.0,
+                          ),
+                          Expanded(
+                              child: TextField(
+                            onChanged: (value) {
+                              filterData(value);
+                            },
+                            controller: textController,
+                            decoration: InputDecoration(
+                                hintText: '',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 10.0),
+                                suffixIcon: Visibility(
+                                    visible: _isTextFieldNotEmpty,
+                                    child: IconButton(
+                                        onPressed: clearSearchField,
+                                        icon: const Icon(Icons.clear))),
+                                labelStyle: const TextStyle(fontSize: 16.0),
+                                filled: true,
+                                fillColor: Colors.white),
+                          )),
+                          const SizedBox(
+                            width: 27.0,
+                          )
+                        ]),
+                      ),
+                    ),
+                    //== ElevatedButton Token Asisten ==//
                     Padding(
                       padding: const EdgeInsets.only(right: 25.0, top: 10.0),
                       child: SizedBox(
                         height: 40.0,
-                        width: 140.0,
+                        width: 165.0,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF3CBEA9),
@@ -210,7 +275,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
                                         const TokenPraktikan()));
                           },
                           child: const Text(
-                            "+ Token Kelas",
+                            "+ Token Praktikum",
                             style: TextStyle(
                               fontSize: 14.0,
                               fontWeight: FontWeight.bold,
@@ -315,12 +380,15 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
-      DataCell(Text(fileInfo.kode)),
+      DataCell(SizedBox(width: 140.0, child: Text(fileInfo.kode))),
       DataCell(
-        Text(
-          fileInfo.matkul,
-          style: TextStyle(
-              color: Colors.lightBlue[700], fontWeight: FontWeight.bold),
+        SizedBox(
+          width: 170.0,
+          child: Text(
+            fileInfo.matkul,
+            style: TextStyle(
+                color: Colors.lightBlue[700], fontWeight: FontWeight.bold),
+          ),
         ),
         onTap: () {
           Navigator.push(
@@ -332,10 +400,10 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
         },
       ),
       DataCell(SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu, 30)))),
       DataCell(SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
     ],
   );

@@ -459,9 +459,9 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
                   context,
                   MaterialPageRoute(
                       builder: (context) => DataAsistenAdmin(
-                            kodeAsisten: fileInfo.asisten,
-                            mataKuliah: fileInfo.matkul,
-                          )));
+                          kodeAsisten: fileInfo.asisten,
+                          mataKuliah: fileInfo.matkul,
+                          kodeKelas: fileInfo.kelas)));
             },
             icon: const Hero(
                 tag: 'Tambah Data Asisten',

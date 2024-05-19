@@ -392,6 +392,7 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
             MaterialPageRoute(
                 builder: (context) => DeskripsiKelas(
                       kodeKelas: fileInfo.kode,
+                      mataKuliah: fileInfo.matkul,
                     )));
       }),
       DataCell(SizedBox(

@@ -32,10 +32,8 @@ class _DashboardPraktikanNavState extends State<DashboardPraktikanNav> {
                 child: Column(
                   children: [
                     SizedBox(
-                      child: Image.asset(
-                        "assets/images/logo_laksi.png",
-                        height: 150,
-                      ),
+                      child: Image.asset("assets/images/logo_laksi.png",
+                          height: 150),
                     ),
                     const Padding(
                       padding: EdgeInsets.only(left: 20.0, bottom: 10.0),

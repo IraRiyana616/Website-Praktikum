@@ -8,7 +8,9 @@ import '../Tabel/tbl_ujipemahaman.dart';
 
 class KumpulUjianPemahaman extends StatefulWidget {
   final String kodeKelas;
-  const KumpulUjianPemahaman({super.key, required this.kodeKelas});
+  final String mataKuliah;
+  const KumpulUjianPemahaman(
+      {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
   State<KumpulUjianPemahaman> createState() => _KumpulUjianPemahamanState();
@@ -34,6 +36,7 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
           MaterialPageRoute(
               builder: (context) => KumpulTugas(
                     kodeKelas: widget.kodeKelas,
+                    mataKuliah: widget.mataKuliah,
                   )),
         );
       }
@@ -121,7 +124,9 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => DeskripsiKelas(
-                                            kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -146,7 +151,9 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => AbsenKu(
-                                            kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -184,6 +191,7 @@ class _KumpulUjianPemahamanState extends State<KumpulUjianPemahaman> {
                                       builder: (context) =>
                                           DataPraktikanAsistensi(
                                             kodeKelas: widget.kodeKelas,
+                                            mataKuliah: widget.mataKuliah,
                                           )));
                             },
                             child: Padding(

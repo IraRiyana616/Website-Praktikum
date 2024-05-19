@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -17,8 +19,7 @@ class _TokenAsistenState extends State<TokenAsisten> {
     try {
       String userUid = FirebaseAuth.instance.currentUser!.uid;
 
-      // ignore: unnecessary_null_comparison
-      if (userUid != null) {
+      if (userUid.isNotEmpty) {
         DocumentSnapshot<Map<String, dynamic>> userSnapshot =
             await FirebaseFirestore.instance
                 .collection('akun_mahasiswa')
@@ -26,82 +27,86 @@ class _TokenAsistenState extends State<TokenAsisten> {
                 .get();
 
         if (userSnapshot.exists) {
-          int userNim = userSnapshot['nim'];
+          String userNim =
+              userSnapshot['nim'].toString(); // Convert nim to String
 
-          QuerySnapshot<Map<String, dynamic>> classSnapshot =
+          DocumentSnapshot<Map<String, dynamic>> assistantSnapshot =
               await FirebaseFirestore.instance
-                  .collection('dataKelas')
-                  .where('kodeAsisten', isEqualTo: _classCodeController.text)
+                  .collection('dataAsisten')
+                  .doc(userNim) // Use nim as document ID
                   .get();
 
-          if (classSnapshot.docs.isNotEmpty) {
-            for (QueryDocumentSnapshot<Map<String, dynamic>> classDocument
-                in classSnapshot.docs) {
-              String classCode = classDocument['kodeAsisten'];
+          if (assistantSnapshot.exists) {
+            String classCode = _classCodeController.text;
 
-              // Check if there is an existing document with the same nim and kode_kelas
-              QuerySnapshot<Map<String, dynamic>> existingTokenSnapshot =
+            QuerySnapshot<Map<String, dynamic>> classSnapshot =
+                await FirebaseFirestore.instance
+                    .collection('dataKelas')
+                    .where('kodeAsisten', isEqualTo: classCode)
+                    .get();
+
+            if (classSnapshot.docs.isNotEmpty) {
+              for (QueryDocumentSnapshot<Map<String, dynamic>> classDocument
+                  in classSnapshot.docs) {
+                String existingTokenId =
+                    '$userNim-$classCode-${classDocument.id}';
+
+                DocumentSnapshot<Map<String, dynamic>> existingTokenSnapshot =
+                    await FirebaseFirestore.instance
+                        .collection('tokenAsisten')
+                        .doc(existingTokenId)
+                        .get();
+
+                if (existingTokenSnapshot.exists) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                          'Data dengan nim dan kode kelas yang sama sudah terdaftar'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                } else {
+                  Map<String, dynamic> updatedClassData = {
+                    'nama': userSnapshot['nama'],
+                    'nim': userNim,
+                    'tokenAsisten': existingTokenId,
+                    'tokenKelas': classDocument.id,
+                    'mataKuliah': classDocument['mataKuliah'],
+                    'dosenPengampu': classDocument['dosenPengampu'],
+                    'dosenPengampu2': classDocument['dosenPengampu2'],
+                    'tahunAjaran': classDocument['tahunAjaran'],
+                  };
+
                   await FirebaseFirestore.instance
                       .collection('tokenAsisten')
-                      .where('nim', isEqualTo: userNim)
-                      .where('kodeAsisten', isEqualTo: classCode)
-                      .get();
+                      .doc(existingTokenId)
+                      .set(updatedClassData);
 
-              if (existingTokenSnapshot.docs.isNotEmpty) {
-                // Jika data sudah terdaftar, tampilkan snackbar
-                // ignore: use_build_context_synchronously
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                        'Data dengan nim dan kode kelas yang sama sudah terdaftar'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              } else {
-                // Jika data belum terdaftar, simpan data baru
-                Map<String, dynamic> updatedClassData = {
-                  'kodeAsisten': classDocument['kodeAsisten'],
-                  'kodeKelas': classDocument['kodeKelas'],
-                  'mataKuliah': classDocument['mataKuliah'],
-                  'tahunAjaran': classDocument['tahunAjaran'],
-                  'dosenPengampu': classDocument['dosenPengampu'],
-                  'dosenPengampu2': classDocument['dosenPengampu2'],
-                  'nim': userNim,
-                  'nama': userSnapshot['nama'],
-                };
-
-                await FirebaseFirestore.instance
-                    .collection('tokenAsisten')
-                    .add(updatedClassData);
-
-                // Tampilkan snackbar bahwa data berhasil disimpan
-                // ignore: use_build_context_synchronously
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Data berhasil disimpan'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-                _classCodeController.clear();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Data berhasil disimpan'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  _classCodeController.clear();
+                }
               }
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Data kelas tidak ditemukan'),
+                  backgroundColor: Colors.red,
+                ),
+              );
             }
           } else {
-            // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Data kelas tidak ditemukan'),
+                content: Text('NIM tidak terdaftar sebagai asisten'),
                 backgroundColor: Colors.red,
               ),
             );
           }
-        } else {
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Data akun mahasiswa tidak ditemukan'),
-              backgroundColor: Colors.red,
-            ),
-          );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -202,7 +207,7 @@ class _TokenAsistenState extends State<TokenAsisten> {
                           child: TextField(
                             controller: _classCodeController,
                             decoration: InputDecoration(
-                              hintText: 'Masukkan Kode Kelas Asisten',
+                              hintText: 'Masukkan Kode Praktikum Asisten',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),

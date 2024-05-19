@@ -14,7 +14,9 @@ class TokenPraktikan extends StatefulWidget {
 }
 
 class _TokenPraktikanState extends State<TokenPraktikan> {
+  //== Controller Class Code ==//
   final TextEditingController _classCodeController = TextEditingController();
+  //== Fungsi Mendapatkan Data ==//
   Future<void> _getData() async {
     try {
       String userUid = FirebaseAuth.instance.currentUser!.uid;
@@ -121,6 +123,44 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
     }
   }
 
+  //== Nama Akun ==//
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  User? _currentUser;
+  String _namaMahasiswa = '';
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUser();
+  }
+
+  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
+  void _getCurrentUser() async {
+    setState(() {
+      _currentUser = _auth.currentUser;
+    });
+    if (_currentUser != null) {
+      await _getNamaMahasiswa(_currentUser!.uid);
+    }
+  }
+
+  // Fungsi untuk mengambil nama mahasiswa dari database
+  Future<void> _getNamaMahasiswa(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('akun_mahasiswa').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          _namaMahasiswa = doc.get('nama');
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching nama mahasiswa: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,43 +177,35 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
                   Icons.arrow_back,
                   color: Colors.black,
                 )),
-            title: Padding(
-              padding: const EdgeInsets.only(top: 8.0, left: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                      child: Text(
-                    'Token Kelas',
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                    child: Text(
+                  'Token Praktikum Praktikan',
+                  style: GoogleFonts.quicksand(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                )),
+                const SizedBox(
+                  width: 400.0,
+                ),
+                if (_currentUser != null) ...[
+                  Text(
+                    _namaMahasiswa.isNotEmpty
+                        ? _namaMahasiswa
+                        : (_currentUser!.email ?? ''),
                     style: GoogleFonts.quicksand(
-                        fontSize: 18.0,
+                        fontSize: 17.0,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
-                  )),
-                  const SizedBox(
-                    width: 750.0,
-                  ),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.logout,
-                        color: Color(0xFF031F31),
-                      )),
-                  const SizedBox(
-                    width: 10.0,
-                  ),
-                  Text(
-                    'Log out',
-                    style: GoogleFonts.quicksand(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF031F31)),
                   ),
                   const SizedBox(
-                    width: 50.0,
-                  )
+                    width: 30.0,
+                  ),
                 ],
-              ),
+              ],
             ),
           )),
       body: Container(
@@ -198,7 +230,7 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
                     Padding(
                       padding: const EdgeInsets.only(top: 30.0, left: 50.0),
                       child: Text(
-                        "Kode Kelas",
+                        "Kode Kelas Praktikum",
                         style: GoogleFonts.quicksand(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -216,7 +248,7 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
                         child: TextField(
                           controller: _classCodeController,
                           decoration: InputDecoration(
-                            hintText: 'Masukkan Kode Kelas',
+                            hintText: 'Masukkan Kode Kelas Praktikum',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
@@ -253,9 +285,6 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
                       ),
                     ),
                     const SizedBox(
-                      height: 16.0,
-                    ),
-                    const SizedBox(
                       height: 40.0,
                     ),
                   ],
@@ -263,7 +292,7 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
               ),
             ),
             const SizedBox(
-              height: 130.0,
+              height: 30.0,
             ),
           ],
         ),

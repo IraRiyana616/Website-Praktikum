@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
         // '/dashboard': (context) => const DashboardPraktikan(),
         '/login': (context) => const LandingPage(),
       },
+      //home: Profil()
     );
   }
 }
