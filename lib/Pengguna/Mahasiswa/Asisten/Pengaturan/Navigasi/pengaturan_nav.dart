@@ -4,7 +4,8 @@ import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Screen/absensi_mhs.da
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Hasil%20Studi/Screen/transkrip.dart';
 
-import '../../Absensi/Form/Screen/absensi_ass.dart';
+import '../../Absensi/Screen/absensi_ass.dart';
+import '../../Jadwal/Screen/jadwal_asisten.dart';
 import '../../Kelas/Screen/kelas_asisten.dart';
 
 class PengaturanNav extends StatefulWidget {
@@ -120,19 +121,19 @@ class _PengaturanNavState extends State<PengaturanNav> {
                     const SizedBox(
                       height: 10,
                     ),
-                    // DashboardListTile(
-                    //   title: 'Mahasiswa',
-                    //   icon: const Icon(
-                    //     Icons.people,
-                    //   ),
-                    //   page: const DataMahasiswaAss(),
-                    //   updatePage: updatePage,
-                    //   isActive: currentPage is DataMahasiswaAss,
-                    // ),
+                    DashboardListTile(
+                      title: 'Jadwal',
+                      icon: const Icon(
+                        Icons.calendar_month,
+                      ),
+                      page: const JadwalPraktikumAsisten(),
+                      updatePage: updatePage,
+                      isActive: currentPage is JadwalPraktikumAsisten,
+                    ),
 
-                    // const SizedBox(
-                    //   height: 10,
-                    // ),
+                    const SizedBox(
+                      height: 10,
+                    ),
                     DashboardListTile(
                       title: 'Absensi',
                       icon: const Icon(

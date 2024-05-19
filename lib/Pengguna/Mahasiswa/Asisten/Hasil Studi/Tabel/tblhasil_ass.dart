@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Nilai%20Harian/Screen/nilai_percobaan.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Tabel/Form%20Tabel%20Penilaian/form_penialain.dart';
 
 class TabelHasilAsisten extends StatefulWidget {
   const TabelHasilAsisten({super.key});
@@ -18,7 +17,7 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
   List<DataKelas> filteredDataKelas = [];
 
   //== Dropdown Button Tahun Ajaran ==
-  String selectedYear = 'Tampilkan Semua';
+  String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
   String nim = '';
@@ -43,7 +42,7 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
               .map((doc) => doc['tahunAjaran'].toString())
               .toSet();
           setState(() {
-            availableYears = ['Tampilkan Semua', ...years.toList()];
+            availableYears = ['Tahun Ajaran', ...years.toList()];
           });
         }
       }
@@ -57,7 +56,7 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
   Future<void> fetchDataFromFirebase(String? selectedYear) async {
     try {
       QuerySnapshot<Map<String, dynamic>> tokenQuerySnapshot;
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         tokenQuerySnapshot = await FirebaseFirestore.instance
             .collection('tokenAsisten')
             .where('tahunAjaran', isEqualTo: selectedYear)
@@ -147,7 +146,7 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
                   padding: const EdgeInsets.only(bottom: 15.0, left: 0.0),
                   child: Container(
                     height: 47.0,
-                    width: 1000.0,
+                    width: 1020.0,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
@@ -214,12 +213,6 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
-                              DataColumn(
-                                label: Text(
-                                  "  Aksi",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
                             ],
                             source: DataSource(filteredDataKelas, context),
                             rowsPerPage:
@@ -281,37 +274,31 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
+      DataCell(SizedBox(
+        width: 140.0,
+        child: Text(fileInfo.kode),
+      )),
       DataCell(
-          Text(fileInfo.kode,
-              style: TextStyle(
-                  color: Colors.lightBlue[700],
-                  fontWeight: FontWeight.bold)), onTap: () {
+          SizedBox(
+            width: 170.0,
+            child: Text(fileInfo.matkul,
+                style: TextStyle(
+                    color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
+          ), onTap: () {
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => NilaiPercobaan(
                       kodeKelas: fileInfo.kode,
+                      mataKuliah: fileInfo.matkul,
                     )));
       }),
-      DataCell(Text(fileInfo.matkul)),
       DataCell(SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu, 30)))),
       DataCell(SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
-      DataCell(IconButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        FormPenilaian(kodeKelas: fileInfo.kode)));
-          },
-          icon: const Icon(
-            Icons.add_box,
-            color: Colors.grey,
-          )))
     ],
   );
 }

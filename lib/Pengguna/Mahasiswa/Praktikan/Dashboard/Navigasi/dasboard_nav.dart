@@ -3,7 +3,8 @@ import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Screen/hasilstudi
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Screen/absensi_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Hasil%20Studi/Screen/transkrip.dart';
-import '../../../Asisten/Absensi/Form/Screen/absensi_ass.dart';
+import '../../../Asisten/Absensi/Screen/absensi_ass.dart';
+import '../../../Asisten/Jadwal/Screen/jadwal_asisten.dart';
 import '../../../Asisten/Kelas/Screen/kelas_asisten.dart';
 import '../../../Asisten/Pengaturan/Screen/pengaturan.dart';
 
@@ -120,6 +121,18 @@ class _DashboardPraktikanNavState extends State<DashboardPraktikanNav> {
 
                     const SizedBox(
                       height: 10,
+                    ),
+                    DashboardListTile(
+                      title: 'Jadwal',
+                      icon: const Icon(
+                        Icons.calendar_month,
+                      ),
+                      page: const JadwalPraktikumAsisten(),
+                      updatePage: updatePage,
+                      isActive: currentPage is JadwalPraktikumAsisten,
+                    ),
+                    const SizedBox(
+                      height: 10.0,
                     ),
                     DashboardListTile(
                       title: 'Absensi',

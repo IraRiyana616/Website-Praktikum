@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Absensi/Screen/absensi_ass.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Screen/hasilstudi_ass.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Jadwal/Screen/jadwal_asisten.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Screen/kelas_asisten.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Pengaturan/Screen/pengaturan.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Screen/absensi_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Screen/dashboard_mhs.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Hasil%20Studi/Screen/transkrip.dart';
+import '../../Jadwal/Screen/jadwal_asisten.dart';
+import '../../Kelas/Screen/kelas_asisten.dart';
+import '../../Pengaturan/Screen/pengaturan.dart';
+import '../Screen/absensi_ass.dart';
 
-import '../../../Praktikan/Hasil Studi/Screen/transkrip.dart';
-
-class KelasAsistenNav extends StatefulWidget {
-  const KelasAsistenNav({super.key});
+class AbsensiAsistenNav extends StatefulWidget {
+  const AbsensiAsistenNav({super.key});
 
   @override
-  State<KelasAsistenNav> createState() => _KelasAsistenNavState();
+  State<AbsensiAsistenNav> createState() => _AbsensiAsistenNavState();
 }
 
-class _KelasAsistenNavState extends State<KelasAsistenNav> {
-  Widget currentPage = const KelasAsisten(); // Halaman awal
+class _AbsensiAsistenNavState extends State<AbsensiAsistenNav> {
+  Widget currentPage = const AbsensiAsisten(); // Halaman awal
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +146,6 @@ class _KelasAsistenNavState extends State<KelasAsistenNav> {
                     const SizedBox(
                       height: 10,
                     ),
-
                     DashboardListTile(
                       title: 'Hasil Studi',
                       icon: const Icon(

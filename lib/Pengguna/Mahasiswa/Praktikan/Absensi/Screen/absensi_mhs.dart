@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../Asisten/Absensi/Form/Screen/absensi_ass.dart';
+import '../../../Asisten/Absensi/Screen/absensi_ass.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class AbsensiPraktikan extends StatefulWidget {

@@ -3,18 +3,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:laksi/Pengguna/Admin/Jadwal%20Praktikum/Form%20Jadwal/form_jadwal_praktikum_admin.dart';
-import '../../Kelas/Komponen/Deskripsi/deskripsi_admin.dart';
 
-class TabelJadwalPraktikumAdmin extends StatefulWidget {
-  const TabelJadwalPraktikumAdmin({super.key});
+class TabelJadwalPraktikumAsisten extends StatefulWidget {
+  const TabelJadwalPraktikumAsisten({super.key});
 
   @override
-  State<TabelJadwalPraktikumAdmin> createState() =>
-      _TabelJadwalPraktikumAdminState();
+  State<TabelJadwalPraktikumAsisten> createState() =>
+      _TabelJadwalPraktikumAsistenState();
 }
 
-class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
+class _TabelJadwalPraktikumAsistenState
+    extends State<TabelJadwalPraktikumAsisten> {
   //== List Tabel dan Filtering ==//
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
@@ -377,41 +376,6 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 25.0, top: 10.0),
-                      child: SizedBox(
-                        height: 40.0,
-                        width: 170.0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3CBEA9),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const FormJadwalPraktikumAdmin(),
-                              ),
-                            );
-                          },
-                          child: const Hero(
-                            tag: "Tambah Jadwal",
-                            child: Material(
-                              color: Colors.transparent,
-                              child: Text(
-                                "+ Tambah Jadwal",
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
                 const SizedBox(
@@ -455,14 +419,8 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
-                              DataColumn(
-                                  label: Text(
-                                '     Aksi',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ))
                             ],
-                            source: DataSource(
-                                filteredClassData, deleteData, context),
+                            source: DataSource(filteredClassData, context),
                             rowsPerPage:
                                 calculateRowsPerPage(filteredClassData.length),
                           )
@@ -494,21 +452,6 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
       return defaultRowsPerPage;
     }
   }
-
-//== Fungsi Untuk Menghapus Data ==//
-  void deleteData(String id) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('dataJadwalPraktikum')
-          .doc(id)
-          .delete();
-      fetchDataFromFirebase(selectedYear);
-    } catch (error) {
-      if (kDebugMode) {
-        print('Error deleting data: $error');
-      }
-    }
-  }
 }
 
 class DataClass {
@@ -531,8 +474,7 @@ class DataClass {
   });
 }
 
-DataRow dataFileDataRow(DataClass fileInfo, int index,
-    Function(String) onDelete, BuildContext context) {
+DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -567,64 +509,6 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
           ),
         ),
       ),
-      DataCell(Row(
-        children: [
-          //== IconButton Edit ==//
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.edit, color: Colors.grey),
-            tooltip: 'Edit Data',
-          ),
-          //== IconButton Delete ==//
-          IconButton(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text(
-                      "Hapus Jadwal Praktikum",
-                      style: GoogleFonts.quicksand(
-                          fontWeight: FontWeight.bold, fontSize: 20.0),
-                    ),
-                    content: const SizedBox(
-                      height: 30.0,
-                      width: 100.0,
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 10.0),
-                        child: Text("Anda yakin ingin menghapus data?"),
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.only(bottom: 10.0),
-                          child: Text("Batal"),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          onDelete(fileInfo.id);
-                          Navigator.of(context).pop();
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.only(bottom: 10.0),
-                          child: Text("Hapus"),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-            icon: const Icon(Icons.delete, color: Colors.grey),
-            tooltip: 'Hapus Data',
-          )
-        ],
-      ))
     ],
   );
 }
@@ -639,10 +523,9 @@ Color getRowColor(int index) {
 
 class DataSource extends DataTableSource {
   final List<DataClass> data;
-  final Function(String) onDelete;
   final BuildContext context;
 
-  DataSource(this.data, this.onDelete, this.context);
+  DataSource(this.data, this.context);
 
   @override
   DataRow? getRow(int index) {
@@ -650,7 +533,7 @@ class DataSource extends DataTableSource {
       return null;
     }
     final fileInfo = data[index];
-    return dataFileDataRow(fileInfo, index, onDelete, context);
+    return dataFileDataRow(fileInfo, index, context);
   }
 
   @override

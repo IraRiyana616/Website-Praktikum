@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import '../../../Mahasiswa/Asisten/Absensi/Form/Screen/absensi_ass.dart';
+import '../../../Mahasiswa/Asisten/Absensi/Screen/absensi_ass.dart';
 
 class FormJadwalPraktikumAdmin extends StatefulWidget {
   const FormJadwalPraktikumAdmin({Key? key}) : super(key: key);

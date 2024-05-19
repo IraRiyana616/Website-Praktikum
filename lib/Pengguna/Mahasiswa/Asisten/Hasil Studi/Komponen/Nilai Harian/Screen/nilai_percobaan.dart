@@ -1,12 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Nilai%20Akhir/Screen/nilai_akhir.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Nilai%20Harian/Nilai/penilaian_percobaan.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Navigasi/hasil_studi_nav_ass.dart';
 
 class NilaiPercobaan extends StatefulWidget {
   final String kodeKelas;
+  final String mataKuliah;
 
-  const NilaiPercobaan({Key? key, required this.kodeKelas}) : super(key: key);
+  const NilaiPercobaan(
+      {Key? key, required this.kodeKelas, required this.mataKuliah})
+      : super(key: key);
 
   @override
   State<NilaiPercobaan> createState() => _NilaiPercobaanState();
@@ -23,15 +30,59 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    NilaiPercobaan(kodeKelas: widget.kodeKelas)));
+                builder: (context) => NilaiPercobaan(
+                      kodeKelas: widget.kodeKelas,
+                      mataKuliah: widget.mataKuliah,
+                    )));
       } else if (index == 1) {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => NilaiAkhir(kodeKelas: widget.kodeKelas)));
+                builder: (context) => NilaiAkhir(
+                      kodeKelas: widget.kodeKelas,
+                      mataKuliah: widget.mataKuliah,
+                    )));
       }
     });
+  }
+
+  //== Nama Akun ==//
+  User? _currentUser;
+  String _namaMahasiswa = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUser();
+  }
+
+  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  void _getCurrentUser() async {
+    setState(() {
+      _currentUser = _auth.currentUser;
+    });
+    if (_currentUser != null) {
+      await _getNamaMahasiswa(_currentUser!.uid);
+    }
+  }
+
+  // Fungsi untuk mengambil nama mahasiswa dari database
+  Future<void> _getNamaMahasiswa(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('akun_mahasiswa').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          _namaMahasiswa = doc.get('nama');
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching nama mahasiswa: $e');
+      }
+    }
   }
 
   @override
@@ -44,7 +95,10 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
           automaticallyImplyLeading: false,
           leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const HasilStudiAsistenNav()));
             },
             icon: const Icon(
               Icons.arrow_back,
@@ -56,12 +110,9 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const SizedBox(
-                  width: 10.0,
-                ),
                 Expanded(
                   child: Text(
-                    'Penilaian Praktikum',
+                    widget.mataKuliah,
                     style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -69,6 +120,23 @@ class _NilaiPercobaanState extends State<NilaiPercobaan> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  width: 400.0,
+                ),
+                if (_currentUser != null) ...[
+                  Text(
+                    _namaMahasiswa.isNotEmpty
+                        ? _namaMahasiswa
+                        : (_currentUser!.email ?? ''),
+                    style: GoogleFonts.quicksand(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  const SizedBox(
+                    width: 30.0,
+                  ),
+                ],
               ],
             ),
           ),

@@ -9,7 +9,9 @@ import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Komponen/Nilai%20
 
 class NilaiAkhir extends StatefulWidget {
   final String kodeKelas;
-  const NilaiAkhir({super.key, required this.kodeKelas});
+  final String mataKuliah;
+  const NilaiAkhir(
+      {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
   State<NilaiAkhir> createState() => _NilaiAkhirState();
@@ -35,6 +37,7 @@ class _NilaiAkhirState extends State<NilaiAkhir> {
   void initState() {
     super.initState();
     checkAndFetchData();
+    _getCurrentUser();
   }
 
   Future<void> checkAndFetchData() async {
@@ -276,15 +279,51 @@ class _NilaiAkhirState extends State<NilaiAkhir> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    NilaiPercobaan(kodeKelas: widget.kodeKelas)));
+                builder: (context) => NilaiPercobaan(
+                    kodeKelas: widget.kodeKelas,
+                    mataKuliah: widget.mataKuliah)));
       } else if (index == 1) {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => NilaiAkhir(kodeKelas: widget.kodeKelas)));
+                builder: (context) => NilaiAkhir(
+                    kodeKelas: widget.kodeKelas,
+                    mataKuliah: widget.mataKuliah)));
       }
     });
+  }
+
+  //== Nama Akun ==//
+  User? _currentUser;
+  String _namaMahasiswa = '';
+
+  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  void _getCurrentUser() async {
+    setState(() {
+      _currentUser = _auth.currentUser;
+    });
+    if (_currentUser != null) {
+      await _getNamaMahasiswa(_currentUser!.uid);
+    }
+  }
+
+  // Fungsi untuk mengambil nama mahasiswa dari database
+  Future<void> _getNamaMahasiswa(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('akun_mahasiswa').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          _namaMahasiswa = doc.get('nama');
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching nama mahasiswa: $e');
+      }
+    }
   }
 
   @override
@@ -310,23 +349,15 @@ class _NilaiAkhirState extends State<NilaiAkhir> {
         child: AppBar(
           backgroundColor: const Color(0xFFF7F8FA),
           automaticallyImplyLeading: false,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.black,
-            ),
-          ),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                const SizedBox(width: 40.0),
                 Expanded(
                   child: Text(
-                    'Penilaian Akhir',
+                    widget.mataKuliah,
                     style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -334,6 +365,23 @@ class _NilaiAkhirState extends State<NilaiAkhir> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  width: 400.0,
+                ),
+                if (_currentUser != null) ...[
+                  Text(
+                    _namaMahasiswa.isNotEmpty
+                        ? _namaMahasiswa
+                        : (_currentUser!.email ?? ''),
+                    style: GoogleFonts.quicksand(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  const SizedBox(
+                    width: 30.0,
+                  ),
+                ],
               ],
             ),
           ),

@@ -3,16 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Hasil%20Studi/Tabel/tblhasil_ass.dart';
 
-class HasilStudiAsisten extends StatefulWidget {
-  const HasilStudiAsisten({super.key});
+import '../Tabel/tabel_jadwal_asisten.dart';
+
+class JadwalPraktikumAsisten extends StatefulWidget {
+  const JadwalPraktikumAsisten({super.key});
 
   @override
-  State<HasilStudiAsisten> createState() => _HasilStudiAsistenState();
+  State<JadwalPraktikumAsisten> createState() => _JadwalPraktikumAsistenState();
 }
 
-class _HasilStudiAsistenState extends State<HasilStudiAsisten> {
+class _JadwalPraktikumAsistenState extends State<JadwalPraktikumAsisten> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? _currentUser;
@@ -72,51 +73,47 @@ class _HasilStudiAsistenState extends State<HasilStudiAsisten> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
-          backgroundColor: const Color(0xFFF7F8FA),
-          automaticallyImplyLeading: false,
-          title: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox(
-                  width: 10.0,
-                ),
-                Expanded(
-                    child: Text(
-                  "Hasil Studi Praktikum",
-                  style: GoogleFonts.quicksand(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                )),
-                const SizedBox(
-                  width: 400.0,
-                ),
-                if (_currentUser != null) ...[
-                  Text(
-                    _namaMahasiswa.isNotEmpty
-                        ? _namaMahasiswa
-                        : (_currentUser!.email ?? ''),
-                    style: GoogleFonts.quicksand(
-                        fontSize: 17.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
-                  ),
-                  IconButton(
-                      onPressed: _logout,
-                      icon: const Icon(
-                        Icons.logout,
-                        color: Color(0xFF031F31),
-                      )),
-                  const SizedBox(
-                    width: 10.0,
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
+            backgroundColor: const Color(0xFFF7F8FA),
+            automaticallyImplyLeading: false,
+            title: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const SizedBox(width: 10.0),
+                      Expanded(
+                        child: Text(
+                          "Dashboard Asisten",
+                          style: GoogleFonts.quicksand(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 400.0,
+                      ),
+                      if (_currentUser != null) ...[
+                        Text(
+                          _namaMahasiswa.isNotEmpty
+                              ? _namaMahasiswa
+                              : (_currentUser!.email ?? ''),
+                          style: GoogleFonts.quicksand(
+                              fontSize: 17.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        IconButton(
+                            onPressed: _logout,
+                            icon: const Icon(
+                              Icons.logout,
+                              color: Color(0xFF031F31),
+                            )),
+                        const SizedBox(
+                          width: 10.0,
+                        ),
+                      ],
+                    ]))),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -130,10 +127,7 @@ class _HasilStudiAsistenState extends State<HasilStudiAsisten> {
                 child: Container(
                   width: 1095.0,
                   color: Colors.white,
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [TabelHasilAsisten()],
-                  ),
+                  child: const TabelJadwalPraktikumAsisten(),
                 ),
               ),
               const SizedBox(

@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:intl/intl.dart';
-
 import '../../Deskripsi/form_deskripsi.dart';
+import '../Laporan/form_laporan.dart';
+import '../Tugas/form_tugas.dart';
 
 class FormPengumpulanLatihan extends StatefulWidget {
   final String kodeKelas;
@@ -41,16 +41,19 @@ class _FormPengumpulanLatihanState extends State<FormPengumpulanLatihan> {
                   kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah)),
         );
       } else if (index == 1) {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => const FormPengumpulanTugas()),
-        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => FormPengumpulanTugas(
+                  kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah)),
+        );
       } else if (index == 2) {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //       builder: (context) => const FormPengumpulanLaporan()),
-        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => FormPengumpulanLaporan(
+                  mataKuliah: widget.mataKuliah, kodeKelas: widget.kodeKelas)),
+        );
       }
     });
   }
@@ -122,6 +125,7 @@ class _FormPengumpulanLatihanState extends State<FormPengumpulanLatihan> {
       'judulMateri': _judulModulController.text,
       'aksesLatihan': DateTime.parse(_bukaController.text),
       'tutupAksesLatihan': DateTime.parse(_tutupController.text),
+      'namaFile': _fileName
     });
     //== Tampilkan pesan sukses ==//
     // ignore: use_build_context_synchronously
@@ -135,9 +139,11 @@ class _FormPengumpulanLatihanState extends State<FormPengumpulanLatihan> {
     _deskripsiTugasController.clear();
     _bukaController.clear();
     _tutupController.clear();
+    setState(() {
+      _fileName = '';
+    });
   }
 
-//== Pilih Tanggal dan Waktu ==//
   Future<void> _selectDate(
       BuildContext context, TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
@@ -168,12 +174,8 @@ class _FormPengumpulanLatihanState extends State<FormPengumpulanLatihan> {
         picked.minute,
       );
 
-      // Format tanggal dan waktu menggunakan intl
-      String formattedDateTime =
-          DateFormat('d MMMM y, hh:mm a', 'id_ID').format(selectedDateTime);
-
       setState(() {
-        controller.text = formattedDateTime;
+        controller.text = selectedDateTime.toString();
       });
     }
   }
@@ -230,7 +232,7 @@ class _FormPengumpulanLatihanState extends State<FormPengumpulanLatihan> {
 
       firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('$kodeKelas/${file.name}');
+          .child('$kodeKelas/Latihan/${file.name}');
 
       try {
         //== Upload file ==//
@@ -523,7 +525,7 @@ class _FormPengumpulanLatihanState extends State<FormPengumpulanLatihan> {
                                                     fillColor: Colors.white,
                                                     suffixIcon: IconButton(
                                                       icon: const Icon(
-                                                          Icons.calendar_today),
+                                                          Icons.calendar_month),
                                                       onPressed: () async {
                                                         await _selectDate(
                                                             context,
@@ -565,7 +567,7 @@ class _FormPengumpulanLatihanState extends State<FormPengumpulanLatihan> {
                                                     fillColor: Colors.white,
                                                     suffixIcon: IconButton(
                                                       icon: const Icon(
-                                                          Icons.calendar_today),
+                                                          Icons.calendar_month),
                                                       onPressed: () async {
                                                         await _selectDate(
                                                             context,
