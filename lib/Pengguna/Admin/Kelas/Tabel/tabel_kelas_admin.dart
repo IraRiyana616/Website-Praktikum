@@ -461,7 +461,10 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
                       builder: (context) => DataAsistenAdmin(
                           kodeAsisten: fileInfo.asisten,
                           mataKuliah: fileInfo.matkul,
-                          kodeKelas: fileInfo.kelas)));
+                          kodeKelas: fileInfo.kelas,
+                          dosenPengampu: fileInfo.dosenpengampu,
+                          dosenPengampu2: fileInfo.dosenpengampu2,
+                          tahunAjaran: fileInfo.tahun)));
             },
             icon: const Hero(
                 tag: 'Tambah Data Asisten',

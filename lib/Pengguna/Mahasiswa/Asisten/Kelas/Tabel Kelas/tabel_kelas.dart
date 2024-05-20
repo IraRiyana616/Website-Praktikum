@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Data%20Mahasiswa/Screen/data_mahasiswa.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Form%20Komponen/Deskripsi/form_deskripsi.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Tabel%20Kelas/Komponen/token_asisten.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
 
 class TabelKelasAsisten extends StatefulWidget {
@@ -63,7 +61,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
           nim = userNim.toString();
 
           QuerySnapshot<Map<String, dynamic>> querySnapshot =
-              await FirebaseFirestore.instance.collection('tokenAsisten').get();
+              await FirebaseFirestore.instance.collection('dataAsisten').get();
           Set<String> years = querySnapshot.docs
               .map((doc) => doc['tahunAjaran'].toString())
               .toSet();
@@ -84,12 +82,12 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
       QuerySnapshot<Map<String, dynamic>> tokenQuerySnapshot;
       if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         tokenQuerySnapshot = await FirebaseFirestore.instance
-            .collection('tokenAsisten')
+            .collection('dataAsisten')
             .where('tahunAjaran', isEqualTo: selectedYear)
             .get();
       } else {
         tokenQuerySnapshot =
-            await FirebaseFirestore.instance.collection('tokenAsisten').get();
+            await FirebaseFirestore.instance.collection('dataAsisten').get();
       }
       List<DataKelas> data = [];
       for (var tokenDoc in tokenQuerySnapshot.docs) {
@@ -218,7 +216,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                             style: TextStyle(fontSize: 16.0),
                           ),
                           const SizedBox(
-                            width: 10.0,
+                            width: 8.0,
                           ),
                           Expanded(
                               child: TextField(
@@ -248,34 +246,6 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                         ]),
                       ),
                     ),
-                    //== ElevatedButton Token Asisten ==//
-                    Padding(
-                      padding: const EdgeInsets.only(right: 25.0, top: 10.0),
-                      child: SizedBox(
-                        height: 40.0,
-                        width: 165.0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3CBEA9),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const TokenAsisten()));
-                          },
-                          child: const Text(
-                            "+ Token Praktikum",
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
                   ],
                 ),
                 const SizedBox(
@@ -314,7 +284,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "     Aksi",
+                                  "  Aksi",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -401,44 +371,20 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
       DataCell(SizedBox(
           width: 220.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
-      DataCell(Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          //== Tambah Data ==
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => FormDeskripsiKelas(
-                            kodeKelas: fileInfo.kode,
-                            mataKuliah: fileInfo.matkul,
-                          )));
-            },
-            icon: const Icon(
-              Icons.add_box,
-              color: Colors.grey,
-            ),
-            tooltip: 'Tambah Data',
-          ),
-          //== Informasi ==
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DataMahasiswaKelas(
-                            kodeKelas: fileInfo.kode,
-                          )));
-            },
-            icon: const Icon(
-              Icons.info,
-              color: Colors.grey,
-            ),
-            tooltip: 'Data Mahasiswa',
-          )
-        ],
+      DataCell(IconButton(
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DataMahasiswaKelas(
+                        kodeKelas: fileInfo.kode,
+                      )));
+        },
+        icon: const Icon(
+          Icons.info,
+          color: Colors.grey,
+        ),
+        tooltip: 'Data Mahasiswa',
       ))
     ],
   );

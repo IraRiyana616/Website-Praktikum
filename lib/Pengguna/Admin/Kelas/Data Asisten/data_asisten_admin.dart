@@ -10,11 +10,17 @@ class DataAsistenAdmin extends StatefulWidget {
   final String kodeAsisten;
   final String mataKuliah;
   final String kodeKelas;
+  final String dosenPengampu;
+  final String dosenPengampu2;
+  final String tahunAjaran;
   const DataAsistenAdmin(
       {super.key,
       required this.kodeAsisten,
       required this.mataKuliah,
-      required this.kodeKelas});
+      required this.kodeKelas,
+      required this.dosenPengampu,
+      required this.dosenPengampu2,
+      required this.tahunAjaran});
 
   @override
   State<DataAsistenAdmin> createState() => _DataAsistenAdminState();
@@ -522,7 +528,10 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                         'nama': namaAsistenController.text,
                                         'nim': int.tryParse(
                                                 nimAsistenController.text) ??
-                                            0, // Konversi nim menjadi integer
+                                            0,
+                                        'dosenPengampu': widget.dosenPengampu,
+                                        'dosenPengampu2': widget.dosenPengampu2,
+                                        'tahunAjaran': widget.tahunAjaran,
                                       }, {
                                         'kodeAsisten': widget.kodeAsisten,
                                         'mataKuliah': widget.mataKuliah,
@@ -530,7 +539,10 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                         'nama': namaAsisten2Controller.text,
                                         'nim': int.tryParse(
                                                 nimAsisten2Controller.text) ??
-                                            0, // Konversi nim menjadi integer
+                                            0,
+                                        'dosenPengampu': widget.dosenPengampu,
+                                        'dosenPengampu2': widget.dosenPengampu2,
+                                        'tahunAjaran': widget.tahunAjaran,
                                       });
 
                                       _saveDataToFirestore({
@@ -540,7 +552,10 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                         'nama': namaAsisten3Controller.text,
                                         'nim': int.tryParse(
                                                 nimAsisten3Controller.text) ??
-                                            0, // Konversi nim menjadi integer
+                                            0,
+                                        'dosenPengampu': widget.dosenPengampu,
+                                        'dosenPengampu2': widget.dosenPengampu2,
+                                        'tahunAjaran': widget.tahunAjaran,
                                       }, {
                                         'kodeAsisten': widget.kodeAsisten,
                                         'mataKuliah': widget.mataKuliah,
@@ -548,7 +563,10 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
                                         'nama': namaAsisten4Controller.text,
                                         'nim': int.tryParse(
                                                 nimAsisten4Controller.text) ??
-                                            0, // Konversi nim menjadi integer
+                                            0,
+                                        'dosenPengampu': widget.dosenPengampu,
+                                        'dosenPengampu2': widget.dosenPengampu2,
+                                        'tahunAjaran': widget.tahunAjaran,
                                       });
 
                                       namaAsistenController.clear();
