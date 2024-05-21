@@ -573,11 +573,28 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
           IconButton(
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => FormEditJadwalAdmin(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      FormEditJadwalAdmin(
                           kodeKelas: fileInfo.kelas,
-                          mataKuliah: fileInfo.matkul)));
+                          mataKuliah: fileInfo.matkul),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ),
+              );
             },
             icon: const Icon(Icons.edit_document, color: Colors.grey),
             tooltip: 'Edit Data',

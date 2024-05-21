@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Admin/Kelas/Komponen/Deskripsi/deskripsi_admin.dart';
+import 'package:laksi/Pengguna/Admin/Kelas/Komponen/Deskripsi/Screen/deskripsi_admin.dart';
 import 'package:laksi/Pengguna/Admin/Kelas/Komponen/Pengumpulan/Tugas/tugas_admin.dart';
 import '../../../../Dosen/Dashboard/Komponen/Asistensi/Tabel/tabel_asistensi.dart';
 

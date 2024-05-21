@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Admin/Kelas/Komponen/Asistensi/asisten_admin.dart';
-import '../../../../Dosen/Dashboard/Komponen/Deskripsi/Tabel/tabel_modul.dart';
-import '../../Navigasi/kelas_admin_nav.dart';
-import '../Pengumpulan/Tugas/tugas_admin.dart';
+import '../../../../../Dosen/Dashboard/Komponen/Deskripsi/Tabel/tabel_modul.dart';
+import '../../../Navigasi/kelas_admin_nav.dart';
+import '../../Pengumpulan/Tugas/tugas_admin.dart';
 
 class DeskripsiKelasAdmin extends StatefulWidget {
   final String kodeKelas;

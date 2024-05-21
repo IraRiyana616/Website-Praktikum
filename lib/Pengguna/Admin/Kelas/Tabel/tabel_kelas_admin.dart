@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../Data Mahasiswa/Praktikan/data_mahasiswa_admin.dart';
+import '../../Data Mahasiswa/Praktikan/Screen/data_mahasiswa_admin.dart';
 import '../Data Asisten/data_asisten_admin.dart';
 import '../Form Komponen/form_kelas_admin.dart';
-import '../Komponen/Deskripsi/deskripsi_admin.dart';
+import '../Komponen/Deskripsi/Screen/deskripsi_admin.dart';
 
 class TabelKelasAdmin extends StatefulWidget {
   const TabelKelasAdmin({Key? key}) : super(key: key);
@@ -405,11 +405,26 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => DeskripsiKelasAdmin(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  DeskripsiKelasAdmin(
                 kodeKelas: fileInfo.kelas,
                 mataKuliah: fileInfo.matkul,
               ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                const begin = Offset(0.0, 0.0);
+                const end = Offset.zero;
+                const curve = Curves.ease;
+
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
             ),
           );
         },
@@ -439,10 +454,25 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
             onPressed: () async {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => DataPraktikanKelasAdmin(
-                    kodeKelas: fileInfo.kelas,
-                  ),
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      DataPraktikanKelasAdmin(
+                          kodeKelas: fileInfo.kelas,
+                          mataKuliah: fileInfo.matkul),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
                 ),
               );
             },
@@ -457,15 +487,32 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
           IconButton(
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DataAsistenAdmin(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      DataAsistenAdmin(
                           kodeAsisten: fileInfo.asisten,
                           mataKuliah: fileInfo.matkul,
                           kodeKelas: fileInfo.kelas,
                           dosenPengampu: fileInfo.dosenpengampu,
                           dosenPengampu2: fileInfo.dosenpengampu2,
-                          tahunAjaran: fileInfo.tahun)));
+                          tahunAjaran: fileInfo.tahun),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ),
+              );
             },
             icon: const Hero(
                 tag: 'Tambah Data Asisten',

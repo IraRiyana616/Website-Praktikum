@@ -29,22 +29,56 @@ class _AbsensiPraktikanAdminState extends State<AbsensiPraktikanAdmin> {
       // Memilih halaman sesuai dengan index yang dipilih
       if (index == 0) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AbsensiPraktikanAdmin(
-                      kodeKelas: widget.kodeKelas,
-                      mataKuliah: widget.mataKuliah,
-                      kodeAsisten: widget.kodeAsisten,
-                    )));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                AbsensiPraktikanAdmin(
+              kodeKelas: widget.kodeKelas,
+              mataKuliah: widget.mataKuliah,
+              kodeAsisten: widget.kodeAsisten,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       } else if (index == 1) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AbsensiAsistenAdmin(
-                      kodeKelas: widget.kodeKelas,
-                      mataKuliah: widget.mataKuliah,
-                      kodeAsisten: widget.kodeAsisten,
-                    )));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                AbsensiAsistenAdmin(
+              kodeKelas: widget.kodeKelas,
+              mataKuliah: widget.mataKuliah,
+              kodeAsisten: widget.kodeAsisten,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       }
     });
   }

@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../Praktikan/Screen/absensi_praktikan_admin.dart';
-import '../Tabel/absensi_asisten_admin_tabel.dart';
+import 'package:laksi/Pengguna/Admin/Data%20Mahasiswa/Praktikan/Screen/data_mahasiswa_admin.dart';
+import '../Tabel/tabel_data_asisten_admin.dart';
 
-class AbsensiAsistenAdmin extends StatefulWidget {
+class DataAsistenKelasAdmin extends StatefulWidget {
   final String kodeKelas;
   final String mataKuliah;
-  final String kodeAsisten;
-  const AbsensiAsistenAdmin(
-      {super.key,
-      required this.kodeKelas,
-      required this.mataKuliah,
-      required this.kodeAsisten});
+  const DataAsistenKelasAdmin(
+      {Key? key, required this.kodeKelas, required this.mataKuliah})
+      : super(key: key);
 
   @override
-  State<AbsensiAsistenAdmin> createState() => _AbsensiAsistenAdminState();
+  State<DataAsistenKelasAdmin> createState() => _DataAsistenKelasAdminState();
 }
 
-class _AbsensiAsistenAdminState extends State<AbsensiAsistenAdmin> {
+class _DataAsistenKelasAdminState extends State<DataAsistenKelasAdmin> {
   //Fungsi Untuk Bottom Navigation
   int _selectedIndex = 1; // untuk mengatur index bottom navigation
   void _onItemTapped(int index) {
@@ -29,10 +26,9 @@ class _AbsensiAsistenAdminState extends State<AbsensiAsistenAdmin> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                AbsensiPraktikanAdmin(
+                DataPraktikanKelasAdmin(
               kodeKelas: widget.kodeKelas,
               mataKuliah: widget.mataKuliah,
-              kodeAsisten: widget.kodeAsisten,
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -55,10 +51,9 @@ class _AbsensiAsistenAdminState extends State<AbsensiAsistenAdmin> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                AbsensiAsistenAdmin(
+                DataAsistenKelasAdmin(
               kodeKelas: widget.kodeKelas,
               mataKuliah: widget.mataKuliah,
-              kodeAsisten: widget.kodeAsisten,
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -88,72 +83,63 @@ class _AbsensiAsistenAdminState extends State<AbsensiAsistenAdmin> {
         child: AppBar(
           backgroundColor: const Color(0xFFF7F8FA),
           automaticallyImplyLeading: false,
-          title: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox(
-                  width: 40.0,
-                ),
-                Expanded(
-                  child: Text(
-                    widget.mataKuliah,
-                    style: GoogleFonts.quicksand(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 700.0,
-                ),
-                Text(
-                  'Admin',
-                  style: GoogleFonts.quicksand(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-                const SizedBox(width: 30.0)
-              ],
-            ),
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          color: const Color(0xFFE3E8EF),
-          width: 2000.0,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding:
-                    const EdgeInsets.only(left: 65.0, top: 20.0, right: 45.0),
-                child: Container(
-                  width: 1260.0,
-                  color: Colors.white,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TabelAbsensiAsistenAdmin(
-                        kodeAsisten: widget.kodeAsisten,
-                        mataKuliah: widget.mataKuliah,
-                      ),
-                      const SizedBox(
-                        height: 20.0,
-                      )
-                    ],
+              const SizedBox(
+                width: 40.0,
+              ),
+              Expanded(
+                child: Text(
+                  widget.mataKuliah,
+                  style: GoogleFonts.quicksand(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
               ),
               const SizedBox(
-                height: 200.0,
-              )
+                width: 700.0,
+              ),
+              Text(
+                'Admin',
+                style: GoogleFonts.quicksand(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
+              ),
+              const SizedBox(width: 30.0)
             ],
           ),
+        ),
+      ),
+      body: Container(
+        color: const Color(0xFFE3E8EF),
+        width: 2000.0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20.0),
+            Padding(
+              padding: const EdgeInsets.only(left: 35.0, top: 5.0),
+              child: Container(
+                width: 1300.0,
+                color: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TabelDataAsistenAdmin(
+                      kodeKelas: widget.kodeKelas,
+                    ),
+                    const SizedBox(
+                      height: 30.0,
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(

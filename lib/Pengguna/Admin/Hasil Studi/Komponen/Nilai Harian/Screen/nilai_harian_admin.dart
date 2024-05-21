@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../Navigasi/hs_admin.dart';
 import '../../Nilai Akhir/tabel_nilai_akhir_admin.dart';
 import '../Tabel/tabel_nilai_harian_admin.dart';
 
@@ -22,20 +23,54 @@ class _NilaiHarianAdminScreenState extends State<NilaiHarianAdminScreen> {
       // Memilih halaman sesuai dengan index yang dipilih
       if (index == 0) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => NilaiHarianAdminScreen(
-                      kodeKelas: widget.kodeKelas,
-                      mataKuliah: widget.mataKuliah,
-                    )));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                NilaiHarianAdminScreen(
+              kodeKelas: widget.kodeKelas,
+              mataKuliah: widget.mataKuliah,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       } else if (index == 1) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => TabelNilaiAkhirAdmin(
-                      kodeKelas: widget.kodeKelas,
-                      mataKuliah: widget.mataKuliah,
-                    )));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                TabelNilaiAkhirAdmin(
+              kodeKelas: widget.kodeKelas,
+              mataKuliah: widget.mataKuliah,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       }
     });
   }
@@ -50,7 +85,27 @@ class _NilaiHarianAdminScreenState extends State<NilaiHarianAdminScreen> {
           automaticallyImplyLeading: false,
           leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const HasilStudiAdminNav(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ),
+              );
             },
             icon: const Icon(
               Icons.arrow_back,

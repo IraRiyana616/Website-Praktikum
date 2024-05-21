@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Admin/Kelas/Komponen/Asistensi/asisten_admin.dart';
 import '../../../../../Mahasiswa/Asisten/Kelas/Komponen/Pengumpulan/Pre-Test/Tabel/tbl_ujipemahaman.dart';
-import '../../Deskripsi/deskripsi_admin.dart';
+import '../../Deskripsi/Screen/deskripsi_admin.dart';
 import '../Latihan/latihan_admin.dart';
 
 class KumpulUjianPemahamanAdmin extends StatefulWidget {

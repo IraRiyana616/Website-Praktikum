@@ -260,13 +260,30 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
                     color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
           ), onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AbsensiPraktikanAdmin(
-                      kodeKelas: fileInfo.kelas,
-                      mataKuliah: fileInfo.matkul,
-                      kodeAsisten: fileInfo.asisten,
-                    )));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                AbsensiPraktikanAdmin(
+              kodeKelas: fileInfo.kelas,
+              mataKuliah: fileInfo.matkul,
+              kodeAsisten: fileInfo.asisten,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       }),
       DataCell(
         SizedBox(

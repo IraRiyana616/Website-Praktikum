@@ -1,12 +1,9 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Admin/Hasil%20Studi/Navigasi/hs_admin.dart';
-
 import '../Nilai Harian/Screen/nilai_harian_admin.dart';
 
 class TabelNilaiAkhirAdmin extends StatefulWidget {
@@ -278,20 +275,54 @@ class _TabelNilaiAkhirAdminState extends State<TabelNilaiAkhirAdmin> {
       // Memilih halaman sesuai dengan index yang dipilih
       if (index == 0) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => NilaiHarianAdminScreen(
-                      kodeKelas: widget.kodeKelas,
-                      mataKuliah: widget.mataKuliah,
-                    )));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                NilaiHarianAdminScreen(
+              kodeKelas: widget.kodeKelas,
+              mataKuliah: widget.mataKuliah,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       } else if (index == 1) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => TabelNilaiAkhirAdmin(
-                      kodeKelas: widget.kodeKelas,
-                      mataKuliah: widget.mataKuliah,
-                    )));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                TabelNilaiAkhirAdmin(
+              kodeKelas: widget.kodeKelas,
+              mataKuliah: widget.mataKuliah,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       }
     });
   }
@@ -319,23 +350,12 @@ class _TabelNilaiAkhirAdminState extends State<TabelNilaiAkhirAdmin> {
         child: AppBar(
           backgroundColor: const Color(0xFFF7F8FA),
           automaticallyImplyLeading: false,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const HasilStudiAdminNav()));
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.black,
-            ),
-          ),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                const SizedBox(width: 40.0),
                 Expanded(
                   child: Text(
                     widget.mataKuliah,

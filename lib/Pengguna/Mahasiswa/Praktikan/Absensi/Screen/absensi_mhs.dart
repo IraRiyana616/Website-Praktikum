@@ -125,7 +125,6 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
 
   void _uploadFile() async {
     String kodeKelas = _kodeEditingController.text;
-    String namaModul = _modulEditingController.text;
 
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -143,9 +142,10 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
         if (userSnapshot.exists) {
           int userNim = userSnapshot['nim'];
 
-          firebase_storage.Reference ref =
-              firebase_storage.FirebaseStorage.instance.ref().child(
-                  'Absensi Mahasiswa/$kodeKelas/$namaModul/$userNim/${file.name}');
+          firebase_storage.Reference ref = firebase_storage
+              .FirebaseStorage.instance
+              .ref()
+              .child('Absensi Mahasiswa/$kodeKelas/$userNim/${file.name}');
 
           // Upload file
           await ref.putData(file.bytes!);

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Admin/Data%20Mahasiswa/Asisten/data_asistensi_admin.dart';
+import 'package:laksi/Pengguna/Admin/Data%20Mahasiswa/Asisten/Screen/data_asistensi_admin.dart';
+import 'package:laksi/Pengguna/Admin/Data%20Mahasiswa/Praktikan/Tabel/tabel_data_mahasiswa_admin.dart';
 import 'package:laksi/Pengguna/Admin/Kelas/Navigasi/kelas_admin_nav.dart';
-import '../../../Mahasiswa/Asisten/Data Mahasiswa/Tabel/tabel_data.dart';
 
 class DataPraktikanKelasAdmin extends StatefulWidget {
   final String kodeKelas;
-  const DataPraktikanKelasAdmin({Key? key, required this.kodeKelas})
+  final String mataKuliah;
+  const DataPraktikanKelasAdmin(
+      {Key? key, required this.kodeKelas, required this.mataKuliah})
       : super(key: key);
 
   @override
@@ -25,10 +27,29 @@ class _DataPraktikanKelasAdminState extends State<DataPraktikanKelasAdmin> {
         Navigator.pop(context);
       } else if (index == 1) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    DataAsistenKelasAdmin(kodeKelas: widget.kodeKelas)));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                DataAsistenKelasAdmin(
+              kodeKelas: widget.kodeKelas,
+              mataKuliah: widget.mataKuliah,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       }
     });
   }
@@ -51,16 +72,31 @@ class _DataPraktikanKelasAdminState extends State<DataPraktikanKelasAdmin> {
                 Icons.arrow_back,
                 color: Colors.black,
               )),
-          title: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              widget.kodeKelas,
-              style: GoogleFonts.quicksand(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  widget.mataKuliah,
+                  style: GoogleFonts.quicksand(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(
+                width: 700.0,
+              ),
+              Text(
+                'Admin',
+                style: GoogleFonts.quicksand(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
+              ),
+              const SizedBox(width: 30.0)
+            ],
           ),
         ),
       ),
@@ -80,7 +116,7 @@ class _DataPraktikanKelasAdminState extends State<DataPraktikanKelasAdmin> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TabelDataKelasMahasiswa(kodeKelas: widget.kodeKelas),
+                      TabelDataMahasiswaAdmin(kodeKelas: widget.kodeKelas),
                       const SizedBox(
                         height: 30.0,
                       )

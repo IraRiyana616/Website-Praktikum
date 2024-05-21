@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TabelAbsensiPraktikanAdmin extends StatefulWidget {
   final String kodeKelas;
@@ -76,6 +78,7 @@ class _TabelAbsensiPraktikanAdminState
             kode: data?['kode'] ?? '',
             nama: data?['nama'] ?? '',
             nim: data?['nim'] ?? 0,
+            file: data?['namaFile'] ?? '',
             modul: modul,
             timestamp: (data?['timestamp'] as Timestamp).toDate(),
             tanggal: data?['tanggal'] ?? '',
@@ -249,6 +252,11 @@ class _TabelAbsensiPraktikanAdminState
                         ),
                       ),
                       DataColumn(
+                          label: Text(
+                        'Bukti Absensi',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
                         label: Text(
                           'Aksi',
                           style: TextStyle(fontWeight: FontWeight.bold),
@@ -289,7 +297,8 @@ class AbsensiMahasiswa {
   final String nama;
   final int nim;
   final String modul;
-  final DateTime timestamp; // Mengubah tipe data timestamp menjadi DateTime
+  final DateTime timestamp;
+  final String file;
   final String tanggal;
   final String keterangan;
 
@@ -298,7 +307,8 @@ class AbsensiMahasiswa {
     required this.nama,
     required this.nim,
     required this.modul,
-    required this.timestamp, // Mengubah tipe data timestamp menjadi DateTime
+    required this.timestamp,
+    required this.file,
     required this.tanggal,
     required this.keterangan,
   });
@@ -326,6 +336,32 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
         ),
       ),
       DataCell(Text(fileInfo.keterangan)),
+      DataCell(
+        Row(
+          children: [
+            const Icon(
+              Icons.download,
+              color: Colors.grey,
+            ),
+            const SizedBox(
+              width: 5.0,
+            ),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () {
+                  downloadFile(fileInfo.kode, fileInfo.file, fileInfo.nim);
+                },
+                child: const Text(
+                  'Download',
+                  style: TextStyle(
+                      color: Colors.blue, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
       DataCell(IconButton(
         onPressed: () {},
         icon: const Icon(
@@ -336,6 +372,41 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
       ))
     ],
   );
+}
+
+//== Fungsi Download File ==//
+void downloadFile(String kodeKelas, String fileName, int userNim) async {
+  if (kodeKelas.isEmpty) {
+    if (kDebugMode) {
+      print('Error: kodeKelas is null or empty.');
+    }
+    return;
+  }
+
+  // Membuat referensi ke file di Firebase Storage
+  final ref = FirebaseStorage.instance
+      .ref()
+      .child('Absensi Mahasiswa/$kodeKelas/$userNim/$fileName');
+
+  try {
+    final url = await ref.getDownloadURL();
+
+    // Logging the URL for debugging purposes
+    if (kDebugMode) {
+      print('Download URL: $url');
+    }
+
+    // Checking if URL can be launched and launching it
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
+    } else {
+      throw 'Could not launch $url';
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error downloading file: $e');
+    }
+  }
 }
 
 String getLimitedText(String text, int limit) {

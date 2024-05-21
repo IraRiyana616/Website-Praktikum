@@ -288,7 +288,7 @@ class AbsensiMahasiswa {
   final String nama;
   final int nim;
   final String modul;
-  final DateTime timestamp; // Mengubah tipe data timestamp menjadi DateTime
+  final DateTime timestamp;
   final String tanggal;
   final String keterangan;
 
@@ -297,7 +297,7 @@ class AbsensiMahasiswa {
     required this.nama,
     required this.nim,
     required this.modul,
-    required this.timestamp, // Mengubah tipe data timestamp menjadi DateTime
+    required this.timestamp,
     required this.tanggal,
     required this.keterangan,
   });

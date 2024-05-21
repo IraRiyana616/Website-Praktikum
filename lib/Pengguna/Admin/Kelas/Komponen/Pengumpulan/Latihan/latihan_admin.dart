@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Admin/Kelas/Komponen/Asistensi/asisten_admin.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Pengumpulan/Tugas/Tabel/tbl_tugas_prak.dart';
-import '../../Deskripsi/deskripsi_admin.dart';
+import '../../Deskripsi/Screen/deskripsi_admin.dart';
 import '../Tugas/tugas_admin.dart';
 
 class KumpulTugasAdmin extends StatefulWidget {
