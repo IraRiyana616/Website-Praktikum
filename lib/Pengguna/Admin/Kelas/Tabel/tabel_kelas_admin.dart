@@ -408,6 +408,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
             MaterialPageRoute(
               builder: (context) => DeskripsiKelasAdmin(
                 kodeKelas: fileInfo.kelas,
+                mataKuliah: fileInfo.matkul,
               ),
             ),
           );

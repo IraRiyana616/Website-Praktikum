@@ -16,7 +16,7 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
   List<TranskripNilai> filteredTranskripNilai = [];
   //==
   //Dropdown Button Tahun Ajaran
-  String selectedKeterangan = 'Tampilkan Semua Status Praktikum';
+  String selectedKeterangan = ' Status Praktikum';
   List<String> availableKeterangans = [];
   //==
   String nim = ''; // Deklarasi variable nim di luar block if
@@ -40,10 +40,7 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
               .map((doc) => doc['keterangan'].toString())
               .toSet();
           setState(() {
-            availableKeterangans = [
-              'Tampilkan Semua Status Praktikum',
-              ...status.toList()
-            ];
+            availableKeterangans = [' Status Praktikum', ...status.toList()];
           });
         }
       }
@@ -71,7 +68,7 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
         if (transkripNim.toString() == nim) {
           // Check kesamaan NIM dengan pengguna yang sedang login
           Map<String, dynamic> transkripData = transkripDoc.data();
-          if (selectedKeterangan == 'Tampilkan Semua Status Praktikum' ||
+          if (selectedKeterangan == ' Status Praktikum' ||
               transkripData['keterangan'] == selectedKeterangan) {
             data.add(TranskripNilai(
               kode: transkripData['kodeKelas'] ?? '',
@@ -143,7 +140,6 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
                   icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
                   iconSize: 24,
                   elevation: 16,
-
                   value: selectedKeterangan,
                   onChanged: (String? newValue) {
                     setState(() {
@@ -151,12 +147,9 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
                       fetchDataFromFirebase();
                     });
                   },
-                  underline: Container(), // Menjadikan garis bawah kosong
-                  items: [
-                    'Tampilkan Semua Status Praktikum',
-                    'Lulus',
-                    'Tidak Lulus'
-                  ].map((String value) {
+                  underline: Container(),
+                  items: [' Status Praktikum', 'Lulus', 'Tidak Lulus']
+                      .map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Padding(

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:laksi/Pengguna/Admin/Jadwal%20Praktikum/Form%20Jadwal/form_jadwal_praktikum_admin.dart';
-import '../../Kelas/Komponen/Deskripsi/deskripsi_admin.dart';
+import 'package:laksi/Pengguna/Admin/Jadwal%20Praktikum/Tabel/Form%20Edit%20Jadwal/form_edit_jadwal.dart';
 
 class TabelJadwalPraktikumAdmin extends StatefulWidget {
   const TabelJadwalPraktikumAdmin({super.key});
@@ -571,8 +571,15 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
         children: [
           //== IconButton Edit ==//
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.edit, color: Colors.grey),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => FormEditJadwalAdmin(
+                          kodeKelas: fileInfo.kelas,
+                          mataKuliah: fileInfo.matkul)));
+            },
+            icon: const Icon(Icons.edit_document, color: Colors.grey),
             tooltip: 'Edit Data',
           ),
           //== IconButton Delete ==//

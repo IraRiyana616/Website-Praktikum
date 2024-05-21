@@ -7,7 +7,9 @@ import '../Tabel/tabel_asistensi_laporan_prak.dart';
 
 class DataAsistensiPraktikan extends StatefulWidget {
   final String kodeKelas;
-  const DataAsistensiPraktikan({super.key, required this.kodeKelas});
+  final String mataKuliah;
+  const DataAsistensiPraktikan(
+      {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
   State<DataAsistensiPraktikan> createState() => _DataAsistensiPraktikanState();
@@ -87,7 +89,9 @@ class _DataAsistensiPraktikanState extends State<DataAsistensiPraktikan> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => DeskripsiMahasiswa(
-                                          kodeKelas: widget.kodeKelas)));
+                                            kodeKelas: widget.kodeKelas,
+                                            mataKuliah: widget.mataKuliah,
+                                          )));
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(
@@ -118,7 +122,9 @@ class _DataAsistensiPraktikanState extends State<DataAsistensiPraktikan> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             AbsensiPraktikanScreen(
-                                                kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -142,7 +148,9 @@ class _DataAsistensiPraktikanState extends State<DataAsistensiPraktikan> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             DataLatihanPraktikan(
-                                                kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: Text(
                                 'Pengumpulan',

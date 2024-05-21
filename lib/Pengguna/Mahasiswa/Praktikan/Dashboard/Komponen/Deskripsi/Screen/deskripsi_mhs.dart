@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
@@ -8,10 +10,11 @@ import '../Modul/Screen/modul_mhs.dart';
 
 class DeskripsiMahasiswa extends StatefulWidget {
   final String kodeKelas;
-
+  final String mataKuliah;
   const DeskripsiMahasiswa({
     super.key,
     required this.kodeKelas,
+    required this.mataKuliah,
   });
 
   @override
@@ -19,6 +22,45 @@ class DeskripsiMahasiswa extends StatefulWidget {
 }
 
 class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
+  //== Nama Akun ==//
+  User? _currentUser;
+  String _namaMahasiswa = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUser();
+  }
+
+  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  void _getCurrentUser() async {
+    setState(() {
+      _currentUser = _auth.currentUser;
+    });
+    if (_currentUser != null) {
+      await _getNamaMahasiswa(_currentUser!.uid);
+    }
+  }
+
+  // Fungsi untuk mengambil nama mahasiswa dari database
+  Future<void> _getNamaMahasiswa(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('akun_mahasiswa').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          _namaMahasiswa = doc.get('nama');
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching nama mahasiswa: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +88,7 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                 ),
                 Expanded(
                   child: Text(
-                    widget.kodeKelas,
+                    widget.mataKuliah,
                     style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -54,6 +96,23 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  width: 400.0,
+                ),
+                if (_currentUser != null) ...[
+                  Text(
+                    _namaMahasiswa.isNotEmpty
+                        ? _namaMahasiswa
+                        : (_currentUser!.email ?? ''),
+                    style: GoogleFonts.quicksand(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  const SizedBox(
+                    width: 30.0,
+                  ),
+                ],
               ],
             ),
           ),
@@ -63,6 +122,7 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
         stream: FirebaseFirestore.instance
             .collection('deskripsiKelas')
             .where('kodeKelas', isEqualTo: widget.kodeKelas)
+            .where('mataKuliah', isEqualTo: widget.mataKuliah)
             .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -147,6 +207,8 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                                               builder: (context) =>
                                                   AbsensiPraktikanScreen(
                                                     kodeKelas: widget.kodeKelas,
+                                                    mataKuliah:
+                                                        widget.mataKuliah,
                                                   )));
                                     },
                                     child: Padding(
@@ -173,8 +235,10 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   DataLatihanPraktikan(
-                                                      kodeKelas:
-                                                          widget.kodeKelas)));
+                                                    kodeKelas: widget.kodeKelas,
+                                                    mataKuliah:
+                                                        widget.mataKuliah,
+                                                  )));
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
@@ -201,8 +265,10 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   DataAsistensiPraktikan(
-                                                      kodeKelas:
-                                                          widget.kodeKelas)));
+                                                    kodeKelas: widget.kodeKelas,
+                                                    mataKuliah:
+                                                        widget.mataKuliah,
+                                                  )));
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
@@ -279,153 +345,119 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                                   ),
                                   //Peralatan Belajar
                                   SizedBox(
-                                    width: 500.0,
+                                    width: 400.0,
                                     height: 350.0,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        //Peralatan Belajar
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 8.0),
-                                          child: Text(
-                                            'Peralatan Belajar',
-                                            style: GoogleFonts.quicksand(
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20.0),
-                                          child: Text(
-                                            'Spesifikasi minimal perangkan',
-                                            style: GoogleFonts.quicksand(
-                                                fontSize: 15.0),
-                                          ),
-                                        ),
-                                        //RAM
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20.0),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              SizedBox(
-                                                height: 30.0,
-                                                width: 30.0,
-                                                child: Image.asset(
-                                                    'assets/images/disk.png'),
-                                              ),
-                                              const SizedBox(
-                                                width: 15.0,
-                                              ),
-                                              Text(
-                                                'RAM',
-                                                style: GoogleFonts.quicksand(
-                                                    fontSize: 15.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20.0),
-                                          child: SizedBox(
-                                            width: 320.0,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 10.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          //Peralatan Belajar
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 8.0),
                                             child: Text(
-                                              '${data['ram'] ?? 'Not available'}',
+                                              'Peralatan Belajar',
                                               style: GoogleFonts.quicksand(
-                                                  fontSize: 15.0,
-                                                  color: Colors.black),
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                           ),
-                                        ),
-                                        //Sistem Operasi
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20.0),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              SizedBox(
-                                                height: 30.0,
-                                                width: 30.0,
-                                                child: Image.asset(
-                                                    'assets/images/os.png'),
-                                              ),
-                                              const SizedBox(
-                                                width: 15.0,
-                                              ),
-                                              Text(
-                                                'Sistem Operasi',
-                                                style: GoogleFonts.quicksand(
-                                                    fontSize: 15.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20.0),
-                                          child: SizedBox(
-                                            width: 320.0,
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 20.0),
                                             child: Text(
-                                              '${data['sistemOperasi'] ?? 'Not available'}',
+                                              'Peralatan yang dibutuhkan :',
                                               style: GoogleFonts.quicksand(
-                                                  fontSize: 15.0,
-                                                  color: Colors.black),
+                                                  fontSize: 15.0),
                                             ),
                                           ),
-                                        ),
-                                        //Prosesor
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20.0),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              SizedBox(
-                                                height: 30.0,
-                                                width: 30.0,
-                                                child: Image.asset(
-                                                    'assets/images/processor.png'),
-                                              ),
-                                              const SizedBox(
-                                                width: 15.0,
-                                              ),
-                                              Text(
-                                                'Prosesor',
-                                                style: GoogleFonts.quicksand(
-                                                    fontSize: 15.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20.0),
-                                          child: SizedBox(
-                                            width: 320.0,
-                                            child: Text(
-                                              '${data['prosesor'] ?? 'Not available'}',
-                                              style: GoogleFonts.quicksand(
-                                                  fontSize: 15.0,
-                                                  color: Colors.black),
+
+                                          //== Perangkat Lunak ==//
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 20.0),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                SizedBox(
+                                                  height: 30.0,
+                                                  width: 30.0,
+                                                  child: Image.asset(
+                                                      'assets/images/os.png'),
+                                                ),
+                                                const SizedBox(
+                                                  width: 15.0,
+                                                ),
+                                                Text(
+                                                  'Perangkat Lunak',
+                                                  style: GoogleFonts.quicksand(
+                                                      fontSize: 15.0,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black),
+                                                )
+                                              ],
                                             ),
                                           ),
-                                        )
-                                      ],
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 20.0),
+                                            child: SizedBox(
+                                              width: 320.0,
+                                              child: Text(
+                                                '${data['perangkatLunak'] ?? 'Not available'}',
+                                                style: GoogleFonts.quicksand(
+                                                    fontSize: 15.0,
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                          ),
+                                          //== Perangkat Keras ==//
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 20.0),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                SizedBox(
+                                                  height: 30.0,
+                                                  width: 30.0,
+                                                  child: Image.asset(
+                                                      'assets/images/processor.png'),
+                                                ),
+                                                const SizedBox(
+                                                  width: 15.0,
+                                                ),
+                                                Text(
+                                                  'Perangkat Keras',
+                                                  style: GoogleFonts.quicksand(
+                                                      fontSize: 15.0,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 20.0),
+                                            child: SizedBox(
+                                              width: 320.0,
+                                              child: Text(
+                                                '${data['perangkatKeras'] ?? 'Not available'}',
+                                                style: GoogleFonts.quicksand(
+                                                    fontSize: 15.0,
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   )
                                 ],

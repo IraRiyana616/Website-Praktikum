@@ -396,15 +396,16 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
               MaterialPageRoute(
                   builder: (context) => DeskripsiMahasiswa(
                         kodeKelas: fileInfo.kode,
+                        mataKuliah: fileInfo.matkul,
                       )));
         },
       ),
       DataCell(SizedBox(
-          width: 220.0,
-          child: Text(getLimitedText(fileInfo.dosenpengampu, 30)))),
+          width: 250.0,
+          child: Text(getLimitedText(fileInfo.dosenpengampu, 40)))),
       DataCell(SizedBox(
-          width: 220.0,
-          child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
+          width: 250.0,
+          child: Text(getLimitedText(fileInfo.dosenpengampu2, 40)))),
     ],
   );
 }

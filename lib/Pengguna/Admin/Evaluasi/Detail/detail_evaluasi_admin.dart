@@ -177,7 +177,18 @@ class _PieChartNilaiHurufAdminState extends State<PieChartNilaiHurufAdmin> {
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
                   ),
-                )
+                ),
+                const SizedBox(
+                  width: 700.0,
+                ),
+                Text(
+                  'Admin',
+                  style: GoogleFonts.quicksand(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+                const SizedBox(width: 30.0)
               ],
             ),
           ),

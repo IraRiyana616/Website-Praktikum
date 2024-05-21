@@ -49,20 +49,30 @@ class _TabelJadwalPraktikumAsistenState
 
   Future<void> fetchDataFromFirebase(String? selectedYear) async {
     try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+      // Fetch kodeKelas from dataAsisten collection
+      QuerySnapshot<Map<String, dynamic>> asistenSnapshot =
+          await FirebaseFirestore.instance.collection('dataAsisten').get();
+
+      Set<String> kodeKelasSet = asistenSnapshot.docs
+          .map((doc) => doc['kodeKelas'].toString())
+          .toSet();
+
+      QuerySnapshot<Map<String, dynamic>> jadwalSnapshot;
 
       if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
-        querySnapshot = await FirebaseFirestore.instance
+        jadwalSnapshot = await FirebaseFirestore.instance
             .collection('dataJadwalPraktikum')
             .where('tahunAjaran', isEqualTo: selectedYear)
+            .where('kodeKelas', whereIn: kodeKelasSet.toList())
             .get();
       } else {
-        querySnapshot = await FirebaseFirestore.instance
+        jadwalSnapshot = await FirebaseFirestore.instance
             .collection('dataJadwalPraktikum')
+            .where('kodeKelas', whereIn: kodeKelasSet.toList())
             .get();
       }
 
-      List<DataClass> data = querySnapshot.docs.map((doc) {
+      List<DataClass> data = jadwalSnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
         return DataClass(
             id: doc.id,
@@ -73,6 +83,7 @@ class _TabelJadwalPraktikumAsistenState
             waktu: data['waktuPraktikum'],
             semester: data['semester']);
       }).toList();
+
       setState(() {
         demoClassData = data;
         filteredClassData = demoClassData;

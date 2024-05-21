@@ -3,7 +3,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../Komponen/Pre-Test/pre_test.dart';
 
 class TabelSilabusPraktikumMahasiswa extends StatefulWidget {
@@ -57,8 +56,10 @@ class _TabelSilabusPraktikumMahasiswaState
       return DataSilabus(
         kode: kodeKelas,
         modul: data['judulMateri'],
-        jadwal: data['waktuPraktikum'],
+        hari: data['tanggalPraktikum'],
+        waktu: data['waktuPraktikum'],
         file: data['modulPraktikum'],
+
         deskripsiKelas: kodeKelasMap[kodeKelas] ?? '',
         documentId: doc.id, // Add documentId to DataSilabus
       );
@@ -85,7 +86,7 @@ class _TabelSilabusPraktikumMahasiswaState
           child: Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 25.0),
             child: Container(
-              width: 1020.0,
+              width: 1100.0,
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey.shade400),
                   borderRadius: BorderRadius.circular(6.0)),
@@ -105,6 +106,11 @@ class _TabelSilabusPraktikumMahasiswaState
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
+                        DataColumn(
+                            label: Text(
+                          'Waktu Praktikum',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
                         DataColumn(
                           label: Text(
                             'File Modul',
@@ -149,14 +155,16 @@ class _TabelSilabusPraktikumMahasiswaState
 class DataSilabus {
   String kode;
   String modul;
-  String jadwal;
+  String hari;
+  String waktu;
   String file;
   String deskripsiKelas;
-  String documentId; // Added documentId field
+  String documentId;
 
   DataSilabus({
     required this.modul,
-    required this.jadwal,
+    required this.hari,
+    required this.waktu,
     required this.kode,
     required this.file,
     required this.deskripsiKelas,
@@ -194,7 +202,8 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
           ),
         ),
       ),
-      DataCell(Text(fileInfo.jadwal)),
+      DataCell(SizedBox(width: 170, child: Text(fileInfo.hari))),
+      DataCell(SizedBox(width: 170.0, child: Text(fileInfo.waktu))),
       DataCell(Row(
         children: [
           const Icon(
@@ -204,13 +213,17 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
           const SizedBox(
             width: 5.0,
           ),
-          GestureDetector(
-            onTap: () {
-              downloadFile(fileInfo.kode, fileInfo.file);
-            },
-            child: const Text(
-              'Download',
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () {
+                downloadFile(fileInfo.kode, fileInfo.file);
+              },
+              child: const Text(
+                'Download',
+                style:
+                    TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+              ),
             ),
           )
         ],

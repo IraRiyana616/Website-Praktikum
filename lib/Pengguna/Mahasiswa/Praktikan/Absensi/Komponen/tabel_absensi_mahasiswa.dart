@@ -38,6 +38,7 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('absensiMahasiswa')
           .where('nim', isEqualTo: nim)
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
           .get();
 
       setState(() {

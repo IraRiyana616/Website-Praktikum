@@ -72,7 +72,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
 
     //== Mengecheck apakah kode_asisten terdapat dalam Firestore 'token_asisten' ==//
     QuerySnapshot kodeAsistenSnapshot = await firestore
-        .collection('tokenAsisten')
+        .collection('dataAsisten')
         .where('kodeKelas', isEqualTo: widget.kodeKelas)
         .get();
 
@@ -98,12 +98,13 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
     await silabusCollection.doc(nextDocumentId.toString()).set({
       //== Kode Kelas dan Deskripsi Kelas ==//
       'kodeKelas': widget.kodeKelas,
+      'mataKuliah': widget.mataKuliah,
       'deskripsi_kelas': _deskripsiKelasController.text,
 
       //== Peralatan Belajar ==//
 
-      'sistemOperasi': _softwareController.text,
-      'prosesor': _hardwareController.text,
+      'perangkatLunak': _softwareController.text,
+      'perangkatKeras': _hardwareController.text,
     });
 
     //== Tampilkan Pesan Sukses ==//
@@ -154,7 +155,7 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
     }
 
     QuerySnapshot kodeKelasSnapshot = await firestore
-        .collection('tokenAsisten')
+        .collection('dataAsisten')
         .where('kodeKelas', isEqualTo: widget.kodeKelas)
         .get();
 

@@ -59,16 +59,16 @@ class _TabelSilabusPraktikumDosenState
         kode: kodeKelas,
         modul: data['judulMateri'],
         jadwal: data['waktuPraktikum'],
+        tanggal: data['tanggalPraktikum'],
         file: data['modulPraktikum'],
         deskripsiKelas: kodeKelasMap[kodeKelas] ?? '',
-        documentId: doc.id, // Add documentId to DataSilabus
+        documentId: doc.id,
       );
     }).toList();
 
     setState(() {
       demoDataSilabus = dataList;
-      filteredDataSilabus =
-          dataList; // Initialize filteredDataSilabus with all data
+      filteredDataSilabus = dataList;
     });
   }
 
@@ -86,7 +86,7 @@ class _TabelSilabusPraktikumDosenState
           child: Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 25.0),
             child: Container(
-              width: 1020.0,
+              width: 1100.0,
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey.shade400),
                   borderRadius: BorderRadius.circular(6.0)),
@@ -102,7 +102,13 @@ class _TabelSilabusPraktikumDosenState
                         ),
                         DataColumn(
                           label: Text(
-                            'Jadwal Praktikum',
+                            'Hari Praktikum',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Waktu Praktikum',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -151,17 +157,19 @@ class DataSilabus {
   String kode;
   String modul;
   String jadwal;
+  String tanggal;
   String file;
   String deskripsiKelas;
-  String documentId; // Added documentId field
+  String documentId;
 
   DataSilabus({
     required this.modul,
     required this.jadwal,
+    required this.tanggal,
     required this.kode,
     required this.file,
     required this.deskripsiKelas,
-    required this.documentId, // Initialize documentId in constructor
+    required this.documentId,
   });
 }
 
@@ -195,7 +203,8 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
           ),
         ),
       ),
-      DataCell(Text(fileInfo.jadwal)),
+      DataCell(SizedBox(width: 170.0, child: Text(fileInfo.tanggal))),
+      DataCell(SizedBox(width: 170.0, child: Text(fileInfo.jadwal))),
       DataCell(Row(
         children: [
           const Icon(
@@ -205,13 +214,17 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
           const SizedBox(
             width: 5.0,
           ),
-          GestureDetector(
-            onTap: () {
-              downloadFile(fileInfo.kode, fileInfo.file);
-            },
-            child: const Text(
-              'Download',
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () {
+                downloadFile(fileInfo.kode, fileInfo.file);
+              },
+              child: const Text(
+                'Download',
+                style:
+                    TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+              ),
             ),
           )
         ],

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Admin/Kelas/Komponen/Deskripsi/deskripsi_admin.dart';
 import 'package:laksi/Pengguna/Admin/Kelas/Komponen/Pengumpulan/Tugas/tugas_admin.dart';
-import 'package:laksi/Pengguna/Admin/Kelas/Navigasi/kelas_admin_nav.dart';
 import '../../../../Dosen/Dashboard/Komponen/Asistensi/Tabel/tabel_asistensi.dart';
 
 class DataPraktikanAsistensiAdmin extends StatefulWidget {
   final String kodeKelas;
-
-  const DataPraktikanAsistensiAdmin({super.key, required this.kodeKelas});
+  final String mataKuliah;
+  const DataPraktikanAsistensiAdmin(
+      {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
   State<DataPraktikanAsistensiAdmin> createState() =>
@@ -24,17 +24,6 @@ class _DataPraktikanAsistensiAdminState
           preferredSize: const Size.fromHeight(70.0),
           child: AppBar(
             automaticallyImplyLeading: false,
-            leading: IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const KelasAdminNav()));
-                },
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                )),
             backgroundColor: const Color(0xFFF7F8FA),
             title: Padding(
               padding: const EdgeInsets.only(top: 8.0),
@@ -42,16 +31,27 @@ class _DataPraktikanAsistensiAdminState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const SizedBox(
-                    width: 10.0,
+                    width: 30.0,
                   ),
                   Expanded(
                       child: Text(
-                    widget.kodeKelas,
+                    widget.mataKuliah,
                     style: GoogleFonts.quicksand(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
-                  ))
+                  )),
+                  const SizedBox(width: 400.0),
+                  Text(
+                    'Admin',
+                    style: GoogleFonts.quicksand(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  const SizedBox(
+                    width: 30.0,
+                  )
                 ],
               ),
             ),
@@ -81,30 +81,56 @@ class _DataPraktikanAsistensiAdminState
                       ),
                       Row(
                         children: [
-                          //Deskripsi Kelas
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(top: 38.0, left: 95.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
+                          //== Deskripsi Kelas ==//
+                          GestureDetector(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                top: 38.0,
+                                left: 95.0,
+                              ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
                                     context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            DeskripsiKelasAdmin(
-                                                kodeKelas: widget.kodeKelas)));
-                              },
-                              child: MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: Text(
-                                  'Deskripsi',
-                                  style: GoogleFonts.quicksand(fontSize: 16.0),
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          DeskripsiKelasAdmin(
+                                        kodeKelas: widget.kodeKelas,
+                                        mataKuliah: widget.mataKuliah,
+                                      ),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        const begin = Offset(0.0, 0.0);
+                                        const end = Offset.zero;
+                                        const curve = Curves.ease;
+
+                                        var tween = Tween(
+                                                begin: begin, end: end)
+                                            .chain(CurveTween(curve: curve));
+
+                                        return SlideTransition(
+                                          position: animation.drive(tween),
+                                          child: child,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                                child: MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: Text(
+                                    'Deskripsi',
+                                    style: GoogleFonts.quicksand(
+                                      fontSize: 16.0,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
 
-                          //Pengumpulan Pre-Test, Latihan dan Tugas
+                          //== Pengumpulan Pre-Test, Latihan dan Tugas ==//
                           GestureDetector(
                             child: Padding(
                               padding: const EdgeInsets.only(
@@ -114,12 +140,31 @@ class _DataPraktikanAsistensiAdminState
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              KumpulUjianPemahamanAdmin(
-                                                  kodeKelas:
-                                                      widget.kodeKelas)));
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          KumpulUjianPemahamanAdmin(
+                                        kodeKelas: widget.kodeKelas,
+                                        mataKuliah: widget.mataKuliah,
+                                      ),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        const begin = Offset(0.0, 0.0);
+                                        const end = Offset.zero;
+                                        const curve = Curves.ease;
+
+                                        var tween = Tween(
+                                                begin: begin, end: end)
+                                            .chain(CurveTween(curve: curve));
+
+                                        return SlideTransition(
+                                          position: animation.drive(tween),
+                                          child: child,
+                                        );
+                                      },
+                                    ),
+                                  );
                                 },
                                 child: MouseRegion(
                                   cursor: SystemMouseCursors.click,
@@ -133,7 +178,7 @@ class _DataPraktikanAsistensiAdminState
                               ),
                             ),
                           ),
-                          //Asistensi Laporan
+                          //== Asistensi Laporan ==//
                           Padding(
                             padding: const EdgeInsets.only(
                               left: 50.0,

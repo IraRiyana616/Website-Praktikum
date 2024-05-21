@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../../Navigasi/hs_admin.dart';
 import '../../Nilai Akhir/tabel_nilai_akhir_admin.dart';
 import '../Tabel/tabel_nilai_harian_admin.dart';
 
@@ -77,6 +75,17 @@ class _NilaiHarianAdminScreenState extends State<NilaiHarianAdminScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  width: 700.0,
+                ),
+                Text(
+                  'Admin',
+                  style: GoogleFonts.quicksand(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+                const SizedBox(width: 30.0)
               ],
             ),
           ),

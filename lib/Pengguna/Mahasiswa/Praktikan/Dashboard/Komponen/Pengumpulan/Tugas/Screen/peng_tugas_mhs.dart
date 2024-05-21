@@ -9,7 +9,9 @@ import '../Tabel/tabel_peng_tugas_mhs.dart';
 
 class DataTugasPraktikan extends StatefulWidget {
   final String kodeKelas;
-  const DataTugasPraktikan({super.key, required this.kodeKelas});
+  final String mataKuliah;
+  const DataTugasPraktikan(
+      {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
   State<DataTugasPraktikan> createState() => _DataTugasPraktikanState();
@@ -28,6 +30,7 @@ class _DataTugasPraktikanState extends State<DataTugasPraktikan> {
           MaterialPageRoute(
               builder: (context) => DataLatihanPraktikan(
                     kodeKelas: widget.kodeKelas,
+                    mataKuliah: widget.mataKuliah,
                   )),
         );
       } else if (index == 1) {
@@ -110,7 +113,9 @@ class _DataTugasPraktikanState extends State<DataTugasPraktikan> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => DeskripsiMahasiswa(
-                                          kodeKelas: widget.kodeKelas)));
+                                            kodeKelas: widget.kodeKelas,
+                                            mataKuliah: widget.mataKuliah,
+                                          )));
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(
@@ -141,7 +146,9 @@ class _DataTugasPraktikanState extends State<DataTugasPraktikan> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             AbsensiPraktikanScreen(
-                                                kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -179,7 +186,9 @@ class _DataTugasPraktikanState extends State<DataTugasPraktikan> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             DataAsistensiPraktikan(
-                                                kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,

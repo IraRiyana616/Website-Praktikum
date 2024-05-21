@@ -40,6 +40,7 @@ class _TabelKTugasPraktikanState extends State<TabelKTugasPraktikan> {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('tugas')
           .where('nim', isEqualTo: nim)
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
           .get();
 
       Set<String> modulSet = {'Tampilkan Semua'};

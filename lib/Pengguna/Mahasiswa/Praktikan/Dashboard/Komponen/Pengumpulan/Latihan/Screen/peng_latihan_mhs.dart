@@ -9,10 +9,12 @@ import '../../../Asistensi/Screen/asistensi_laporan_prak.dart';
 
 class DataLatihanPraktikan extends StatefulWidget {
   final String kodeKelas;
+  final String mataKuliah;
 
   const DataLatihanPraktikan({
     super.key,
     required this.kodeKelas,
+    required this.mataKuliah,
   });
 
   @override
@@ -35,8 +37,7 @@ class _DataLatihanPraktikanState extends State<DataLatihanPraktikan> {
           context,
           MaterialPageRoute(
               builder: (context) => DataTugasPraktikan(
-                    kodeKelas: widget.kodeKelas,
-                  )),
+                  kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah)),
         );
       }
     });
@@ -114,7 +115,9 @@ class _DataLatihanPraktikanState extends State<DataLatihanPraktikan> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => DeskripsiMahasiswa(
-                                          kodeKelas: widget.kodeKelas)));
+                                            kodeKelas: widget.kodeKelas,
+                                            mataKuliah: widget.mataKuliah,
+                                          )));
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(
@@ -145,7 +148,9 @@ class _DataLatihanPraktikanState extends State<DataLatihanPraktikan> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             AbsensiPraktikanScreen(
-                                                kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -183,7 +188,9 @@ class _DataLatihanPraktikanState extends State<DataLatihanPraktikan> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             DataAsistensiPraktikan(
-                                                kodeKelas: widget.kodeKelas)));
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                            )));
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,

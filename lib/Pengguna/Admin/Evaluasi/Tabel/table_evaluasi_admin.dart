@@ -16,7 +16,7 @@ class _TabelEvaluasiAdminState extends State<TabelEvaluasiAdmin> {
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
 
-  String selectedYear = 'Tampilkan Semua';
+  String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
   Future<void> fetchAvailableYears() async {
@@ -28,7 +28,7 @@ class _TabelEvaluasiAdminState extends State<TabelEvaluasiAdmin> {
           .toSet();
 
       setState(() {
-        availableYears = ['Tampilkan Semua', ...years.toList()];
+        availableYears = ['Tahun Ajaran', ...years.toList()];
       });
     } catch (e) {
       if (kDebugMode) {
@@ -41,7 +41,7 @@ class _TabelEvaluasiAdminState extends State<TabelEvaluasiAdmin> {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
 
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         querySnapshot = await FirebaseFirestore.instance
             .collection('dataKelas')
             .where('tahunAjaran', isEqualTo: selectedYear)

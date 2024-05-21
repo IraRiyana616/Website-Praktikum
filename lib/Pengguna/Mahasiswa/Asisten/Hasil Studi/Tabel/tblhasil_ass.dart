@@ -37,7 +37,7 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
           nim = userNim.toString();
 
           QuerySnapshot<Map<String, dynamic>> querySnapshot =
-              await FirebaseFirestore.instance.collection('tokenAsisten').get();
+              await FirebaseFirestore.instance.collection('dataAsisten').get();
           Set<String> years = querySnapshot.docs
               .map((doc) => doc['tahunAjaran'].toString())
               .toSet();
@@ -58,12 +58,12 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
       QuerySnapshot<Map<String, dynamic>> tokenQuerySnapshot;
       if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         tokenQuerySnapshot = await FirebaseFirestore.instance
-            .collection('tokenAsisten')
+            .collection('dataAsisten')
             .where('tahunAjaran', isEqualTo: selectedYear)
             .get();
       } else {
         tokenQuerySnapshot =
-            await FirebaseFirestore.instance.collection('tokenAsisten').get();
+            await FirebaseFirestore.instance.collection('dataAsisten').get();
       }
       List<DataKelas> data = [];
       for (var tokenDoc in tokenQuerySnapshot.docs) {
@@ -192,7 +192,7 @@ class _TabelHasilAsistenState extends State<TabelHasilAsisten> {
                             columns: const [
                               DataColumn(
                                   label: Text(
-                                'Kode Kelas',
+                                'Kode Asisten',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               )),
                               DataColumn(
@@ -275,8 +275,8 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
     ),
     cells: [
       DataCell(SizedBox(
-        width: 140.0,
-        child: Text(fileInfo.kode),
+        width: 100.0,
+        child: Text(fileInfo.asisten),
       )),
       DataCell(
           SizedBox(
@@ -294,11 +294,11 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
                     )));
       }),
       DataCell(SizedBox(
-          width: 220.0,
-          child: Text(getLimitedText(fileInfo.dosenpengampu, 30)))),
+          width: 250.0,
+          child: Text(getLimitedText(fileInfo.dosenpengampu, 40)))),
       DataCell(SizedBox(
-          width: 220.0,
-          child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
+          width: 250.0,
+          child: Text(getLimitedText(fileInfo.dosenpengampu2, 40)))),
     ],
   );
 }

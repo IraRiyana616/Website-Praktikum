@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Data%20Mahasiswa/Screen/data_mahasiswa.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Form%20Komponen/Deskripsi/form_deskripsi.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Screen/deskripsi_kelas.dart';
 
 class TabelKelasAsisten extends StatefulWidget {
@@ -284,7 +285,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "  Aksi",
+                                  "      Aksi",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -371,20 +372,39 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
       DataCell(SizedBox(
           width: 220.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
-      DataCell(IconButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DataMahasiswaKelas(
-                        kodeKelas: fileInfo.kode,
-                      )));
-        },
-        icon: const Icon(
-          Icons.info,
-          color: Colors.grey,
-        ),
-        tooltip: 'Data Mahasiswa',
+      DataCell(Row(
+        children: [
+          //== Tambah Data ==//
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FormDeskripsiKelas(
+                            kodeKelas: fileInfo.kode,
+                            mataKuliah: fileInfo.matkul)));
+              },
+              icon: const Icon(
+                Icons.add_box,
+                color: Colors.grey,
+              )),
+          //== Informasi ==//
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DataMahasiswaKelas(
+                            kodeKelas: fileInfo.kode,
+                          )));
+            },
+            icon: const Icon(
+              Icons.info,
+              color: Colors.grey,
+            ),
+            tooltip: 'Data Mahasiswa',
+          ),
+        ],
       ))
     ],
   );

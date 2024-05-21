@@ -84,6 +84,17 @@ class _AbsensiPraktikanAdminState extends State<AbsensiPraktikanAdmin> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  width: 700.0,
+                ),
+                Text(
+                  'Admin',
+                  style: GoogleFonts.quicksand(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+                const SizedBox(width: 30.0)
               ],
             ),
           ),
@@ -111,7 +122,7 @@ class _AbsensiPraktikanAdminState extends State<AbsensiPraktikanAdmin> {
                       ),
                       const SizedBox(
                         height: 20.0,
-                      )
+                      ),
                     ],
                   ),
                 ),

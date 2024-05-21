@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../../Dosen/Hasil Studi/Komponen/Nilai Harian/nilai_harian_ds.dart';
 import '../Komponen/Nilai Harian/Screen/nilai_harian_admin.dart';
 
 class TabelHasilStudiAdmin extends StatefulWidget {

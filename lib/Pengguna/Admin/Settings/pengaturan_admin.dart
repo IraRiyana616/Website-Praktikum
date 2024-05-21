@@ -110,18 +110,6 @@ class _PengaturanAdminScreenState extends State<PengaturanAdminScreen> {
                         color: Colors.black),
                   ),
                 ),
-                Container(
-                  width: 37.0,
-                  height: 37.0,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50.0),
-                  ),
-                  child: const CircleAvatar(
-                      backgroundImage: AssetImage('assets/images/admin.jpg')),
-                ),
-                const SizedBox(
-                  width: 8.0,
-                ),
                 IconButton(
                     onPressed: _logout,
                     icon: const Icon(
