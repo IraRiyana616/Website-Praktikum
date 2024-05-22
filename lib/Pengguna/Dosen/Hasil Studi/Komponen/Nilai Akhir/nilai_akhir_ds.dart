@@ -1,17 +1,16 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../Navigation/hasil_studi_ds.dart';
 import '../Nilai Harian/nilai_harian_ds.dart';
 
 class NilaiAkhirDosen extends StatefulWidget {
   final String kodeKelas;
   final String matkul;
   const NilaiAkhirDosen(
-      {Key? key, required this.kodeKelas, required this.matkul})
-      : super(key: key);
+      {super.key, required this.kodeKelas, required this.matkul});
 
   @override
   State<NilaiAkhirDosen> createState() => _NilaiAkhirDosenState();
@@ -19,331 +18,345 @@ class NilaiAkhirDosen extends StatefulWidget {
 
 class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
   final ScrollController _controller = ScrollController();
+
   String selectedKeterangan = 'Tampilkan Semua';
+  late final StreamController<List<PenilaianAkhir>> _penilaianStreamController =
+      StreamController<List<PenilaianAkhir>>();
 
-//== Pre-Test ==//
-  TextEditingController pretestController = TextEditingController();
-  //== Project Akhir ==//
-  TextEditingController projectAkhirController = TextEditingController();
-  //== Laporan Resmi ==//
-  TextEditingController laporanResmiController = TextEditingController();
+  List<PenilaianAkhir> demoPenilaianAkhir = [];
+  List<PenilaianAkhir> filteredPenilaianAkhir = [];
 
-  late StreamSubscription<QuerySnapshot> _penilaianStreamSubscription;
-  late StreamSubscription<QuerySnapshot> _nilaiHarianStreamSubscription;
-
-  List<PenilaianAkhir> _penilaianList = [];
+  @override
+  void dispose() {
+    _penilaianStreamController.close();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
-    _subscribeToNilaiAkhir();
-    _subscribeToNilaiHarian(); // Tambahkan listener untuk nilaiHarian
+    checkAndFetchData();
+    _getCurrentUser();
   }
 
-  void _subscribeToNilaiHarian() {
-    _nilaiHarianStreamSubscription = FirebaseFirestore.instance
-        .collection('nilaiHarian')
-        .snapshots()
-        .listen((snapshot) async {
-      try {
-        for (var document in snapshot.docs) {
-          var data = document.data();
-          String kodeKelas = data['kodeKelas'];
-          int nim = data['nim'];
-          double modul1 = (data['modul1'] ?? 0).toDouble();
-          double modul2 = (data['modul2'] ?? 0).toDouble();
-          double modul3 = (data['modul3'] ?? 0).toDouble();
-          double modul4 = (data['modul4'] ?? 0).toDouble();
-          double modul5 = (data['modul5'] ?? 0).toDouble();
-          double modul6 = (data['modul6'] ?? 0).toDouble();
-          double modul7 = (data['modul7'] ?? 0).toDouble();
-          double modul8 = (data['modul8'] ?? 0).toDouble();
-
-          // Update nilaiAkhir berdasarkan perubahan di nilaiHarian
-          await _updateNilaiAkhir(modul1, modul2, modul3, modul4, modul5,
-              modul6, modul7, modul8, kodeKelas, nim);
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error: $e');
-        }
-      }
-    });
-  }
-
-  Future<void> _updateNilaiAkhir(
-      double newModul1,
-      double newModul2,
-      double newModul3,
-      double newModul4,
-      double newModul5,
-      double newModul6,
-      double newModul7,
-      double newModul8,
-      String kodeKelas,
-      int nim) async {
+  Future<void> checkAndFetchData() async {
     try {
-      var querySnapshot = await FirebaseFirestore.instance
+      final nilaiAkhirSnapshots = await FirebaseFirestore.instance
           .collection('nilaiAkhir')
-          .where('kodeKelas', isEqualTo: kodeKelas)
-          .where('nim', isEqualTo: nim)
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
           .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        var documentSnapshot = querySnapshot.docs.first;
-        var data = documentSnapshot.data();
+      if (nilaiAkhirSnapshots.docs.isNotEmpty) {
+        final List<PenilaianAkhir> data = nilaiAkhirSnapshots.docs.map((doc) {
+          final data = doc.data();
+          final nilaiAkhirData = calculateHuruf(
+            data['modul1'] ?? 0.0,
+            data['modul2'] ?? 0.0,
+            data['modul3'] ?? 0.0,
+            data['modul4'] ?? 0.0,
+            data['modul5'] ?? 0.0,
+            data['modul6'] ?? 0.0,
+            data['modul7'] ?? 0.0,
+            data['modul8'] ?? 0.0,
+            data['pretest'] ?? 0.0,
+            data['projectAkhir'] ?? 0.0,
+            data['laporanResmi'] ?? 0.0,
+          );
+          return PenilaianAkhir(
+            nim: data['nim'] ?? '',
+            nama: data['nama'] ?? '',
+            kode: widget.kodeKelas,
+            modul1: data['modul1'] ?? 0.0,
+            modul2: data['modul2'] ?? 0.0,
+            modul3: data['modul3'] ?? 0.0,
+            modul4: data['modul4'] ?? 0.0,
+            modul5: data['modul5'] ?? 0.0,
+            modul6: data['modul6'] ?? 0.0,
+            modul7: data['modul7'] ?? 0.0,
+            modul8: data['modul8'] ?? 0.0,
+            pretest: data['pretest'] ?? 0.0,
+            project: data['projectAkhir'] ?? 0.0,
+            resmi: data['laporanResmi'] ?? 0.0,
+            akhir: calculateNilaiAkhir(
+                data['modul1'] ?? 0.0,
+                data['modul2'] ?? 0.0,
+                data['modul3'] ?? 0.0,
+                data['modul4'] ?? 0.0,
+                data['modul5'] ?? 0.0,
+                data['modul6'] ?? 0.0,
+                data['modul7'] ?? 0.0,
+                data['modul8'] ?? 0.0,
+                data['pretest'] ?? 0.0,
+                data['projectAkhir'] ?? 0.0,
+                data['laporanResmi'] ?? 0.0),
+            huruf: nilaiAkhirData['nilaiHuruf'] ?? '',
+            status: nilaiAkhirData['status'] ?? '',
+          );
+        }).toList();
 
-        var penilaian = PenilaianAkhir(
-          nim: nim,
-          nama: data['nama'] ?? '',
-          kode: kodeKelas,
-          modul1: newModul1,
-          modul2: newModul2,
-          modul3: newModul3,
-          modul4: newModul4,
-          modul5: newModul5,
-          modul6: newModul6,
-          modul7: newModul7,
-          modul8: newModul8,
-          pretest: (data['pretest'] ?? 0).toDouble(),
-          project: (data['projectAkhir'] ?? 0).toDouble(),
-          resmi: (data['laporanResmi'] ?? 0).toDouble(),
-          akhir: (data['nilaiAkhir'] ?? 0).toDouble(),
-          huruf: data['nilaiHuruf'] ?? '',
-          status: data['status'] ?? '',
-        );
-
-        var hasil = calculateHuruf(
-            penilaian.modul1,
-            penilaian.modul2,
-            penilaian.modul3,
-            penilaian.modul4,
-            penilaian.modul5,
-            penilaian.modul6,
-            penilaian.modul7,
-            penilaian.modul8,
-            penilaian.pretest,
-            penilaian.project,
-            penilaian.resmi);
-        penilaian.akhir = calculateNilaiAkhir(
-            penilaian.modul1,
-            penilaian.modul2,
-            penilaian.modul3,
-            penilaian.modul4,
-            penilaian.modul5,
-            penilaian.modul6,
-            penilaian.modul7,
-            penilaian.modul8,
-            penilaian.pretest,
-            penilaian.project,
-            penilaian.resmi);
-        penilaian.huruf = hasil['nilaiHuruf']!;
-        penilaian.status = hasil['status']!;
-
-        await documentSnapshot.reference.update({
-          'modul1': penilaian.modul1,
-          'modul2': penilaian.modul2,
-          'modul3': penilaian.modul3,
-          'modul4': penilaian.modul4,
-          'modul5': penilaian.modul5,
-          'modul6': penilaian.modul6,
-          'modul7': penilaian.modul7,
-          'modul8': penilaian.modul8,
-          'nilaiAkhir': penilaian.akhir,
-          'nilaiHuruf': penilaian.huruf,
-          'status': penilaian.status,
+        setState(() {
+          _penilaianStreamController.add(data);
         });
-
-        if (kDebugMode) {
-          print('Nilai akhir updated based on nilai harian changes');
-        }
       } else {
-        if (kDebugMode) {
-          print(
-              'Document in nilaiAkhir does not exist for provided kodeKelas and nim');
-        }
+        await addDataFromNilaiHarian();
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating nilaiAkhir: $e');
+        print('Error: $e');
       }
     }
   }
 
-  void _subscribeToNilaiAkhir() {
-    _penilaianStreamSubscription = FirebaseFirestore.instance
-        .collection('nilaiAkhir')
-        .snapshots()
-        .listen((snapshot) async {
-      List<PenilaianAkhir> penilaianList = [];
+  Future<void> addDataFromNilaiHarian() async {
+    final nilaiHarianSnapshot = await FirebaseFirestore.instance
+        .collection('nilaiHarian')
+        .where('kodeKelas', isEqualTo: widget.kodeKelas)
+        .get();
 
-      try {
-        for (var document in snapshot.docs) {
-          var data = document.data();
-          var modul1 = (data['modul1'] ?? 0).toDouble();
-          var modul2 = (data['modul2'] ?? 0).toDouble();
-          var modul3 = (data['modul3'] ?? 0).toDouble();
-          var modul4 = (data['modul4'] ?? 0).toDouble();
-          var modul5 = (data['modul5'] ?? 0).toDouble();
-          var modul6 = (data['modul6'] ?? 0).toDouble();
-          var modul7 = (data['modul7'] ?? 0).toDouble();
-          var modul8 = (data['modul8'] ?? 0).toDouble();
-          var project = (data['projectAkhir'] ?? 0).toDouble();
-          var resmi = (data['laporanResmi'] ?? 0).toDouble();
-          var pretest = (data['pretest'] ?? 0).toDouble();
+    if (nilaiHarianSnapshot.docs.isNotEmpty) {
+      final batch = FirebaseFirestore.instance.batch();
 
-          var nilaiAkhir = calculateNilaiAkhir(modul1, modul2, modul3, modul4,
-              modul5, modul6, modul7, modul8, pretest, project, resmi);
-          var penilaian = PenilaianAkhir(
-              nim: data['nim'] ?? 0,
-              nama: data['nama'] ?? '',
-              kode: data['kodeKelas'] ?? '',
-              modul1: modul1,
-              modul2: modul2,
-              modul3: modul3,
-              modul4: modul4,
-              modul5: modul5,
-              modul6: modul6,
-              modul7: modul7,
-              modul8: modul8,
-              pretest: (data['pretest'] ?? 0).toDouble(),
-              project: (data['projectAkhir'] ?? 0).toDouble(),
-              resmi: (data['laporanResmi'] ?? 0).toDouble(),
-              akhir: nilaiAkhir,
-              huruf: data['nilaiHuruf'] ?? '',
-              status: data['status'] ?? '');
+      for (var doc in nilaiHarianSnapshot.docs) {
+        final data = doc.data();
+        final nilaiAkhirData = calculateHuruf(
+            data['modul1'] ?? 0.0,
+            data['modul2'] ?? 0.0,
+            data['modul3'] ?? 0.0,
+            data['modul4'] ?? 0.0,
+            data['modul5'] ?? 0.0,
+            data['modul6'] ?? 0.0,
+            data['modul7'] ?? 0.0,
+            data['modul8'] ?? 0.0,
+            data['pretest'] ?? 0.0,
+            data['projectAkhir'] ?? 0.0,
+            data['laporanResmi'] ?? 0.0);
+        final nilaiAkhir = calculateNilaiAkhir(
+            data['modul1'] ?? 0.0,
+            data['modul2'] ?? 0.0,
+            data['modul3'] ?? 0.0,
+            data['modul4'] ?? 0.0,
+            data['modul5'] ?? 0.0,
+            data['modul6'] ?? 0.0,
+            data['modul7'] ?? 0.0,
+            data['modul8'] ?? 0.0,
+            data['pretest'] ?? 0.0,
+            data['projectAkhir'] ?? 0.0,
+            data['laporanResmi'] ?? 0.0);
 
-          penilaianList.add(penilaian);
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error: $e');
-        }
-      }
+        // Check if there is existing data in nilaiAkhir for this nim
+        final existingData = await FirebaseFirestore.instance
+            .collection('nilaiAkhir')
+            .where('nim', isEqualTo: data['nim'])
+            .limit(1)
+            .get();
 
-      setState(() {
-        _penilaianList = penilaianList;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _penilaianStreamSubscription.cancel();
-    _nilaiHarianStreamSubscription.cancel(); // Tambahkan ini
-    super.dispose();
-  }
-
-  void _updatePretest(double newPretest, double newProject, double newResmi,
-      String kodeKelas, int nim) async {
-    try {
-      var querySnapshot = await FirebaseFirestore.instance
-          .collection('nilaiAkhir')
-          .where('kodeKelas', isEqualTo: kodeKelas)
-          .where('nim', isEqualTo: nim)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        var documentSnapshot = querySnapshot.docs.first;
-        var data = documentSnapshot.data();
-
-        // Check if nilai harian exists
-        if (data.containsKey('pretest')) {
-          var penilaian = PenilaianAkhir(
-            nim: nim,
-            nama: data['nama'] ?? '',
-            kode: kodeKelas,
-            modul1: (data['modul1'] ?? 0).toDouble(),
-            modul2: (data['modul2'] ?? 0).toDouble(),
-            modul3: (data['modul3'] ?? 0).toDouble(),
-            modul4: (data['modul4'] ?? 0).toDouble(),
-            modul5: (data['modul5'] ?? 0).toDouble(),
-            modul6: (data['modul6'] ?? 0).toDouble(),
-            modul7: (data['modul7'] ?? 0).toDouble(),
-            modul8: (data['modul8'] ?? 0).toDouble(),
-            pretest: newPretest,
-            project: newProject,
-            resmi: newResmi,
-            akhir: calculateNilaiAkhir(
-                (data['modul1'] ?? 0).toDouble(),
-                (data['modul2'] ?? 0).toDouble(),
-                (data['modul3'] ?? 0).toDouble(),
-                (data['modul4'] ?? 0).toDouble(),
-                (data['modul5'] ?? 0).toDouble(),
-                (data['modul6'] ?? 0).toDouble(),
-                (data['modul7'] ?? 0).toDouble(),
-                (data['modul8'] ?? 0).toDouble(),
-                newPretest,
-                newProject,
-                newResmi),
-            huruf: data['nilaiHuruf'] ?? '',
-            status: data['status'] ?? '',
+        if (existingData.docs.isNotEmpty) {
+          // Update existing entry
+          final docId = existingData.docs.first.id;
+          batch.update(
+            FirebaseFirestore.instance.collection('nilaiAkhir').doc(docId),
+            {
+              'modul1': data['modul1'] ?? 0.0,
+              'modul2': data['modul2'] ?? 0.0,
+              'modul3': data['modul3'] ?? 0.0,
+              'modul4': data['modul4'] ?? 0.0,
+              'modul5': data['modul5'] ?? 0.0,
+              'modul6': data['modul6'] ?? 0.0,
+              'modul7': data['modul7'] ?? 0.0,
+              'modul8': data['modul8'] ?? 0.0,
+              'pretest': data['pretest'] ?? 0.0,
+              'projectAkhir': data['projectAkhir'] ?? 0.0,
+              'laporanResmi': data['laporanResmi'] ?? 0.0,
+              'status': nilaiAkhirData['status'] ?? '',
+              'nilaiAkhir': nilaiAkhir,
+              'nilaiHuruf': nilaiAkhirData['nilaiHuruf'] ?? '',
+            },
           );
-
-          var hasil = calculateHuruf(
-              penilaian.modul1,
-              penilaian.modul2,
-              penilaian.modul3,
-              penilaian.modul4,
-              penilaian.modul5,
-              penilaian.modul6,
-              penilaian.modul7,
-              penilaian.modul8,
-              penilaian.pretest,
-              penilaian.project,
-              penilaian.resmi);
-          penilaian.huruf = hasil['nilaiHuruf']!;
-          penilaian.status = hasil['status']!;
-
-          await documentSnapshot.reference.update({
-            'nim': penilaian.nim,
-            'nama': penilaian.nama,
-            'kodeKelas': penilaian.kode,
-            'modul1': penilaian.modul1,
-            'modul2': penilaian.modul2,
-            'modul3': penilaian.modul3,
-            'modul4': penilaian.modul4,
-            'modul5': penilaian.modul5,
-            'modul6': penilaian.modul6,
-            'modul7': penilaian.modul7,
-            'modul8': penilaian.modul8,
-            'pretest': penilaian.pretest,
-            'projectAkhir': penilaian.project,
-            'laporanResmi': penilaian.resmi,
-            'nilaiAkhir': penilaian.akhir,
-            'nilaiHuruf': penilaian.huruf,
-            'status': penilaian.status,
+        } else {
+          // Add new entry
+          final penilaianAkhirRef =
+              FirebaseFirestore.instance.collection('nilaiAkhir').doc();
+          batch.set(penilaianAkhirRef, {
+            'nim': data['nim'] ?? 0,
+            'nama': data['nama'] ?? '',
+            'kodeKelas': widget.kodeKelas,
+            'modul1': data['modul1'] ?? 0.0,
+            'modul2': data['modul2'] ?? 0.0,
+            'modul3': data['modul3'] ?? 0.0,
+            'modul4': data['modul4'] ?? 0.0,
+            'modul5': data['modul5'] ?? 0.0,
+            'modul6': data['modul6'] ?? 0.0,
+            'modul7': data['modul7'] ?? 0.0,
+            'modul8': data['modul8'] ?? 0.0,
+            'pretest': data['pretest'] ?? 0.0,
+            'projectAkhir': data['projectAkhir'] ?? 0.0,
+            'laporanResmi': data['laporanResmi'] ?? 0.0,
+            'status': nilaiAkhirData['status'] ?? '',
+            'nilaiAkhir': nilaiAkhir,
+            'nilaiHuruf': nilaiAkhirData['nilaiHuruf'] ?? '',
           });
         }
       }
+      await getDataFromFirebase();
+      await batch.commit();
+    }
+  }
+
+  Future<void> getDataFromFirebase() async {
+    try {
+      final penilaianStream = FirebaseFirestore.instance
+          .collection('nilaiHarian')
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
+          .snapshots()
+          .map((snapshot) => snapshot.docs.map((doc) {
+                final data = doc.data();
+                final nilaiAkhirData = calculateHuruf(
+                  data['modul1'] ?? 0.0,
+                  data['modul2'] ?? 0.0,
+                  data['modul3'] ?? 0.0,
+                  data['modul4'] ?? 0.0,
+                  data['modul5'] ?? 0.0,
+                  data['modul6'] ?? 0.0,
+                  data['modul7'] ?? 0.0,
+                  data['modul8'] ?? 0.0,
+                  data['pretest'] ?? 0.0,
+                  data['projectAkhir'] ?? 0.0,
+                  data['laporanResmi'] ?? 0.0,
+                );
+                return PenilaianAkhir(
+                  nim: data['nim'] ?? '',
+                  nama: data['nama'] ?? '',
+                  kode: widget.kodeKelas,
+                  modul1: data['modul1'] ?? 0.0,
+                  modul2: data['modul2'] ?? 0.0,
+                  modul3: data['modul3'] ?? 0.0,
+                  modul4: data['modul4'] ?? 0.0,
+                  modul5: data['modul5'] ?? 0.0,
+                  modul6: data['modul6'] ?? 0.0,
+                  modul7: data['modul7'] ?? 0.0,
+                  modul8: data['modul8'] ?? 0.0,
+                  pretest: data['pretest'] ?? 0.0,
+                  project: data['projectAkhir'] ?? 0.0,
+                  resmi: data['laporanResmi'] ?? 0.0,
+                  akhir: calculateNilaiAkhir(
+                    data['modul1'] ?? 0.0,
+                    data['modul2'] ?? 0.0,
+                    data['modul3'] ?? 0.0,
+                    data['modul4'] ?? 0.0,
+                    data['modul5'] ?? 0.0,
+                    data['modul6'] ?? 0.0,
+                    data['modul7'] ?? 0.0,
+                    data['modul8'] ?? 0.0,
+                    data['pretest'] ?? 0.0,
+                    data['projectAkhir'] ?? 0.0,
+                    data['laporanResmi'] ?? 0.0,
+                  ),
+                  huruf: nilaiAkhirData['nilaiHuruf'] ?? '',
+                  status: nilaiAkhirData['status'] ?? '',
+                );
+              }).toList());
+
+      // Clear previous data before adding new one
+      _penilaianStreamController.sink.add([]);
+
+      // Add the stream to the StreamController
+      _penilaianStreamController.addStream(penilaianStream);
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating pretest: $e');
+        print('Error: $e');
       }
     }
   }
 
-  int _selectedIndex = 1;
+  //== Nama Akun ==//
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  User? _currentUser;
+  String _namaDosen = '';
+
+  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
+  void _getCurrentUser() async {
+    setState(() {
+      _currentUser = _auth.currentUser;
+    });
+    if (_currentUser != null) {
+      await _getNamaDosen(_currentUser!.uid);
+    }
+  }
+
+  // Fungsi untuk mengambil nama mahasiswa dari database
+  Future<void> _getNamaDosen(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('akun_dosen').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          _namaDosen = doc.get('nama');
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching nama mahasiswa: $e');
+      }
+    }
+  }
+
+  //Fungsi Untuk Bottom Navigation
+  int _selectedIndex = 1; // untuk mengatur index bottom navigation
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-
+      // Memilih halaman sesuai dengan index yang dipilih
       if (index == 0) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => NilaiPercobaanDosen(
-                      kodeKelas: widget.kodeKelas,
-                      matkul: widget.matkul,
-                    )));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                NilaiPercobaanDosen(
+              kodeKelas: widget.kodeKelas,
+              matkul: widget.matkul,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       } else if (index == 1) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => NilaiAkhirDosen(
-                      kodeKelas: widget.kodeKelas,
-                      matkul: widget.matkul,
-                    )));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                NilaiAkhirDosen(
+              kodeKelas: widget.kodeKelas,
+              matkul: widget.matkul,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       }
     });
   }
@@ -359,7 +372,7 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.task),
-            label: 'Nilai Akhir',
+            label: 'Nilai AKhir',
           ),
         ],
         currentIndex: _selectedIndex,
@@ -371,23 +384,12 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
         child: AppBar(
           backgroundColor: const Color(0xFFF7F8FA),
           automaticallyImplyLeading: false,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const HasilStudiDosenNav()));
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.black,
-            ),
-          ),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                const SizedBox(width: 40.0),
                 Expanded(
                   child: Text(
                     widget.matkul,
@@ -398,6 +400,23 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  width: 700.0,
+                ),
+                if (_currentUser != null) ...[
+                  Text(
+                    _namaDosen.isNotEmpty
+                        ? _namaDosen
+                        : (_currentUser!.email ?? ''),
+                    style: GoogleFonts.quicksand(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  const SizedBox(
+                    width: 30.0,
+                  ),
+                ],
               ],
             ),
           ),
@@ -415,8 +434,7 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
                 height: 20.0,
               ),
               Padding(
-                padding:
-                    const EdgeInsets.only(left: 25.0, top: 5.0, right: 25.0),
+                padding: const EdgeInsets.only(left: 25.0, right: 45.0),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -432,11 +450,8 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(
-                                top: 8.0,
-                                bottom: 30.0,
-                                left: 8.0), // Ubah left menjadi 8.0
+                                top: 8.0, bottom: 30.0, left: 880.0),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 const Text(
                                   'Search :',
@@ -495,333 +510,361 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
                             child: SingleChildScrollView(
                               controller: _controller,
                               scrollDirection: Axis.horizontal,
-                              child: DataTable(
-                                columnSpacing: 10,
-                                columns: const [
-                                  DataColumn(
-                                    label: Text('NIM',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Nama',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Pre-Test',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Modul 1',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Modul 2',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Modul 3',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Modul 4',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Modul 5',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Modul 6',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Modul 7',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Modul 8',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Project Akhir',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Laporan Resmi',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Nilai Akhir',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Nilai Huruf',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Status',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  DataColumn(
-                                    label: Text('Aksi',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                ],
-                                rows: _penilaianList
-                                    .where((penilaian) =>
-                                        selectedKeterangan ==
-                                            'Tampilkan Semua' ||
-                                        penilaian.status ==
-                                            (selectedKeterangan == 'Lulus'
-                                                ? 'Lulus'
-                                                : 'Tidak Lulus'))
-                                    .map((penilaian) {
-                                  int index = _penilaianList.indexOf(penilaian);
-                                  return DataRow(
-                                    color: MaterialStateProperty.resolveWith<
-                                        Color>(
-                                      (Set<MaterialState> states) {
-                                        return getRowColor(index);
-                                      },
-                                    ),
-                                    cells: [
-                                      DataCell(SizedBox(
-                                        width: 100.0,
-                                        child: Text(penilaian.nim.toString()),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 180.0,
-                                        child: Text(penilaian.nama),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 80.0,
-                                        child: Text(getLimitedText(
-                                            penilaian.pretest.toString(), 5)),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 80.0,
-                                        child: Text(getLimitedText(
-                                            penilaian.modul1.toString(), 5)),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 80.0,
-                                        child: Text(getLimitedText(
-                                            penilaian.modul2.toString(), 5)),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 80.0,
-                                        child: Text(getLimitedText(
-                                            penilaian.modul3.toString(), 5)),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 80.0,
-                                        child: Text(getLimitedText(
-                                            penilaian.modul4.toString(), 5)),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 80.0,
-                                        child: Text(getLimitedText(
-                                            penilaian.modul5.toString(), 5)),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 80.0,
-                                        child: Text(getLimitedText(
-                                            penilaian.modul6.toString(), 5)),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 80.0,
-                                        child: Text(getLimitedText(
-                                            penilaian.modul7.toString(), 5)),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 80.0,
-                                        child: Text(getLimitedText(
-                                            penilaian.modul8.toString(), 5)),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 120.0,
-                                        child: Text(getLimitedText(
-                                            penilaian.project.toString(), 5)),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 120.0,
-                                        child: Text(getLimitedText(
-                                            penilaian.resmi.toString(), 5)),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 120.0,
-                                        child: Text(getLimitedText(
-                                            penilaian.akhir.toString(), 5)),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 100.0,
-                                        child: Text(penilaian.huruf),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 150.0,
-                                        child: Text(penilaian.status),
-                                      )),
-                                      DataCell(IconButton(
-                                        onPressed: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                title: const Text(
-                                                    'Formulir Nilai Akhir'),
-                                                content: SizedBox(
-                                                  height: 160.0,
-                                                  width: 140.0,
-                                                  child: Column(
-                                                    children: [
-                                                      //== PreTest ==//
+                              child: StreamBuilder<List<PenilaianAkhir>>(
+                                stream: _penilaianStreamController.stream,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text('Error: ${snapshot.error}');
+                                  }
 
-                                                      TextField(
-                                                        controller:
-                                                            pretestController,
-                                                        keyboardType:
-                                                            TextInputType
-                                                                .number,
-                                                        decoration:
-                                                            const InputDecoration(
-                                                                labelText:
-                                                                    'Pretest'),
-                                                      ),
-                                                      //== Projek Akhir ==//
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const CircularProgressIndicator();
+                                  }
 
-                                                      TextField(
-                                                        controller:
-                                                            projectAkhirController,
-                                                        keyboardType:
-                                                            TextInputType
-                                                                .number,
-                                                        decoration:
-                                                            const InputDecoration(
-                                                                labelText:
-                                                                    'Project Akhir'),
-                                                      ),
-                                                      //== Laporan Resmi ==//
+                                  if (!snapshot.hasData) {
+                                    return const Text('No data available');
+                                  }
 
-                                                      TextField(
-                                                        controller:
-                                                            laporanResmiController,
-                                                        keyboardType:
-                                                            TextInputType
-                                                                .number,
-                                                        decoration:
-                                                            const InputDecoration(
-                                                                labelText:
-                                                                    'Laporan Resmi'),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                actions: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                    children: [
-                                                      //== SIMPAN ==//
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                bottom: 8.0),
-                                                        child: TextButton(
-                                                          onPressed: () {
-                                                            if (pretestController.text.isNotEmpty &&
-                                                                projectAkhirController
-                                                                    .text
-                                                                    .isNotEmpty &&
-                                                                laporanResmiController
-                                                                    .text
-                                                                    .isNotEmpty) {
-                                                              double
-                                                                  newPretest =
-                                                                  double.tryParse(
-                                                                          pretestController
-                                                                              .text) ??
-                                                                      0.0;
-                                                              double
-                                                                  newProject =
-                                                                  double.tryParse(
-                                                                          projectAkhirController
-                                                                              .text) ??
-                                                                      0.0;
-                                                              double newResmi =
-                                                                  double.tryParse(
-                                                                          laporanResmiController
-                                                                              .text) ??
-                                                                      0.0;
+                                  // Filter data berdasarkan nilai yang dipilih
+                                  List<PenilaianAkhir> filteredData =
+                                      snapshot.data!;
+                                  if (selectedKeterangan != 'Tampilkan Semua') {
+                                    filteredData = filteredData.where((data) {
+                                      if (selectedKeterangan == 'Lulus') {
+                                        return data.status == 'Lulus';
+                                      } else {
+                                        return data.status == 'Tidak Lulus';
+                                      }
+                                    }).toList();
+                                  }
 
-                                                              _updatePretest(
-                                                                  newPretest,
-                                                                  newProject,
-                                                                  newResmi,
-                                                                  widget
-                                                                      .kodeKelas,
-                                                                  penilaian
-                                                                      .nim);
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                            } else {
-                                                              if (kDebugMode) {
-                                                                print(
-                                                                    'Pretest value is empty');
-                                                              }
-                                                            }
-                                                          },
-                                                          child: const Text(
-                                                              'Simpan'),
-                                                        ),
-                                                      ),
-                                                      //== Batal ==//
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                bottom: 8.0),
-                                                        child: TextButton(
-                                                          onPressed: () {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                          child: const Text(
-                                                              'Batal'),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
+                                  return DataTable(
+                                    columnSpacing: 10,
+                                    columns: const [
+                                      DataColumn(
+                                        label: Text('NIM',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Nama',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Pre-Test',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 1',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 2',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 3',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 4',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 5',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 6',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 7',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Modul 8',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Project Akhir',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Laporan Resmi',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Nilai Akhir',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Nilai Huruf',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Aksi',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                    ],
+                                    rows: filteredData.isEmpty
+                                        ? [
+                                            DataRow(
+                                              color: MaterialStateColor.resolveWith(
+                                                  (states) => getRowColor(
+                                                      0)), // Menggunakan nilai default 0
+                                              cells: const [
+                                                DataCell(SizedBox(
+                                                  width: 150.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 200.0,
+                                                  child: Text(
+                                                      'No data Available',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 100.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                                DataCell(SizedBox(
+                                                  width: 80.0,
+                                                  child: Text('',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )),
+                                              ],
+                                            )
+                                          ]
+                                        : filteredData.asMap().entries.map(
+                                            (entry) {
+                                              int index = entry.key;
+                                              PenilaianAkhir data = entry.value;
+                                              return DataRow(
+                                                color: MaterialStateColor
+                                                    .resolveWith((states) =>
+                                                        getRowColor(index)),
+                                                cells: [
+                                                  DataCell(SizedBox(
+                                                      width: 150.0,
+                                                      child: Text(data.nim
+                                                          .toString()))),
+                                                  DataCell(SizedBox(
+                                                      width: 200.0,
+                                                      child: Text(data.nama))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.pretest
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul1
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul2
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul3
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul4
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul5
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul6
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul7
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.modul8
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 150.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.project
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 150.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.resmi
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 100.0,
+                                                      child: Text(
+                                                          getLimitedText(
+                                                              data.akhir
+                                                                  .toString(),
+                                                              5)))),
+                                                  DataCell(SizedBox(
+                                                      width: 80.0,
+                                                      child: Text(data.huruf))),
+                                                  DataCell(SizedBox(
+                                                    child: IconButton(
+                                                      onPressed: () {
+                                                        editNilai(data);
+                                                      },
+                                                      icon: const Icon(
+                                                          Icons.add_box,
+                                                          color: Colors.grey),
+                                                    ),
+                                                  ))
                                                 ],
                                               );
                                             },
-                                          );
-                                        },
-                                        icon: const Icon(Icons.add_box),
-                                        tooltip: 'Tambah Nilai',
-                                      )),
-                                    ],
+                                          ).toList(),
                                   );
-                                }).toList(),
+                                },
                               ),
                             ),
                           ),
@@ -833,7 +876,7 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
               ),
               const SizedBox(
                 height: 359.0,
-              ),
+              )
             ],
           ),
         ),
@@ -877,50 +920,415 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
     );
   }
 
-  Map<String, String> calculateHuruf(
-      double modul1,
-      double modul2,
-      double modul3,
-      double modul4,
-      double modul5,
-      double modul6,
-      double modul7,
-      double modul8,
-      double pretest,
-      double resmi,
-      double project) {
-    double rataRata = (modul1 * 0.08) +
-        (modul2 * 0.08) +
-        (modul3 * 0.08) +
-        (modul4 * 0.08) +
-        (modul5 * 0.08) +
-        (modul6 * 0.08) +
-        (modul7 * 0.08) +
-        (modul8 * 0.08) +
-        (pretest * 0.05) +
-        (resmi * 0.11) +
-        (project * 0.2);
-    String nilaiHuruf;
-    String status;
+  Color getRowColor(int index) {
+    return index % 2 == 0 ? Colors.grey.withOpacity(0.3) : Colors.white;
+  }
 
-    if (rataRata >= 80) {
-      nilaiHuruf = 'A';
-      status = 'Lulus';
-    } else if (rataRata >= 70) {
-      nilaiHuruf = 'B';
-      status = 'Lulus';
-    } else if (rataRata >= 60) {
-      nilaiHuruf = 'C';
-      status = 'Lulus';
-    } else if (rataRata >= 50) {
-      nilaiHuruf = 'D';
-      status = 'Tidak Lulus';
-    } else {
-      nilaiHuruf = 'E';
-      status = 'Tidak Lulus';
+  String getLimitedText(String text, int limit) {
+    return text.length <= limit ? text : text.substring(0, limit);
+  }
+
+  void editNilai(PenilaianAkhir nilai) {
+    TextEditingController pretestController =
+        TextEditingController(text: nilai.pretest.toString());
+    //== Rata-rata
+    TextEditingController modul1Controller =
+        TextEditingController(text: nilai.modul1.toString());
+    TextEditingController modul2Controller =
+        TextEditingController(text: nilai.modul2.toString());
+    TextEditingController modul3Controller =
+        TextEditingController(text: nilai.modul3.toString());
+    TextEditingController modul4Controller =
+        TextEditingController(text: nilai.modul4.toString());
+    TextEditingController modul5Controller =
+        TextEditingController(text: nilai.modul5.toString());
+    TextEditingController modul6Controller =
+        TextEditingController(text: nilai.modul6.toString());
+    TextEditingController modul7Controller =
+        TextEditingController(text: nilai.modul7.toString());
+    TextEditingController modul8Controller =
+        TextEditingController(text: nilai.modul8.toString());
+    //== Project Akhir
+    TextEditingController projectController =
+        TextEditingController(text: nilai.project.toString());
+    //== Laporan Resmi
+    TextEditingController resmiController =
+        TextEditingController(text: nilai.resmi.toString());
+    //== Nilai Akhir
+    TextEditingController akhirController =
+        TextEditingController(text: nilai.akhir.toString());
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 20.0),
+                child: Text(
+                  'Formulir Nilai Akhir',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
+                child: Divider(
+                  thickness: 0.5,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            height: 240.0,
+            width: 600.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //=== Pretest, Modul 1, Modul 2 dan Modul 3
+//== Pre-Test
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: pretestController,
+                          onChanged: (value) {
+                            nilai.pretest = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Pre-Test'),
+                        ),
+                      ),
+                    ),
+                    //== Modul 1
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul1Controller,
+                          onChanged: (value) {
+                            nilai.modul1 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 1'),
+                        ),
+                      ),
+                    ),
+                    //== Modul 2
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul2Controller,
+                          onChanged: (value) {
+                            nilai.modul2 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 2'),
+                        ),
+                      ),
+                    ),
+                    //== Modul 3
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul3Controller,
+                          onChanged: (value) {
+                            nilai.modul3 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 3'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //=== Modul 4, Modul 5, Modul 6, Modul 7
+//== Modul 4
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul4Controller,
+                          onChanged: (value) {
+                            nilai.modul4 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 4'),
+                        ),
+                      ),
+                    ),
+                    //== Modul 5
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul5Controller,
+                          onChanged: (value) {
+                            nilai.modul5 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 5'),
+                        ),
+                      ),
+                    ),
+                    //== Modul 6
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul6Controller,
+                          onChanged: (value) {
+                            nilai.modul6 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 6'),
+                        ),
+                      ),
+                    ),
+                    //== Modul 7
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul7Controller,
+                          onChanged: (value) {
+                            nilai.modul7 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 7'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //=== Modul 8, Project Resmi, Laporan Resmi dan Nilai Akhir
+//== Modul 8
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: modul8Controller,
+                          onChanged: (value) {
+                            nilai.modul8 = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Modul 8'),
+                        ),
+                      ),
+                    ),
+                    //== Project Akhir
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: projectController,
+                          onChanged: (value) {
+                            nilai.project = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Project Ahir'),
+                        ),
+                      ),
+                    ),
+                    //== Laporan Resmi
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: resmiController,
+                          onChanged: (value) {
+                            nilai.resmi = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(labelText: 'Laporan Resmi'),
+                        ),
+                      ),
+                    ),
+                    //== Nilai Akhir
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                      child: SizedBox(
+                        width: 130.0,
+                        child: TextField(
+                          controller: akhirController,
+                          onChanged: (value) {
+                            nilai.akhir = double.parse(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          readOnly: true,
+                          decoration:
+                              const InputDecoration(labelText: 'Nilai Akhir'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: TextButton(
+                onPressed: () async {
+                  try {
+                    String? namaAsisten = await getNamaAsisten();
+                    final nilaiAkhirData = calculateHuruf(
+                      nilai.modul1,
+                      nilai.modul2,
+                      nilai.modul3,
+                      nilai.modul4,
+                      nilai.modul5,
+                      nilai.modul6,
+                      nilai.modul7,
+                      nilai.modul8,
+                      nilai.pretest,
+                      nilai.project,
+                      nilai.resmi,
+                    ); // Hitung kembali huruf dan status
+
+                    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+                        await FirebaseFirestore.instance
+                            .collection('nilaiAkhir')
+                            .where('nim', isEqualTo: nilai.nim)
+                            .where('nama', isEqualTo: nilai.nama)
+                            .where('kodeKelas', isEqualTo: widget.kodeKelas)
+                            .get();
+
+                    if (querySnapshot.docs.isEmpty) {
+                      await FirebaseFirestore.instance
+                          .collection('nilaiAkhir')
+                          .add({
+                        'nim': nilai.nim,
+                        'nama': nilai.nama,
+                        'kodeKelas': widget.kodeKelas,
+                        'modul1': nilai.modul1,
+                        'modul2': nilai.modul2,
+                        'modul3': nilai.modul3,
+                        'modul4': nilai.modul4,
+                        'modul5': nilai.modul5,
+                        'modul6': nilai.modul6,
+                        'modul7': nilai.modul7,
+                        'modul8': nilai.modul8,
+                        'pretest': nilai.pretest,
+                        'projectAkhir': nilai.project,
+                        'laporanResmi': nilai.resmi,
+                        'status': nilaiAkhirData[
+                            'status'], // Gunakan nilai status yang baru
+                        'nilaiHuruf': nilaiAkhirData[
+                            'nilaiHuruf'], // Gunakan nilai huruf yang baru
+                        'namaAsisten': namaAsisten ?? "",
+                      });
+                    } else {
+                      await querySnapshot.docs[0].reference.update({
+                        'modul1': nilai.modul1,
+                        'modul2': nilai.modul2,
+                        'modul3': nilai.modul3,
+                        'modul4': nilai.modul4,
+                        'modul5': nilai.modul5,
+                        'modul6': nilai.modul6,
+                        'modul7': nilai.modul7,
+                        'modul8': nilai.modul8,
+                        'pretest': nilai.pretest,
+                        'projectAkhir': nilai.project,
+                        'laporanResmi': nilai.resmi,
+                        'status': nilaiAkhirData[
+                            'status'], // Gunakan nilai status yang baru
+                        'nilaiHuruf': nilaiAkhirData[
+                            'nilaiHuruf'], // Gunakan nilai huruf yang baru
+                        'namaAsisten': namaAsisten ?? "",
+                      });
+                    }
+
+                    setState(() {
+                      demoPenilaianAkhir = demoPenilaianAkhir.map((item) {
+                        if (item.nim == nilai.nim) {
+                          return nilai;
+                        } else {
+                          return item;
+                        }
+                      }).toList();
+                      filteredPenilaianAkhir = List.from(demoPenilaianAkhir);
+                    });
+
+                    await getDataFromFirebase();
+
+                    // ignore: use_build_context_synchronously
+                    Navigator.of(context).pop();
+                  } catch (e) {
+                    if (kDebugMode) {
+                      print('Error updating data:$e');
+                    }
+                  }
+                },
+                child: const Text('Simpan'),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10.0, right: 20.0),
+              child: TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Batal'),
+              ),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  Future<String?> getNamaAsisten() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String uid = user.uid;
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+          .instance
+          .collection('akun_mahasiswa')
+          .doc(uid)
+          .get();
+      if (snapshot.exists) {
+        String? namaAsisten = snapshot.data()?['nama'];
+        return namaAsisten;
+      }
     }
-
-    return {'nilaiHuruf': nilaiHuruf, 'status': status};
+    return null;
   }
 
   double calculateNilaiAkhir(
@@ -935,7 +1343,7 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
       double pretest,
       double project,
       double resmi) {
-    return (modul1 * 0.08) +
+    return ((modul1 * 0.08) +
         (modul2 * 0.08) +
         (modul3 * 0.08) +
         (modul4 * 0.08) +
@@ -944,54 +1352,95 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
         (modul7 * 0.08) +
         (modul8 * 0.08) +
         (pretest * 0.05) +
-        (resmi * 0.11) +
-        (project * 0.2);
+        (resmi * 0.05) +
+        (project * 0.1));
   }
-}
 
-String getLimitedText(String text, int limit) {
-  return text.length <= limit ? text : text.substring(0, limit);
-}
+  Map<String, String> calculateHuruf(
+      double modul1,
+      double modul2,
+      double modul3,
+      double modul4,
+      double modul5,
+      double modul6,
+      double modul7,
+      double modul8,
+      double pretest,
+      double project,
+      double resmi) {
+    double nilaiAkhir = calculateNilaiAkhir(modul1, modul2, modul3, modul4,
+        modul5, modul6, modul7, modul8, pretest, project, resmi);
+    String huruf;
+    String status;
+    if (nilaiAkhir >= 80) {
+      huruf = 'A';
+      status = 'Lulus';
+    } else if (nilaiAkhir >= 70) {
+      huruf = 'B';
+      status = 'Lulus';
+    } else if (nilaiAkhir >= 60) {
+      huruf = 'C';
+      status = 'Lulus';
+    } else if (nilaiAkhir >= 40) {
+      huruf = 'D';
+      status = 'Tidak Lulus';
+    } else {
+      huruf = 'E';
+      status = 'Tidak Lulus';
+    }
 
-Color getRowColor(int index) {
-  return index % 2 == 0 ? Colors.grey.withOpacity(0.3) : Colors.white;
+    return {'nilaiHuruf': huruf, 'status': status};
+  }
 }
 
 class PenilaianAkhir {
   final int nim;
   final String nama;
   final String kode;
-  final double modul1;
-  final double modul2;
-  final double modul3;
-  final double modul4;
-  final double modul5;
-  final double modul6;
-  final double modul7;
-  final double modul8;
-  final double pretest;
-  final double project;
-  final double resmi;
-  double akhir;
-  String huruf;
-  String status;
 
-  PenilaianAkhir(
-      {required this.nim,
-      required this.nama,
-      required this.kode,
-      required this.modul1,
-      required this.modul2,
-      required this.modul3,
-      required this.modul4,
-      required this.modul5,
-      required this.modul6,
-      required this.modul7,
-      required this.modul8,
-      required this.pretest,
-      required this.project,
-      required this.resmi,
-      this.akhir = 0.0,
-      this.huruf = '',
-      this.status = ''});
+  //=== Rata - Rata
+  double modul1;
+  double modul2;
+  double modul3;
+  double modul4;
+  double modul5;
+  double modul6;
+  double modul7;
+  double modul8;
+
+  //==Pretest
+  double pretest;
+  //== Project Akhir
+  double project;
+  //== Laporan Resmi
+  double resmi;
+  //== Hasil Akhir
+  late double akhir;
+  late String status;
+  late String huruf;
+
+  PenilaianAkhir({
+    required this.nim,
+    required this.nama,
+    required this.kode,
+    //== Rata-Rata
+    required this.modul1,
+    required this.modul2,
+    required this.modul3,
+    required this.modul4,
+    required this.modul5,
+    required this.modul6,
+    required this.modul7,
+    required this.modul8,
+    //== PreTest
+    this.pretest = 0.0,
+    //== Project Akhir
+    this.project = 0.0,
+    //== Laporan Resmi
+    this.resmi = 0.0,
+    //== Hasil Akhir
+    this.akhir = 0.0,
+    this.status = '',
+    this.huruf = '',
+  });
 }

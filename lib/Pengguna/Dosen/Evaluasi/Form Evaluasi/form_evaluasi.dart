@@ -1,4 +1,5 @@
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,7 +9,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FormEvaluasiKegiatan extends StatefulWidget {
   final String kodeKelas;
-  const FormEvaluasiKegiatan({Key? key, required this.kodeKelas})
+  final String mataKuliah;
+  const FormEvaluasiKegiatan(
+      {Key? key, required this.kodeKelas, required this.mataKuliah})
       : super(key: key);
 
   @override
@@ -164,6 +167,46 @@ class _FormEvaluasiKegiatanState extends State<FormEvaluasiKegiatan> {
     }
   }
 
+  //== Nama Akun ==//
+  //== Nama Akun ==//
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? _currentUser;
+  String _namaDosen = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUser();
+  }
+
+  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
+  void _getCurrentUser() async {
+    setState(() {
+      _currentUser = _auth.currentUser;
+    });
+    if (_currentUser != null) {
+      await _getNamaDosen(_currentUser!.uid);
+    }
+  }
+
+  // Fungsi untuk mengambil nama mahasiswa dari database
+  Future<void> _getNamaDosen(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('akun_dosen').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          _namaDosen = doc.get('nama');
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching nama mahasiswa: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -191,7 +234,7 @@ class _FormEvaluasiKegiatanState extends State<FormEvaluasiKegiatan> {
                 ),
                 Expanded(
                   child: Text(
-                    widget.kodeKelas,
+                    widget.mataKuliah,
                     style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -199,6 +242,23 @@ class _FormEvaluasiKegiatanState extends State<FormEvaluasiKegiatan> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  width: 700.0,
+                ),
+                if (_currentUser != null) ...[
+                  Text(
+                    _namaDosen.isNotEmpty
+                        ? _namaDosen
+                        : (_currentUser!.email ?? ''),
+                    style: GoogleFonts.quicksand(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  const SizedBox(
+                    width: 30.0,
+                  ),
+                ],
               ],
             ),
           ),

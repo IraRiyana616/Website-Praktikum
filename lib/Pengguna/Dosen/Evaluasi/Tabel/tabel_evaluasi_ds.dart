@@ -17,7 +17,7 @@ class _TabelEvaluasiDosenState extends State<TabelEvaluasiDosen> {
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
 
-  String selectedYear = 'Tampilkan Semua';
+  String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
   Future<void> fetchAvailableYears() async {
@@ -29,7 +29,7 @@ class _TabelEvaluasiDosenState extends State<TabelEvaluasiDosen> {
           .toSet();
 
       setState(() {
-        availableYears = ['Tampilkan Semua', ...years.toList()];
+        availableYears = ['Tahun Ajaran', ...years.toList()];
       });
     } catch (e) {
       if (kDebugMode) {
@@ -42,7 +42,7 @@ class _TabelEvaluasiDosenState extends State<TabelEvaluasiDosen> {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
 
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         querySnapshot = await FirebaseFirestore.instance
             .collection('dataKelas')
             .where('tahunAjaran', isEqualTo: selectedYear)
@@ -126,7 +126,7 @@ class _TabelEvaluasiDosenState extends State<TabelEvaluasiDosen> {
                   padding: const EdgeInsets.only(bottom: 15.0, left: 0.0),
                   child: Container(
                     height: 47.0,
-                    width: 1000.0,
+                    width: 1020.0,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
@@ -169,7 +169,7 @@ class _TabelEvaluasiDosenState extends State<TabelEvaluasiDosen> {
                             columns: const [
                               DataColumn(
                                 label: Text(
-                                  "Kode Kelas",
+                                  "Kode Praktikum",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -259,11 +259,17 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
     ),
     cells: [
       DataCell(
-        Text(
-          fileInfo.kelas,
-          style: TextStyle(
-            color: Colors.lightBlue[700],
-            fontWeight: FontWeight.bold,
+        SizedBox(width: 140.0, child: Text(fileInfo.kelas)),
+      ),
+      DataCell(
+        SizedBox(
+          width: 170.0,
+          child: Text(
+            fileInfo.matkul,
+            style: TextStyle(
+              color: Colors.lightBlue[700],
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         onTap: () async {
@@ -273,8 +279,10 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    PieChartNilaiHuruf(kodeKelas: fileInfo.kelas),
+                builder: (context) => PieChartNilaiHuruf(
+                  kodeKelas: fileInfo.kelas,
+                  mataKuliah: fileInfo.matkul,
+                ),
               ),
             );
           } else {
@@ -320,13 +328,8 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
         },
       ),
       DataCell(
-        Text(
-          fileInfo.matkul,
-        ),
-      ),
-      DataCell(
         SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(
             getLimitedText(fileInfo.dosenpengampu, 30),
           ),
@@ -334,21 +337,23 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
       ),
       DataCell(
         SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(
             getLimitedText(fileInfo.dosenpengampu2, 30),
           ),
         ),
       ),
       DataCell(IconButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        FormEvaluasiKegiatan(kodeKelas: fileInfo.kelas)));
-          },
-          icon: const Icon(Icons.add_box, color: Colors.grey)))
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => FormEvaluasiKegiatan(
+                      kodeKelas: fileInfo.kelas, mataKuliah: fileInfo.matkul)));
+        },
+        icon: const Icon(Icons.add_box, color: Colors.grey),
+        tooltip: 'Tambah Data Evaluasi',
+      ))
     ],
   );
 }

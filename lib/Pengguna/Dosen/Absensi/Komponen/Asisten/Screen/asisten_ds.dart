@@ -1,15 +1,21 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../Navigasi/absensi_ds_nav.dart';
 import '../../Praktikan/Screen/praktikan_ds.dart';
 import '../Tabel/tbl_asisten_ds.dart';
 
 class AbsensiAsistenDosen extends StatefulWidget {
   final String kodeKelas;
   final String kodeAsisten;
+  final String mataKuliah;
 
   const AbsensiAsistenDosen(
-      {Key? key, required this.kodeKelas, required this.kodeAsisten})
+      {Key? key,
+      required this.kodeKelas,
+      required this.kodeAsisten,
+      required this.mataKuliah})
       : super(key: key);
 
   @override
@@ -17,6 +23,45 @@ class AbsensiAsistenDosen extends StatefulWidget {
 }
 
 class _AbsensiAsistenDosenState extends State<AbsensiAsistenDosen> {
+  //== Nama Akun ==//
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? _currentUser;
+  String _namaDosen = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUser();
+  }
+
+  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
+  void _getCurrentUser() async {
+    setState(() {
+      _currentUser = _auth.currentUser;
+    });
+    if (_currentUser != null) {
+      await _getNamaDosen(_currentUser!.uid);
+    }
+  }
+
+  // Fungsi untuk mengambil nama mahasiswa dari database
+  Future<void> _getNamaDosen(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('akun_dosen').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          _namaDosen = doc.get('nama');
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching nama mahasiswa: $e');
+      }
+    }
+  }
+
   //Fungsi Untuk Bottom Navigation
   int _selectedIndex = 1; // untuk mengatur index bottom navigation
   void _onItemTapped(int index) {
@@ -25,19 +70,56 @@ class _AbsensiAsistenDosenState extends State<AbsensiAsistenDosen> {
       // Memilih halaman sesuai dengan index yang dipilih
       if (index == 0) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AbsensiPraktikanDosen(
-                      kodeKelas: widget.kodeKelas,
-                      kodeAsisten: widget.kodeAsisten,
-                    )));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                AbsensiPraktikanDosen(
+              kodeKelas: widget.kodeKelas,
+              kodeAsisten: widget.kodeAsisten,
+              mataKuliah: widget.mataKuliah,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       } else if (index == 1) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AbsensiAsistenDosen(
-                    kodeKelas: widget.kodeKelas,
-                    kodeAsisten: widget.kodeAsisten)));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                AbsensiAsistenDosen(
+              kodeKelas: widget.kodeKelas,
+              kodeAsisten: widget.kodeAsisten,
+              mataKuliah: widget.mataKuliah,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       }
     });
   }
@@ -50,29 +132,17 @@ class _AbsensiAsistenDosenState extends State<AbsensiAsistenDosen> {
         child: AppBar(
           backgroundColor: const Color(0xFFF7F8FA),
           automaticallyImplyLeading: false,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const AbsensiDosenNav()));
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.black,
-            ),
-          ),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const SizedBox(
-                  width: 10.0,
+                  width: 40.0,
                 ),
                 Expanded(
                   child: Text(
-                    widget.kodeKelas,
+                    widget.mataKuliah,
                     style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -80,6 +150,23 @@ class _AbsensiAsistenDosenState extends State<AbsensiAsistenDosen> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  width: 700.0,
+                ),
+                if (_currentUser != null) ...[
+                  Text(
+                    _namaDosen.isNotEmpty
+                        ? _namaDosen
+                        : (_currentUser!.email ?? ''),
+                    style: GoogleFonts.quicksand(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  const SizedBox(
+                    width: 30.0,
+                  ),
+                ],
               ],
             ),
           ),

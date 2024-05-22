@@ -3,16 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Dosen/Dashboard/Tabel/kelas_ds.dart';
+import '../Tabel/tabel_jadwal_praktikum_ds.dart';
 
-class DashboardDosen extends StatefulWidget {
-  const DashboardDosen({super.key});
+class JadwalPraktikumDosen extends StatefulWidget {
+  const JadwalPraktikumDosen({super.key});
 
   @override
-  State<DashboardDosen> createState() => _DashboardDosenState();
+  State<JadwalPraktikumDosen> createState() => _JadwalPraktikumDosenState();
 }
 
-class _DashboardDosenState extends State<DashboardDosen> {
+class _JadwalPraktikumDosenState extends State<JadwalPraktikumDosen> {
   //== Fungsi untuk authentikasi ==//
   final FirebaseAuth _auth = FirebaseAuth.instance;
   //== Fungsi Keluar dari akun ==//
@@ -30,6 +30,7 @@ class _DashboardDosenState extends State<DashboardDosen> {
     }
   }
 
+  //== Nama Akun ==//
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? _currentUser;
   String _namaDosen = '';
@@ -73,8 +74,8 @@ class _DashboardDosenState extends State<DashboardDosen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
-          backgroundColor: const Color(0xFFF7F8FA),
           automaticallyImplyLeading: false,
+          backgroundColor: const Color(0xFFF7F8FA),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(
@@ -85,7 +86,7 @@ class _DashboardDosenState extends State<DashboardDosen> {
                 ),
                 Expanded(
                     child: Text(
-                  "Dashboard",
+                  "Jadwal Praktikum",
                   style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -133,14 +134,12 @@ class _DashboardDosenState extends State<DashboardDosen> {
                   color: Colors.white,
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TabelKelasDosen(),
-                    ],
+                    children: [TabelJadwalPraktikumDosen()],
                   ),
                 ),
               ),
               const SizedBox(
-                height: 161.0,
+                height: 221.0,
               )
             ],
           ),

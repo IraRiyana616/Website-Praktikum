@@ -300,7 +300,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
                             columns: const [
                               DataColumn(
                                 label: Text(
-                                  "Kode Kelas",
+                                  "Kode Praktikum",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -392,12 +392,29 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
         ),
         onTap: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DeskripsiMahasiswa(
-                        kodeKelas: fileInfo.kode,
-                        mataKuliah: fileInfo.matkul,
-                      )));
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  DeskripsiMahasiswa(
+                kodeKelas: fileInfo.kode,
+                mataKuliah: fileInfo.matkul,
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                const begin = Offset(0.0, 0.0);
+                const end = Offset.zero;
+                const curve = Curves.ease;
+
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+            ),
+          );
         },
       ),
       DataCell(SizedBox(

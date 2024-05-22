@@ -20,8 +20,8 @@ class _TabelPengumpulanUjiPemahamanState
   List<Pengumpulan> filteredPengumpulan = [];
   bool _isTextFieldNotEmpty = false;
   //Judul Materi
-  String selectedModul = 'Tampilkan Semua';
-  List<String> availableModuls = ['Tampilkan Semua'];
+  String selectedModul = 'Judul Modul';
+  List<String> availableModuls = ['Judul Modul'];
   Future<void> deleteDataFromFirestore(String documentId) async {
     try {
       await FirebaseFirestore.instance
@@ -78,7 +78,7 @@ class _TabelPengumpulanUjiPemahamanState
     if (modul != null) {
       setState(() {
         selectedModul = modul;
-        if (modul == 'Tampilkan Semua') {
+        if (modul == 'Judul Modul') {
           filteredPengumpulan = demoPengumpulan;
         } else {
           filteredPengumpulan = demoPengumpulan
@@ -99,7 +99,7 @@ class _TabelPengumpulanUjiPemahamanState
 
   void filterData(String query, String selectedModul) {
     setState(() {
-      if (selectedModul == 'Tampilkan Semua') {
+      if (selectedModul == 'Judul Modul') {
         filteredPengumpulan = demoPengumpulan
             .where((data) => (data.nim.toString().contains(query) ||
                 data.nama.toLowerCase().contains(query.toLowerCase())))

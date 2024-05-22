@@ -7,7 +7,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 class TabelDataAsistensiPraktikan extends StatefulWidget {
   final String kodeKelas;
-
   const TabelDataAsistensiPraktikan({Key? key, required this.kodeKelas})
       : super(key: key);
 
@@ -22,14 +21,14 @@ class _TabelDataAsistensiPraktikanState
   List<Asistensi> filteredAsistensi = [];
   int nim = 0;
   //Judul Materi
-  String selectedModul = 'Tampilkan Semua';
-  List<String> availableModuls = ['Tampilkan Semua'];
+  String selectedModul = 'Judul Modul';
+  List<String> availableModuls = ['Judul Modul'];
 
   void _filterData(String? modul) {
     if (modul != null) {
       setState(() {
         selectedModul = modul;
-        if (modul == 'Tampilkan Semua') {
+        if (modul == 'Judul Modul') {
           filteredAsistensi = List.from(demoAsistensi);
         } else {
           filteredAsistensi = demoAsistensi
@@ -54,6 +53,7 @@ class _TabelDataAsistensiPraktikanState
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
             .collection('asistensiLaporan')
             .where('nim', isEqualTo: nim)
+            .where('kodeKelas', isEqualTo: widget.kodeKelas)
             .get();
 
         setState(() {
@@ -72,14 +72,14 @@ class _TabelDataAsistensiPraktikanState
 
           filteredAsistensi = List.from(demoAsistensi);
           // Menambahkan modul ke availableModuls
-          availableModuls = ['Tampilkan Semua'] +
+          availableModuls = ['Judul Modul'] +
               demoAsistensi
                   .map((asistensi) => asistensi.modul)
                   .toSet()
                   .toList();
           // Memastikan selectedModul ada di availableModuls
           if (!availableModuls.contains(selectedModul)) {
-            selectedModul = 'Tampilkan Semua';
+            selectedModul = 'Judul Modul';
           }
           _filterData(
               selectedModul); // Memanggil _filterData setelah data diambil

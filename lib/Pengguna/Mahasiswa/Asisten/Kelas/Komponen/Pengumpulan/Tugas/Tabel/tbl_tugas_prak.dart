@@ -18,8 +18,8 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
   List<Pengumpulan> demoPengumpulan = [];
   List<Pengumpulan> filteredPengumpulan = [];
   //Judul Materi
-  String selectedModul = 'Tampilkan Semua';
-  List<String> availableModuls = ['Tampilkan Semua'];
+  String selectedModul = 'Judul Modul';
+  List<String> availableModuls = ['Judul Modul'];
 
   Future<void> deleteDataFromFirestore(String documentId) async {
     try {
@@ -71,7 +71,7 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
     if (modul != null) {
       setState(() {
         selectedModul = modul;
-        if (modul == 'Tampilkan Semua') {
+        if (modul == 'Judul Modul') {
           filteredPengumpulan = demoPengumpulan;
         } else {
           filteredPengumpulan =
@@ -91,7 +91,7 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
 
   void filterData(String query, String selectedModul) {
     setState(() {
-      if (selectedModul == 'Tampilkan Semua') {
+      if (selectedModul == 'Judul Modul') {
         filteredPengumpulan = demoPengumpulan
             .where((data) => (data.nim.toString().contains(query) ||
                 data.nama.toLowerCase().contains(query.toLowerCase())))
@@ -128,7 +128,7 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
 
   @override
   Widget build(BuildContext context) {
-    _sortDataByName(); // Panggil fungsi untuk mengurutkan data berdasarkan nama
+    _sortDataByName();
     return Container(
       color: Colors.white,
       child: Column(
@@ -183,9 +183,6 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
                     Expanded(
                       child: TextField(
                         onChanged: _onTextChanged,
-                        // (value) {
-                        //   filterData(value, selectedModul);
-                        // },
                         controller: _textController,
                         decoration: InputDecoration(
                           hintText: '',

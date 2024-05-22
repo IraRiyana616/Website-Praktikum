@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Absensi/Asisten/Screen/absensi_ass_sc.dart';
@@ -18,6 +21,44 @@ class KumpulTugas extends StatefulWidget {
 }
 
 class _KumpulTugasState extends State<KumpulTugas> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  User? _currentUser;
+  String _namaMahasiswa = '';
+  //== Nama Akun ==//
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUser();
+  }
+
+  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
+  void _getCurrentUser() async {
+    setState(() {
+      _currentUser = _auth.currentUser;
+    });
+    if (_currentUser != null) {
+      await _getNamaMahasiswa(_currentUser!.uid);
+    }
+  }
+
+  // Fungsi untuk mengambil nama mahasiswa dari database
+  Future<void> _getNamaMahasiswa(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('akun_mahasiswa').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          _namaMahasiswa = doc.get('nama');
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching nama mahasiswa: $e');
+      }
+    }
+  }
+
   //Fungsi Untuk Bottom Navigation
   int _selectedIndex = 1; // untuk mengatur index bottom navigation
   void _onItemTapped(int index) {
@@ -25,28 +66,54 @@ class _KumpulTugasState extends State<KumpulTugas> {
       _selectedIndex = index;
       // Memilih halaman sesuai dengan index yang dipilih
       if (index == 0) {
-        // Tindakan ketika item "Latihan" ditekan
-        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan latihan
-        // Misalnya:
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => KumpulUjianPemahaman(
-                    kodeKelas: widget.kodeKelas,
-                    mataKuliah: widget.mataKuliah,
-                  )),
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                KumpulUjianPemahaman(
+              kodeKelas: widget.kodeKelas,
+              mataKuliah: widget.mataKuliah,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
         );
       } else if (index == 1) {
-        // Tindakan ketika item "Tugas" ditekan
-        // Di sini Anda dapat menambahkan navigasi ke halaman pengumpulan tugas
-        // Misalnya:
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => KumpulTugas(
-                    kodeKelas: widget.kodeKelas,
-                    mataKuliah: widget.mataKuliah,
-                  )),
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                KumpulTugas(
+              kodeKelas: widget.kodeKelas,
+              mataKuliah: widget.mataKuliah,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
         );
       }
     });
@@ -59,14 +126,6 @@ class _KumpulTugasState extends State<KumpulTugas> {
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
           automaticallyImplyLeading: false,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-              )),
           backgroundColor: const Color(0xFFF7F8FA),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
@@ -74,16 +133,33 @@ class _KumpulTugasState extends State<KumpulTugas> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const SizedBox(
-                  width: 10.0,
+                  width: 40.0,
                 ),
                 Expanded(
                     child: Text(
-                  widget.kodeKelas,
+                  widget.mataKuliah,
                   style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.black),
-                ))
+                )),
+                const SizedBox(
+                  width: 700.0,
+                ),
+                if (_currentUser != null) ...[
+                  Text(
+                    _namaMahasiswa.isNotEmpty
+                        ? _namaMahasiswa
+                        : (_currentUser!.email ?? ''),
+                    style: GoogleFonts.quicksand(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  const SizedBox(
+                    width: 10.0,
+                  ),
+                ],
               ],
             ),
           ),
@@ -121,12 +197,30 @@ class _KumpulTugasState extends State<KumpulTugas> {
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => DeskripsiKelas(
-                                              kodeKelas: widget.kodeKelas,
-                                              mataKuliah: widget.mataKuliah,
-                                            )));
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        DeskripsiKelas(
+                                      kodeKelas: widget.kodeKelas,
+                                      mataKuliah: widget.mataKuliah,
+                                    ),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      const begin = Offset(0.0, 0.0);
+                                      const end = Offset.zero;
+                                      const curve = Curves.ease;
+
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+
+                                      return SlideTransition(
+                                        position: animation.drive(tween),
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                );
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -144,12 +238,30 @@ class _KumpulTugasState extends State<KumpulTugas> {
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => AbsenKu(
-                                              kodeKelas: widget.kodeKelas,
-                                              mataKuliah: widget.mataKuliah,
-                                            )));
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        AbsenKu(
+                                      kodeKelas: widget.kodeKelas,
+                                      mataKuliah: widget.mataKuliah,
+                                    ),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      const begin = Offset(0.0, 0.0);
+                                      const end = Offset.zero;
+                                      const curve = Curves.ease;
+
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+
+                                      return SlideTransition(
+                                        position: animation.drive(tween),
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                );
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -167,12 +279,30 @@ class _KumpulTugasState extends State<KumpulTugas> {
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => KumpulTugas(
-                                              kodeKelas: widget.kodeKelas,
-                                              mataKuliah: widget.mataKuliah,
-                                            )));
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        KumpulTugas(
+                                      kodeKelas: widget.kodeKelas,
+                                      mataKuliah: widget.mataKuliah,
+                                    ),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      const begin = Offset(0.0, 0.0);
+                                      const end = Offset.zero;
+                                      const curve = Curves.ease;
+
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+
+                                      return SlideTransition(
+                                        position: animation.drive(tween),
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                );
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -189,13 +319,30 @@ class _KumpulTugasState extends State<KumpulTugas> {
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          DataPraktikanAsistensi(
-                                            kodeKelas: widget.kodeKelas,
-                                            mataKuliah: widget.mataKuliah,
-                                          )));
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      DataPraktikanAsistensi(
+                                    kodeKelas: widget.kodeKelas,
+                                    mataKuliah: widget.mataKuliah,
+                                  ),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    const begin = Offset(0.0, 0.0);
+                                    const end = Offset.zero;
+                                    const curve = Curves.ease;
+
+                                    var tween = Tween(begin: begin, end: end)
+                                        .chain(CurveTween(curve: curve));
+
+                                    return SlideTransition(
+                                      position: animation.drive(tween),
+                                      child: child,
+                                    );
+                                  },
+                                ),
+                              );
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(

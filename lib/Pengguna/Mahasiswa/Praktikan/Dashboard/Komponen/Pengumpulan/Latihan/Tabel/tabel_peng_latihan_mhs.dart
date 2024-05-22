@@ -17,8 +17,8 @@ class _TabelKLatihanPraktikanState extends State<TabelKLatihanPraktikan> {
   List<Pengumpulan> demoPengumpulan = [];
   List<Pengumpulan> filteredPengumpulan = [];
   //Judul Materi
-  String selectedModul = 'Tampilkan Semua';
-  List<String> availableModuls = ['Tampilkan Semua'];
+  String selectedModul = 'Judul Modul';
+  List<String> availableModuls = ['Judul Modul'];
   int nim = 0;
 
   @override
@@ -43,7 +43,7 @@ class _TabelKLatihanPraktikanState extends State<TabelKLatihanPraktikan> {
           .where('kodeKelas', isEqualTo: widget.kodeKelas)
           .get();
 
-      Set<String> modulSet = {'Tampilkan Semua'};
+      Set<String> modulSet = {'Judul Modul'};
       List<Pengumpulan> pengumpulanList = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         String modul = data['judulMateri'] ?? '';
@@ -70,7 +70,7 @@ class _TabelKLatihanPraktikanState extends State<TabelKLatihanPraktikan> {
     if (modul != null) {
       setState(() {
         selectedModul = modul;
-        if (modul == 'Tampilkan Semua') {
+        if (modul == 'Judul Modul') {
           filteredPengumpulan = demoPengumpulan;
         } else {
           filteredPengumpulan = demoPengumpulan
@@ -89,7 +89,7 @@ class _TabelKLatihanPraktikanState extends State<TabelKLatihanPraktikan> {
 
   @override
   Widget build(BuildContext context) {
-    _sortDataByName(); // Panggil fungsi untuk mengurutkan data berdasarkan nama
+    _sortDataByName();
     return Container(
       color: Colors.white,
       child: Column(

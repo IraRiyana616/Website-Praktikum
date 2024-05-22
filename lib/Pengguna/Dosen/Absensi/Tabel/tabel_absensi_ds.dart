@@ -255,21 +255,40 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
         fileInfo.kelas,
       )),
       DataCell(
-          Text(fileInfo.matkul,
-              style: TextStyle(
-                  color: Colors.lightBlue[700],
-                  fontWeight: FontWeight.bold)), onTap: () {
+          SizedBox(
+            width: 170.0,
+            child: Text(fileInfo.matkul,
+                style: TextStyle(
+                    color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
+          ), onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AbsensiPraktikanDosen(
-                      kodeKelas: fileInfo.kelas,
-                      kodeAsisten: fileInfo.asisten,
-                    )));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                AbsensiPraktikanDosen(
+                    kodeKelas: fileInfo.kelas,
+                    kodeAsisten: fileInfo.asisten,
+                    mataKuliah: fileInfo.matkul),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       }),
       DataCell(
         SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(
             getLimitedText(fileInfo.dosenpengampu, 30),
           ),
@@ -277,7 +296,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
       ),
       DataCell(
         SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(
             getLimitedText(fileInfo.dosenpengampu2, 30),
           ),

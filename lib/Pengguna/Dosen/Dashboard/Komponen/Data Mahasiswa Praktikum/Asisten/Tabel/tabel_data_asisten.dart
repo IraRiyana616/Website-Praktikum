@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class TabelDataKelasAsisten extends StatefulWidget {
   final String kodeKelas;
-  const TabelDataKelasAsisten({super.key, required this.kodeKelas});
+  final String kodeAsisten;
+  const TabelDataKelasAsisten(
+      {super.key, required this.kodeKelas, required this.kodeAsisten});
 
   @override
   State<TabelDataKelasAsisten> createState() => _TabelDataKelasAsistenState();
@@ -14,6 +15,8 @@ class TabelDataKelasAsisten extends StatefulWidget {
 class _TabelDataKelasAsistenState extends State<TabelDataKelasAsisten> {
   List<DataMahasiswa> demoDataMahasiswa = [];
   List<DataMahasiswa> filteredDataMahasiswa = [];
+
+  //== Fungsi Untuk Menampilkan Data dari Firestore 'akun_mahasiswa' ==//
   @override
   void initState() {
     super.initState();
@@ -23,7 +26,7 @@ class _TabelDataKelasAsistenState extends State<TabelDataKelasAsisten> {
   Future<void> fetchData() async {
     // Ambil data dari Firestore 'tokenKelas' berdasarkan kodeKelas
     QuerySnapshot tokenSnapshot = await FirebaseFirestore.instance
-        .collection('tokenAsisten')
+        .collection('dataAsisten')
         .where('kodeKelas', isEqualTo: widget.kodeKelas)
         .get();
 
@@ -40,10 +43,10 @@ class _TabelDataKelasAsistenState extends State<TabelDataKelasAsisten> {
         demoDataMahasiswa.add(DataMahasiswa(
           nim: nim,
           kode: widget.kodeKelas,
-          nama: mahasiswaDoc['nama'],
-          email: mahasiswaDoc['email'],
-          nohp: mahasiswaDoc['no_hp'],
-          angkatan: mahasiswaDoc['angkatan'],
+          nama: mahasiswaDoc['nama'] ?? '',
+          email: mahasiswaDoc['email'] ?? '',
+          nohp: mahasiswaDoc['no_hp'] ?? 0,
+          angkatan: mahasiswaDoc['angkatan'] ?? 0,
         ));
       }
     }
@@ -54,6 +57,37 @@ class _TabelDataKelasAsistenState extends State<TabelDataKelasAsisten> {
     });
   }
 
+  //== TextField Search ==//
+  final TextEditingController _textController = TextEditingController();
+  bool _isTextFieldNotEmpty = false;
+
+  void _onTextChanged() {
+    setState(() {
+      _isTextFieldNotEmpty = _textController.text.isNotEmpty;
+      filterData(_textController.text);
+    });
+  }
+
+  void filterData(String query) {
+    setState(() {
+      filteredDataMahasiswa = demoDataMahasiswa
+          .where((data) => (data.nama
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              data.nim.toString().toLowerCase().contains(query.toLowerCase()) ||
+              data.nohp.toString().toLowerCase().contains(query.toLowerCase())))
+          .toList();
+    });
+  }
+
+  void clearSearchField() {
+    setState(() {
+      _textController.clear();
+      filterData('');
+    });
+  }
+
+  //== Warna Pada Tabel ==//
   Color getRowColor(int index) {
     // Define your conditions for different colors here
     if (index % 2 == 0) {
@@ -69,11 +103,52 @@ class _TabelDataKelasAsistenState extends State<TabelDataKelasAsisten> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 25.0, left: 35.0),
+          padding: const EdgeInsets.only(top: 35.0, left: 35.0),
           child: Text(
             'Data Asisten Praktikum',
             style: GoogleFonts.quicksand(
                 fontSize: 18.0, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 15.0, left: 960.0),
+          child: SizedBox(
+            width: 300.0,
+            height: 40.0,
+            child: Row(
+              children: [
+                const Text("Search :", style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 10.0),
+                Expanded(
+                  child: TextField(
+                    onChanged: (value) {
+                      filterData(value);
+                    },
+                    controller: _textController,
+                    decoration: InputDecoration(
+                      hintText: '',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 10),
+                      suffixIcon: Visibility(
+                        visible: _isTextFieldNotEmpty,
+                        child: IconButton(
+                          onPressed: clearSearchField,
+                          icon: const Icon(Icons.clear),
+                        ),
+                      ),
+                      labelStyle: const TextStyle(
+                        fontSize: 16,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         Padding(
@@ -150,7 +225,7 @@ class DataMahasiswa {
   final String nama;
   final String email;
   final int nohp;
-  final String angkatan;
+  final int angkatan;
 
   DataMahasiswa({
     required this.nim,
@@ -170,13 +245,13 @@ DataRow dataFileDataRow(DataMahasiswa fileInfo, int index) {
       },
     ),
     cells: [
-      DataCell(Text(fileInfo.nim.toString())),
-      DataCell(Text(fileInfo.angkatan)),
+      DataCell(SizedBox(width: 140.0, child: Text(fileInfo.nim.toString()))),
+      DataCell(SizedBox(width: 140, child: Text(fileInfo.angkatan.toString()))),
       DataCell(SizedBox(
-          width: 200.0, child: Text(getLimitedText(fileInfo.nama, 30)))),
+          width: 250.0, child: Text(getLimitedText(fileInfo.nama, 30)))),
       DataCell(SizedBox(
-          width: 200.0, child: Text(getLimitedText(fileInfo.email, 30)))),
-      DataCell(Text(fileInfo.nohp.toString())),
+          width: 250.0, child: Text(getLimitedText(fileInfo.email, 30)))),
+      DataCell(SizedBox(width: 140.0, child: Text(fileInfo.nohp.toString()))),
     ],
   );
 }

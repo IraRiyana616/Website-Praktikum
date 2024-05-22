@@ -5,6 +5,7 @@ import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Screen/hasilstudi_ds.dart';
 import 'package:laksi/Pengguna/Dosen/Pengaturan/Screen/pengaturan_ds.dart';
 
 import '../../Absensi/Screen/absensi_ds.dart';
+import '../../Jadwal/Screen/jadwal_praktikum_ds.dart';
 
 class PengaturanDosenNav extends StatefulWidget {
   const PengaturanDosenNav({super.key});
@@ -62,6 +63,18 @@ class _PengaturanDosenNavState extends State<PengaturanDosenNav> {
                   page: const DashboardDosen(),
                   updatePage: updatePage,
                   isActive: currentPage is DashboardDosen,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                DashboardListTile(
+                  title: 'Jadwal',
+                  icon: const Icon(
+                    Icons.calendar_month,
+                  ),
+                  page: const JadwalPraktikumDosen(),
+                  updatePage: updatePage,
+                  isActive: currentPage is JadwalPraktikumDosen,
                 ),
                 const SizedBox(
                   height: 20,

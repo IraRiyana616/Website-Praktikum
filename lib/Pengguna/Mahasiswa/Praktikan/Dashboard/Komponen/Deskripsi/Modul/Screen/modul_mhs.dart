@@ -56,19 +56,17 @@ class _TabelSilabusPraktikumMahasiswaState
       return DataSilabus(
         kode: kodeKelas,
         modul: data['judulMateri'],
-        hari: data['tanggalPraktikum'],
-        waktu: data['waktuPraktikum'],
+        jadwal: data['waktuPraktikum'],
+        tanggal: data['tanggalPraktikum'],
         file: data['modulPraktikum'],
-
         deskripsiKelas: kodeKelasMap[kodeKelas] ?? '',
-        documentId: doc.id, // Add documentId to DataSilabus
+        documentId: doc.id,
       );
     }).toList();
 
     setState(() {
       demoDataSilabus = dataList;
-      filteredDataSilabus =
-          dataList; // Initialize filteredDataSilabus with all data
+      filteredDataSilabus = dataList;
     });
   }
 
@@ -102,15 +100,16 @@ class _TabelSilabusPraktikumMahasiswaState
                         ),
                         DataColumn(
                           label: Text(
-                            'Jadwal Praktikum',
+                            'Hari Praktikum',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                         DataColumn(
-                            label: Text(
-                          'Waktu Praktikum',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
+                          label: Text(
+                            'Waktu Praktikum',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                         DataColumn(
                           label: Text(
                             'File Modul',
@@ -155,20 +154,20 @@ class _TabelSilabusPraktikumMahasiswaState
 class DataSilabus {
   String kode;
   String modul;
-  String hari;
-  String waktu;
+  String jadwal;
+  String tanggal;
   String file;
   String deskripsiKelas;
   String documentId;
 
   DataSilabus({
     required this.modul,
-    required this.hari,
-    required this.waktu,
+    required this.jadwal,
+    required this.tanggal,
     required this.kode,
     required this.file,
     required this.deskripsiKelas,
-    required this.documentId, // Initialize documentId in constructor
+    required this.documentId,
   });
 }
 
@@ -202,8 +201,8 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
           ),
         ),
       ),
-      DataCell(SizedBox(width: 170, child: Text(fileInfo.hari))),
-      DataCell(SizedBox(width: 170.0, child: Text(fileInfo.waktu))),
+      DataCell(SizedBox(width: 170.0, child: Text(fileInfo.tanggal))),
+      DataCell(SizedBox(width: 170.0, child: Text(fileInfo.jadwal))),
       DataCell(Row(
         children: [
           const Icon(

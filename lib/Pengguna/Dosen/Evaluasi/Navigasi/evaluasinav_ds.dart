@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Screen/hasilstudi_ds.dart';
 import '../../Absensi/Screen/absensi_ds.dart';
 import '../../Dashboard/Screen/dashboard_ds.dart';
+import '../../Jadwal/Screen/jadwal_praktikum_ds.dart';
 import '../../Pengaturan/Screen/pengaturan_ds.dart';
 import '../Screen/evaluasi_ds.dart';
 
@@ -61,6 +62,18 @@ class _EvaluasiNavDosenState extends State<EvaluasiNavDosen> {
                   page: const DashboardDosen(),
                   updatePage: updatePage,
                   isActive: currentPage is DashboardDosen,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                DashboardListTile(
+                  title: 'Jadwal',
+                  icon: const Icon(
+                    Icons.calendar_month,
+                  ),
+                  page: const JadwalPraktikumDosen(),
+                  updatePage: updatePage,
+                  isActive: currentPage is JadwalPraktikumDosen,
                 ),
                 const SizedBox(
                   height: 20,

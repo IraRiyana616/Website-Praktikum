@@ -15,7 +15,7 @@ class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
 
-  String selectedYear = 'Tampilkan Semua';
+  String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
   Future<void> fetchAvailableYears() async {
@@ -27,7 +27,7 @@ class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
           .toSet();
 
       setState(() {
-        availableYears = ['Tampilkan Semua', ...years.toList()];
+        availableYears = ['Tahun Ajaran', ...years.toList()];
       });
     } catch (e) {
       if (kDebugMode) {
@@ -40,7 +40,7 @@ class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
 
-      if (selectedYear != null && selectedYear != 'Tampilkan Semua') {
+      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         querySnapshot = await FirebaseFirestore.instance
             .collection('dataKelas')
             .where('tahunAjaran', isEqualTo: selectedYear)
@@ -124,7 +124,7 @@ class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
                   padding: const EdgeInsets.only(bottom: 15.0, left: 0.0),
                   child: Container(
                     height: 47.0,
-                    width: 1000.0,
+                    width: 1020.0,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
@@ -167,7 +167,7 @@ class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
                             columns: const [
                               DataColumn(
                                 label: Text(
-                                  "Kode Kelas",
+                                  "Kode Praktikum",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -251,27 +251,42 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
+      DataCell(Text(fileInfo.kelas)),
       DataCell(
-          Text(fileInfo.kelas,
-              style: TextStyle(
-                  color: Colors.lightBlue[700],
-                  fontWeight: FontWeight.bold)), onTap: () {
+          SizedBox(
+            width: 170.0,
+            child: Text(fileInfo.matkul,
+                style: TextStyle(
+                    color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
+          ), onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => NilaiPercobaanDosen(
-                      kodeKelas: fileInfo.kelas,
-                      matkul: fileInfo.matkul,
-                    )));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                NilaiPercobaanDosen(
+              kodeKelas: fileInfo.kelas,
+              matkul: fileInfo.matkul,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       }),
       DataCell(
-        Text(
-          fileInfo.matkul,
-        ),
-      ),
-      DataCell(
         SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(
             getLimitedText(fileInfo.dosenpengampu, 30),
           ),
@@ -279,7 +294,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
       ),
       DataCell(
         SizedBox(
-          width: 180.0,
+          width: 220.0,
           child: Text(
             getLimitedText(fileInfo.dosenpengampu2, 30),
           ),

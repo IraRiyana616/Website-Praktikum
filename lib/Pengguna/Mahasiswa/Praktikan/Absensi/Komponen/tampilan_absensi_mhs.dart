@@ -3,10 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Absensi/Komponen/tabel_absensi_mahasiswa.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_mhs.dart';
-
 import '../../Dashboard/Komponen/Asistensi/Screen/asistensi_laporan_prak.dart';
 import '../../Dashboard/Komponen/Pengumpulan/Latihan/Screen/peng_latihan_mhs.dart';
 
@@ -142,11 +140,30 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => DeskripsiMahasiswa(
-                                          kodeKelas: widget.kodeKelas,
-                                          mataKuliah: widget.mataKuliah)));
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      DeskripsiMahasiswa(
+                                    kodeKelas: widget.kodeKelas,
+                                    mataKuliah: widget.mataKuliah,
+                                  ),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    const begin = Offset(0.0, 0.0);
+                                    const end = Offset.zero;
+                                    const curve = Curves.ease;
+
+                                    var tween = Tween(begin: begin, end: end)
+                                        .chain(CurveTween(curve: curve));
+
+                                    return SlideTransition(
+                                      position: animation.drive(tween),
+                                      child: child,
+                                    );
+                                  },
+                                ),
+                              );
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(
@@ -188,13 +205,30 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            DataLatihanPraktikan(
-                                              kodeKelas: widget.kodeKelas,
-                                              mataKuliah: widget.mataKuliah,
-                                            )));
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        DataLatihanPraktikan(
+                                      kodeKelas: widget.kodeKelas,
+                                      mataKuliah: widget.mataKuliah,
+                                    ),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      const begin = Offset(0.0, 0.0);
+                                      const end = Offset.zero;
+                                      const curve = Curves.ease;
+
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+
+                                      return SlideTransition(
+                                        position: animation.drive(tween),
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                );
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
@@ -219,13 +253,30 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            DataAsistensiPraktikan(
-                                              kodeKelas: widget.kodeKelas,
-                                              mataKuliah: widget.mataKuliah,
-                                            )));
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        DataAsistensiPraktikan(
+                                      kodeKelas: widget.kodeKelas,
+                                      mataKuliah: widget.mataKuliah,
+                                    ),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      const begin = Offset(0.0, 0.0);
+                                      const end = Offset.zero;
+                                      const curve = Curves.ease;
+
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+
+                                      return SlideTransition(
+                                        position: animation.drive(tween),
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                );
                               },
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,

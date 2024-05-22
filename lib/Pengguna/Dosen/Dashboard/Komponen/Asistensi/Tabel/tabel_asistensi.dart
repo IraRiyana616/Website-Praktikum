@@ -136,14 +136,31 @@ DataRow dataFileDataRow(
         DataCell(GestureDetector(
           onTap: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AsistensiLaporanDosen(
-                          kodeKelas: fileInfo.kode,
-                          nama: fileInfo.nama,
-                          modul: fileInfo.matkul,
-                          nim: fileInfo.nim,
-                        )));
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    AsistensiLaporanDosen(
+                  kodeKelas: fileInfo.kode,
+                  nama: fileInfo.nama,
+                  modul: fileInfo.matkul,
+                  nim: fileInfo.nim,
+                ),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(0.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.ease;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+              ),
+            );
           },
           child: const MouseRegion(
             cursor: SystemMouseCursors.click,

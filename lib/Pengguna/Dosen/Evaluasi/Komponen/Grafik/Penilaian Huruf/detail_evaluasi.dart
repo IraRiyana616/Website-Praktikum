@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
@@ -8,7 +9,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 class PieChartNilaiHuruf extends StatefulWidget {
   final String kodeKelas;
-  const PieChartNilaiHuruf({Key? key, required this.kodeKelas})
+  final String mataKuliah;
+  const PieChartNilaiHuruf(
+      {Key? key, required this.kodeKelas, required this.mataKuliah})
       : super(key: key);
 
   @override
@@ -19,12 +22,47 @@ class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
   List<PieChartSectionData> _pieChartSections = [];
   List<PieChartSectionData> _pieChartKelulusanSections = [];
   bool _dataLoaded = false;
+  //== Nama Akun ==//
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  User? _currentUser;
+  String _namaDosen = '';
+
+  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
+  void _getCurrentUser() async {
+    setState(() {
+      _currentUser = _auth.currentUser;
+    });
+    if (_currentUser != null) {
+      await _getNamaDosen(_currentUser!.uid);
+    }
+  }
+
+  // Fungsi untuk mengambil nama mahasiswa dari database
+  Future<void> _getNamaDosen(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('akun_dosen').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          _namaDosen = doc.get('nama');
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching nama mahasiswa: $e');
+      }
+    }
+  }
+
+  //== Fungsi untuk authentikasi ==//
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
     _loadDataLulusTidakLulusFromFirestore();
     _loadDataFromFirestore();
+    _getCurrentUser();
   }
 
   Future<void> _loadDataLulusTidakLulusFromFirestore() async {
@@ -170,13 +208,30 @@ class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
                 ),
                 Expanded(
                   child: Text(
-                    widget.kodeKelas,
+                    widget.mataKuliah,
                     style: GoogleFonts.quicksand(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
                   ),
-                )
+                ),
+                const SizedBox(
+                  width: 700.0,
+                ),
+                if (_currentUser != null) ...[
+                  Text(
+                    _namaDosen.isNotEmpty
+                        ? _namaDosen
+                        : (_currentUser!.email ?? ''),
+                    style: GoogleFonts.quicksand(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  const SizedBox(
+                    width: 30.0,
+                  ),
+                ],
               ],
             ),
           ),

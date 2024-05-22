@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:laksi/Pengguna/Dosen/Dashboard/Screen/dashboard_ds.dart';
-import 'package:laksi/Pengguna/Dosen/Evaluasi/Screen/evaluasi_ds.dart';
-import 'package:laksi/Pengguna/Dosen/Hasil%20Studi/Screen/hasilstudi_ds.dart';
-import 'package:laksi/Pengguna/Dosen/Pengaturan/Screen/pengaturan_ds.dart';
+import 'package:laksi/Pengguna/Dosen/Jadwal/Screen/jadwal_praktikum_ds.dart';
 import '../../Absensi/Screen/absensi_ds.dart';
-import '../../Jadwal/Screen/jadwal_praktikum_ds.dart';
+import '../../Dashboard/Screen/dashboard_ds.dart';
+import '../../Evaluasi/Screen/evaluasi_ds.dart';
+import '../../Hasil Studi/Screen/hasilstudi_ds.dart';
+import '../../Pengaturan/Screen/pengaturan_ds.dart';
 
-class DashboardDosenNav extends StatefulWidget {
-  const DashboardDosenNav({super.key});
+class JadwalPraktikumDosenNav extends StatefulWidget {
+  const JadwalPraktikumDosenNav({super.key});
 
   @override
-  State<DashboardDosenNav> createState() => _DashboardDosenNavState();
+  State<JadwalPraktikumDosenNav> createState() =>
+      _JadwalPraktikumDosenNavState();
 }
 
-class _DashboardDosenNavState extends State<DashboardDosenNav> {
-  Widget currentPage = const DashboardDosen();
+class _JadwalPraktikumDosenNavState extends State<JadwalPraktikumDosenNav> {
+  Widget currentPage = const JadwalPraktikumDosen();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,7 +113,7 @@ class _DashboardDosenNavState extends State<DashboardDosenNav> {
                   isActive: currentPage is EvaluasiDosen,
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
                 DashboardListTile(
                   title: 'Settings',
@@ -124,7 +125,7 @@ class _DashboardDosenNavState extends State<DashboardDosenNav> {
                   isActive: currentPage is PengaturanDosen,
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
               ],
             ),

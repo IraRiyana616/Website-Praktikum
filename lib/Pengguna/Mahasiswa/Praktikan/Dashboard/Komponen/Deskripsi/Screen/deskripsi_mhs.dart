@@ -3,10 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../../../Dosen/Dashboard/Komponen/Deskripsi/Tabel/tabel_modul.dart';
 import '../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
 import '../../Asistensi/Screen/asistensi_laporan_prak.dart';
 import '../../Pengumpulan/Latihan/Screen/peng_latihan_mhs.dart';
-import '../Modul/Screen/modul_mhs.dart';
 
 class DeskripsiMahasiswa extends StatefulWidget {
   final String kodeKelas;
@@ -122,7 +122,6 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
         stream: FirebaseFirestore.instance
             .collection('deskripsiKelas')
             .where('kodeKelas', isEqualTo: widget.kodeKelas)
-            .where('mataKuliah', isEqualTo: widget.mataKuliah)
             .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -198,89 +197,160 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                                       ),
                                     ),
                                   ),
-                                  //Absensi Mahasiswa
+                                  //== Absensi ==//
                                   GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 50.0,
+                                        top: 38.0,
+                                      ),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation,
+                                                      secondaryAnimation) =>
                                                   AbsensiPraktikanScreen(
-                                                    kodeKelas: widget.kodeKelas,
-                                                    mataKuliah:
-                                                        widget.mataKuliah,
-                                                  )));
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 50.0,
-                                        top: 38.0,
-                                      ),
-                                      child: MouseRegion(
-                                        cursor: SystemMouseCursors.click,
-                                        child: Text(
-                                          'Absensi',
-                                          style: GoogleFonts.quicksand(
-                                            fontSize: 16.0,
+                                                kodeKelas: widget.kodeKelas,
+                                                mataKuliah: widget.mataKuliah,
+                                              ),
+                                              transitionsBuilder: (context,
+                                                  animation,
+                                                  secondaryAnimation,
+                                                  child) {
+                                                const begin = Offset(0.0, 0.0);
+                                                const end = Offset.zero;
+                                                const curve = Curves.ease;
+
+                                                var tween = Tween(
+                                                        begin: begin, end: end)
+                                                    .chain(CurveTween(
+                                                        curve: curve));
+
+                                                return SlideTransition(
+                                                  position:
+                                                      animation.drive(tween),
+                                                  child: child,
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        },
+                                        child: MouseRegion(
+                                          cursor: SystemMouseCursors.click,
+                                          child: Text(
+                                            'Absensi',
+                                            style: GoogleFonts.quicksand(
+                                              fontSize: 16.0,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                  //Pengumpulan
+
+                                  //== Pengumpulan Pre-Test, Latihan dan Tugas ==//
                                   GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DataLatihanPraktikan(
-                                                    kodeKelas: widget.kodeKelas,
-                                                    mataKuliah:
-                                                        widget.mataKuliah,
-                                                  )));
-                                    },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                         left: 50.0,
                                         top: 38.0,
                                       ),
-                                      child: MouseRegion(
-                                        cursor: SystemMouseCursors.click,
-                                        child: Text(
-                                          'Pengumpulan',
-                                          style: GoogleFonts.quicksand(
-                                            fontSize: 16.0,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation,
+                                                      secondaryAnimation) =>
+                                                  DataLatihanPraktikan(
+                                                kodeKelas: widget.kodeKelas,
+                                                mataKuliah: widget.mataKuliah,
+                                              ),
+                                              transitionsBuilder: (context,
+                                                  animation,
+                                                  secondaryAnimation,
+                                                  child) {
+                                                const begin = Offset(0.0, 0.0);
+                                                const end = Offset.zero;
+                                                const curve = Curves.ease;
+
+                                                var tween = Tween(
+                                                        begin: begin, end: end)
+                                                    .chain(CurveTween(
+                                                        curve: curve));
+
+                                                return SlideTransition(
+                                                  position:
+                                                      animation.drive(tween),
+                                                  child: child,
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        },
+                                        child: MouseRegion(
+                                          cursor: SystemMouseCursors.click,
+                                          child: Text(
+                                            'Pengumpulan',
+                                            style: GoogleFonts.quicksand(
+                                              fontSize: 16.0,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                  //Asistensi
+
+                                  //== Asistensi Laporan ==//
 
                                   GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DataAsistensiPraktikan(
-                                                    kodeKelas: widget.kodeKelas,
-                                                    mataKuliah:
-                                                        widget.mataKuliah,
-                                                  )));
-                                    },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                         left: 50.0,
                                         top: 38.0,
                                       ),
-                                      child: MouseRegion(
-                                        cursor: SystemMouseCursors.click,
-                                        child: Text(
-                                          'Asistensi',
-                                          style: GoogleFonts.quicksand(
-                                            fontSize: 16.0,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation,
+                                                      secondaryAnimation) =>
+                                                  DataAsistensiPraktikan(
+                                                kodeKelas: widget.kodeKelas,
+                                                mataKuliah: widget.mataKuliah,
+                                              ),
+                                              transitionsBuilder: (context,
+                                                  animation,
+                                                  secondaryAnimation,
+                                                  child) {
+                                                const begin = Offset(0.0, 0.0);
+                                                const end = Offset.zero;
+                                                const curve = Curves.ease;
+
+                                                var tween = Tween(
+                                                        begin: begin, end: end)
+                                                    .chain(CurveTween(
+                                                        curve: curve));
+
+                                                return SlideTransition(
+                                                  position:
+                                                      animation.drive(tween),
+                                                  child: child,
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        },
+                                        child: MouseRegion(
+                                          cursor: SystemMouseCursors.click,
+                                          child: Text(
+                                            'Asisten',
+                                            style: GoogleFonts.quicksand(
+                                              fontSize: 16.0,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -348,7 +418,8 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                                     width: 400.0,
                                     height: 350.0,
                                     child: Padding(
-                                      padding: const EdgeInsets.only(top: 10.0),
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -374,7 +445,7 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                                             ),
                                           ),
 
-                                          //== Perangkat Lunak ==//
+                                          //Sistem Operasi
                                           Padding(
                                             padding: const EdgeInsets.only(
                                                 top: 20.0),
@@ -415,7 +486,7 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                                               ),
                                             ),
                                           ),
-                                          //== Perangkat Keras ==//
+                                          //Prosesor
                                           Padding(
                                             padding: const EdgeInsets.only(
                                                 top: 20.0),
@@ -490,8 +561,9 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                                 ),
                               ),
 
-                              TabelSilabusPraktikumMahasiswa(
+                              TabelSilabusPraktikumDosen(
                                   kodeKelas: widget.kodeKelas),
+
                               const SizedBox(height: 50.0)
                             ],
                           ),
