@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Navigation/kelas_assnav.dart';
-import '../../../../../../Dosen/Dashboard/Komponen/Asistensi/Screen/asistensi_ds.dart';
-import '../../../../../../Dosen/Dashboard/Komponen/Pengumpulan/Latihan/latihan_ds.dart';
+import '../../../../../../Dosen/Dashboard/Komponen/Deskripsi/Tabel/tabel_modul.dart';
+import '../../../../../Praktikan/Absensi/Komponen/tampilan_absensi_mhs.dart';
+import '../../../../../Praktikan/Dashboard/Komponen/Asistensi/Screen/asistensi_laporan_prak.dart';
+import '../../../../../Praktikan/Dashboard/Komponen/Pengumpulan/Latihan/Screen/peng_latihan_mhs.dart';
+import '../../../../../Praktikan/Dashboard/Navigasi/dasboard_nav.dart';
 import '../Modul/tabel_modul.dart';
 
 class DeskripsiKelas extends StatefulWidget {
@@ -29,9 +31,26 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
           leading: IconButton(
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const KelasAsistenNav()));
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const DashboardPraktikanNav(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ),
+              );
             },
             icon: const Icon(
               Icons.arrow_back,
@@ -57,18 +76,6 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 400.0),
-                Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
-                  child: Text(
-                    'Admin',
-                    style: GoogleFonts.quicksand(
-                        fontSize: 17.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
-                  ),
-                ),
-                const SizedBox(width: 30.0)
               ],
             ),
           ),
@@ -153,6 +160,58 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                       ),
                                     ),
                                   ),
+                                  //== Absensi ==//
+                                  GestureDetector(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 50.0,
+                                        top: 38.0,
+                                      ),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation,
+                                                      secondaryAnimation) =>
+                                                  AbsensiPraktikanScreen(
+                                                kodeKelas: widget.kodeKelas,
+                                                mataKuliah: widget.mataKuliah,
+                                              ),
+                                              transitionsBuilder: (context,
+                                                  animation,
+                                                  secondaryAnimation,
+                                                  child) {
+                                                const begin = Offset(0.0, 0.0);
+                                                const end = Offset.zero;
+                                                const curve = Curves.ease;
+
+                                                var tween = Tween(
+                                                        begin: begin, end: end)
+                                                    .chain(CurveTween(
+                                                        curve: curve));
+
+                                                return SlideTransition(
+                                                  position:
+                                                      animation.drive(tween),
+                                                  child: child,
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        },
+                                        child: MouseRegion(
+                                          cursor: SystemMouseCursors.click,
+                                          child: Text(
+                                            'Absensi',
+                                            style: GoogleFonts.quicksand(
+                                              fontSize: 16.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
 
                                   //== Pengumpulan Pre-Test, Latihan dan Tugas ==//
                                   GestureDetector(
@@ -168,7 +227,7 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                             PageRouteBuilder(
                                               pageBuilder: (context, animation,
                                                       secondaryAnimation) =>
-                                                  KumpulUjianPemahamanDosen(
+                                                  DataLatihanPraktikan(
                                                 kodeKelas: widget.kodeKelas,
                                                 mataKuliah: widget.mataKuliah,
                                               ),
@@ -222,7 +281,7 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                             PageRouteBuilder(
                                               pageBuilder: (context, animation,
                                                       secondaryAnimation) =>
-                                                  DataPraktikanAsistensiDosen(
+                                                  DataAsistensiPraktikan(
                                                 kodeKelas: widget.kodeKelas,
                                                 mataKuliah: widget.mataKuliah,
                                               ),
@@ -465,7 +524,7 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                 ),
                               ),
 
-                              TabelSilabusPraktikum(
+                              TabelSilabusPraktikumDosen(
                                   kodeKelas: widget.kodeKelas),
 
                               const SizedBox(height: 50.0)

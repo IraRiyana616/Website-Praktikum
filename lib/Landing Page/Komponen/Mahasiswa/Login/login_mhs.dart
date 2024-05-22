@@ -237,20 +237,39 @@ class _LoginMahasiswaState extends State<LoginMahasiswa> {
                                 ),
                               ),
                               const SizedBox(width: 5.0),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const RegisterMahasiswa(),
-                                    ),
-                                  );
-                                },
-                                child: const Text(
-                                  "Registrasi Akun",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.blue),
+                              MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation,
+                                                secondaryAnimation) =>
+                                            const RegisterMahasiswa(),
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          const begin = Offset(0.0, 0.0);
+                                          const end = Offset.zero;
+                                          const curve = Curves.ease;
+
+                                          var tween = Tween(
+                                                  begin: begin, end: end)
+                                              .chain(CurveTween(curve: curve));
+
+                                          return SlideTransition(
+                                            position: animation.drive(tween),
+                                            child: child,
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    "Registrasi Akun",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.blue),
+                                  ),
                                 ),
                               )
                             ],

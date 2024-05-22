@@ -21,24 +21,55 @@ class _KumpulTugasAdminState extends State<KumpulTugasAdmin> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // Memilih halaman sesuai dengan index yang dipilih
       if (index == 0) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => KumpulUjianPemahamanAdmin(
-                    kodeKelas: widget.kodeKelas,
-                    mataKuliah: widget.mataKuliah,
-                  )),
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                KumpulUjianPemahamanAdmin(
+              kodeKelas: widget.kodeKelas,
+              mataKuliah: widget.mataKuliah,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
         );
       } else if (index == 1) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => KumpulTugasAdmin(
-                    kodeKelas: widget.kodeKelas,
-                    mataKuliah: widget.mataKuliah,
-                  )),
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                KumpulTugasAdmin(
+              kodeKelas: widget.kodeKelas,
+              mataKuliah: widget.mataKuliah,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
         );
       }
     });

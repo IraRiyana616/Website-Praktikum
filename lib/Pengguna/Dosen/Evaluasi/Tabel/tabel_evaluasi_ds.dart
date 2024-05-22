@@ -278,11 +278,26 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
             // ignore: use_build_context_synchronously
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => PieChartNilaiHuruf(
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    PieChartNilaiHuruf(
                   kodeKelas: fileInfo.kelas,
                   mataKuliah: fileInfo.matkul,
                 ),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(0.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.ease;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
               ),
             );
           } else {
@@ -346,10 +361,27 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
       DataCell(IconButton(
         onPressed: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => FormEvaluasiKegiatan(
-                      kodeKelas: fileInfo.kelas, mataKuliah: fileInfo.matkul)));
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  FormEvaluasiKegiatan(
+                      kodeKelas: fileInfo.kelas, mataKuliah: fileInfo.matkul),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                const begin = Offset(0.0, 0.0);
+                const end = Offset.zero;
+                const curve = Curves.ease;
+
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+            ),
+          );
         },
         icon: const Icon(Icons.add_box, color: Colors.grey),
         tooltip: 'Tambah Data Evaluasi',

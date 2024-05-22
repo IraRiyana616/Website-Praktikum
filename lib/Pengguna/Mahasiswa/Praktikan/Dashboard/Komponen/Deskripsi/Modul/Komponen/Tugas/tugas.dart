@@ -143,15 +143,6 @@ class _PengumpulanTugasState extends State<PengumpulanTugas> {
         child: AppBar(
           automaticallyImplyLeading: false,
           backgroundColor: const Color(0xFFF7F8FA),
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.black,
-            ),
-          ),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(

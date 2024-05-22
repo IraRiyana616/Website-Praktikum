@@ -35,27 +35,30 @@ class _LoginDosenState extends State<LoginDosen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 285.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isLectureSelected = true;
-                        });
-                      },
-                      child: Container(
-                        height: 45.0,
-                        width: 130.0,
-                        color: isLectureSelected
-                            ? const Color(0xFF3CBEA9)
-                            : Colors.white,
-                        child: Center(
-                          child: Text(
-                            "Dosen",
-                            style: GoogleFonts.quicksand(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                              color: isLectureSelected
-                                  ? Colors.white
-                                  : Colors.black,
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isLectureSelected = true;
+                          });
+                        },
+                        child: Container(
+                          height: 45.0,
+                          width: 130.0,
+                          color: isLectureSelected
+                              ? const Color(0xFF3CBEA9)
+                              : Colors.white,
+                          child: Center(
+                            child: Text(
+                              "Dosen",
+                              style: GoogleFonts.quicksand(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                                color: isLectureSelected
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
                             ),
                           ),
                         ),
@@ -65,32 +68,52 @@ class _LoginDosenState extends State<LoginDosen> {
                   const SizedBox(
                     width: 5.0,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isLectureSelected = false;
-                      });
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginAdmin(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      height: 45.0,
-                      width: 130.0,
-                      color: isLectureSelected
-                          ? Colors.white
-                          : const Color(0xFF3CBEA9),
-                      child: Center(
-                        child: Text(
-                          "Admin",
-                          style: GoogleFonts.quicksand(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                            color:
-                                isLectureSelected ? Colors.black : Colors.white,
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isLectureSelected = false;
+                        });
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    const LoginAdmin(),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              const begin = Offset(0.0, 0.0);
+                              const end = Offset.zero;
+                              const curve = Curves.ease;
+
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: 45.0,
+                        width: 130.0,
+                        color: isLectureSelected
+                            ? Colors.white
+                            : const Color(0xFF3CBEA9),
+                        child: Center(
+                          child: Text(
+                            "Admin",
+                            style: GoogleFonts.quicksand(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: isLectureSelected
+                                  ? Colors.black
+                                  : Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -355,21 +378,44 @@ class _LoginDosenState extends State<LoginDosen> {
                                       ),
                                     ),
                                     const SizedBox(width: 5.0),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const RegisterDosen(),
+                                    MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation,
+                                                      secondaryAnimation) =>
+                                                  const RegisterDosen(),
+                                              transitionsBuilder: (context,
+                                                  animation,
+                                                  secondaryAnimation,
+                                                  child) {
+                                                const begin = Offset(0.0, 0.0);
+                                                const end = Offset.zero;
+                                                const curve = Curves.ease;
+
+                                                var tween = Tween(
+                                                        begin: begin, end: end)
+                                                    .chain(CurveTween(
+                                                        curve: curve));
+
+                                                return SlideTransition(
+                                                  position:
+                                                      animation.drive(tween),
+                                                  child: child,
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        },
+                                        child: const Text(
+                                          "Registrasi Akun",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.blue,
                                           ),
-                                        );
-                                      },
-                                      child: const Text(
-                                        "Registrasi Akun",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.blue,
                                         ),
                                       ),
                                     )

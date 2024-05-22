@@ -106,102 +106,134 @@ class _LandingPageState extends State<LandingPage> {
                 style: GoogleFonts.quicksand(
                     fontSize: 45.0, fontWeight: FontWeight.bold),
               ),
-              InkWell(
-                onTap: () {},
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 55.0),
-                  child: Container(
-                    color: Colors.grey.shade300,
-                    height: 400.0,
-                    width: double.infinity,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        //Halaman Mahasiswa
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const LoginMahasiswa()));
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 200.0),
-                            child: Material(
-                              elevation: 5.0,
-                              borderRadius: BorderRadius.circular(20.0),
-                              child: Container(
-                                height: 240.0,
-                                width: 400.0,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20.0)),
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/mahasiswa.png',
-                                      height: 150.0,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    const SizedBox(
-                                      height: 20.0,
-                                    ),
-                                    const Text(
-                                      'Mahasiswa',
-                                      style: TextStyle(
-                                          fontSize: 35.0,
-                                          fontWeight: FontWeight.bold),
-                                    )
-                                  ],
-                                ),
+              Padding(
+                padding: const EdgeInsets.only(top: 55.0),
+                child: Container(
+                  color: Colors.grey.shade300,
+                  height: 400.0,
+                  width: double.infinity,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      //== Halaman Mahasiswa ==//
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const LoginMahasiswa(),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                const begin = Offset(0.0, 0.0);
+                                const end = Offset.zero;
+                                const curve = Curves.ease;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+
+                                return SlideTransition(
+                                  position: animation.drive(tween),
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 200.0),
+                          child: Material(
+                            elevation: 5.0,
+                            borderRadius: BorderRadius.circular(20.0),
+                            child: Container(
+                              height: 240.0,
+                              width: 400.0,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20.0)),
+                              child: Column(
+                                children: [
+                                  Image.asset(
+                                    'assets/images/mahasiswa.png',
+                                    height: 150.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  const SizedBox(
+                                    height: 20.0,
+                                  ),
+                                  const Text(
+                                    'Mahasiswa',
+                                    style: TextStyle(
+                                        fontSize: 35.0,
+                                        fontWeight: FontWeight.bold),
+                                  )
+                                ],
                               ),
                             ),
                           ),
                         ),
-                        //Halaman Non Mahasiswa
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginDosen()));
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 200.0),
-                            child: Material(
-                              elevation: 5.0,
-                              borderRadius: BorderRadius.circular(20.0),
-                              child: Container(
-                                height: 240.0,
-                                width: 400.0,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20.0)),
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/dosen.png',
-                                      height: 150.0,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    const SizedBox(
-                                      height: 20.0,
-                                    ),
-                                    const Text(
-                                      'Non Mahasiswa',
-                                      style: TextStyle(
-                                          fontSize: 35.0,
-                                          fontWeight: FontWeight.bold),
-                                    )
-                                  ],
-                                ),
+                      ),
+                      //== Halaman Non Mahasiswa ==//
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const LoginDosen(),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                const begin = Offset(0.0, 0.0);
+                                const end = Offset.zero;
+                                const curve = Curves.ease;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+
+                                return SlideTransition(
+                                  position: animation.drive(tween),
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 200.0),
+                          child: Material(
+                            elevation: 5.0,
+                            borderRadius: BorderRadius.circular(20.0),
+                            child: Container(
+                              height: 240.0,
+                              width: 400.0,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20.0)),
+                              child: Column(
+                                children: [
+                                  Image.asset(
+                                    'assets/images/dosen.png',
+                                    height: 150.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  const SizedBox(
+                                    height: 20.0,
+                                  ),
+                                  const Text(
+                                    'Non Mahasiswa',
+                                    style: TextStyle(
+                                        fontSize: 35.0,
+                                        fontWeight: FontWeight.bold),
+                                  )
+                                ],
                               ),
                             ),
                           ),
-                        )
-                      ],
-                    ),
+                        ),
+                      )
+                    ],
                   ),
                 ),
               )

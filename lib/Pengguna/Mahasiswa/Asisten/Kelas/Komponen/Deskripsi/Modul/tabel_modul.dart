@@ -60,14 +60,13 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
         waktu: data['waktuPraktikum'],
         file: data['modulPraktikum'],
         deskripsiKelas: kodeKelasMap[kodeKelas] ?? '',
-        documentId: doc.id, // Add documentId to DataSilabus
+        documentId: doc.id,
       );
     }).toList();
 
     setState(() {
       demoDataSilabus = dataList;
-      filteredDataSilabus =
-          dataList; // Initialize filteredDataSilabus with all data
+      filteredDataSilabus = dataList;
     });
   }
 
@@ -85,7 +84,7 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
           child: Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 25.0),
             child: Container(
-              width: 1020.0,
+              width: 1100.0,
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey.shade400),
                   borderRadius: BorderRadius.circular(6.0)),
@@ -118,10 +117,8 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
                           ),
                         ),
                       ],
-                      source: DataSource(
-                          filteredDataSilabus,
-                          deleteDataFromFirestore,
-                          context), // Pass delete function
+                      source: DataSource(filteredDataSilabus,
+                          deleteDataFromFirestore, context),
                       rowsPerPage:
                           calculateRowsPerPage(filteredDataSilabus.length),
                     )
@@ -159,7 +156,7 @@ class DataSilabus {
   String waktu;
   String file;
   String deskripsiKelas;
-  String documentId; // Added documentId field
+  String documentId;
 
   DataSilabus({
     required this.modul,
@@ -168,13 +165,12 @@ class DataSilabus {
     required this.kode,
     required this.file,
     required this.deskripsiKelas,
-    required this.documentId, // Initialize documentId in constructor
+    required this.documentId,
   });
 }
 
 DataRow dataFileDataRow(DataSilabus fileInfo, int index,
     Function(String) onDelete, BuildContext context) {
-  // Pass onDelete function
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -202,9 +198,9 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
           ),
         ),
       ),
-      DataCell(SizedBox(width: 85.0, child: Text(fileInfo.hari))),
+      DataCell(SizedBox(width: 170.0, child: Text(fileInfo.hari))),
       DataCell(SizedBox(
-        width: 100.0,
+        width: 170.0,
         child: Text(fileInfo.waktu),
       )),
       DataCell(Row(

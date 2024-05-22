@@ -268,7 +268,7 @@ class _FormJadwalPraktikumAdminState extends State<FormJadwalPraktikumAdmin> {
                                       child: TextField(
                                         controller: kodeKelasController,
                                         decoration: InputDecoration(
-                                            hintText: 'Masukkan Kode Kelas',
+                                            hintText: 'Masukkan Kode Praktikum',
                                             border: OutlineInputBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(

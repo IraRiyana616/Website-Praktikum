@@ -490,15 +490,18 @@ class _PieChartNilaiHurufState extends State<PieChartNilaiHuruf> {
                                       style: const TextStyle(
                                           fontSize: 14.0, color: Colors.blue),
                                     ),
-                                    IconButton(
-                                        onPressed: () {
-                                          downloadFile(
-                                              widget.kodeKelas, namaFile);
-                                        },
-                                        icon: const Icon(
-                                          Icons.download,
-                                          color: Colors.grey,
-                                        ))
+                                    MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      child: IconButton(
+                                          onPressed: () {
+                                            downloadFile(
+                                                widget.kodeKelas, namaFile);
+                                          },
+                                          icon: const Icon(
+                                            Icons.download,
+                                            color: Colors.grey,
+                                          )),
+                                    )
                                   ],
                                 ),
                               ),

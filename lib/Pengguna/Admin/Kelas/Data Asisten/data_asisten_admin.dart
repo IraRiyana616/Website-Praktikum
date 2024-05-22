@@ -108,9 +108,12 @@ class _DataAsistenAdminState extends State<DataAsistenAdmin> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
+              icon: const Hero(
+                tag: 'backbutton',
+                child: Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                ),
               ),
             ),
             backgroundColor: const Color(0xFFF7F8FA),

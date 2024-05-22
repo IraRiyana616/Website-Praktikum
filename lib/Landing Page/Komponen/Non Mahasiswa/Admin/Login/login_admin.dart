@@ -33,31 +33,52 @@ class _LoginAdminState extends State<LoginAdmin> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 285.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isAdminSelected = false;
-                        });
-                        Navigator.push(
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isAdminSelected = false;
+                          });
+                          Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginDosen()));
-                      },
-                      child: Container(
-                        height: 45.0,
-                        width: 130.0,
-                        color: isAdminSelected
-                            ? Colors.white
-                            : const Color(0xFF3CBEA9),
-                        child: Center(
-                          child: Text("Dosen",
-                              style: GoogleFonts.quicksand(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                                color: isAdminSelected
-                                    ? Colors.black
-                                    : Colors.white,
-                              )),
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const LoginDosen(),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                const begin = Offset(0.0, 0.0);
+                                const end = Offset.zero;
+                                const curve = Curves.ease;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+
+                                return SlideTransition(
+                                  position: animation.drive(tween),
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                        child: Container(
+                          height: 45.0,
+                          width: 130.0,
+                          color: isAdminSelected
+                              ? Colors.white
+                              : const Color(0xFF3CBEA9),
+                          child: Center(
+                            child: Text("Dosen",
+                                style: GoogleFonts.quicksand(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: isAdminSelected
+                                      ? Colors.black
+                                      : Colors.white,
+                                )),
+                          ),
                         ),
                       ),
                     ),
@@ -65,28 +86,31 @@ class _LoginAdminState extends State<LoginAdmin> {
                   const SizedBox(
                     width: 5.0,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isAdminSelected = true;
-                      });
-                    },
-                    child: Container(
-                      height: 45.0,
-                      width: 130.0,
-                      color: isAdminSelected
-                          ? const Color(
-                              0xFF3CBEA9,
-                            )
-                          : Colors.white,
-                      child: Center(
-                        child: Text("Admin",
-                            style: GoogleFonts.quicksand(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                                color: isAdminSelected
-                                    ? Colors.white
-                                    : Colors.black)),
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isAdminSelected = true;
+                        });
+                      },
+                      child: Container(
+                        height: 45.0,
+                        width: 130.0,
+                        color: isAdminSelected
+                            ? const Color(
+                                0xFF3CBEA9,
+                              )
+                            : Colors.white,
+                        child: Center(
+                          child: Text("Admin",
+                              style: GoogleFonts.quicksand(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: isAdminSelected
+                                      ? Colors.white
+                                      : Colors.black)),
+                        ),
                       ),
                     ),
                   ),

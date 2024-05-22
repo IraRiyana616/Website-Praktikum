@@ -187,34 +187,6 @@ class _DashboardPraktikanNavState extends State<DashboardPraktikanNav> {
   }
 }
 
-class HasilStudiPage extends StatelessWidget {
-  const HasilStudiPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white, // Ganti sesuai kebutuhan
-      child: const Center(
-        child: Text('Hasil Studi Page'),
-      ),
-    );
-  }
-}
-
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white, // Ganti sesuai kebutuhan
-      child: const Center(
-        child: Text('Login Page'),
-      ),
-    );
-  }
-}
-
 class DashboardListTile extends StatefulWidget {
   const DashboardListTile({
     Key? key,

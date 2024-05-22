@@ -15,52 +15,6 @@ class TabelDataMahasiswaAdmin extends StatefulWidget {
 }
 
 class _TabelDataMahasiswaAdminState extends State<TabelDataMahasiswaAdmin> {
-  //== List Tabel ==//
-  List<DataMahasiswa> demoDataMahasiswa = [];
-  List<DataMahasiswa> filteredDataMahasiswa = [];
-
-  //== Fungsi Untuk Menampilkan Data dari Firestore 'akun_mahasiswa' ==//
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
-  }
-
-  Future<void> fetchData() async {
-    // Ambil data dari Firestore 'tokenKelas' berdasarkan kodeKelas
-    QuerySnapshot tokenSnapshot = await FirebaseFirestore.instance
-        .collection('tokenKelas')
-        .where('kodeKelas', isEqualTo: widget.kodeKelas)
-        .get();
-
-    // Ambil data dari Firestore 'akun_mahasiswa' berdasarkan NIM yang didapat dari tokenKelas
-    for (QueryDocumentSnapshot tokenDoc in tokenSnapshot.docs) {
-      int nim = tokenDoc['nim'];
-      QuerySnapshot mahasiswaSnapshot = await FirebaseFirestore.instance
-          .collection('akun_mahasiswa')
-          .where('nim', isEqualTo: nim)
-          .get();
-
-      for (QueryDocumentSnapshot mahasiswaDoc in mahasiswaSnapshot.docs) {
-        // Simpan data ke dalam list demoDataMahasiswa
-        demoDataMahasiswa.add(DataMahasiswa(
-          nim: nim,
-          kode: widget.kodeKelas,
-          nama: mahasiswaDoc['nama'] ?? '',
-          email: mahasiswaDoc['email'] ?? '',
-          nohp: mahasiswaDoc['no_hp'] ?? 0,
-          angkatan: mahasiswaDoc['angkatan'] ?? 0,
-        ));
-      }
-    }
-
-    // Update state untuk merender data
-    setState(() {
-      filteredDataMahasiswa = List.from(demoDataMahasiswa);
-    });
-  }
-
-  //== TextField Search ==//
   final TextEditingController _textController = TextEditingController();
   bool _isTextFieldNotEmpty = false;
 
@@ -71,9 +25,39 @@ class _TabelDataMahasiswaAdminState extends State<TabelDataMahasiswaAdmin> {
     });
   }
 
+  Stream<List<DataMahasiswa>> fetchData() {
+    return FirebaseFirestore.instance
+        .collection('tokenKelas')
+        .where('kodeKelas', isEqualTo: widget.kodeKelas)
+        .snapshots()
+        .asyncMap((snapshot) async {
+      List<DataMahasiswa> dataMahasiswa = [];
+      for (var tokenDoc in snapshot.docs) {
+        int nim = tokenDoc['nim'];
+        var mahasiswaSnapshot = await FirebaseFirestore.instance
+            .collection('akun_mahasiswa')
+            .where('nim', isEqualTo: nim)
+            .get();
+        for (var mahasiswaDoc in mahasiswaSnapshot.docs) {
+          dataMahasiswa.add(DataMahasiswa(
+            nim: nim,
+            kode: widget.kodeKelas,
+            nama: mahasiswaDoc['nama'] ?? '',
+            email: mahasiswaDoc['email'] ?? '',
+            nohp: mahasiswaDoc['no_hp'] ?? 0,
+            angkatan: mahasiswaDoc['angkatan'] ?? 0,
+          ));
+        }
+      }
+      return dataMahasiswa;
+    });
+  }
+
+  List<DataMahasiswa> filteredDataMahasiswa = [];
+
   void filterData(String query) {
     setState(() {
-      filteredDataMahasiswa = demoDataMahasiswa
+      filteredDataMahasiswa = filteredDataMahasiswa
           .where((data) => (data.nama
                   .toLowerCase()
                   .contains(query.toLowerCase()) ||
@@ -90,133 +74,135 @@ class _TabelDataMahasiswaAdminState extends State<TabelDataMahasiswaAdmin> {
     });
   }
 
-  //== Warna Pada Tabel ==//
-  Color getRowColor(int index) {
-    // Define your conditions for different colors here
-    if (index % 2 == 0) {
-      return Colors.grey.shade200;
-    } else {
-      return Colors.transparent;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 35.0, left: 35.0),
-          child: Text(
-            'Data Mahasiswa Praktikum',
-            style: GoogleFonts.quicksand(
-                fontSize: 18.0, fontWeight: FontWeight.bold),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 15.0, left: 960.0),
-          child: SizedBox(
-            width: 300.0,
-            height: 40.0,
-            child: Row(
-              children: [
-                const Text("Search :", style: TextStyle(fontSize: 16)),
-                const SizedBox(width: 10.0),
-                Expanded(
-                  child: TextField(
-                    onChanged: (value) {
-                      filterData(value);
-                    },
-                    controller: _textController,
-                    decoration: InputDecoration(
-                      hintText: '',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 0, horizontal: 10),
-                      suffixIcon: Visibility(
-                        visible: _isTextFieldNotEmpty,
-                        child: IconButton(
-                          onPressed: clearSearchField,
-                          icon: const Icon(Icons.clear),
-                        ),
-                      ),
-                      labelStyle: const TextStyle(
-                        fontSize: 16,
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                  ),
+    return StreamBuilder<List<DataMahasiswa>>(
+      stream: fetchData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return const Center(child: Text('Error fetching data'));
+        } else {
+          filteredDataMahasiswa = snapshot.data ?? [];
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 35.0, left: 35.0),
+                child: Text(
+                  'Data Mahasiswa Praktikum',
+                  style: GoogleFonts.quicksand(
+                      fontSize: 18.0, fontWeight: FontWeight.bold),
                 ),
-              ],
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 35.0, right: 35.0, top: 25.0),
-          child: SizedBox(
-            width: double.infinity,
-            child: filteredDataMahasiswa.isNotEmpty
-                ? PaginatedDataTable(
-                    columnSpacing: 10,
-                    columns: const [
-                      DataColumn(
-                        label: Text(
-                          "NIM",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          "Angkatan",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          "Nama Lengkap",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          "Email",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          "Nomor Handphone",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 15.0, left: 960.0),
+                child: SizedBox(
+                  width: 300.0,
+                  height: 40.0,
+                  child: Row(
+                    children: [
+                      const Text("Search :", style: TextStyle(fontSize: 16)),
+                      const SizedBox(width: 10.0),
+                      Expanded(
+                        child: TextField(
+                          onChanged: (value) {
+                            filterData(value);
+                          },
+                          controller: _textController,
+                          decoration: InputDecoration(
+                            hintText: '',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 0, horizontal: 10),
+                            suffixIcon: Visibility(
+                              visible: _isTextFieldNotEmpty,
+                              child: IconButton(
+                                onPressed: clearSearchField,
+                                icon: const Icon(Icons.clear),
+                              ),
+                            ),
+                            labelStyle: const TextStyle(
+                              fontSize: 16,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
                         ),
                       ),
                     ],
-                    source: DataSource(filteredDataMahasiswa),
-                    rowsPerPage:
-                        calculateRowsPerPage(filteredDataMahasiswa.length),
-                  )
-                : const Center(
-                    child: Text(
-                      'No data available',
-                      style: TextStyle(
-                          fontSize: 16.0, fontWeight: FontWeight.bold),
-                    ),
                   ),
-          ),
-        ),
-      ],
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.only(left: 35.0, right: 35.0, top: 25.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: filteredDataMahasiswa.isNotEmpty
+                      ? PaginatedDataTable(
+                          columnSpacing: 10,
+                          columns: const [
+                            DataColumn(
+                              label: Text(
+                                "NIM",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                "Angkatan",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                "Nama Lengkap",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                "Email",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                "Nomor Handphone",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                          source: DataSource(filteredDataMahasiswa),
+                          rowsPerPage: calculateRowsPerPage(
+                              filteredDataMahasiswa.length),
+                        )
+                      : const Center(
+                          child: Text(
+                            'No data available',
+                            style: TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          );
+        }
+      },
     );
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 25; // Set your default value here
+    const int defaultRowsPerPage = 25;
 
     if (rowCount <= defaultRowsPerPage) {
       return rowCount;
     } else {
-      // You can adjust this logic based on your requirements
       return defaultRowsPerPage;
     }
   }
@@ -265,9 +251,9 @@ String getLimitedText(String text, int limit) {
 
 Color getRowColor(int index) {
   if (index % 2 == 0) {
-    return Colors.grey.shade200; // Grey for even rows
+    return Colors.grey.shade200;
   } else {
-    return Colors.transparent; // Transparent for odd rows
+    return Colors.transparent;
   }
 }
 

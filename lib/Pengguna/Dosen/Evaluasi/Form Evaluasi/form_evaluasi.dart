@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -67,20 +68,48 @@ class _FormEvaluasiKegiatanState extends State<FormEvaluasiKegiatan> {
     }
   }
 
-  //=== Selected tanggal ===//
-  Future<void> _selectDate(
-      BuildContext context, TextEditingController controller) async {
+  //== Memilih Tanggal ==//
+  DateTime? selectedAwalDate;
+  DateTime? selectedAkhirDate;
+
+// Fungsi untuk memilih tanggal awal praktikum
+  Future<void> _selectAwalDate(BuildContext context) async {
+    // Initialize the locale for Indonesian
+    await initializeDateFormatting('id', null);
+
+    // ignore: use_build_context_synchronously
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: selectedAwalDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null) {
+    if (picked != null && picked != selectedAwalDate) {
       setState(() {
-        // Format tanggal yang dipilih tanpa jam
-        String formattedDate = DateFormat('yyyy - MM - dd').format(picked);
-        controller.text = formattedDate;
+        selectedAwalDate = picked;
+        _awalPraktikumController.text =
+            DateFormat('EEEE, dd MMMM yyyy', 'id').format(picked);
+      });
+    }
+  }
+
+// Fungsi untuk memilih tanggal akhir praktikum
+  Future<void> _selectAkhirDate(BuildContext context) async {
+    // Initialize the locale for Indonesian
+    await initializeDateFormatting('id', null);
+
+    // ignore: use_build_context_synchronously
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedAkhirDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedAkhirDate) {
+      setState(() {
+        selectedAkhirDate = picked;
+        _akhirPraktikumController.text =
+            DateFormat('EEEE, dd MMMM yyyy', 'id').format(picked);
       });
     }
   }
@@ -349,8 +378,7 @@ class _FormEvaluasiKegiatanState extends State<FormEvaluasiKegiatan> {
                                   suffixIcon: IconButton(
                                     icon: const Icon(Icons.calendar_today),
                                     onPressed: () async {
-                                      await _selectDate(
-                                          context, _awalPraktikumController);
+                                      await _selectAwalDate(context);
                                     },
                                   ),
                                 ),
@@ -374,8 +402,7 @@ class _FormEvaluasiKegiatanState extends State<FormEvaluasiKegiatan> {
                                     suffixIcon: IconButton(
                                       icon: const Icon(Icons.calendar_today),
                                       onPressed: () async {
-                                        await _selectDate(
-                                            context, _akhirPraktikumController);
+                                        await _selectAkhirDate(context);
                                       },
                                     ),
                                   ),
@@ -443,6 +470,15 @@ class _FormEvaluasiKegiatanState extends State<FormEvaluasiKegiatan> {
                           ),
                         ),
                       ),
+                      Padding(
+                          padding: const EdgeInsets.only(top: 10.0, left: 75.0),
+                          child: Text(
+                            'Catatan : Dokumentasi dalam bentuk PDF',
+                            style: GoogleFonts.quicksand(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12.0,
+                                color: Colors.red),
+                          )),
                       //== Evaluasi Kegiatan Praktikum ==//
                       Padding(
                         padding: const EdgeInsets.only(left: 75.0, top: 30.0),
