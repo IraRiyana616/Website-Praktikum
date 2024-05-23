@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,29 +19,53 @@ class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
   String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
-  Future<void> fetchAvailableYears() async {
-    try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await FirebaseFirestore.instance.collection('dataKelas').get();
-      Set<String> years = querySnapshot.docs
-          .map((doc) => doc['tahunAjaran'].toString())
-          .toSet();
+  //== Fungsi dari Authentikasi ==//
+  String nip = '';
+  User? user = FirebaseAuth.instance.currentUser;
 
-      setState(() {
-        availableYears = ['Tahun Ajaran', ...years.toList()];
-      });
+  Future<void> fetchUserNIPFromDatabase(
+      String userUid, String? selectedYear) async {
+    try {
+      if (userUid.isNotEmpty) {
+        DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+            await FirebaseFirestore.instance
+                .collection('akun_dosen')
+                .doc(userUid)
+                .get();
+        if (userSnapshot.exists) {
+          String? userNip = userSnapshot['nip'] as String?;
+          nip = userNip ?? '';
+
+          QuerySnapshot<Map<String, dynamic>> querySnapshot =
+              await FirebaseFirestore.instance.collection('dataKelas').get();
+          Set<String> years = querySnapshot.docs
+              .map((doc) => doc['tahunAjaran'].toString())
+              .toSet();
+          setState(() {
+            availableYears = ['Tahun Ajaran', ...years.toList()];
+          });
+        }
+      }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching available years from firebase: $e');
+        print('Error fetching user data from Firebase: $e');
       }
     }
   }
 
-  Future<void> fetchDataFromFirebase(String? selectedYear) async {
+  Future<void> fetchDataFromFirebase(String selectedYear) async {
     try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+      // Query pertama untuk mengambil 'nip' dari koleksi 'akun_dosen'
+      QuerySnapshot<Map<String, dynamic>> nipSnapshot =
+          await FirebaseFirestore.instance.collection('akun_dosen').get();
 
-      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
+      // Simpan 'nip' dalam sebuah Set
+      Set<String> availableNips =
+          nipSnapshot.docs.map((doc) => doc['nip'].toString()).toSet();
+
+      // Query kedua untuk mengambil data 'dataKelas' berdasarkan 'tahunAjaran'
+      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+      if (selectedYear != 'Tahun Ajaran') {
         querySnapshot = await FirebaseFirestore.instance
             .collection('dataKelas')
             .where('tahunAjaran', isEqualTo: selectedYear)
@@ -50,18 +75,31 @@ class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
             await FirebaseFirestore.instance.collection('dataKelas').get();
       }
 
-      List<DataClass> data = querySnapshot.docs.map((doc) {
-        Map<String, dynamic> data = doc.data();
-        return DataClass(
-          id: doc.id,
-          kelas: data['kodeKelas'],
-          asisten: data['kodeAsisten'],
-          tahun: data['tahunAjaran'],
-          matkul: data['mataKuliah'],
-          dosenpengampu: data['dosenPengampu'],
-          dosenpengampu2: data['dosenPengampu2'],
-        );
-      }).toList();
+      List<DataClass> data = querySnapshot.docs
+          .map((doc) {
+            Map<String, dynamic> data = doc.data();
+            // Cocokkan 'nip' dengan Set 'availableNips'
+            if (availableNips.contains(data['nipDosenPengampu']) ||
+                availableNips.contains(data['nipDosenPengampu2'])) {
+              return DataClass(
+                kelas: data['kodeKelas'],
+                asisten: data['kodeAsisten'],
+                tahun: data['tahunAjaran'],
+                matkul: data['mataKuliah'],
+                nip: data['nipDosenPengampu'] ??
+                    data[
+                        'nipDosenPengampu2'], // Gunakan nipDosenPengampu atau nipDosenPengampu2, jika salah satu kosong
+                dosenpengampu: data['dosenPengampu'],
+                dosenpengampu2: data['dosenPengampu2'],
+              );
+            } else {
+              // Jika 'nip' tidak valid, kembalikan null
+              return null;
+            }
+          })
+          .whereType<DataClass>() // Hapus elemen null dari daftar
+          .toList(); // Konversi ke List<DataClass>
+
       setState(() {
         demoClassData = data;
         filteredClassData = demoClassData;
@@ -76,10 +114,13 @@ class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
   @override
   void initState() {
     super.initState();
-
-    fetchAvailableYears().then((_) {
-      fetchDataFromFirebase(selectedYear);
-    });
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userUid = user.uid;
+      fetchUserNIPFromDatabase(userUid, selectedYear).then((_) {
+        fetchDataFromFirebase(selectedYear);
+      });
+    }
   }
 
   Future<void> _onRefresh() async {
@@ -225,7 +266,7 @@ class _TabelStudiKelasDosenState extends State<TabelStudiKelasDosen> {
 }
 
 class DataClass {
-  String id;
+  String nip;
   String kelas;
   String asisten;
   String tahun;
@@ -233,7 +274,7 @@ class DataClass {
   String dosenpengampu;
   String dosenpengampu2;
   DataClass({
-    required this.id,
+    required this.nip,
     required this.kelas,
     required this.asisten,
     required this.tahun,

@@ -56,6 +56,7 @@ class _TabelAbsensiPraktikanAdminState
   @override
   void initState() {
     super.initState();
+    _textController.addListener(_onTextChanged);
     _fetchDataFromFirestore();
   }
 

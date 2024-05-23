@@ -13,6 +13,7 @@ class RegisterDosen extends StatefulWidget {
 }
 
 class _RegisterDosenState extends State<RegisterDosen> {
+  //== Fungsi Controller ==//
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _nipController = TextEditingController();
   final TextEditingController _noHpController = TextEditingController();
@@ -39,10 +40,26 @@ class _RegisterDosenState extends State<RegisterDosen> {
         return;
       }
 
+      // Validate No HP
+      if (_noHpController.text.isEmpty ||
+          !RegExp(r'^\d+$').hasMatch(_noHpController.text)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Nomor Handphone harus diisi dan berupa angka.'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
+
+      int nip = int.parse(_nipController.text);
+      int noHp = int.parse(_noHpController.text);
+
       // Check for duplicate NIP
       QuerySnapshot nipSnapshot = await _firestore
           .collection('akun_dosen')
-          .where('nip', isEqualTo: _nipController.text)
+          .where('nip', isEqualTo: nip)
           .get();
 
       if (nipSnapshot.docs.isNotEmpty) {
@@ -84,8 +101,8 @@ class _RegisterDosenState extends State<RegisterDosen> {
       // Add user data to Firestore
       await _firestore.collection('akun_dosen').doc(authResult.user?.uid).set({
         'nama': _namaController.text,
-        'nip': _nipController.text,
-        'no_hp': _noHpController.text,
+        'nip': nip,
+        'no_hp': noHp,
         'email': _emailController.text,
         'password': _passwordController.text,
         // For security reasons, it's recommended to use Firebase Authentication

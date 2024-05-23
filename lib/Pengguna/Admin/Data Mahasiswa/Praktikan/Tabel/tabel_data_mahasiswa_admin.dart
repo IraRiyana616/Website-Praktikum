@@ -25,6 +25,12 @@ class _TabelDataMahasiswaAdminState extends State<TabelDataMahasiswaAdmin> {
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _textController.addListener(_onTextChanged);
+  }
+
   Stream<List<DataMahasiswa>> fetchData() {
     return FirebaseFirestore.instance
         .collection('tokenKelas')

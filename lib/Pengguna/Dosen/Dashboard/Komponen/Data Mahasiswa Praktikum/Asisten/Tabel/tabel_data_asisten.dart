@@ -20,6 +20,7 @@ class _TabelDataKelasAsistenState extends State<TabelDataKelasAsisten> {
   @override
   void initState() {
     super.initState();
+    _textController.addListener(_onTextChanged);
     fetchData();
   }
 

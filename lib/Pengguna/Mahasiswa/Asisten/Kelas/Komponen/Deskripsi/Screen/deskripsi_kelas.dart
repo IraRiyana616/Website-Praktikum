@@ -6,7 +6,6 @@ import '../../../../../Praktikan/Absensi/Komponen/tampilan_absensi_mhs.dart';
 import '../../../../../Praktikan/Dashboard/Komponen/Asistensi/Screen/asistensi_laporan_prak.dart';
 import '../../../../../Praktikan/Dashboard/Komponen/Pengumpulan/Latihan/Screen/peng_latihan_mhs.dart';
 import '../../../../../Praktikan/Dashboard/Navigasi/dasboard_nav.dart';
-import '../Modul/tabel_modul.dart';
 
 class DeskripsiKelas extends StatefulWidget {
   final String kodeKelas;

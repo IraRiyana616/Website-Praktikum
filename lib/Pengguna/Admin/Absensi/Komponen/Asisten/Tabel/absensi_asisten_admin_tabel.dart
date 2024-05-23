@@ -25,6 +25,7 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
   @override
   void initState() {
     super.initState();
+    _textController.addListener(_onTextChanged);
     _fetchDataFromFirestore();
   }
 

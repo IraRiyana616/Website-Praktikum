@@ -25,6 +25,72 @@ class _TabelJadwalPraktikumDosenState extends State<TabelJadwalPraktikumDosen> {
   //== Fungsi Controller Waktu dan Hari ==//
   TextEditingController waktuPraktikumController = TextEditingController();
   TextEditingController hariPraktikumController = TextEditingController();
+  // Future<void> fetchAvailableYears() async {
+  //   try {
+  //     QuerySnapshot<Map<String, dynamic>> querySnapshot =
+  //         await FirebaseFirestore.instance
+  //             .collection('dataJadwalPraktikum')
+  //             .get();
+  //     Set<String> years = querySnapshot.docs
+  //         .map((doc) => doc['tahunAjaran'].toString())
+  //         .toSet();
+
+  //     setState(() {
+  //       availableYears = ['Tahun Ajaran', ...years.toList()];
+  //     });
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Error fetching available years from firebase: $e');
+  //     }
+  //   }
+  // }
+
+  // Future<void> fetchDataFromFirebase(String? selectedYear) async {
+  //   try {
+  //     QuerySnapshot<Map<String, dynamic>> querySnapshot;
+
+  //     if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
+  //       querySnapshot = await FirebaseFirestore.instance
+  //           .collection('dataJadwalPraktikum')
+  //           .where('tahunAjaran', isEqualTo: selectedYear)
+  //           .get();
+  //     } else {
+  //       querySnapshot = await FirebaseFirestore.instance
+  //           .collection('dataJadwalPraktikum')
+  //           .get();
+  //     }
+
+  //     List<DataClass> data = querySnapshot.docs.map((doc) {
+  //       Map<String, dynamic> data = doc.data();
+  //       return DataClass(
+  //           id: doc.id,
+  //           kelas: data['kodeKelas'],
+  //           tahun: data['tahunAjaran'],
+  //           matkul: data['mataKuliah'],
+  //           jadwal: data['hariPraktikum'],
+  //           waktu: data['waktuPraktikum'],
+  //           semester: data['semester']);
+  //     }).toList();
+  //     setState(() {
+  //       demoClassData = data;
+  //       filteredClassData = demoClassData;
+  //     });
+  //   } catch (error) {
+  //     if (kDebugMode) {
+  //       print('Error fetching data from Firebase: $error');
+  //     }
+  //   }
+  // }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _textController.addListener(_onTextChanged);
+  //   fetchAvailableYears().then((_) {
+  //     fetchDataFromFirebase(selectedYear);
+  //   });
+  // }
+
   Future<void> fetchAvailableYears() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
@@ -47,20 +113,30 @@ class _TabelJadwalPraktikumDosenState extends State<TabelJadwalPraktikumDosen> {
 
   Future<void> fetchDataFromFirebase(String? selectedYear) async {
     try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+      // Fetch kodeKelas from dataAsisten collection
+      QuerySnapshot<Map<String, dynamic>> asistenSnapshot =
+          await FirebaseFirestore.instance.collection('dataKelas').get();
+
+      Set<String> kodeKelasSet = asistenSnapshot.docs
+          .map((doc) => doc['kodeKelas'].toString())
+          .toSet();
+
+      QuerySnapshot<Map<String, dynamic>> jadwalSnapshot;
 
       if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
-        querySnapshot = await FirebaseFirestore.instance
+        jadwalSnapshot = await FirebaseFirestore.instance
             .collection('dataJadwalPraktikum')
             .where('tahunAjaran', isEqualTo: selectedYear)
+            .where('kodeKelas', whereIn: kodeKelasSet.toList())
             .get();
       } else {
-        querySnapshot = await FirebaseFirestore.instance
+        jadwalSnapshot = await FirebaseFirestore.instance
             .collection('dataJadwalPraktikum')
+            .where('kodeKelas', whereIn: kodeKelasSet.toList())
             .get();
       }
 
-      List<DataClass> data = querySnapshot.docs.map((doc) {
+      List<DataClass> data = jadwalSnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
         return DataClass(
             id: doc.id,
@@ -71,6 +147,7 @@ class _TabelJadwalPraktikumDosenState extends State<TabelJadwalPraktikumDosen> {
             waktu: data['waktuPraktikum'],
             semester: data['semester']);
       }).toList();
+
       setState(() {
         demoClassData = data;
         filteredClassData = demoClassData;

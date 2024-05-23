@@ -47,6 +47,7 @@ class _TabelNilaiHarianAdminState extends State<TabelNilaiHarianAdmin> {
   @override
   void initState() {
     super.initState();
+    _textController.addListener(_onTextChanged);
     checkAndFetchData();
   }
 

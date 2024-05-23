@@ -52,6 +52,7 @@ class _PenilaianPercobaanAsistenState extends State<PenilaianPercobaanAsisten> {
   @override
   void initState() {
     super.initState();
+    _textController.addListener(_onTextChanged);
     checkAndFetchData();
   }
 

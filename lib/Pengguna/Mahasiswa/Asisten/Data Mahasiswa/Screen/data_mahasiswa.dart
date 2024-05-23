@@ -56,21 +56,6 @@ class _DataMahasiswaKelasState extends State<DataMahasiswaKelas> {
     }
   }
 
-  // Fungsi untuk logout dari akun Firebase
-  Future<void> _logout() async {
-    try {
-      await _auth.signOut();
-      // Navigasi kembali ke halaman login atau halaman lain setelah logout berhasil
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/login');
-    } catch (e) {
-      // Tangani kesalahan logout
-      if (kDebugMode) {
-        print('Error during logout: $e');
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

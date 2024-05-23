@@ -133,7 +133,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
   @override
   void initState() {
     super.initState();
-
+    textController.addListener(_onTextChanged);
     // Ambil tahun ajaran yang tersedia
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {

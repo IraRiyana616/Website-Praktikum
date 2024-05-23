@@ -20,6 +20,7 @@ class _TabelDataAsistenAdminState extends State<TabelDataAsistenAdmin> {
   @override
   void initState() {
     super.initState();
+    _textController.addListener(_onTextChanged);
     fetchData();
   }
 

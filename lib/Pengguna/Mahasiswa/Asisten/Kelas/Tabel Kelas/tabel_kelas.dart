@@ -120,6 +120,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
   void initState() {
     super.initState();
 
+    textController.addListener(_onTextChanged);
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       String userUid = user.uid;

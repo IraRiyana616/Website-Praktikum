@@ -21,6 +21,7 @@ class _TabelDataKelasMahasiswaState extends State<TabelDataKelasMahasiswa> {
   @override
   void initState() {
     super.initState();
+    _textController.addListener(_onTextChanged);
     fetchData();
   }
 
