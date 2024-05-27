@@ -30,6 +30,9 @@ class _TabelDataPraktikanState extends State<TabelDataPraktikan> {
         .map((doc) => DataPraktikan.fromFirestore(doc))
         .toList();
 
+    // Mengurutkan data berdasarkan nama secara ascending
+    data.sort((a, b) => a.nama.compareTo(b.nama));
+
     setState(() {
       filteredDataPraktikan = data;
     });
@@ -41,9 +44,9 @@ class _TabelDataPraktikanState extends State<TabelDataPraktikan> {
       children: [
         Center(
           child: Padding(
-            padding: const EdgeInsets.only(left: 18.0, right: 25.0),
+            padding: const EdgeInsets.only(left: 18.0, right: 25.0, top: 35.0),
             child: SizedBox(
-                width: 1195.0,
+                width: 1250.0,
                 child: filteredDataPraktikan.isNotEmpty
                     ? PaginatedDataTable(
                         columnSpacing: 10,

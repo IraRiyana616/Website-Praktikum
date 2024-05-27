@@ -143,6 +143,14 @@ class _PengumpulanTugasState extends State<PengumpulanTugas> {
         child: AppBar(
           automaticallyImplyLeading: false,
           backgroundColor: const Color(0xFFF7F8FA),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.black,
+              )),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(
@@ -358,11 +366,29 @@ class _PengumpulanTugasState extends State<PengumpulanTugas> {
                     if (dataExists) {
                       // ignore: use_build_context_synchronously
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PengumpulanLaporan(
-                                  kodeKelas: widget.kodeKelas,
-                                  modul: widget.modul)));
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  PengumpulanLaporan(
+                                      kodeKelas: widget.kodeKelas,
+                                      modul: widget.modul),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin = Offset(0.0, 0.0);
+                            const end = Offset.zero;
+                            const curve = Curves.ease;
+
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+
+                            return SlideTransition(
+                              position: animation.drive(tween),
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
                     } else {
                       // Tampilkan pesan atau lakukan aksi lain sesuai kebutuhan
                       if (kDebugMode) {

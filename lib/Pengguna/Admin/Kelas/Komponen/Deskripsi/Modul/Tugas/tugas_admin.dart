@@ -1,78 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Modul/Komponen/Tugas/tugas_mhs.dart';
 
-class LatihanAsisten extends StatefulWidget {
+import '../Laporan/laporan_admin.dart';
+
+class PengumpulanTugasAdmin extends StatefulWidget {
   final String kodeKelas;
   final String modul;
-  const LatihanAsisten(
+  const PengumpulanTugasAdmin(
       {super.key, required this.kodeKelas, required this.modul});
 
   @override
-  State<LatihanAsisten> createState() => _LatihanAsistenState();
+  State<PengumpulanTugasAdmin> createState() => _PengumpulanTugasAdminState();
 }
 
-class _LatihanAsistenState extends State<LatihanAsisten> {
-  //== Controller ==//
+class _PengumpulanTugasAdminState extends State<PengumpulanTugasAdmin> {
   final TextEditingController _bukaController = TextEditingController();
   final TextEditingController _tutupController = TextEditingController();
-  late int userNim;
-  late String userName;
-
-//== Fungsi Mengambil Data ==//
-  Future<void> _getData() async {
-    try {
-      String userUid = FirebaseAuth.instance.currentUser!.uid;
-      // ignore: unnecessary_null_comparison
-      if (userUid != null) {
-        DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-            await FirebaseFirestore.instance
-                .collection('akun_mahasiswa')
-                .doc(userUid)
-                .get();
-
-        if (userSnapshot.exists) {
-          userNim = userSnapshot['nim'];
-          userName = userSnapshot['nama'];
-        } else {
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Data akun tidak ditemukan'),
-            backgroundColor: Colors.red,
-          ));
-          return;
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Harap login terlebih dahulu'),
-          backgroundColor: Colors.red,
-        ));
-        return;
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: $e'),
-        backgroundColor: Colors.red,
-      ));
-      if (kDebugMode) {
-        print('Error: $e');
-      }
-      return;
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    _getData();
     _loadUserData();
   }
 
-//== Memilih Tanggal ==//
   Future<void> _selectDate(
       BuildContext context, TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
@@ -86,7 +39,6 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
     }
   }
 
-//== Memilih Waktu ==//
   Future<void> _selectTime(BuildContext context,
       TextEditingController controller, DateTime selectedDate) async {
     final TimeOfDay? picked = await showTimePicker(
@@ -108,7 +60,35 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
     }
   }
 
-//== Fungsi Update Data ==//
+  //== Load Data dari Database ==//
+  Future<void> _loadUserData() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> userData = await FirebaseFirestore
+          .instance
+          .collection('pengumpulanTugas')
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
+          .where('judulMateri', isEqualTo: widget.modul)
+          .get();
+      if (userData.docs.isNotEmpty) {
+        var data = userData.docs.first.data();
+        setState(() {
+          _bukaController.text = data['aksesTugas'] != null
+              ? DateFormat('yyyy-MM-dd HH:mm:ss')
+                  .format((data['aksesTugas'] as Timestamp).toDate())
+              : '';
+          _tutupController.text = data['tutupAksesTugas'] != null
+              ? DateFormat('yyyy-MM-dd HH:mm:ss')
+                  .format((data['tutupAksesTugas'] as Timestamp).toDate())
+              : '';
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching user data: $e');
+      }
+    }
+  }
+
   Future<void> _updateFirestoreData() async {
     try {
       Timestamp bukaTimestamp =
@@ -117,7 +97,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
           Timestamp.fromDate(DateTime.parse(_tutupController.text));
 
       await FirebaseFirestore.instance
-          .collection('pengumpulanLatihan')
+          .collection('pengumpulanTugas')
           .where('kodeKelas', isEqualTo: widget.kodeKelas)
           .where('judulMateri', isEqualTo: widget.modul)
           .get()
@@ -125,8 +105,8 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
         // ignore: avoid_function_literals_in_foreach_calls
         querySnapshot.docs.forEach((doc) async {
           await doc.reference.update({
-            'aksesLatihan': bukaTimestamp,
-            'tutupAksesLatihan': tutupTimestamp,
+            'aksesTugas': bukaTimestamp,
+            'tutupAksesTugas': tutupTimestamp,
           });
         });
       });
@@ -150,42 +130,13 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
     }
   }
 
-  //== Load Data dari Database ==//
-  Future<void> _loadUserData() async {
-    try {
-      QuerySnapshot<Map<String, dynamic>> userData = await FirebaseFirestore
-          .instance
-          .collection('pengumpulanLatihan')
-          .where('kodeKelas', isEqualTo: widget.kodeKelas)
-          .where('judulMateri', isEqualTo: widget.modul)
-          .get();
-      if (userData.docs.isNotEmpty) {
-        var data = userData.docs.first.data();
-        setState(() {
-          _bukaController.text = data['aksesLatihan'] != null
-              ? DateFormat('yyyy-MM-dd HH:mm:ss')
-                  .format((data['aksesLatihan'] as Timestamp).toDate())
-              : '';
-          _tutupController.text = data['tutupAksesLatihan'] != null
-              ? DateFormat('yyyy-MM-dd HH:mm:ss')
-                  .format((data['tutupAksesLatihan'] as Timestamp).toDate())
-              : '';
-        });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching user data: $e');
-      }
-    }
-  }
-
-  void _showEditDialog() {
+  void _editDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            'Edit JadwalPengumpulan',
+            'Edit Jadwal Pengumpulan',
             style: GoogleFonts.quicksand(fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
@@ -272,13 +223,13 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
     );
   }
 
-// Fungsi async untuk memeriksa keberadaan kodeKelas dan judulMateri dalam Firestore
+  // Fungsi async untuk memeriksa keberadaan kodeKelas dan judulMateri dalam Firestore
   Future<bool> checkDataExist(String kodeKelas, String modul) async {
     bool exists = false;
 
     // Melakukan query ke Firestore
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('pengumpulanLatihan')
+        .collection('pengumpulanLaporan')
         .where('kodeKelas', isEqualTo: kodeKelas)
         .where('judulMateri', isEqualTo: modul)
         .get();
@@ -323,6 +274,18 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                     ),
                   ),
                 ),
+                const SizedBox(width: 400.0),
+                Padding(
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: Text(
+                    'Admin',
+                    style: GoogleFonts.quicksand(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                ),
+                const SizedBox(width: 30.0)
               ],
             ),
           ),
@@ -330,7 +293,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
-            .collection('pengumpulanLatihan')
+            .collection('pengumpulanTugas')
             .where('kodeKelas', isEqualTo: widget.kodeKelas)
             .where('judulMateri', isEqualTo: widget.modul)
             .snapshots(),
@@ -388,7 +351,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                                   padding: const EdgeInsets.only(
                                       left: 75.0, right: 100.0, top: 55.0),
                                   child: Text(
-                                    '${data['deskripsiLatihan'] ?? 'Not available'}',
+                                    '${data['deskripsiTugas'] ?? 'Not available'}',
                                     style: const TextStyle(
                                       fontSize: 15.0,
                                       height: 2.0,
@@ -408,7 +371,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                                             const Color(0xFF3CBEA9),
                                           ),
                                         ),
-                                        onPressed: _showEditDialog,
+                                        onPressed: _editDialog,
                                         child: Row(
                                           children: [
                                             const SizedBox(width: 3.0),
@@ -429,7 +392,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                                         ),
                                       ),
                                     )),
-                                const SizedBox(height: 35.0),
+                                const SizedBox(height: 50.0),
                               ],
                             ),
                           ),
@@ -466,7 +429,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                         PageRouteBuilder(
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  TugasAsisten(
+                                  PengumpulanLaporanAdmin(
                                       kodeKelas: widget.kodeKelas,
                                       modul: widget.modul),
                           transitionsBuilder:

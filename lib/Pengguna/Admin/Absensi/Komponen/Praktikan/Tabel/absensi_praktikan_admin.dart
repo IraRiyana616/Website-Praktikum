@@ -87,7 +87,8 @@ class _TabelAbsensiPraktikanAdminState
           );
         },
       ).toList();
-
+// Mengurutkan data berdasarkan nama secara ascending
+      absensiMahasiswaList.sort((a, b) => a.nama.compareTo(b.nama));
       setState(() {
         demoAbsensiMahasiswa = absensiMahasiswaList;
         filteredAbsensiMahasiswa = demoAbsensiMahasiswa;

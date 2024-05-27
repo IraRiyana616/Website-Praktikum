@@ -1,6 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TabelAbsensiMahasiswaScreen extends StatefulWidget {
   final String kodeKelas;
@@ -19,8 +23,8 @@ class _TabelAbsensiMahasiswaScreenState
   List<AbsensiMahasiswa> filteredAbsensiMahasiswa = [];
 
   //Judul Materi
-  String selectedModul = 'Tampilkan Semua';
-  List<String> availableModuls = ['Tampilkan Semua'];
+  String selectedModul = 'Judul Modul';
+  List<String> availableModuls = ['Judul Modul'];
 
   @override
   void initState() {
@@ -44,14 +48,14 @@ class _TabelAbsensiMahasiswaScreenState
             availableModuls.add(modul);
           }
           return AbsensiMahasiswa(
-            kode: data?['kode'] ?? '',
-            nama: data?['nama'] ?? '',
-            nim: data?['nim'] ?? 0,
-            modul: modul,
-            timestamp: (data?['timestamp'] as Timestamp).toDate(),
-            tanggal: data?['tanggal'] ?? '',
-            keterangan: data?['keterangan'] ?? '',
-          );
+              kode: data?['kode'] ?? '',
+              nama: data?['nama'] ?? '',
+              nim: data?['nim'] ?? 0,
+              modul: modul,
+              timestamp: (data?['timestamp'] as Timestamp).toDate(),
+              tanggal: data?['tanggal'] ?? '',
+              keterangan: data?['keterangan'] ?? '',
+              file: data?['namaFile'] ?? '');
         },
       ).toList();
 
@@ -70,7 +74,7 @@ class _TabelAbsensiMahasiswaScreenState
     if (modul != null) {
       setState(() {
         selectedModul = modul;
-        if (modul == 'Tampilkan Semua') {
+        if (modul == 'Judul Modul') {
           filteredAbsensiMahasiswa = demoAbsensiMahasiswa;
         } else {
           filteredAbsensiMahasiswa = demoAbsensiMahasiswa
@@ -158,6 +162,11 @@ class _TabelAbsensiMahasiswaScreenState
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
+                        DataColumn(
+                            label: Text(
+                          'Bukti Foto',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ))
                       ],
                       source: DataSource(filteredAbsensiMahasiswa),
                       rowsPerPage:
@@ -194,16 +203,18 @@ class AbsensiMahasiswa {
   final String nama;
   final int nim;
   final String modul;
-  final DateTime timestamp; // Mengubah tipe data timestamp menjadi DateTime
+  final DateTime timestamp;
   final String tanggal;
   final String keterangan;
+  final String file;
 
   AbsensiMahasiswa({
     required this.kode,
+    required this.file,
     required this.nama,
     required this.nim,
     required this.modul,
-    required this.timestamp, // Mengubah tipe data timestamp menjadi DateTime
+    required this.timestamp,
     required this.tanggal,
     required this.keterangan,
   });
@@ -232,8 +243,53 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
         ),
       ),
       DataCell(Text(fileInfo.keterangan)),
+      DataCell(Row(
+        children: [
+          const Icon(
+            Icons.download,
+            color: Colors.grey,
+          ),
+          GestureDetector(
+            onTap: () => downloadFile(
+              fileInfo.kode,
+              fileInfo.file,
+              fileInfo.nim,
+            ),
+            child: const MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 5.0),
+                  child: Text(
+                    'Download',
+                    style: TextStyle(
+                        color: Colors.blue, fontWeight: FontWeight.bold),
+                  ),
+                )),
+          )
+        ],
+      ))
     ],
   );
+}
+
+Future<void> downloadFile(String kodeKelas, String fileName, int nim) async {
+  final ref = FirebaseStorage.instance
+      .ref()
+      .child('$kodeKelas/Absensi Mahasiswa/$nim/$fileName');
+
+  try {
+    final url = await ref.getDownloadURL();
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error downloading file: $e');
+      print('Tried path: $kodeKelas/Absensi Mahasiswa/$nim/$fileName');
+    }
+  }
 }
 
 String getLimitedText(String text, int limit) {

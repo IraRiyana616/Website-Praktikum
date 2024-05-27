@@ -335,7 +335,7 @@ class _UjianPemahamanState extends State<UjianPemahaman> {
                                           ),
                                         ), // Atau Container() jika tidak ingin menampilkan apa pun
                                 ),
-                                const SizedBox(height: 35.0),
+                                const SizedBox(height: 20.0),
                               ],
                             ),
                           ),
@@ -367,11 +367,29 @@ class _UjianPemahamanState extends State<UjianPemahaman> {
                     if (dataExists) {
                       // ignore: use_build_context_synchronously
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PengumpulanTugas(
-                                  kodeKelas: widget.kodeKelas,
-                                  modul: widget.modul)));
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  PengumpulanTugas(
+                                      kodeKelas: widget.kodeKelas,
+                                      modul: widget.modul),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin = Offset(0.0, 0.0);
+                            const end = Offset.zero;
+                            const curve = Curves.ease;
+
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+
+                            return SlideTransition(
+                              position: animation.drive(tween),
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
                     } else {
                       // Tampilkan pesan atau lakukan aksi lain sesuai kebutuhan
                       if (kDebugMode) {

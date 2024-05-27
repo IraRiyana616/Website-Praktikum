@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class LaporanAsisten extends StatefulWidget {
   final String kodeKelas;
@@ -65,6 +66,7 @@ class _LaporanAsistenState extends State<LaporanAsisten> {
   void initState() {
     super.initState();
     _getData();
+    _loadUserData();
   }
 
   Future<void> _selectDate(
@@ -142,6 +144,35 @@ class _LaporanAsistenState extends State<LaporanAsisten> {
     }
   }
 
+  //== Load Data dari Database ==//
+  Future<void> _loadUserData() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> userData = await FirebaseFirestore
+          .instance
+          .collection('pengumpulanLaporan')
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
+          .where('judulMateri', isEqualTo: widget.modul)
+          .get();
+      if (userData.docs.isNotEmpty) {
+        var data = userData.docs.first.data();
+        setState(() {
+          _bukaController.text = data['aksesLaporan'] != null
+              ? DateFormat('yyyy-MM-dd HH:mm:ss')
+                  .format((data['aksesLaporan'] as Timestamp).toDate())
+              : '';
+          _tutupController.text = data['tutupAksesLaporan'] != null
+              ? DateFormat('yyyy-MM-dd HH:mm:ss')
+                  .format((data['tutupAksesLaporan'] as Timestamp).toDate())
+              : '';
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching user data: $e');
+      }
+    }
+  }
+
   void _editDialog() {
     showDialog(
       context: context,
@@ -169,7 +200,7 @@ class _LaporanAsistenState extends State<LaporanAsisten> {
                         filled: true,
                         fillColor: Colors.white,
                         suffixIcon: IconButton(
-                          icon: const Icon(Icons.calendar_today),
+                          icon: const Icon(Icons.calendar_month),
                           onPressed: () async {
                             await _selectDate(context, _bukaController);
                           },
@@ -193,7 +224,7 @@ class _LaporanAsistenState extends State<LaporanAsisten> {
                         filled: true,
                         fillColor: Colors.white,
                         suffixIcon: IconButton(
-                          icon: const Icon(Icons.calendar_today),
+                          icon: const Icon(Icons.calendar_month),
                           onPressed: () async {
                             await _selectDate(context, _tutupController);
                           },
@@ -316,7 +347,7 @@ class _LaporanAsistenState extends State<LaporanAsisten> {
                 child: Container(
                   color: const Color(0xFFE3E8EF),
                   width: 2000.0,
-                  height: 620.0,
+                  height: 1000.0,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -380,6 +411,7 @@ class _LaporanAsistenState extends State<LaporanAsisten> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 20.0),
                     ],
                   ),
                 ),

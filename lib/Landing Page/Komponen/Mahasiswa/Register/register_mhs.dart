@@ -40,6 +40,8 @@ class _RegisterMahasiswaState extends State<RegisterMahasiswa> {
       }
       //Parse NIM to integer
       int nim = int.parse(_nimController.text);
+      //Parse Angkatan to integer
+      int angkatan = int.parse(_angkatanController.text);
       //Parse Handphone Number to Integer
       int phoneNumber = int.parse(_noHpController.text);
       //Check for duplicate NIM
@@ -86,7 +88,7 @@ class _RegisterMahasiswaState extends State<RegisterMahasiswa> {
         'email': _emailController.text,
         'password': _passwordController.text,
         'no_hp': phoneNumber,
-        'angkatan': _angkatanController.text,
+        'angkatan': angkatan,
       });
 
       //Rest textfields to empty after successful registration

@@ -53,13 +53,13 @@ class _RegisterDosenState extends State<RegisterDosen> {
         return;
       }
 
-      int nip = int.parse(_nipController.text);
+      // int nip = int.parse(_nipController.text);
       int noHp = int.parse(_noHpController.text);
 
       // Check for duplicate NIP
       QuerySnapshot nipSnapshot = await _firestore
           .collection('akun_dosen')
-          .where('nip', isEqualTo: nip)
+          .where('nip', isEqualTo: _nipController.text)
           .get();
 
       if (nipSnapshot.docs.isNotEmpty) {
@@ -101,7 +101,7 @@ class _RegisterDosenState extends State<RegisterDosen> {
       // Add user data to Firestore
       await _firestore.collection('akun_dosen').doc(authResult.user?.uid).set({
         'nama': _namaController.text,
-        'nip': nip,
+        'nip': _nipController.text,
         'no_hp': noHp,
         'email': _emailController.text,
         'password': _passwordController.text,

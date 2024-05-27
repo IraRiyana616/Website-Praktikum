@@ -88,8 +88,15 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
               backgroundColor: Colors.red,
             ));
           } else {
-            // Panggil fungsi untuk mengunggah file sebelum menyimpan data
-            _uploadFile();
+            // Pastikan file telah dipilih dan diunggah sebelum menyimpan data
+            if (_fileName.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('Harap unggah file terlebih dahulu'),
+                backgroundColor: Colors.red,
+              ));
+              return;
+            }
+
             // Setelah file diunggah, lanjutkan dengan menyimpan data
             Map<String, dynamic> updatedAbsenData = {
               'kodeKelas': _kodeEditingController.text,
@@ -104,6 +111,16 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
             await FirebaseFirestore.instance
                 .collection('absensiMahasiswa')
                 .add(updatedAbsenData);
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Data berhasil disimpan'),
+              backgroundColor: Colors.green,
+            ));
+            _kodeEditingController.clear();
+            _modulEditingController.clear();
+            setState(() {
+              selectedAbsen = 'Status Kehadiran';
+              _fileName = '';
+            });
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -125,6 +142,7 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
 
   void _uploadFile() async {
     String kodeKelas = _kodeEditingController.text;
+    //String namaModul = _modulEditingController.text;
 
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -132,6 +150,27 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
       PlatformFile file = result.files.first;
 
       try {
+        // Show loading indicator
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return const Dialog(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(width: 20),
+                    Text("Uploading..."),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+
         String userUid = FirebaseAuth.instance.currentUser!.uid;
         DocumentSnapshot<Map<String, dynamic>> userSnapshot =
             await FirebaseFirestore.instance
@@ -145,7 +184,7 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
           firebase_storage.Reference ref = firebase_storage
               .FirebaseStorage.instance
               .ref()
-              .child('Absensi Mahasiswa/$kodeKelas/$userNim/${file.name}');
+              .child('$kodeKelas/Absensi Mahasiswa/$userNim/${file.name}');
 
           // Upload file
           await ref.putData(file.bytes!);
@@ -153,22 +192,35 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
           setState(() {
             _fileName = file.name;
           });
+
+          // Close loading indicator
+          Navigator.of(context).pop();
         } else {
+          // Close loading indicator
+          Navigator.of(context).pop();
+
+          // Show error message
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('User data not found'),
             backgroundColor: Colors.red,
           ));
         }
       } catch (e) {
+        // Close loading indicator
+        Navigator.of(context).pop();
+
         if (kDebugMode) {
           print("Error during upload or getting download URL: $e");
         }
+
+        // Show error message
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Error uploading image'),
           backgroundColor: Colors.red,
         ));
       }
     } else {
+      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('No file selected'),
         backgroundColor: Colors.red,

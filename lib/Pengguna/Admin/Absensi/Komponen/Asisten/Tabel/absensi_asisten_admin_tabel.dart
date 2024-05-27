@@ -53,8 +53,12 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
           timestamp: (data?['timestamp'] as Timestamp).toDate(),
           tanggal: data?['tanggal'] ?? '',
           keterangan: data?['keterangan'] ?? '',
+          file: data?['namaFile'] ?? '',
         ));
       }
+
+      // Mengurutkan data berdasarkan nama secara ascending
+      absensiMahasiswaList.sort((a, b) => a.nama.compareTo(b.nama));
 
       setState(() {
         demoAbsensiMahasiswa = absensiMahasiswaList;
@@ -249,6 +253,11 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
                         ),
                       ),
                       DataColumn(
+                          label: Text(
+                        'Bukti Absensi',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
                         label: Text(
                           'Aksi',
                           style: TextStyle(fontWeight: FontWeight.bold),
@@ -292,9 +301,11 @@ class AbsensiMahasiswa {
   final DateTime timestamp;
   final String tanggal;
   final String keterangan;
+  final String file;
 
   AbsensiMahasiswa({
     required this.kode,
+    required this.file,
     required this.nama,
     required this.nim,
     required this.modul,
@@ -327,6 +338,32 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
         ),
       ),
       DataCell(Text(fileInfo.keterangan)),
+      DataCell(
+        Row(
+          children: [
+            const Icon(
+              Icons.download,
+              color: Colors.grey,
+            ),
+            const SizedBox(
+              width: 5.0,
+            ),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () {
+                  // downloadFile(fileInfo.kode, fileInfo.file, fileInfo.nim);
+                },
+                child: const Text(
+                  'Download',
+                  style: TextStyle(
+                      color: Colors.blue, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
       DataCell(IconButton(
         onPressed: () {},
         icon: const Icon(

@@ -13,14 +13,19 @@ class TabelKumpulTugas extends StatefulWidget {
 }
 
 class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
+  //== Fungsi Controller ==//
   final TextEditingController _textController = TextEditingController();
   bool _isTextFieldNotEmpty = false;
+
+  //== List Pada Table ==//
   List<Pengumpulan> demoPengumpulan = [];
   List<Pengumpulan> filteredPengumpulan = [];
+
   //Judul Materi
   String selectedModul = 'Judul Modul';
   List<String> availableModuls = ['Judul Modul'];
 
+//== Fungsi Menghapus Data ==//
   Future<void> deleteDataFromFirestore(String documentId) async {
     try {
       await FirebaseFirestore.instance
@@ -35,6 +40,7 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
     }
   }
 
+//== Fungsi Menampilkan Data dari Database 'tugas' ==//
   Future<void> fetchDataFromFirestore() async {
     final QuerySnapshot silabusSnapshot = await FirebaseFirestore.instance
         .collection('tugas')
@@ -59,11 +65,11 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
             : '',
       );
     }).toList();
-
+// Mengurutkan data berdasarkan nama secara ascending
+    demoPengumpulan.sort((a, b) => a.nama.compareTo(b.nama));
     setState(() {
       demoPengumpulan = dataList;
-      filteredPengumpulan =
-          dataList; // Initialize filteredDataSilabus with all data
+      filteredPengumpulan = dataList;
     });
   }
 
@@ -135,10 +141,10 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 70.0),
+            padding: const EdgeInsets.only(left: 70.0, right: 70.0),
             child: Container(
               height: 47.0,
-              width: 1195.0,
+              width: 1250.0,
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(8.0),
@@ -166,11 +172,11 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 25.0, right: 80.0),
+            padding: const EdgeInsets.only(top: 25.0, right: 50.0),
             child: Align(
               alignment: Alignment.centerRight,
               child: SizedBox(
-                width: 250.0,
+                width: 300.0,
                 height: 35.0,
                 child: Row(
                   children: [
@@ -187,10 +193,10 @@ class _TabelKumpulTugasState extends State<TabelKumpulTugas> {
                         decoration: InputDecoration(
                           hintText: '',
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(0.0),
+                            borderRadius: BorderRadius.circular(8.0),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
-                              vertical: 0, horizontal: 10),
+                              vertical: 0, horizontal: 18),
                           suffixIcon: Visibility(
                             visible: _isTextFieldNotEmpty,
                             child: IconButton(

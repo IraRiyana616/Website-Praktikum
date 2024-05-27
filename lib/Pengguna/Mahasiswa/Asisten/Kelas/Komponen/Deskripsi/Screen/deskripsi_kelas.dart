@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../../Dosen/Dashboard/Komponen/Deskripsi/Tabel/tabel_modul.dart';
-import '../../../../../Praktikan/Absensi/Komponen/tampilan_absensi_mhs.dart';
 import '../../../../../Praktikan/Dashboard/Komponen/Asistensi/Screen/asistensi_laporan_prak.dart';
 import '../../../../../Praktikan/Dashboard/Komponen/Pengumpulan/Latihan/Screen/peng_latihan_mhs.dart';
-import '../../../../../Praktikan/Dashboard/Navigasi/dasboard_nav.dart';
+import '../../../Navigation/kelas_assnav.dart';
+import '../../Absensi/Asisten/Screen/absensi_ass_sc.dart';
+import '../Tabel Modul/tabel_modul_asisten.dart';
 
 class DeskripsiKelas extends StatefulWidget {
   final String kodeKelas;
@@ -33,7 +33,7 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                 context,
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      const DashboardPraktikanNav(),
+                      const KelasAsistenNav(),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
                     const begin = Offset(0.0, 0.0);
@@ -173,7 +173,7 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                             PageRouteBuilder(
                                               pageBuilder: (context, animation,
                                                       secondaryAnimation) =>
-                                                  AbsensiPraktikanScreen(
+                                                  AbsenKu(
                                                 kodeKelas: widget.kodeKelas,
                                                 mataKuliah: widget.mataKuliah,
                                               ),
@@ -523,7 +523,7 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                 ),
                               ),
 
-                              TabelSilabusPraktikumDosen(
+                              TabelModulPraktikumAsisten(
                                   kodeKelas: widget.kodeKelas),
 
                               const SizedBox(height: 50.0)

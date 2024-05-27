@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../../Dosen/Dashboard/Komponen/Deskripsi/Tabel/tabel_modul.dart';
 import '../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
 import '../../../Navigasi/dasboard_nav.dart';
 import '../../Asistensi/Screen/asistensi_laporan_prak.dart';
 import '../../Pengumpulan/Latihan/Screen/peng_latihan_mhs.dart';
+import '../Modul/Tabel Modul/tabel_modul_mahasiswa.dart';
 
 class DeskripsiMahasiswa extends StatefulWidget {
   final String kodeKelas;
@@ -524,8 +524,7 @@ class _DeskripsiMahasiswaState extends State<DeskripsiMahasiswa> {
                                 ),
                               ),
 
-                              TabelSilabusPraktikumDosen(
-                                  kodeKelas: widget.kodeKelas),
+                              TabelModulPraktikum(kodeKelas: widget.kodeKelas),
 
                               const SizedBox(height: 50.0)
                             ],

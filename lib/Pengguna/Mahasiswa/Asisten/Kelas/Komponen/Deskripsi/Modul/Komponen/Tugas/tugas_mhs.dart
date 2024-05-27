@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 import '../Laporan/laporan_mhs.dart';
 
@@ -66,6 +67,7 @@ class _TugasAsistenState extends State<TugasAsisten> {
   void initState() {
     super.initState();
     _getData();
+    _loadUserData();
   }
 
   Future<void> _selectDate(
@@ -99,6 +101,35 @@ class _TugasAsistenState extends State<TugasAsisten> {
       setState(() {
         controller.text = selectedDateTime.toString();
       });
+    }
+  }
+
+  //== Load Data dari Database ==//
+  Future<void> _loadUserData() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> userData = await FirebaseFirestore
+          .instance
+          .collection('pengumpulanTugas')
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
+          .where('judulMateri', isEqualTo: widget.modul)
+          .get();
+      if (userData.docs.isNotEmpty) {
+        var data = userData.docs.first.data();
+        setState(() {
+          _bukaController.text = data['aksesTugas'] != null
+              ? DateFormat('yyyy-MM-dd HH:mm:ss')
+                  .format((data['aksesTugas'] as Timestamp).toDate())
+              : '';
+          _tutupController.text = data['tutupAksesTugas'] != null
+              ? DateFormat('yyyy-MM-dd HH:mm:ss')
+                  .format((data['tutupAksesTugas'] as Timestamp).toDate())
+              : '';
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching user data: $e');
+      }
     }
   }
 
@@ -170,7 +201,7 @@ class _TugasAsistenState extends State<TugasAsisten> {
                         filled: true,
                         fillColor: Colors.white,
                         suffixIcon: IconButton(
-                          icon: const Icon(Icons.calendar_today),
+                          icon: const Icon(Icons.calendar_month),
                           onPressed: () async {
                             await _selectDate(context, _bukaController);
                           },
@@ -194,7 +225,7 @@ class _TugasAsistenState extends State<TugasAsisten> {
                         filled: true,
                         fillColor: Colors.white,
                         suffixIcon: IconButton(
-                          icon: const Icon(Icons.calendar_today),
+                          icon: const Icon(Icons.calendar_month),
                           onPressed: () async {
                             await _selectDate(context, _tutupController);
                           },
@@ -336,7 +367,6 @@ class _TugasAsistenState extends State<TugasAsisten> {
                 child: Container(
                   color: const Color(0xFFE3E8EF),
                   width: 2000.0,
-                  height: 620.0,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -394,12 +424,13 @@ class _TugasAsistenState extends State<TugasAsisten> {
                                         ),
                                       ),
                                     )),
-                                const SizedBox(height: 35.0),
+                                const SizedBox(height: 50.0),
                               ],
                             ),
                           ),
                         ),
                       ),
+                      const SizedBox(height: 20.0),
                     ],
                   ),
                 ),
@@ -426,11 +457,29 @@ class _TugasAsistenState extends State<TugasAsisten> {
                     if (dataExists) {
                       // ignore: use_build_context_synchronously
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LaporanAsisten(
-                                  kodeKelas: widget.kodeKelas,
-                                  modul: widget.modul)));
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  LaporanAsisten(
+                                      kodeKelas: widget.kodeKelas,
+                                      modul: widget.modul),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin = Offset(0.0, 0.0);
+                            const end = Offset.zero;
+                            const curve = Curves.ease;
+
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+
+                            return SlideTransition(
+                              position: animation.drive(tween),
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
                     } else {
                       // Tampilkan pesan atau lakukan aksi lain sesuai kebutuhan
                       if (kDebugMode) {

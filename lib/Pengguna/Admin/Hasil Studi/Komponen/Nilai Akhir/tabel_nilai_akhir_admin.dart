@@ -92,7 +92,8 @@ class _TabelNilaiAkhirAdminState extends State<TabelNilaiAkhirAdmin> {
             status: nilaiAkhirData['status'] ?? '',
           );
         }).toList();
-
+        // Mengurutkan data berdasarkan nama secara ascending
+        data.sort((a, b) => a.nama.compareTo(b.nama));
         setState(() {
           _penilaianStreamController.add(data);
         });
@@ -196,6 +197,7 @@ class _TabelNilaiAkhirAdminState extends State<TabelNilaiAkhirAdmin> {
           });
         }
       }
+
       await getDataFromFirebase();
       await batch.commit();
     }
@@ -1312,8 +1314,8 @@ class _TabelNilaiAkhirAdminState extends State<TabelNilaiAkhirAdmin> {
         (modul7 * 0.08) +
         (modul8 * 0.08) +
         (pretest * 0.05) +
-        (resmi * 0.05) +
-        (project * 0.1));
+        (resmi * 0.11) +
+        (project * 0.2));
   }
 
   Map<String, String> calculateHuruf(

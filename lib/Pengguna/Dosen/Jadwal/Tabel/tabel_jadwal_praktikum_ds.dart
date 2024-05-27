@@ -16,81 +16,20 @@ class _TabelJadwalPraktikumDosenState extends State<TabelJadwalPraktikumDosen> {
   //== List Tabel dan Filtering ==//
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
+
   //== Fungsi Controller pada Search ==//
   final TextEditingController _textController = TextEditingController();
   bool _isTextFieldNotEmpty = false;
+
   //== Filtering Dropdown Button ==//
   String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
+
   //== Fungsi Controller Waktu dan Hari ==//
   TextEditingController waktuPraktikumController = TextEditingController();
   TextEditingController hariPraktikumController = TextEditingController();
-  // Future<void> fetchAvailableYears() async {
-  //   try {
-  //     QuerySnapshot<Map<String, dynamic>> querySnapshot =
-  //         await FirebaseFirestore.instance
-  //             .collection('dataJadwalPraktikum')
-  //             .get();
-  //     Set<String> years = querySnapshot.docs
-  //         .map((doc) => doc['tahunAjaran'].toString())
-  //         .toSet();
 
-  //     setState(() {
-  //       availableYears = ['Tahun Ajaran', ...years.toList()];
-  //     });
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       print('Error fetching available years from firebase: $e');
-  //     }
-  //   }
-  // }
-
-  // Future<void> fetchDataFromFirebase(String? selectedYear) async {
-  //   try {
-  //     QuerySnapshot<Map<String, dynamic>> querySnapshot;
-
-  //     if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
-  //       querySnapshot = await FirebaseFirestore.instance
-  //           .collection('dataJadwalPraktikum')
-  //           .where('tahunAjaran', isEqualTo: selectedYear)
-  //           .get();
-  //     } else {
-  //       querySnapshot = await FirebaseFirestore.instance
-  //           .collection('dataJadwalPraktikum')
-  //           .get();
-  //     }
-
-  //     List<DataClass> data = querySnapshot.docs.map((doc) {
-  //       Map<String, dynamic> data = doc.data();
-  //       return DataClass(
-  //           id: doc.id,
-  //           kelas: data['kodeKelas'],
-  //           tahun: data['tahunAjaran'],
-  //           matkul: data['mataKuliah'],
-  //           jadwal: data['hariPraktikum'],
-  //           waktu: data['waktuPraktikum'],
-  //           semester: data['semester']);
-  //     }).toList();
-  //     setState(() {
-  //       demoClassData = data;
-  //       filteredClassData = demoClassData;
-  //     });
-  //   } catch (error) {
-  //     if (kDebugMode) {
-  //       print('Error fetching data from Firebase: $error');
-  //     }
-  //   }
-  // }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _textController.addListener(_onTextChanged);
-  //   fetchAvailableYears().then((_) {
-  //     fetchDataFromFirebase(selectedYear);
-  //   });
-  // }
-
+  //== Filtering menampilkan tahun ajaran ==//
   Future<void> fetchAvailableYears() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
@@ -115,7 +54,7 @@ class _TabelJadwalPraktikumDosenState extends State<TabelJadwalPraktikumDosen> {
     try {
       // Fetch kodeKelas from dataAsisten collection
       QuerySnapshot<Map<String, dynamic>> asistenSnapshot =
-          await FirebaseFirestore.instance.collection('dataKelas').get();
+          await FirebaseFirestore.instance.collection('dataAsisten').get();
 
       Set<String> kodeKelasSet = asistenSnapshot.docs
           .map((doc) => doc['kodeKelas'].toString())

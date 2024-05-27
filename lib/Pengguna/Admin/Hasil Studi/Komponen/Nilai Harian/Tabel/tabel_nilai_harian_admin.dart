@@ -164,7 +164,8 @@ class _TabelNilaiHarianAdminState extends State<TabelNilaiHarianAdmin> {
             rata8: data['modul8'] ?? 0.0,
           );
         }).toList();
-
+// Mengurutkan data berdasarkan nama secara ascending
+        demoPenilaianPercobaan.sort((a, b) => a.nama.compareTo(b.nama));
         filteredPenilaianPercobaan = List.from(demoPenilaianPercobaan);
       });
     } catch (e) {

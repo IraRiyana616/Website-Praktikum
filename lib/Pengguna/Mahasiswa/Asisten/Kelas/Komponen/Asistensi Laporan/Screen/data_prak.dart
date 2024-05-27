@@ -144,7 +144,9 @@ class _DataPraktikanAsistensiState extends State<DataPraktikanAsistensi> {
                                 cursor: SystemMouseCursors.click,
                                 child: Text(
                                   'Pengumpulan',
-                                  style: GoogleFonts.quicksand(fontSize: 16.0),
+                                  style: GoogleFonts.quicksand(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),

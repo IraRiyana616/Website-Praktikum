@@ -213,8 +213,8 @@ class _DataPraktikanAsistensiDosenState
                                   child: Text(
                                     'Pengumpulan',
                                     style: GoogleFonts.quicksand(
-                                      fontSize: 16.0,
-                                    ),
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),

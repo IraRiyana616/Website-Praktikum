@@ -13,7 +13,13 @@ class TabelDataPraktikanDosen extends StatefulWidget {
 }
 
 class _TabelDataPraktikanDosenState extends State<TabelDataPraktikanDosen> {
+  //== Fungsi Tabel ==//
   List<DataPraktikan> filteredDataPraktikan = [];
+  List<DataPraktikan> demoDataPraktikan = [];
+
+  //== Filtering ==//
+  bool _isTextFieldNotEmpty = false;
+  final TextEditingController _textController = TextEditingController();
 
   @override
   void initState() {
@@ -31,20 +37,103 @@ class _TabelDataPraktikanDosenState extends State<TabelDataPraktikanDosen> {
         .map((doc) => DataPraktikan.fromFirestore(doc))
         .toList();
 
+    // Inisialisasi demoDataPraktikan dengan data sebelumnya
+    demoDataPraktikan = data;
+
+    // Mengurutkan data berdasarkan nama secara ascending
+    demoDataPraktikan.sort((a, b) => a.nama.compareTo(b.nama));
+
     setState(() {
       filteredDataPraktikan = data;
+    });
+  }
+
+  //== Clear ==//
+  void clearSearchField() {
+    setState(() {
+      _textController.clear();
+      filterData(
+        '',
+      );
+    });
+  }
+
+  void _onTextChanged(String value) {
+    setState(() {
+      _isTextFieldNotEmpty = value.isNotEmpty;
+      filterData(value);
+    });
+  }
+
+  //== Fungsi dari Filtering Search ==//
+  void filterData(String query) {
+    setState(() {
+      filteredDataPraktikan = demoDataPraktikan
+          .where((data) =>
+              data.nim.toString().toLowerCase().contains(query.toLowerCase()) ||
+              data.nama.toLowerCase().contains(query.toLowerCase()))
+          .toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        //== Search ==//
+        Padding(
+          padding: const EdgeInsets.only(left: 1010.0),
+          child: SizedBox(
+            width: 300.0,
+            height: 35.0,
+            child: Row(
+              children: [
+                const Text("Search :",
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(
+                  width: 10.0,
+                ),
+                Expanded(
+                  child: TextField(
+                    onChanged: _onTextChanged,
+                    controller: _textController,
+                    decoration: InputDecoration(
+                      hintText: '',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 18),
+                      suffixIcon: Visibility(
+                        visible: _isTextFieldNotEmpty,
+                        child: IconButton(
+                          onPressed: clearSearchField,
+                          icon: const Icon(Icons.clear),
+                        ),
+                      ),
+                      labelStyle: const TextStyle(
+                        fontSize: 16,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 27.0,
+                )
+              ],
+            ),
+          ),
+        ),
+        //== Tabel ==//
         Center(
           child: Padding(
-            padding: const EdgeInsets.only(left: 18.0, right: 25.0),
+            padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 10.0),
             child: SizedBox(
-                width: 1195.0,
+                width: 1200.0,
                 child: filteredDataPraktikan.isNotEmpty
                     ? PaginatedDataTable(
                         columnSpacing: 10,
@@ -58,9 +147,9 @@ class _TabelDataPraktikanDosenState extends State<TabelDataPraktikanDosen> {
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold))),
                           DataColumn(
-                              label: Text(
-                            '',
-                          )),
+                              label: Text('Asisten Laporan',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold))),
                         ],
                         source: DataSource(filteredDataPraktikan, context),
                         rowsPerPage:
@@ -130,55 +219,58 @@ DataRow dataFileDataRow(
         },
       ),
       cells: [
-        DataCell(Text(fileInfo.nim.toString())),
+        DataCell(SizedBox(width: 200.0, child: Text(fileInfo.nim.toString()))),
         DataCell(SizedBox(
-            width: 250.0, child: Text(getLimitedText(fileInfo.nama, 40)))),
-        DataCell(GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    AsistensiLaporanDosen(
-                  kodeKelas: fileInfo.kode,
-                  nama: fileInfo.nama,
-                  modul: fileInfo.matkul,
-                  nim: fileInfo.nim,
+            width: 350.0, child: Text(getLimitedText(fileInfo.nama, 40)))),
+        DataCell(SizedBox(
+          width: 200.0,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      AsistensiLaporanDosen(
+                    kodeKelas: fileInfo.kode,
+                    nama: fileInfo.nama,
+                    modul: fileInfo.matkul,
+                    nim: fileInfo.nim,
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
                 ),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  const begin = Offset(0.0, 0.0);
-                  const end = Offset.zero;
-                  const curve = Curves.ease;
-
-                  var tween = Tween(begin: begin, end: end)
-                      .chain(CurveTween(curve: curve));
-
-                  return SlideTransition(
-                    position: animation.drive(tween),
-                    child: child,
-                  );
-                },
+              );
+            },
+            child: const MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(
+                    width: 8.0,
+                  ),
+                  Text(
+                    'Lihat Detail',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                ],
               ),
-            );
-          },
-          child: const MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: Row(
-              children: [
-                Icon(
-                  Icons.info,
-                  color: Colors.grey,
-                ),
-                SizedBox(
-                  width: 8.0,
-                ),
-                Text(
-                  'Lihat Detail',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.blue),
-                ),
-              ],
             ),
           ),
         ))

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -57,7 +59,6 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
     try {
       await _auth.signOut();
       // Navigasi kembali ke halaman login atau halaman lain setelah logout berhasil
-      // ignore: use_build_context_synchronously
       Navigator.of(context).pushReplacementNamed('/login');
     } catch (e) {
       // Tangani kesalahan logout
@@ -99,7 +100,6 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
           bool isDataExists = await checkDataExists(formattedDate, userNim);
           if (isDataExists) {
             // Data dengan tanggal yang sama telah ada dalam database
-            // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text('Data telah terdapat pada database'),
               backgroundColor: Colors.red,
@@ -119,8 +119,6 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
             await FirebaseFirestore.instance
                 .collection('absensiAsisten')
                 .add(updatedAbsenData);
-
-            // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text('Data berhasil disimpan'),
               backgroundColor: Colors.green,
@@ -135,7 +133,6 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
           }
         } else {
           // JudulMateri tidak sesuai dengan yang ada di Firestore
-          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Data tidak terdapat pada database'),
             backgroundColor: Colors.red,
@@ -219,6 +216,27 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
       PlatformFile file = result.files.first;
 
       try {
+        // Show loading indicator
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return const Dialog(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(width: 20),
+                    Text("Uploading..."),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+
         String userUid = FirebaseAuth.instance.currentUser!.uid;
         DocumentSnapshot<Map<String, dynamic>> userSnapshot =
             await FirebaseFirestore.instance
@@ -231,7 +249,7 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
 
           firebase_storage.Reference ref =
               firebase_storage.FirebaseStorage.instance.ref().child(
-                  'Absensi Mahasiswa/$kodeKelas/$namaModul/$userNim/${file.name}');
+                  '$kodeKelas/Absensi Asisten/$namaModul/$userNim/${file.name}');
 
           // Upload file
           await ref.putData(file.bytes!);
@@ -239,25 +257,35 @@ class _AbsensiAsistenState extends State<AbsensiAsisten> {
           setState(() {
             _fileName = file.name;
           });
+
+          // Close loading indicator
+          Navigator.of(context).pop();
         } else {
-          // ignore: use_build_context_synchronously
+          // Close loading indicator
+          Navigator.of(context).pop();
+
+          // Show error message
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('User data not found'),
             backgroundColor: Colors.red,
           ));
         }
       } catch (e) {
+        // Close loading indicator
+        Navigator.of(context).pop();
+
         if (kDebugMode) {
           print("Error during upload or getting download URL: $e");
         }
-        // ignore: use_build_context_synchronously
+
+        // Show error message
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Error uploading image'),
           backgroundColor: Colors.red,
         ));
       }
     } else {
-      // ignore: use_build_context_synchronously
+      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('No file selected'),
         backgroundColor: Colors.red,

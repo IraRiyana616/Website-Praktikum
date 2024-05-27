@@ -55,6 +55,8 @@ class _TabelDataMahasiswaAdminState extends State<TabelDataMahasiswaAdmin> {
           ));
         }
       }
+      // Mengurutkan data berdasarkan nama secara ascending
+      dataMahasiswa.sort((a, b) => a.nama.compareTo(b.nama));
       return dataMahasiswa;
     });
   }

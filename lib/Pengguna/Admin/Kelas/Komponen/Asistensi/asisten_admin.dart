@@ -206,7 +206,11 @@ class _DataPraktikanAsistensiAdminState
                       ),
 
                       //Tabel Data Praktikan
-                      TabelDataPraktikanDosen(kodeKelas: widget.kodeKelas),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: TabelDataPraktikanDosen(
+                            kodeKelas: widget.kodeKelas),
+                      ),
                       const SizedBox(
                         height: 20.0,
                       )

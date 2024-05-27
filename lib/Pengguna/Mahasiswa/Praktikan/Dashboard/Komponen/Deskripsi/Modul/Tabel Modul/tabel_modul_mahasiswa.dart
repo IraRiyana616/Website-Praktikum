@@ -2,20 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Modul/Komponen/Latihan/latihan_mhs.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../Komponen/Pre-Test/pre_test.dart';
 
-class TabelSilabusPraktikum extends StatefulWidget {
+class TabelModulPraktikum extends StatefulWidget {
   final String kodeKelas;
-
-  const TabelSilabusPraktikum({Key? key, required this.kodeKelas})
-      : super(key: key);
+  const TabelModulPraktikum({super.key, required this.kodeKelas});
 
   @override
-  State<TabelSilabusPraktikum> createState() => _TabelSilabusPraktikumState();
+  State<TabelModulPraktikum> createState() => _TabelModulPraktikumState();
 }
 
-class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
+class _TabelModulPraktikumState extends State<TabelModulPraktikum> {
   List<DataSilabus> demoDataSilabus = [];
   List<DataSilabus> filteredDataSilabus = [];
 
@@ -56,8 +54,8 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
       return DataSilabus(
         kode: kodeKelas,
         modul: data['judulMateri'],
-        hari: data['hariPraktikum'],
-        waktu: data['waktuPraktikum'],
+        jadwal: data['waktuPraktikum'],
+        tanggal: data['tanggalPraktikum'],
         file: data['modulPraktikum'],
         deskripsiKelas: kodeKelasMap[kodeKelas] ?? '',
         documentId: doc.id,
@@ -112,13 +110,15 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
                         ),
                         DataColumn(
                           label: Text(
-                            'Aksi',
+                            'File Modul',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
-                      source: DataSource(filteredDataSilabus,
-                          deleteDataFromFirestore, context),
+                      source: DataSource(
+                          filteredDataSilabus,
+                          deleteDataFromFirestore,
+                          context), // Pass delete function
                       rowsPerPage:
                           calculateRowsPerPage(filteredDataSilabus.length),
                     )
@@ -152,16 +152,16 @@ class _TabelSilabusPraktikumState extends State<TabelSilabusPraktikum> {
 class DataSilabus {
   String kode;
   String modul;
-  String hari;
-  String waktu;
+  String jadwal;
+  String tanggal;
   String file;
   String deskripsiKelas;
   String documentId;
 
   DataSilabus({
     required this.modul,
-    required this.hari,
-    required this.waktu,
+    required this.jadwal,
+    required this.tanggal,
     required this.kode,
     required this.file,
     required this.deskripsiKelas,
@@ -171,6 +171,7 @@ class DataSilabus {
 
 DataRow dataFileDataRow(DataSilabus fileInfo, int index,
     Function(String) onDelete, BuildContext context) {
+  // Pass onDelete function
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -179,18 +180,35 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
     ),
     cells: [
       DataCell(
-        MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => LatihanAsisten(
-                            kodeKelas: fileInfo.kode,
-                            modul: fileInfo.modul,
-                          )));
-            },
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    UjianPemahaman(
+                  kodeKelas: fileInfo.kode,
+                  modul: fileInfo.modul,
+                ),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(0.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.ease;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+              ),
+            );
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
             child: SizedBox(
               width: 250.0,
               child: Text(getLimitedText(fileInfo.modul, 50)),
@@ -198,68 +216,29 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
           ),
         ),
       ),
-      DataCell(SizedBox(width: 170.0, child: Text(fileInfo.hari))),
-      DataCell(SizedBox(
-        width: 170.0,
-        child: Text(fileInfo.waktu),
-      )),
+      DataCell(SizedBox(width: 170.0, child: Text(fileInfo.tanggal))),
+      DataCell(SizedBox(width: 170.0, child: Text(fileInfo.jadwal))),
       DataCell(Row(
         children: [
-          //== Download ==//
-          IconButton(
-            onPressed: () {
-              downloadFile(fileInfo.kode, fileInfo.file);
-            },
-            icon: const Icon(
-              Icons.download,
-              color: Colors.grey,
-            ),
-            tooltip: 'Download Modul',
+          const Icon(
+            Icons.download,
+            color: Colors.grey,
           ),
-          //== Edit Data ==//
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.edit_document,
-              color: Colors.grey,
-            ),
-            tooltip: 'Edit Data',
+          const SizedBox(
+            width: 5.0,
           ),
-          //== Delete ==//
-          IconButton(
-            onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text(
-                        'Hapus Modul',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16.0),
-                      ),
-                      content:
-                          const Text('Apakah Anda yakin ingin menghapusnya ?'),
-                      actions: [
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Batal')),
-                        TextButton(
-                            onPressed: () {
-                              onDelete(fileInfo.documentId);
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Hapus'))
-                      ],
-                    );
-                  });
-            },
-            icon: const Icon(
-              Icons.delete,
-              color: Colors.grey,
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () {
+                downloadFile(fileInfo.kode, fileInfo.file);
+              },
+              child: const Text(
+                'Download',
+                style:
+                    TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+              ),
             ),
-            tooltip: 'Hapus Data',
           )
         ],
       )),

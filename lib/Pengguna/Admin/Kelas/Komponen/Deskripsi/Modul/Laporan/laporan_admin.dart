@@ -1,78 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Modul/Komponen/Tugas/tugas_mhs.dart';
 
-class LatihanAsisten extends StatefulWidget {
+class PengumpulanLaporanAdmin extends StatefulWidget {
   final String kodeKelas;
   final String modul;
-  const LatihanAsisten(
+  const PengumpulanLaporanAdmin(
       {super.key, required this.kodeKelas, required this.modul});
 
   @override
-  State<LatihanAsisten> createState() => _LatihanAsistenState();
+  State<PengumpulanLaporanAdmin> createState() =>
+      _PengumpulanLaporanAdminState();
 }
 
-class _LatihanAsistenState extends State<LatihanAsisten> {
-  //== Controller ==//
+class _PengumpulanLaporanAdminState extends State<PengumpulanLaporanAdmin> {
   final TextEditingController _bukaController = TextEditingController();
   final TextEditingController _tutupController = TextEditingController();
-  late int userNim;
-  late String userName;
-
-//== Fungsi Mengambil Data ==//
-  Future<void> _getData() async {
-    try {
-      String userUid = FirebaseAuth.instance.currentUser!.uid;
-      // ignore: unnecessary_null_comparison
-      if (userUid != null) {
-        DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-            await FirebaseFirestore.instance
-                .collection('akun_mahasiswa')
-                .doc(userUid)
-                .get();
-
-        if (userSnapshot.exists) {
-          userNim = userSnapshot['nim'];
-          userName = userSnapshot['nama'];
-        } else {
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Data akun tidak ditemukan'),
-            backgroundColor: Colors.red,
-          ));
-          return;
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Harap login terlebih dahulu'),
-          backgroundColor: Colors.red,
-        ));
-        return;
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: $e'),
-        backgroundColor: Colors.red,
-      ));
-      if (kDebugMode) {
-        print('Error: $e');
-      }
-      return;
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    _getData();
     _loadUserData();
   }
 
-//== Memilih Tanggal ==//
   Future<void> _selectDate(
       BuildContext context, TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
@@ -86,7 +38,6 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
     }
   }
 
-//== Memilih Waktu ==//
   Future<void> _selectTime(BuildContext context,
       TextEditingController controller, DateTime selectedDate) async {
     final TimeOfDay? picked = await showTimePicker(
@@ -108,7 +59,6 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
     }
   }
 
-//== Fungsi Update Data ==//
   Future<void> _updateFirestoreData() async {
     try {
       Timestamp bukaTimestamp =
@@ -117,7 +67,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
           Timestamp.fromDate(DateTime.parse(_tutupController.text));
 
       await FirebaseFirestore.instance
-          .collection('pengumpulanLatihan')
+          .collection('pengumpulanLaporan')
           .where('kodeKelas', isEqualTo: widget.kodeKelas)
           .where('judulMateri', isEqualTo: widget.modul)
           .get()
@@ -125,8 +75,8 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
         // ignore: avoid_function_literals_in_foreach_calls
         querySnapshot.docs.forEach((doc) async {
           await doc.reference.update({
-            'aksesLatihan': bukaTimestamp,
-            'tutupAksesLatihan': tutupTimestamp,
+            'aksesLaporan': bukaTimestamp,
+            'tutupAksesLaporan': tutupTimestamp,
           });
         });
       });
@@ -155,20 +105,20 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
     try {
       QuerySnapshot<Map<String, dynamic>> userData = await FirebaseFirestore
           .instance
-          .collection('pengumpulanLatihan')
+          .collection('pengumpulanLaporan')
           .where('kodeKelas', isEqualTo: widget.kodeKelas)
           .where('judulMateri', isEqualTo: widget.modul)
           .get();
       if (userData.docs.isNotEmpty) {
         var data = userData.docs.first.data();
         setState(() {
-          _bukaController.text = data['aksesLatihan'] != null
+          _bukaController.text = data['aksesLaporan'] != null
               ? DateFormat('yyyy-MM-dd HH:mm:ss')
-                  .format((data['aksesLatihan'] as Timestamp).toDate())
+                  .format((data['aksesLaporan'] as Timestamp).toDate())
               : '';
-          _tutupController.text = data['tutupAksesLatihan'] != null
+          _tutupController.text = data['tutupAksesLaporan'] != null
               ? DateFormat('yyyy-MM-dd HH:mm:ss')
-                  .format((data['tutupAksesLatihan'] as Timestamp).toDate())
+                  .format((data['tutupAksesLaporan'] as Timestamp).toDate())
               : '';
         });
       }
@@ -179,13 +129,13 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
     }
   }
 
-  void _showEditDialog() {
+  void _editDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            'Edit JadwalPengumpulan',
+            'Edit Jadwal Pengumpulan',
             style: GoogleFonts.quicksand(fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
@@ -272,25 +222,6 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
     );
   }
 
-// Fungsi async untuk memeriksa keberadaan kodeKelas dan judulMateri dalam Firestore
-  Future<bool> checkDataExist(String kodeKelas, String modul) async {
-    bool exists = false;
-
-    // Melakukan query ke Firestore
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('pengumpulanLatihan')
-        .where('kodeKelas', isEqualTo: kodeKelas)
-        .where('judulMateri', isEqualTo: modul)
-        .get();
-
-    // Jika data ditemukan, set exists menjadi true
-    if (querySnapshot.docs.isNotEmpty) {
-      exists = true;
-    }
-
-    return exists;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -323,6 +254,18 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                     ),
                   ),
                 ),
+                const SizedBox(width: 400.0),
+                Padding(
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: Text(
+                    'Admin',
+                    style: GoogleFonts.quicksand(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                ),
+                const SizedBox(width: 30.0)
               ],
             ),
           ),
@@ -330,7 +273,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
-            .collection('pengumpulanLatihan')
+            .collection('pengumpulanLaporan')
             .where('kodeKelas', isEqualTo: widget.kodeKelas)
             .where('judulMateri', isEqualTo: widget.modul)
             .snapshots(),
@@ -372,6 +315,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                 child: Container(
                   color: const Color(0xFFE3E8EF),
                   width: 2000.0,
+                  height: 1000.0,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -388,7 +332,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                                   padding: const EdgeInsets.only(
                                       left: 75.0, right: 100.0, top: 55.0),
                                   child: Text(
-                                    '${data['deskripsiLatihan'] ?? 'Not available'}',
+                                    '${data['deskripsiLaporan'] ?? 'Not available'}',
                                     style: const TextStyle(
                                       fontSize: 15.0,
                                       height: 2.0,
@@ -408,7 +352,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                                             const Color(0xFF3CBEA9),
                                           ),
                                         ),
-                                        onPressed: _showEditDialog,
+                                        onPressed: _editDialog,
                                         child: Row(
                                           children: [
                                             const SizedBox(width: 3.0),
@@ -448,68 +392,8 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
         child: Container(
           height: 50.0,
           color: const Color(0xFFF7F8FA),
-          child: Padding(
-            padding: const EdgeInsets.only(right: 70.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () async {
-                    // Memeriksa keberadaan data sebelum melakukan navigasi
-                    bool dataExists =
-                        await checkDataExist(widget.kodeKelas, widget.modul);
-                    if (dataExists) {
-                      // ignore: use_build_context_synchronously
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  TugasAsisten(
-                                      kodeKelas: widget.kodeKelas,
-                                      modul: widget.modul),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin = Offset(0.0, 0.0);
-                            const end = Offset.zero;
-                            const curve = Curves.ease;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-
-                            return SlideTransition(
-                              position: animation.drive(tween),
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    } else {
-                      // Tampilkan pesan atau lakukan aksi lain sesuai kebutuhan
-                      if (kDebugMode) {
-                        print('Data tidak ditemukan di Firestore');
-                      }
-                    }
-                  },
-                  child: MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: Text(
-                      'Selanjutnya',
-                      style: GoogleFonts.quicksand(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 8.0,
-                ),
-                const Icon(Icons.arrow_circle_right)
-              ],
-            ),
+          child: const Padding(
+            padding: EdgeInsets.only(right: 70.0),
           ),
         ),
       ),
