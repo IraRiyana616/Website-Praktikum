@@ -42,7 +42,7 @@ class _DataPraktikanAsistensiState extends State<DataPraktikanAsistensi> {
                   ),
                   Expanded(
                       child: Text(
-                    widget.kodeKelas,
+                    widget.mataKuliah,
                     style: GoogleFonts.quicksand(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -144,9 +144,7 @@ class _DataPraktikanAsistensiState extends State<DataPraktikanAsistensi> {
                                 cursor: SystemMouseCursors.click,
                                 child: Text(
                                   'Pengumpulan',
-                                  style: GoogleFonts.quicksand(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold),
+                                  style: GoogleFonts.quicksand(fontSize: 16.0),
                                 ),
                               ),
                             ),

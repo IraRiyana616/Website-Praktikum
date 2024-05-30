@@ -303,14 +303,13 @@ DataRow dataFileDataRow(
             MouseRegion(
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
-                onTap: () {
-                  showInfoDialog(fileInfo, context); // Pass context here
-                },
-                child: const Icon(
-                  Icons.info,
-                  color: Colors.grey,
-                ),
-              ),
+                  onTap: () {
+                    showInfoDialog(fileInfo, context); // Pass context here
+                  },
+                  child: const Icon(
+                    Icons.info,
+                    color: Colors.grey,
+                  )),
             ),
           ],
         ),

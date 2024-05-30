@@ -216,7 +216,6 @@ class _UjianPemahamanState extends State<UjianPemahaman> {
                 child: Container(
                   color: const Color(0xFFE3E8EF),
                   width: 2000.0,
-                  height: 620.0,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -341,6 +340,9 @@ class _UjianPemahamanState extends State<UjianPemahaman> {
                           ),
                         ),
                       ),
+                      const SizedBox(
+                        height: 600.0,
+                      )
                     ],
                   ),
                 ),

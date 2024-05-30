@@ -81,47 +81,65 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
             await checkModulInFirestore(_modulEditingController.text);
 
         if (isModulValid) {
-          bool isDataExists = await checkDataExists(formattedDate);
-          if (isDataExists) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Data telah terdapat pada database'),
-              backgroundColor: Colors.red,
-            ));
-          } else {
-            // Pastikan file telah dipilih dan diunggah sebelum menyimpan data
-            if (_fileName.isEmpty) {
+          // Memeriksa apakah data dengan NIM yang sama sudah ada pada hari yang sama dengan judul materi yang berbeda
+          QuerySnapshot<Map<String, dynamic>> existingDataSnapshot =
+              await FirebaseFirestore.instance
+                  .collection('absensiMahasiswa')
+                  .where('nim', isEqualTo: userNim)
+                  .where('tanggal', isEqualTo: formattedDate)
+                  .get();
+
+          if (existingDataSnapshot.docs.isNotEmpty) {
+            // Jika data sudah ada, cek judul materi
+            bool isDifferentMateri = true;
+            for (var doc in existingDataSnapshot.docs) {
+              if (doc['judulMateri'] == _modulEditingController.text) {
+                isDifferentMateri = false;
+              }
+            }
+
+            if (!isDifferentMateri) {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Harap unggah file terlebih dahulu'),
+                content: Text('Data telah terdapat pada database'),
                 backgroundColor: Colors.red,
               ));
               return;
             }
-
-            // Setelah file diunggah, lanjutkan dengan menyimpan data
-            Map<String, dynamic> updatedAbsenData = {
-              'kodeKelas': _kodeEditingController.text,
-              'judulMateri': _modulEditingController.text,
-              'nama': userSnapshot['nama'],
-              'nim': userNim,
-              'tanggal': formattedDate,
-              'timestamp': FieldValue.serverTimestamp(),
-              'keterangan': selectedAbsen,
-              'namaFile': _fileName,
-            };
-            await FirebaseFirestore.instance
-                .collection('absensiMahasiswa')
-                .add(updatedAbsenData);
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Data berhasil disimpan'),
-              backgroundColor: Colors.green,
-            ));
-            _kodeEditingController.clear();
-            _modulEditingController.clear();
-            setState(() {
-              selectedAbsen = 'Status Kehadiran';
-              _fileName = '';
-            });
           }
+
+          // Pastikan file telah dipilih dan diunggah sebelum menyimpan data
+          if (_fileName.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Harap unggah file terlebih dahulu'),
+              backgroundColor: Colors.red,
+            ));
+            return;
+          }
+
+          // Setelah file diunggah, lanjutkan dengan menyimpan data
+          Map<String, dynamic> updatedAbsenData = {
+            'kodeKelas': _kodeEditingController.text,
+            'judulMateri': _modulEditingController.text,
+            'nama': userSnapshot['nama'],
+            'nim': userNim,
+            'tanggal': formattedDate,
+            'timestamp': FieldValue.serverTimestamp(),
+            'keterangan': selectedAbsen,
+            'namaFile': _fileName,
+          };
+          await FirebaseFirestore.instance
+              .collection('absensiMahasiswa')
+              .add(updatedAbsenData);
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Data berhasil disimpan'),
+            backgroundColor: Colors.green,
+          ));
+          _kodeEditingController.clear();
+          _modulEditingController.clear();
+          setState(() {
+            selectedAbsen = 'Status Kehadiran';
+            _fileName = '';
+          });
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Data tidak terdapat pada database'),
@@ -142,7 +160,6 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
 
   void _uploadFile() async {
     String kodeKelas = _kodeEditingController.text;
-    //String namaModul = _modulEditingController.text;
 
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -150,7 +167,6 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
       PlatformFile file = result.files.first;
 
       try {
-        // Show loading indicator
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -179,48 +195,47 @@ class _AbsensiPraktikanState extends State<AbsensiPraktikan> {
                 .get();
 
         if (userSnapshot.exists) {
-          int userNim = userSnapshot['nim'];
+          dynamic userNim =
+              userSnapshot['nim']; // Sesuaikan dengan tipe data yang seharusnya
+          if (userNim != null) {
+            firebase_storage.Reference ref = firebase_storage
+                .FirebaseStorage.instance
+                .ref()
+                .child('$kodeKelas/Absensi Mahasiswa/$userNim/${file.name}');
 
-          firebase_storage.Reference ref = firebase_storage
-              .FirebaseStorage.instance
-              .ref()
-              .child('$kodeKelas/Absensi Mahasiswa/$userNim/${file.name}');
+            await ref.putData(file.bytes!);
 
-          // Upload file
-          await ref.putData(file.bytes!);
+            setState(() {
+              _fileName = file.name;
+            });
 
-          setState(() {
-            _fileName = file.name;
-          });
-
-          // Close loading indicator
-          Navigator.of(context).pop();
+            Navigator.of(context).pop(); // Tutup dialog loading
+          } else {
+            // Tidak ada nim ditemukan, tangani sesuai kebutuhan
+            Navigator.of(context).pop(); // Tutup dialog loading
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('NIM not found'),
+              backgroundColor: Colors.red,
+            ));
+          }
         } else {
-          // Close loading indicator
-          Navigator.of(context).pop();
-
-          // Show error message
+          Navigator.of(context).pop(); // Tutup dialog loading
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('User data not found'),
             backgroundColor: Colors.red,
           ));
         }
       } catch (e) {
-        // Close loading indicator
-        Navigator.of(context).pop();
-
+        Navigator.of(context).pop(); // Tutup dialog loading
         if (kDebugMode) {
           print("Error during upload or getting download URL: $e");
         }
-
-        // Show error message
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Error uploading image'),
+          content: Text('Error uploading file'),
           backgroundColor: Colors.red,
         ));
       }
     } else {
-      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('No file selected'),
         backgroundColor: Colors.red,

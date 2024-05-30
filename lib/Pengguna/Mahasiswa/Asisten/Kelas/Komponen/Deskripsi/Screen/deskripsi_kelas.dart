@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../Praktikan/Dashboard/Komponen/Asistensi/Screen/asistensi_laporan_prak.dart';
 import '../../../../../Praktikan/Dashboard/Komponen/Pengumpulan/Latihan/Screen/peng_latihan_mhs.dart';
 import '../../../Navigation/kelas_assnav.dart';
 import '../../Absensi/Asisten/Screen/absensi_ass_sc.dart';
+import '../../Asistensi Laporan/Screen/data_prak.dart';
 import '../Tabel Modul/tabel_modul_asisten.dart';
 
 class DeskripsiKelas extends StatefulWidget {
@@ -280,7 +280,7 @@ class _DeskripsiKelasState extends State<DeskripsiKelas> {
                                             PageRouteBuilder(
                                               pageBuilder: (context, animation,
                                                       secondaryAnimation) =>
-                                                  DataAsistensiPraktikan(
+                                                  DataPraktikanAsistensi(
                                                 kodeKelas: widget.kodeKelas,
                                                 mataKuliah: widget.mataKuliah,
                                               ),

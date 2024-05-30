@@ -215,7 +215,6 @@ class _PengumpulanTugasState extends State<PengumpulanTugas> {
                 child: Container(
                   color: const Color(0xFFE3E8EF),
                   width: 2000.0,
-                  height: 620.0,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -340,6 +339,9 @@ class _PengumpulanTugasState extends State<PengumpulanTugas> {
                           ),
                         ),
                       ),
+                      const SizedBox(
+                        height: 50.0,
+                      )
                     ],
                   ),
                 ),

@@ -52,7 +52,8 @@ class _TabelDataKelasMahasiswaState extends State<TabelDataKelasMahasiswa> {
         ));
       }
     }
-
+// Mengurutkan data berdasarkan nama secara ascending
+    demoDataMahasiswa.sort((a, b) => a.nama.compareTo(b.nama));
     // Update state untuk merender data
     setState(() {
       filteredDataMahasiswa = List.from(demoDataMahasiswa);

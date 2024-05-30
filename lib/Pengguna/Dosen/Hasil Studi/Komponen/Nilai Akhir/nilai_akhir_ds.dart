@@ -1352,8 +1352,8 @@ class _NilaiAkhirDosenState extends State<NilaiAkhirDosen> {
         (modul7 * 0.08) +
         (modul8 * 0.08) +
         (pretest * 0.05) +
-        (resmi * 0.05) +
-        (project * 0.1));
+        (resmi * 0.11) +
+        (project * 0.2));
   }
 
   Map<String, String> calculateHuruf(

@@ -17,14 +17,98 @@ class TabelNilaiAkhirAdmin extends StatefulWidget {
 }
 
 class _TabelNilaiAkhirAdminState extends State<TabelNilaiAkhirAdmin> {
-  final ScrollController _controller = ScrollController();
+  // final ScrollController _controller = ScrollController();
 
   String selectedKeterangan = 'Tampilkan Semua';
-  late final StreamController<List<PenilaianAkhir>> _penilaianStreamController =
-      StreamController<List<PenilaianAkhir>>();
+  // late final StreamController<List<PenilaianAkhir>> _penilaianStreamController =
+  //     StreamController<List<PenilaianAkhir>>();
 
   List<PenilaianAkhir> demoPenilaianAkhir = [];
   List<PenilaianAkhir> filteredPenilaianAkhir = [];
+
+  // @override
+  // void dispose() {
+  //   _penilaianStreamController.close();
+  //   super.dispose();
+  // }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   checkAndFetchData();
+  // }
+
+  // Future<void> checkAndFetchData() async {
+  //   try {
+  //     final nilaiAkhirSnapshots = await FirebaseFirestore.instance
+  //         .collection('nilaiAkhir')
+  //         .where('kodeKelas', isEqualTo: widget.kodeKelas)
+  //         .get();
+
+  //     if (nilaiAkhirSnapshots.docs.isNotEmpty) {
+  //       final List<PenilaianAkhir> data = nilaiAkhirSnapshots.docs.map((doc) {
+  //         final data = doc.data();
+  //         final nilaiAkhirData = calculateHuruf(
+  //           data['modul1'] ?? 0.0,
+  //           data['modul2'] ?? 0.0,
+  //           data['modul3'] ?? 0.0,
+  //           data['modul4'] ?? 0.0,
+  //           data['modul5'] ?? 0.0,
+  //           data['modul6'] ?? 0.0,
+  //           data['modul7'] ?? 0.0,
+  //           data['modul8'] ?? 0.0,
+  //           data['pretest'] ?? 0.0,
+  //           data['projectAkhir'] ?? 0.0,
+  //           data['laporanResmi'] ?? 0.0,
+  //         );
+  //         return PenilaianAkhir(
+  //           nim: data['nim'] ?? '',
+  //           nama: data['nama'] ?? '',
+  //           kode: widget.kodeKelas,
+  //           modul1: data['modul1'] ?? 0.0,
+  //           modul2: data['modul2'] ?? 0.0,
+  //           modul3: data['modul3'] ?? 0.0,
+  //           modul4: data['modul4'] ?? 0.0,
+  //           modul5: data['modul5'] ?? 0.0,
+  //           modul6: data['modul6'] ?? 0.0,
+  //           modul7: data['modul7'] ?? 0.0,
+  //           modul8: data['modul8'] ?? 0.0,
+  //           pretest: data['pretest'] ?? 0.0,
+  //           project: data['projectAkhir'] ?? 0.0,
+  //           resmi: data['laporanResmi'] ?? 0.0,
+  //           akhir: calculateNilaiAkhir(
+  //               data['modul1'] ?? 0.0,
+  //               data['modul2'] ?? 0.0,
+  //               data['modul3'] ?? 0.0,
+  //               data['modul4'] ?? 0.0,
+  //               data['modul5'] ?? 0.0,
+  //               data['modul6'] ?? 0.0,
+  //               data['modul7'] ?? 0.0,
+  //               data['modul8'] ?? 0.0,
+  //               data['pretest'] ?? 0.0,
+  //               data['projectAkhir'] ?? 0.0,
+  //               data['laporanResmi'] ?? 0.0),
+  //           huruf: nilaiAkhirData['nilaiHuruf'] ?? '',
+  //           status: nilaiAkhirData['status'] ?? '',
+  //         );
+  //       }).toList();
+  //       // Mengurutkan data berdasarkan nama secara ascending
+  //       data.sort((a, b) => a.nama.compareTo(b.nama));
+  //       _penilaianStreamController.add(data);
+  //     } else {
+  //       await addDataFromNilaiHarian();
+  //       // Fetch data again after adding new data
+  //       await checkAndFetchData();
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Error: $e');
+  //     }
+  //   }
+  // }
+  final ScrollController _controller = ScrollController();
+  final StreamController<List<PenilaianAkhir>> _penilaianStreamController =
+      StreamController<List<PenilaianAkhir>>();
 
   @override
   void dispose() {
@@ -94,11 +178,11 @@ class _TabelNilaiAkhirAdminState extends State<TabelNilaiAkhirAdmin> {
         }).toList();
         // Mengurutkan data berdasarkan nama secara ascending
         data.sort((a, b) => a.nama.compareTo(b.nama));
-        setState(() {
-          _penilaianStreamController.add(data);
-        });
+        _penilaianStreamController.add(data);
       } else {
         await addDataFromNilaiHarian();
+        // Fetch data again after adding new data
+        await checkAndFetchData();
       }
     } catch (e) {
       if (kDebugMode) {
@@ -198,8 +282,9 @@ class _TabelNilaiAkhirAdminState extends State<TabelNilaiAkhirAdmin> {
         }
       }
 
-      await getDataFromFirebase();
       await batch.commit();
+      // Refresh data after adding new entries
+      await checkAndFetchData();
     }
   }
 
