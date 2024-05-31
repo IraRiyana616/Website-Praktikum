@@ -12,10 +12,13 @@ class LoginAdmin extends StatefulWidget {
 }
 
 class _LoginAdminState extends State<LoginAdmin> {
-  bool isAdminSelected = true;
+  //== Fungsi Controller ==//
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  //== Password ==//
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -103,23 +106,33 @@ class _LoginAdminState extends State<LoginAdmin> {
                                 child: SizedBox(
                                   width: constraints.maxWidth * 0.23,
                                   child: TextField(
+                                    obscureText: _obscurePassword,
                                     controller: _passwordController,
                                     decoration: InputDecoration(
-                                      prefixIcon: const Padding(
-                                        padding: EdgeInsets.only(left: 10.0),
-                                        child: Icon(
-                                          Icons.lock,
-                                          color: Colors.grey,
+                                        prefixIcon: const Padding(
+                                          padding: EdgeInsets.only(left: 10.0),
+                                          child: Icon(
+                                            Icons.lock,
+                                            color: Colors.grey,
+                                          ),
                                         ),
-                                      ),
-                                      hintText: '  Masukkan Password',
-                                      hintStyle:
-                                          const TextStyle(color: Colors.grey),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
-                                      ),
-                                    ),
+                                        hintText: '  Masukkan Password',
+                                        hintStyle:
+                                            const TextStyle(color: Colors.grey),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20.0),
+                                        ),
+                                        suffixIcon: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _obscurePassword =
+                                                    !_obscurePassword;
+                                              });
+                                            },
+                                            icon: Icon(_obscurePassword
+                                                ? Icons.visibility
+                                                : Icons.visibility_off))),
                                   ),
                                 ),
                               ),

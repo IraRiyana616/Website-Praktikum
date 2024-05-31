@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../../../Landing Page/Komponen/Mahasiswa/Login/login_mhs.dart';
-import '../../../../Landing Page/Komponen/Non Mahasiswa/Dosen/Login/login_dosen.dart';
-import '../Komponen/Non Mahasiswa/Admin/Login/login_admin.dart';
+import '../Komponen/Mahasiswa/Login/login_mahasiswa.dart';
+import '../Komponen/Non Mahasiswa/Admin/login_admin.dart';
+import '../Komponen/Non Mahasiswa/Dosen/Login/login_dosen.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -197,7 +196,7 @@ class _LandingPageState extends State<LandingPage> {
                                   ),
                                   serviceBox(
                                     'Dosen',
-                                    'assets/images/dosen.png',
+                                    'assets/images/admin.png',
                                     () {
                                       Navigator.push(
                                         context,
@@ -301,7 +300,7 @@ class _LandingPageState extends State<LandingPage> {
                                   const SizedBox(height: 20.0),
                                   serviceBox(
                                     'Dosen',
-                                    'assets/images/dosen.png',
+                                    'assets/images/admin.png',
                                     () {
                                       Navigator.push(
                                         context,
