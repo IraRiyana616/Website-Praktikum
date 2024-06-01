@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Registrasi/registrasi_mahasiswa.dart';
-
 class LoginMahasiswa extends StatefulWidget {
   const LoginMahasiswa({super.key});
 
@@ -173,7 +171,11 @@ class _LoginMahasiswaState extends State<LoginMahasiswa> {
                                                 print(
                                                     'User signed in: ${userCredential.user?.email}');
                                               }
-                                              //== Navigator ke arah berikutnya
+                                              //     //== Navigator ke arah berikutnya
+                                              //                                               Navigator.pushNamed(
+                                              //   context,
+                                              //   '/register_mahasiswa',
+                                              // );
                                             } else {
                                               if (kDebugMode) {
                                                 print(
@@ -251,32 +253,9 @@ class _LoginMahasiswaState extends State<LoginMahasiswa> {
                                       cursor: SystemMouseCursors.click,
                                       child: GestureDetector(
                                         onTap: () {
-                                          Navigator.push(
+                                          Navigator.pushNamed(
                                             context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation,
-                                                      secondaryAnimation) =>
-                                                  const RegisterMahasiswa(),
-                                              transitionsBuilder: (context,
-                                                  animation,
-                                                  secondaryAnimation,
-                                                  child) {
-                                                const begin = Offset(0.0, 0.0);
-                                                const end = Offset.zero;
-                                                const curve = Curves.ease;
-
-                                                var tween = Tween(
-                                                        begin: begin, end: end)
-                                                    .chain(CurveTween(
-                                                        curve: curve));
-
-                                                return SlideTransition(
-                                                  position:
-                                                      animation.drive(tween),
-                                                  child: child,
-                                                );
-                                              },
-                                            ),
+                                            '/register-mahasiswa',
                                           );
                                         },
                                         child: const Text(

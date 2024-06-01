@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class TabelDataMahasiswaAdmin extends StatefulWidget {
   final String kodeKelas;
@@ -17,6 +16,8 @@ class TabelDataMahasiswaAdmin extends StatefulWidget {
 class _TabelDataMahasiswaAdminState extends State<TabelDataMahasiswaAdmin> {
   final TextEditingController _textController = TextEditingController();
   bool _isTextFieldNotEmpty = false;
+  List<DataMahasiswa> allDataMahasiswa = [];
+  List<DataMahasiswa> filteredDataMahasiswa = [];
 
   void _onTextChanged() {
     setState(() {
@@ -29,43 +30,45 @@ class _TabelDataMahasiswaAdminState extends State<TabelDataMahasiswaAdmin> {
   void initState() {
     super.initState();
     _textController.addListener(_onTextChanged);
+    fetchData();
   }
 
-  Stream<List<DataMahasiswa>> fetchData() {
-    return FirebaseFirestore.instance
+  Future<void> fetchData() async {
+    List<DataMahasiswa> dataMahasiswa = [];
+    var snapshot = await FirebaseFirestore.instance
         .collection('tokenKelas')
         .where('kodeKelas', isEqualTo: widget.kodeKelas)
-        .snapshots()
-        .asyncMap((snapshot) async {
-      List<DataMahasiswa> dataMahasiswa = [];
-      for (var tokenDoc in snapshot.docs) {
-        int nim = tokenDoc['nim'];
-        var mahasiswaSnapshot = await FirebaseFirestore.instance
-            .collection('akun_mahasiswa')
-            .where('nim', isEqualTo: nim)
-            .get();
-        for (var mahasiswaDoc in mahasiswaSnapshot.docs) {
-          dataMahasiswa.add(DataMahasiswa(
-            nim: nim,
-            kode: widget.kodeKelas,
-            nama: mahasiswaDoc['nama'] ?? '',
-            email: mahasiswaDoc['email'] ?? '',
-            nohp: mahasiswaDoc['no_hp'] ?? 0,
-            angkatan: mahasiswaDoc['angkatan'] ?? 0,
-          ));
-        }
+        .get();
+
+    for (var tokenDoc in snapshot.docs) {
+      int nim = tokenDoc['nim'];
+      var mahasiswaSnapshot = await FirebaseFirestore.instance
+          .collection('akun_mahasiswa')
+          .where('nim', isEqualTo: nim)
+          .get();
+      for (var mahasiswaDoc in mahasiswaSnapshot.docs) {
+        dataMahasiswa.add(DataMahasiswa(
+          nim: nim,
+          kode: widget.kodeKelas,
+          nama: mahasiswaDoc['nama'] ?? '',
+          email: mahasiswaDoc['email'] ?? '',
+          nohp: mahasiswaDoc['no_hp'] ?? 0,
+          angkatan: mahasiswaDoc['angkatan'] ?? 0,
+        ));
       }
-      // Mengurutkan data berdasarkan nama secara ascending
-      dataMahasiswa.sort((a, b) => a.nama.compareTo(b.nama));
-      return dataMahasiswa;
+    }
+    // Mengurutkan data berdasarkan nama secara ascending
+    dataMahasiswa.sort((a, b) => a.nama.compareTo(b.nama));
+
+    setState(() {
+      allDataMahasiswa = dataMahasiswa;
+      filteredDataMahasiswa = dataMahasiswa;
     });
   }
 
-  List<DataMahasiswa> filteredDataMahasiswa = [];
-
   void filterData(String query) {
     setState(() {
-      filteredDataMahasiswa = filteredDataMahasiswa
+      filteredDataMahasiswa = allDataMahasiswa
           .where((data) => (data.nama
                   .toLowerCase()
                   .contains(query.toLowerCase()) ||
@@ -84,34 +87,21 @@ class _TabelDataMahasiswaAdminState extends State<TabelDataMahasiswaAdmin> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<DataMahasiswa>>(
-      stream: fetchData(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return const Center(child: Text('Error fetching data'));
-        } else {
-          filteredDataMahasiswa = snapshot.data ?? [];
-          return Column(
+    return allDataMahasiswa.isEmpty
+        ? const Center(child: CircularProgressIndicator())
+        : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 35.0, left: 35.0),
-                child: Text(
-                  'Data Mahasiswa Praktikum',
-                  style: GoogleFonts.quicksand(
-                      fontSize: 18.0, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 15.0, left: 960.0),
+                padding: const EdgeInsets.only(left: 1020.0),
                 child: SizedBox(
                   width: 300.0,
                   height: 40.0,
                   child: Row(
                     children: [
-                      const Text("Search :", style: TextStyle(fontSize: 16)),
+                      const Text("Search :",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
                       const SizedBox(width: 10.0),
                       Expanded(
                         child: TextField(
@@ -200,9 +190,6 @@ class _TabelDataMahasiswaAdminState extends State<TabelDataMahasiswaAdmin> {
               ),
             ],
           );
-        }
-      },
-    );
   }
 
   int calculateRowsPerPage(int rowCount) {

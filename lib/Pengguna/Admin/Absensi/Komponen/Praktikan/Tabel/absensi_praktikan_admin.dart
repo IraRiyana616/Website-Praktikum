@@ -137,9 +137,9 @@ class _TabelAbsensiPraktikanAdminState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 40.0, left: 35.0),
+          padding: const EdgeInsets.only(top: 35.0, left: 35.0),
           child: Text(
-            'Data Absensi',
+            'Data Absensi Praktikum',
             style: GoogleFonts.quicksand(
                 fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
@@ -148,7 +148,7 @@ class _TabelAbsensiPraktikanAdminState
           padding: const EdgeInsets.only(left: 35.0, top: 20.0),
           child: Container(
             height: 47.0,
-            width: 1180.0,
+            width: 1235.0,
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey),
               borderRadius: BorderRadius.circular(8.0),

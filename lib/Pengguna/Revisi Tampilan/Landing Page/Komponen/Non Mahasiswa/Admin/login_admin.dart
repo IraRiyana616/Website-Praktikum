@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../Routes/routes.dart';
+
 class LoginAdmin extends StatefulWidget {
   const LoginAdmin({Key? key}) : super(key: key);
 
@@ -16,6 +18,9 @@ class _LoginAdminState extends State<LoginAdmin> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  //== Authentikasi Service ==//
+  final authService = AuthService();
 
   //== Password ==//
   bool _obscurePassword = true;
@@ -174,17 +179,25 @@ class _LoginAdminState extends State<LoginAdmin> {
                                               print(
                                                   'User signed in:${userCredential.user?.email}');
                                             }
-                                            // ignore: use_build_context_synchronously
-                                            // Navigator.pushReplacement(
-                                            //     context,
-                                            //     MaterialPageRoute(
-                                            //         builder: (context) =>
-                                            //             const KelasAdminNav()));
+                                            await authService
+                                                .login(); // Await login to ensure it's completed
+                                            if (mounted) {
+                                              Navigator.pushReplacementNamed(
+                                                  context, '/dashboard');
+                                            }
                                           } else {
                                             if (kDebugMode) {
                                               print(
                                                   'User data not found in Firestore');
                                             }
+                                            // ignore: use_build_context_synchronously
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  'Data pengguna tidak ditemukan di Firestore'),
+                                              backgroundColor: Colors.red,
+                                              duration: Duration(seconds: 3),
+                                            ));
                                           }
                                         } else {
                                           if (kDebugMode) {

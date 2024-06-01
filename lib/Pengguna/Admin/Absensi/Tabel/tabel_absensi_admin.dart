@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../Komponen/Praktikan/Screen/absensi_praktikan_admin.dart';
+
+import '../../../Revisi Tampilan/Pengguna/Admin/Absensi/Komponen/Praktikan/absensi_praktikan.dart';
 
 class TabelDataAbsensiAdmin extends StatefulWidget {
   const TabelDataAbsensiAdmin({Key? key}) : super(key: key);
@@ -263,7 +264,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                AbsensiPraktikanAdmin(
+                AbsensiPraktikanScreen(
               kodeKelas: fileInfo.kelas,
               mataKuliah: fileInfo.matkul,
               kodeAsisten: fileInfo.asisten,
@@ -287,17 +288,17 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
       }),
       DataCell(
         SizedBox(
-          width: 220.0,
+          width: 225.0,
           child: Text(
-            getLimitedText(fileInfo.dosenpengampu, 30),
+            getLimitedText(fileInfo.dosenpengampu, 37),
           ),
         ),
       ),
       DataCell(
         SizedBox(
-          width: 220.0,
+          width: 225.0,
           child: Text(
-            getLimitedText(fileInfo.dosenpengampu2, 30),
+            getLimitedText(fileInfo.dosenpengampu2, 37),
           ),
         ),
       ),

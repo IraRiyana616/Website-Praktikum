@@ -2,37 +2,34 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
-import 'package:laksi/Pengguna/Admin/Jadwal%20Praktikum/Tabel/Form%20Edit%20Jadwal/form_edit_jadwal.dart';
 
-class TabelJadwalPraktikumAdmin extends StatefulWidget {
-  const TabelJadwalPraktikumAdmin({super.key});
+import '../Komponen/Kelas Praktikum/Deskripsi Kelas/deskripsi_admin.dart';
+import '../Komponen/Tambah Data Asisten/form_asisten.dart';
+
+class TabelKelasAdmin extends StatefulWidget {
+  const TabelKelasAdmin({super.key});
 
   @override
-  State<TabelJadwalPraktikumAdmin> createState() =>
-      _TabelJadwalPraktikumAdminState();
+  State<TabelKelasAdmin> createState() => _TabelKelasAdminState();
 }
 
-class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
-  //== List Tabel dan Filtering ==//
+class _TabelKelasAdminState extends State<TabelKelasAdmin> {
+  //== List Data Kelas Pada Tabel ==//
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
-  //== Fungsi Controller pada Search ==//
+
+  //== Fungsi Controller 'Search' ==//
   final TextEditingController _textController = TextEditingController();
   bool _isTextFieldNotEmpty = false;
-  //== Filtering Dropdown Button ==//
+
+  //== Fungsi DropdownButton 'Tahun Ajaran' ==//
   String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
-  //== Fungsi Controller Waktu dan Hari ==//
-  TextEditingController waktuPraktikumController = TextEditingController();
-  TextEditingController hariPraktikumController = TextEditingController();
 
   Future<void> fetchAvailableYears() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await FirebaseFirestore.instance
-              .collection('dataJadwalPraktikum')
-              .get();
+          await FirebaseFirestore.instance.collection('dataKelas').get();
       Set<String> years = querySnapshot.docs
           .map((doc) => doc['tahunAjaran'].toString())
           .toSet();
@@ -47,31 +44,32 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
     }
   }
 
+//== Fungsi Untuk Menampilkan Data dari Firestore 'dataKelas' ==//
   Future<void> fetchDataFromFirebase(String? selectedYear) async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
 
       if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
         querySnapshot = await FirebaseFirestore.instance
-            .collection('dataJadwalPraktikum')
+            .collection('dataKelas')
             .where('tahunAjaran', isEqualTo: selectedYear)
             .get();
       } else {
-        querySnapshot = await FirebaseFirestore.instance
-            .collection('dataJadwalPraktikum')
-            .get();
+        querySnapshot =
+            await FirebaseFirestore.instance.collection('dataKelas').get();
       }
 
       List<DataClass> data = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
         return DataClass(
-            id: doc.id,
-            kelas: data['kodeKelas'],
-            tahun: data['tahunAjaran'],
-            matkul: data['mataKuliah'],
-            jadwal: data['hariPraktikum'],
-            waktu: data['waktuPraktikum'],
-            semester: data['semester']);
+          id: doc.id,
+          kelas: data['kodeKelas'],
+          asisten: data['kodeAsisten'],
+          tahun: data['tahunAjaran'],
+          matkul: data['mataKuliah'],
+          dosenpengampu: data['dosenPengampu'],
+          dosenpengampu2: data['dosenPengampu2'],
+        );
       }).toList();
       setState(() {
         demoClassData = data;
@@ -88,7 +86,9 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
   void initState() {
     super.initState();
     _textController.addListener(_onTextChanged);
+    // Ambil tahun ajaran yang tersedia
     fetchAvailableYears().then((_) {
+      // Mengambil data dari Firebase
       fetchDataFromFirebase(selectedYear);
     });
   }
@@ -97,6 +97,7 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
     await fetchDataFromFirebase(selectedYear);
   }
 
+//== Fungsi Pada 'Search' ==//
   void _onTextChanged() {
     setState(() {
       _isTextFieldNotEmpty = _textController.text.isNotEmpty;
@@ -104,16 +105,20 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
     });
   }
 
+//== Fungsi Untuk Filtering Data ==//
   void filterData(String query) {
     setState(() {
       filteredClassData = demoClassData
           .where((data) =>
-              (data.jadwal.toLowerCase().contains(query.toLowerCase()) ||
+              (data.kelas.toLowerCase().contains(query.toLowerCase()) ||
+                  data.asisten.toLowerCase().contains(query.toLowerCase()) ||
+                  data.tahun.toLowerCase().contains(query.toLowerCase()) ||
                   data.matkul.toLowerCase().contains(query.toLowerCase())))
           .toList();
     });
   }
 
+//== Fungsi 'Search' ==//
   void clearSearchField() {
     setState(() {
       _textController.clear();
@@ -121,159 +126,13 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
     });
   }
 
+//== Fungsi Untuk Menambahkan Warna Pada Tabel ==//
   Color getRowColor(int index) {
     if (index % 2 == 0) {
       return Colors.grey.shade200;
     } else {
       return Colors.transparent;
     }
-  }
-
-  //== Memilih Waktu ==//
-  TimeOfDay? startTime;
-  TimeOfDay? endTime;
-  Future<void> _selectTime(BuildContext context,
-      {required bool isStartTime}) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: isStartTime
-          ? (startTime ?? TimeOfDay.now())
-          : (endTime ?? TimeOfDay.now()),
-    );
-
-    if (picked != null) {
-      setState(() {
-        if (isStartTime) {
-          startTime = picked;
-        } else {
-          endTime = picked;
-        }
-        _updateTimeText();
-      });
-    }
-  }
-
-  void _updateTimeText() {
-    if (startTime != null && endTime != null) {
-      final format = DateFormat('hh:mm a');
-      final startTimeFormatted = format.format(DateTime(
-        0,
-        0,
-        0,
-        startTime!.hour,
-        startTime!.minute,
-      ));
-      final endTimeFormatted = format.format(DateTime(
-        0,
-        0,
-        0,
-        endTime!.hour,
-        endTime!.minute,
-      ));
-
-      waktuPraktikumController.text = '$startTimeFormatted - $endTimeFormatted';
-    }
-  }
-
-  //== Show Dialog Edit ==//
-  void editJadwal(BuildContext context, DataClass data) async {
-    //== TextController ==//
-    TextEditingController waktuPraktikumController =
-        TextEditingController(text: data.waktu);
-    TextEditingController hariPraktikumController =
-        TextEditingController(text: data.jadwal);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: 20.0),
-                child: Text(
-                  'Edit Jadwal Praktikum',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
-                child: Divider(
-                  thickness: 0.5,
-                  color: Colors.grey,
-                ),
-              )
-            ],
-          ),
-          content: SizedBox(
-            height: 150.0,
-            width: 150.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                //== Waktu Praktikum ==//
-                TextField(
-                  controller: waktuPraktikumController,
-                  decoration: InputDecoration(
-                    labelText: 'Waktu Praktikum',
-                    suffixIcon: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          onPressed: () =>
-                              _selectTime(context, isStartTime: true),
-                          icon: const Icon(Icons.access_time),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.access_time),
-                          onPressed: () =>
-                              _selectTime(context, isStartTime: false),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                //== Hari Praktikum ==//
-                TextField(
-                  controller: hariPraktikumController,
-                  decoration: const InputDecoration(
-                    labelText: 'Hari Praktikum',
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Batal"),
-            ),
-            TextButton(
-              onPressed: () async {
-                // Update data di Firestore
-                await FirebaseFirestore.instance
-                    .collection('dataJadwalPraktikum')
-                    .doc(data.id)
-                    .update({
-                  'waktuPraktikum': waktuPraktikumController.text,
-                  'hariPraktikum': hariPraktikumController.text,
-                });
-
-                // Fetch data ulang setelah update
-                fetchDataFromFirebase(selectedYear);
-
-                // ignore: use_build_context_synchronously
-                Navigator.of(context).pop();
-              },
-              child: const Text("Simpan"),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -285,7 +144,7 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Jadwal Praktikum',
+            child: Text('Data Kelas Praktikum',
                 style: GoogleFonts.quicksand(
                     fontSize: 18, fontWeight: FontWeight.bold)),
           ),
@@ -293,6 +152,7 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
             onRefresh: _onRefresh,
             child: Column(
               children: [
+                //== DropdownButton Tahun Ajaran ==//
                 Padding(
                   padding: const EdgeInsets.only(bottom: 15.0, left: 0.0),
                   child: Container(
@@ -333,6 +193,7 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    //== Search ==//
                     Padding(
                       padding: const EdgeInsets.only(top: 10.0, left: 25.0),
                       child: SizedBox(
@@ -376,23 +237,24 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
                         ),
                       ),
                     ),
+                    //== ElevatedButton Tambah Kelas ==//
                     Padding(
                       padding: const EdgeInsets.only(right: 25.0, top: 10.0),
                       child: SizedBox(
                         height: 40.0,
-                        width: 170.0,
+                        width: 140.0,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF3CBEA9),
                           ),
                           onPressed: () {
-                            Navigator.of(context).pushReplacementNamed(
-                                '/form-tambah-jadwal-praktikum');
+                            Navigator.pushNamed(
+                                context, '/form-kelas-praktikum');
                           },
                           child: const Material(
                             color: Colors.transparent,
                             child: Text(
-                              "+ Tambah Jadwal",
+                              "+ Tambah Kelas",
                               style: TextStyle(
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.bold,
@@ -403,10 +265,12 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
                         ),
                       ),
                     ),
+
+                    //== == == ==//
                   ],
                 ),
                 const SizedBox(
-                  height: 25,
+                  height: 15,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 18.0, right: 25.0),
@@ -424,33 +288,34 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Matakuliah",
+                                  "Kode Asisten",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Semester",
+                                  "MataKuliah",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Hari Praktikum",
+                                  "Dosen Pengampu 1",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Waktu Praktikum",
+                                  "Dosen Pengampu 2",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
-                                  label: Text(
-                                '     Aksi',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ))
+                                label: Text(
+                                  "       Aksi",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
                             ],
                             source: DataSource(
                                 filteredClassData, deleteData, context),
@@ -486,13 +351,9 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
     }
   }
 
-//== Fungsi Untuk Menghapus Data ==//
   void deleteData(String id) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('dataJadwalPraktikum')
-          .doc(id)
-          .delete();
+      await FirebaseFirestore.instance.collection('dataKelas').doc(id).delete();
       fetchDataFromFirebase(selectedYear);
     } catch (error) {
       if (kDebugMode) {
@@ -505,20 +366,19 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
 class DataClass {
   String id;
   String kelas;
-  String jadwal;
-  String waktu;
+  String asisten;
   String tahun;
   String matkul;
-  int semester;
-
+  String dosenpengampu;
+  String dosenpengampu2;
   DataClass({
     required this.id,
     required this.kelas,
-    required this.jadwal,
-    required this.waktu, // Updated from Timestamp to String
+    required this.asisten,
     required this.tahun,
     required this.matkul,
-    required this.semester,
+    required this.dosenpengampu,
+    required this.dosenpengampu2,
   });
 }
 
@@ -531,45 +391,80 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
       },
     ),
     cells: [
-      DataCell(SizedBox(width: 140.0, child: Text(fileInfo.kelas))),
+      DataCell(SizedBox(width: 115.0, child: Text(fileInfo.kelas))),
+      DataCell(SizedBox(width: 115.0, child: Text(fileInfo.asisten))),
       DataCell(
         SizedBox(
-          width: 170.0,
+          width: 185.0,
           child: Text(
             fileInfo.matkul,
+            style: TextStyle(
+              color: Colors.lightBlue[700],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        onTap: () {
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  DeskripsiKelasAdmin(
+                kodeKelas: fileInfo.kelas,
+                mataKuliah: fileInfo.matkul,
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                const begin = Offset(0.0, 0.0);
+                const end = Offset.zero;
+                const curve = Curves.ease;
+
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+            ),
+          );
+        },
+      ),
+      DataCell(
+        SizedBox(
+          width: 195.0,
+          child: Text(
+            getLimitedText(fileInfo.dosenpengampu, 30),
           ),
         ),
       ),
       DataCell(
-          SizedBox(width: 120.0, child: Text(fileInfo.semester.toString()))),
-      DataCell(
         SizedBox(
-          width: 140.0,
+          width: 195.0,
           child: Text(
-            getLimitedText(fileInfo.jadwal, 6),
-          ),
-        ),
-      ),
-      DataCell(
-        SizedBox(
-          width: 170.0,
-          child: Text(
-            getLimitedText(fileInfo.waktu, 30),
+            getLimitedText(fileInfo.dosenpengampu2, 30),
           ),
         ),
       ),
       DataCell(Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          //== IconButton Edit ==//
+          //== EDIT DATA ==//
           IconButton(
             onPressed: () {
               Navigator.push(
                 context,
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      FormEditJadwalAdmin(
+                      FormDataAsisten(
+                          kodeAsisten: fileInfo.asisten,
+                          mataKuliah: fileInfo.matkul,
                           kodeKelas: fileInfo.kelas,
-                          mataKuliah: fileInfo.matkul),
+                          dosenPengampu: fileInfo.dosenpengampu,
+                          dosenPengampu2: fileInfo.dosenpengampu2,
+                          tahunAjaran: fileInfo.tahun),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
                     const begin = Offset(0.0, 0.0);
@@ -587,59 +482,49 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
                 ),
               );
             },
-            icon: const Icon(Icons.edit_document, color: Colors.grey),
-            tooltip: 'Edit Data',
+            icon: const Icon(
+              Icons.add_box,
+              color: Colors.grey,
+            ),
+            tooltip: 'Tambah Data Asisten',
           ),
-          //== IconButton Delete ==//
+          //== REMOVE DATA ==//
           IconButton(
             onPressed: () {
               showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text(
-                      "Hapus Jadwal Praktikum",
-                      style: GoogleFonts.quicksand(
-                          fontWeight: FontWeight.bold, fontSize: 20.0),
-                    ),
-                    content: const SizedBox(
-                      height: 30.0,
-                      width: 100.0,
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 10.0),
-                        child: Text("Anda yakin ingin menghapus data?"),
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.only(bottom: 10.0),
-                          child: Text("Batal"),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          onDelete(fileInfo.id);
-                          Navigator.of(context).pop();
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.only(bottom: 10.0),
-                          child: Text("Hapus"),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              );
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Hapus Kelas',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16.0)),
+                      content:
+                          const Text('Apakah Anda yakin ingin menghapusnya?'),
+                      actions: [
+                        TextButton(
+                            onPressed: () {
+                              onDelete(fileInfo.id);
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Hapus')),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Batal'),
+                        )
+                      ],
+                    );
+                  });
             },
-            icon: const Icon(Icons.delete, color: Colors.grey),
+            icon: const Icon(
+              Icons.delete,
+              color: Colors.grey,
+            ),
             tooltip: 'Hapus Data',
-          )
+          ),
         ],
-      ))
+      )),
     ],
   );
 }

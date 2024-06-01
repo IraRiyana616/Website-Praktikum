@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Register/register_dosen.dart';
-
 class LoginDosen extends StatefulWidget {
   const LoginDosen({super.key});
 
@@ -250,32 +248,9 @@ class _LoginDosenState extends State<LoginDosen> {
                                       cursor: SystemMouseCursors.click,
                                       child: GestureDetector(
                                         onTap: () {
-                                          Navigator.push(
+                                          Navigator.pushNamed(
                                             context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation,
-                                                      secondaryAnimation) =>
-                                                  const RegisterDosen(),
-                                              transitionsBuilder: (context,
-                                                  animation,
-                                                  secondaryAnimation,
-                                                  child) {
-                                                const begin = Offset(0.0, 0.0);
-                                                const end = Offset.zero;
-                                                const curve = Curves.ease;
-
-                                                var tween = Tween(
-                                                        begin: begin, end: end)
-                                                    .chain(CurveTween(
-                                                        curve: curve));
-
-                                                return SlideTransition(
-                                                  position:
-                                                      animation.drive(tween),
-                                                  child: child,
-                                                );
-                                              },
-                                            ),
+                                            '/register-dosen',
                                           );
                                         },
                                         child: const Text(

@@ -6,8 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Login/login_dosen.dart';
-
 class RegisterDosen extends StatefulWidget {
   const RegisterDosen({super.key});
 
@@ -22,7 +20,6 @@ class _RegisterDosenState extends State<RegisterDosen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _noHpController = TextEditingController();
-  final TextEditingController _angkatanController = TextEditingController();
 
   // Firestore instance
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -32,25 +29,12 @@ class _RegisterDosenState extends State<RegisterDosen> {
   Future<void> _registerUser() async {
     try {
       // Validasi NIM
-      if (_nipController.text.isEmpty ||
-          !RegExp(r'^\d+$').hasMatch(_nipController.text)) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('NIP harus diisi dan berupa angka'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
-        ));
-        return;
-      }
-
-      // Parse Angkatan to integer
-      int angkatan = int.parse(_angkatanController.text);
-      // Check for duplicate NIM
-      QuerySnapshot nimSnapshot = await _firestore
-          .collection('akun_mahasiswa')
+      QuerySnapshot nipSnapshot = await _firestore
+          .collection('akun_dosen')
           .where('nip', isEqualTo: _nipController.text)
           .get();
 
-      if (nimSnapshot.docs.isNotEmpty) {
+      if (nipSnapshot.docs.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('NIP sudah terdaftar'),
           backgroundColor: Colors.red,
@@ -60,7 +44,7 @@ class _RegisterDosenState extends State<RegisterDosen> {
       }
       // Check for duplicate email
       QuerySnapshot emailSnapshot = await _firestore
-          .collection('akun_mahasiswa')
+          .collection('akun_dosen')
           .where('email', isEqualTo: _emailController.text)
           .get();
 
@@ -77,16 +61,12 @@ class _RegisterDosenState extends State<RegisterDosen> {
           email: _emailController.text, password: _passwordController.text);
 
       // Create user with email and password
-      await _firestore
-          .collection('akun_mahasiswa')
-          .doc(authResult.user?.uid)
-          .set({
+      await _firestore.collection('akun_dosen').doc(authResult.user?.uid).set({
         'nama': _namaController.text,
-        'nim': _nipController,
+        'nip': _nipController.text,
         'email': _emailController.text,
         'password': _passwordController.text,
         'no_hp': _noHpController.text,
-        'angkatan': angkatan,
       });
 
       // Reset textfields to empty after successful registration
@@ -95,22 +75,26 @@ class _RegisterDosenState extends State<RegisterDosen> {
       _emailController.clear();
       _passwordController.clear();
       _noHpController.clear();
-      _angkatanController.clear();
 
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Data berhasil disimpan'),
         backgroundColor: Colors.green,
         duration: Duration(seconds: 3),
       ));
-      // Login Mahasiswa
-      Navigator.push(
+      //== Login Dosen ==//
+      Navigator.pushNamed(
         context,
-        MaterialPageRoute(builder: (context) => const LoginDosen()),
+        '/login_dosen',
       );
     } catch (e) {
       if (kDebugMode) {
         print('Error: $e');
       }
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Terjadi kesalahan saat menyimpan data'),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      ));
     }
   }
 
@@ -404,37 +388,9 @@ class _RegisterDosenState extends State<RegisterDosen> {
                                               cursor: SystemMouseCursors.click,
                                               child: GestureDetector(
                                                 onTap: () {
-                                                  Navigator.push(
+                                                  Navigator.pushNamed(
                                                     context,
-                                                    PageRouteBuilder(
-                                                      pageBuilder: (context,
-                                                              animation,
-                                                              secondaryAnimation) =>
-                                                          const LoginDosen(),
-                                                      transitionsBuilder:
-                                                          (context,
-                                                              animation,
-                                                              secondaryAnimation,
-                                                              child) {
-                                                        const begin =
-                                                            Offset(0.0, 0.0);
-                                                        const end = Offset.zero;
-                                                        const curve =
-                                                            Curves.ease;
-
-                                                        var tween = Tween(
-                                                                begin: begin,
-                                                                end: end)
-                                                            .chain(CurveTween(
-                                                                curve: curve));
-
-                                                        return SlideTransition(
-                                                          position: animation
-                                                              .drive(tween),
-                                                          child: child,
-                                                        );
-                                                      },
-                                                    ),
+                                                    '/login-dosen',
                                                   );
                                                 },
                                                 child: const Text(

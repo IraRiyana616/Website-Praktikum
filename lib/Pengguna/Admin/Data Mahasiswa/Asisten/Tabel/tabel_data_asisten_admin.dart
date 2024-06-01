@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class TabelDataAsistenAdmin extends StatefulWidget {
   final String kodeKelas;
@@ -104,15 +103,7 @@ class _TabelDataAsistenAdminState extends State<TabelDataAsistenAdmin> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 35.0, left: 35.0),
-          child: Text(
-            'Data Asisten Praktikum',
-            style: GoogleFonts.quicksand(
-                fontSize: 18.0, fontWeight: FontWeight.bold),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 15.0, left: 960.0),
+          padding: const EdgeInsets.only(left: 1020.0),
           child: SizedBox(
             width: 300.0,
             height: 40.0,

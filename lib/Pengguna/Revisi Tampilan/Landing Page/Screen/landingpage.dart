@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../Komponen/Mahasiswa/Login/login_mahasiswa.dart';
-import '../Komponen/Non Mahasiswa/Admin/login_admin.dart';
-import '../Komponen/Non Mahasiswa/Dosen/Login/login_dosen.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -165,32 +162,8 @@ class _LandingPageState extends State<LandingPage> {
                                     'Mahasiswa',
                                     'assets/images/mahasiswa.png',
                                     () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation,
-                                                  secondaryAnimation) =>
-                                              const LoginMahasiswa(),
-                                          transitionsBuilder: (context,
-                                              animation,
-                                              secondaryAnimation,
-                                              child) {
-                                            const begin = Offset(0.0, 0.0);
-                                            const end = Offset.zero;
-                                            const curve = Curves.ease;
-
-                                            var tween = Tween(
-                                                    begin: begin, end: end)
-                                                .chain(
-                                                    CurveTween(curve: curve));
-
-                                            return SlideTransition(
-                                              position: animation.drive(tween),
-                                              child: child,
-                                            );
-                                          },
-                                        ),
-                                      );
+                                      Navigator.pushReplacementNamed(
+                                          context, '/login-mahasiswa');
                                     },
                                     constraints.maxWidth * 0.28,
                                   ),
@@ -198,32 +171,8 @@ class _LandingPageState extends State<LandingPage> {
                                     'Dosen',
                                     'assets/images/admin.png',
                                     () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation,
-                                                  secondaryAnimation) =>
-                                              const LoginDosen(),
-                                          transitionsBuilder: (context,
-                                              animation,
-                                              secondaryAnimation,
-                                              child) {
-                                            const begin = Offset(0.0, 0.0);
-                                            const end = Offset.zero;
-                                            const curve = Curves.ease;
-
-                                            var tween = Tween(
-                                                    begin: begin, end: end)
-                                                .chain(
-                                                    CurveTween(curve: curve));
-
-                                            return SlideTransition(
-                                              position: animation.drive(tween),
-                                              child: child,
-                                            );
-                                          },
-                                        ),
-                                      );
+                                      Navigator.pushReplacementNamed(
+                                          context, '/login-dosen');
                                     },
                                     constraints.maxWidth * 0.28,
                                   ),
@@ -231,32 +180,8 @@ class _LandingPageState extends State<LandingPage> {
                                     'Admin',
                                     'assets/images/dosen.png',
                                     () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation,
-                                                  secondaryAnimation) =>
-                                              const LoginAdmin(),
-                                          transitionsBuilder: (context,
-                                              animation,
-                                              secondaryAnimation,
-                                              child) {
-                                            const begin = Offset(0.0, 0.0);
-                                            const end = Offset.zero;
-                                            const curve = Curves.ease;
-
-                                            var tween = Tween(
-                                                    begin: begin, end: end)
-                                                .chain(
-                                                    CurveTween(curve: curve));
-
-                                            return SlideTransition(
-                                              position: animation.drive(tween),
-                                              child: child,
-                                            );
-                                          },
-                                        ),
-                                      );
+                                      Navigator.pushReplacementNamed(
+                                          context, '/login-admin');
                                     },
                                     constraints.maxWidth * 0.28,
                                   ),
@@ -268,32 +193,8 @@ class _LandingPageState extends State<LandingPage> {
                                     'Mahasiswa',
                                     'assets/images/mahasiswa.png',
                                     () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation,
-                                                  secondaryAnimation) =>
-                                              const LoginMahasiswa(),
-                                          transitionsBuilder: (context,
-                                              animation,
-                                              secondaryAnimation,
-                                              child) {
-                                            const begin = Offset(0.0, 0.0);
-                                            const end = Offset.zero;
-                                            const curve = Curves.ease;
-
-                                            var tween = Tween(
-                                                    begin: begin, end: end)
-                                                .chain(
-                                                    CurveTween(curve: curve));
-
-                                            return SlideTransition(
-                                              position: animation.drive(tween),
-                                              child: child,
-                                            );
-                                          },
-                                        ),
-                                      );
+                                      Navigator.pushReplacementNamed(
+                                          context, '/login-mahasiswa');
                                     },
                                     constraints.maxWidth * 0.6,
                                   ),
@@ -302,32 +203,8 @@ class _LandingPageState extends State<LandingPage> {
                                     'Dosen',
                                     'assets/images/admin.png',
                                     () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation,
-                                                  secondaryAnimation) =>
-                                              const LoginDosen(),
-                                          transitionsBuilder: (context,
-                                              animation,
-                                              secondaryAnimation,
-                                              child) {
-                                            const begin = Offset(0.0, 0.0);
-                                            const end = Offset.zero;
-                                            const curve = Curves.ease;
-
-                                            var tween = Tween(
-                                                    begin: begin, end: end)
-                                                .chain(
-                                                    CurveTween(curve: curve));
-
-                                            return SlideTransition(
-                                              position: animation.drive(tween),
-                                              child: child,
-                                            );
-                                          },
-                                        ),
-                                      );
+                                      Navigator.pushReplacementNamed(
+                                          context, '/login-dosen');
                                     },
                                     constraints.maxWidth * 0.6,
                                   ),
@@ -336,32 +213,8 @@ class _LandingPageState extends State<LandingPage> {
                                     'Admin',
                                     'assets/images/dosen.png',
                                     () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation,
-                                                  secondaryAnimation) =>
-                                              const LoginAdmin(),
-                                          transitionsBuilder: (context,
-                                              animation,
-                                              secondaryAnimation,
-                                              child) {
-                                            const begin = Offset(0.0, 0.0);
-                                            const end = Offset.zero;
-                                            const curve = Curves.ease;
-
-                                            var tween = Tween(
-                                                    begin: begin, end: end)
-                                                .chain(
-                                                    CurveTween(curve: curve));
-
-                                            return SlideTransition(
-                                              position: animation.drive(tween),
-                                              child: child,
-                                            );
-                                          },
-                                        ),
-                                      );
+                                      Navigator.pushReplacementNamed(
+                                          context, '/login-admin');
                                     },
                                     constraints.maxWidth * 0.6,
                                   ),
