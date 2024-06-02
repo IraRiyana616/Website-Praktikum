@@ -121,15 +121,15 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
               padding:
                   const EdgeInsets.only(top: 20.0, left: 25.0, bottom: 20.0),
               child: Text(
-                'Data Hasil Studi Mahasiswa',
+                'Data Hasil Studi Praktikum',
                 style: GoogleFonts.quicksand(
-                    fontSize: 20.0, fontWeight: FontWeight.bold),
+                    fontSize: 18.0, fontWeight: FontWeight.bold),
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 20.0, left: 25.0),
               child: Container(
-                width: 1010.0,
+                width: 1025.0,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(8.0),

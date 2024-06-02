@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../Komponen/Kelas Praktikum/Deskripsi Kelas/deskripsi_admin.dart';
 import '../Komponen/Tambah Data Asisten/form_asisten.dart';
+import '../Komponen/Tambah Kelas/form_kelas.dart';
 
 class TabelKelasAdmin extends StatefulWidget {
   const TabelKelasAdmin({super.key});
@@ -248,8 +249,28 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
                             backgroundColor: const Color(0xFF3CBEA9),
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(
-                                context, '/form-kelas-praktikum');
+                            Navigator.pushReplacement(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const FormDataKelas(),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  const begin = Offset(0.0, 0.0);
+                                  const end = Offset.zero;
+                                  const curve = Curves.ease;
+
+                                  var tween = Tween(begin: begin, end: end)
+                                      .chain(CurveTween(curve: curve));
+
+                                  return SlideTransition(
+                                    position: animation.drive(tween),
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
                           },
                           child: const Material(
                             color: Colors.transparent,

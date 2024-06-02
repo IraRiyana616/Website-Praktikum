@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../Pengguna/Admin/Dashboard/Navigasi/dasboardnav_admin.dart';
 import '../../../../Routes/routes.dart';
 
 class LoginAdmin extends StatefulWidget {
@@ -182,8 +183,11 @@ class _LoginAdminState extends State<LoginAdmin> {
                                             await authService
                                                 .login(); // Await login to ensure it's completed
                                             if (mounted) {
-                                              Navigator.pushReplacementNamed(
-                                                  context, '/dashboard');
+                                              Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const DashboardNavigasiAdmin()));
                                             }
                                           } else {
                                             if (kDebugMode) {

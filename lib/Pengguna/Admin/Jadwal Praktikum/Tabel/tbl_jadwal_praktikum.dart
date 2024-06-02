@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:laksi/Pengguna/Admin/Jadwal%20Praktikum/Tabel/Form%20Edit%20Jadwal/form_edit_jadwal.dart';
 
+import '../Form Jadwal/form_jadwal_praktikum_admin.dart';
+
 class TabelJadwalPraktikumAdmin extends StatefulWidget {
   const TabelJadwalPraktikumAdmin({super.key});
 
@@ -386,8 +388,28 @@ class _TabelJadwalPraktikumAdminState extends State<TabelJadwalPraktikumAdmin> {
                             backgroundColor: const Color(0xFF3CBEA9),
                           ),
                           onPressed: () {
-                            Navigator.of(context).pushReplacementNamed(
-                                '/form-tambah-jadwal-praktikum');
+                            Navigator.pushReplacement(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const FormJadwalPraktikumAdmin(),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  const begin = Offset(0.0, 0.0);
+                                  const end = Offset.zero;
+                                  const curve = Curves.ease;
+
+                                  var tween = Tween(begin: begin, end: end)
+                                      .chain(CurveTween(curve: curve));
+
+                                  return SlideTransition(
+                                    position: animation.drive(tween),
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
                           },
                           child: const Material(
                             color: Colors.transparent,

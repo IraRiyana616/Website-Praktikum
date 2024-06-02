@@ -3,50 +3,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Tabel/Komponen/token_mhs.dart';
-import '../../../../Revisi Tampilan/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi Kelas/deskripsi_praktikan.dart';
 
-class TabelKelasPraktikan extends StatefulWidget {
-  const TabelKelasPraktikan({super.key});
+import '../Komponen/Screen/data_asistensi_praktikan.dart';
+
+class TabelAsistensiLaporan extends StatefulWidget {
+  const TabelAsistensiLaporan({super.key});
 
   @override
-  State<TabelKelasPraktikan> createState() => _TabelKelasPraktikanState();
+  State<TabelAsistensiLaporan> createState() => _TabelAsistensiLaporanState();
 }
 
-class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
-  List<DataToken> demoTokenData = [];
-  List<DataToken> filteredTokenData = [];
-
-  //== Fungsi Controller pada Search ==//
-  final TextEditingController textController = TextEditingController();
-  bool _isTextFieldNotEmpty = false;
-
-  //== Fungsi dari Filtering Search ==//
-  void filterData(String query) {
-    setState(() {
-      filteredTokenData = demoTokenData
-          .where((data) => (data.matkul
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
-              data.dosenpengampu.toLowerCase().contains(query.toLowerCase()) ||
-              data.dosenpengampu2.toLowerCase().contains(query.toLowerCase())))
-          .toList();
-    });
-  }
-
-  void clearSearchField() {
-    setState(() {
-      textController.clear();
-      filterData('');
-    });
-  }
-
-  void _onTextChanged() {
-    setState(() {
-      _isTextFieldNotEmpty = textController.text.isNotEmpty;
-      filterData(textController.text);
-    });
-  }
+class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
+  List<DataKelas> demoDataKelas = [];
+  List<DataKelas> filteredDataKelas = [];
 
   //Dropdown Button Tahun Ajaran
   String selectedYear = 'Tahun Ajaran';
@@ -98,7 +67,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
             await FirebaseFirestore.instance.collection('tokenKelas').get();
       }
 
-      List<DataToken> data = [];
+      List<DataKelas> data = [];
 
       // Pemrosesan pencocokan berdasarkan NIM
       for (var tokenDoc in tokenQuerySnapshot.docs) {
@@ -108,7 +77,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
         if (tokenNim.toString() == nim) {
           // Check kesamaan NIM dengan pengguna yang sedang login
           Map<String, dynamic> tokenData = tokenDoc.data();
-          data.add(DataToken(
+          data.add(DataKelas(
             kode: tokenData['kodeKelas'] ?? '',
             tahun: tokenData['tahunAjaran'] ?? '',
             matkul: tokenData['mataKuliah'] ?? '',
@@ -119,8 +88,8 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
       }
 
       setState(() {
-        demoTokenData = data;
-        filteredTokenData = demoTokenData;
+        demoDataKelas = data;
+        filteredDataKelas = demoDataKelas;
       });
     } catch (error) {
       if (kDebugMode) {
@@ -132,7 +101,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
   @override
   void initState() {
     super.initState();
-    textController.addListener(_onTextChanged);
+
     // Ambil tahun ajaran yang tersedia
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -166,7 +135,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Kelas Praktikum',
+            child: Text('Data Asistensi Laporan',
                 style: GoogleFonts.quicksand(
                     fontSize: 18.0, fontWeight: FontWeight.bold)),
           ),
@@ -211,81 +180,6 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
                     ),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    //== Search ==//
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 25.0),
-                      child: SizedBox(
-                        width: 300.0,
-                        height: 35.0,
-                        child: Row(children: [
-                          const Text(
-                            'Search :',
-                            style: TextStyle(fontSize: 16.0),
-                          ),
-                          const SizedBox(
-                            width: 10.0,
-                          ),
-                          Expanded(
-                              child: TextField(
-                            onChanged: (value) {
-                              filterData(value);
-                            },
-                            controller: textController,
-                            decoration: InputDecoration(
-                                hintText: '',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 0, horizontal: 10.0),
-                                suffixIcon: Visibility(
-                                    visible: _isTextFieldNotEmpty,
-                                    child: IconButton(
-                                        onPressed: clearSearchField,
-                                        icon: const Icon(Icons.clear))),
-                                labelStyle: const TextStyle(fontSize: 16.0),
-                                filled: true,
-                                fillColor: Colors.white),
-                          )),
-                          const SizedBox(
-                            width: 27.0,
-                          )
-                        ]),
-                      ),
-                    ),
-                    //== ElevatedButton Token Asisten ==//
-                    Padding(
-                      padding: const EdgeInsets.only(right: 25.0, top: 10.0),
-                      child: SizedBox(
-                        height: 40.0,
-                        width: 165.0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3CBEA9),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const TokenPraktikan()));
-                          },
-                          child: const Text(
-                            "+ Token Praktikum",
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
                 const SizedBox(
                   height: 15,
                 ),
@@ -293,7 +187,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
                   padding: const EdgeInsets.only(left: 18.0, right: 25.0),
                   child: SizedBox(
                     width: double.infinity,
-                    child: filteredTokenData.isNotEmpty
+                    child: filteredDataKelas.isNotEmpty
                         ? PaginatedDataTable(
                             columnSpacing: 10,
                             columns: const [
@@ -322,9 +216,9 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
                                 ),
                               ),
                             ],
-                            source: DataSource(filteredTokenData, context),
+                            source: DataSource(filteredDataKelas, context),
                             rowsPerPage:
-                                calculateRowsPerPage(filteredTokenData.length),
+                                calculateRowsPerPage(filteredDataKelas.length),
                           )
                         : const Center(
                             child: Text(
@@ -356,14 +250,14 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
   }
 }
 
-class DataToken {
+class DataKelas {
   String kode;
   String matkul;
   String tahun;
   String dosenpengampu;
   String dosenpengampu2;
 
-  DataToken(
+  DataKelas(
       {required this.kode,
       required this.tahun,
       required this.matkul,
@@ -371,7 +265,7 @@ class DataToken {
       required this.dosenpengampu2});
 }
 
-DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
+DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -394,7 +288,7 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-                  DeskripsiKelasPraktikan(
+                  DataAsistensiLaporanPraktikan(
                 kodeKelas: fileInfo.kode,
                 mataKuliah: fileInfo.matkul,
               ),
@@ -439,7 +333,7 @@ Color getRowColor(int index) {
 }
 
 class DataSource extends DataTableSource {
-  final List<DataToken> data;
+  final List<DataKelas> data;
   final BuildContext context;
 
   DataSource(this.data, this.context);

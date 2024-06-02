@@ -210,7 +210,7 @@ class _PengaturanState extends State<Pengaturan> {
             automaticallyImplyLeading: false,
             backgroundColor: const Color(0xFFF7F8FA),
             title: Padding(
-              padding: const EdgeInsets.only(top: 8.0, left: 20.0),
+              padding: const EdgeInsets.only(top: 8.0, left: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

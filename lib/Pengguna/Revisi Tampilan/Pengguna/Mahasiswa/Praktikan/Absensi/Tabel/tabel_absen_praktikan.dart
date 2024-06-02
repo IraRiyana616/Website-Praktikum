@@ -3,50 +3,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Tabel/Komponen/token_mhs.dart';
-import '../../../../Revisi Tampilan/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi Kelas/deskripsi_praktikan.dart';
 
-class TabelKelasPraktikan extends StatefulWidget {
-  const TabelKelasPraktikan({super.key});
+import '../Komponen Tabel/Screen/absenku_praktikan.dart';
+
+class TabelAbsensiPraktikan extends StatefulWidget {
+  const TabelAbsensiPraktikan({super.key});
 
   @override
-  State<TabelKelasPraktikan> createState() => _TabelKelasPraktikanState();
+  State<TabelAbsensiPraktikan> createState() => _TabelAbsensiPraktikanState();
 }
 
-class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
+class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
   List<DataToken> demoTokenData = [];
   List<DataToken> filteredTokenData = [];
-
-  //== Fungsi Controller pada Search ==//
-  final TextEditingController textController = TextEditingController();
-  bool _isTextFieldNotEmpty = false;
-
-  //== Fungsi dari Filtering Search ==//
-  void filterData(String query) {
-    setState(() {
-      filteredTokenData = demoTokenData
-          .where((data) => (data.matkul
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
-              data.dosenpengampu.toLowerCase().contains(query.toLowerCase()) ||
-              data.dosenpengampu2.toLowerCase().contains(query.toLowerCase())))
-          .toList();
-    });
-  }
-
-  void clearSearchField() {
-    setState(() {
-      textController.clear();
-      filterData('');
-    });
-  }
-
-  void _onTextChanged() {
-    setState(() {
-      _isTextFieldNotEmpty = textController.text.isNotEmpty;
-      filterData(textController.text);
-    });
-  }
 
   //Dropdown Button Tahun Ajaran
   String selectedYear = 'Tahun Ajaran';
@@ -132,7 +101,7 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
   @override
   void initState() {
     super.initState();
-    textController.addListener(_onTextChanged);
+
     // Ambil tahun ajaran yang tersedia
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -166,9 +135,9 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Kelas Praktikum',
+            child: Text('Data Absensi',
                 style: GoogleFonts.quicksand(
-                    fontSize: 18.0, fontWeight: FontWeight.bold)),
+                    fontSize: 20.0, fontWeight: FontWeight.bold)),
           ),
           RefreshIndicator(
             onRefresh: _onRefresh,
@@ -210,81 +179,6 @@ class _TabelKelasPraktikanState extends State<TabelKelasPraktikan> {
                       underline: Container(),
                     ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    //== Search ==//
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 25.0),
-                      child: SizedBox(
-                        width: 300.0,
-                        height: 35.0,
-                        child: Row(children: [
-                          const Text(
-                            'Search :',
-                            style: TextStyle(fontSize: 16.0),
-                          ),
-                          const SizedBox(
-                            width: 10.0,
-                          ),
-                          Expanded(
-                              child: TextField(
-                            onChanged: (value) {
-                              filterData(value);
-                            },
-                            controller: textController,
-                            decoration: InputDecoration(
-                                hintText: '',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 0, horizontal: 10.0),
-                                suffixIcon: Visibility(
-                                    visible: _isTextFieldNotEmpty,
-                                    child: IconButton(
-                                        onPressed: clearSearchField,
-                                        icon: const Icon(Icons.clear))),
-                                labelStyle: const TextStyle(fontSize: 16.0),
-                                filled: true,
-                                fillColor: Colors.white),
-                          )),
-                          const SizedBox(
-                            width: 27.0,
-                          )
-                        ]),
-                      ),
-                    ),
-                    //== ElevatedButton Token Asisten ==//
-                    Padding(
-                      padding: const EdgeInsets.only(right: 25.0, top: 10.0),
-                      child: SizedBox(
-                        height: 40.0,
-                        width: 165.0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3CBEA9),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const TokenPraktikan()));
-                          },
-                          child: const Text(
-                            "+ Token Praktikum",
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
                 ),
                 const SizedBox(
                   height: 15,
@@ -394,7 +288,7 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-                  DeskripsiKelasPraktikan(
+                  AbsenkuPraktikan(
                 kodeKelas: fileInfo.kode,
                 mataKuliah: fileInfo.matkul,
               ),

@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/landingpage',
       routes: appRoutes,
+      // home: PraktikanMode(),
     );
   }
 }

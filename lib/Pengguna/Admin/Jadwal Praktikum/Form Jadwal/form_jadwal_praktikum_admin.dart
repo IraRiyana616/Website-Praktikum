@@ -164,14 +164,11 @@ class _FormJadwalPraktikumAdminState extends State<FormJadwalPraktikumAdmin> {
           child: AppBar(
             leading: IconButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pushReplacementNamed(context, '/jadwal-praktikum');
                 },
-                icon: const Hero(
-                  tag: 'backButton',
-                  child: Icon(
-                    Icons.arrow_back,
-                    color: Colors.black,
-                  ),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
                 )),
             backgroundColor: const Color(0xFFF7F8FA),
             title: Padding(

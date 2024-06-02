@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laksi/Pengguna/Revisi%20Tampilan/Pengguna/Mahasiswa/Praktikan/Dashboard/Navigasi/dashboardnav_praktikan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Landing Page/Komponen/Non Mahasiswa/Admin/Register/register_admin.dart';
@@ -33,6 +34,9 @@ Map<String, WidgetBuilder> appRoutes = {
       const AuthGuard(child: FormJadwalPraktikum()),
   '/data-absensi-praktikum': (context) =>
       const AuthGuard(child: AbsensiPraktikumNav()),
+
+  //== Routes Tampilan Praktikan ==//
+  '/dashboard-praktikan': (context) => const DashboardNavigasiPraktikan(),
 };
 
 //== AuthService ==//
@@ -94,22 +98,3 @@ class AuthGuard extends StatelessWidget {
     );
   }
 }
-
-// class AuthGuard extends StatelessWidget {
-//   final Widget child;
-//   const AuthGuard({super.key, required this.child});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final authService = AuthService();
-
-//     if (!authService.isLoggedIn()) {
-//       WidgetsBinding.instance.addPostFrameCallback((_) {
-//         Navigator.pushReplacementNamed(context, '/login-admin');
-//       });
-//       return const Scaffold(body: Center(child: CircularProgressIndicator()));
-//     }
-
-//     return child;
-//   }
-// }

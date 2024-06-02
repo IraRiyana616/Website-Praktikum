@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../Pengguna/Mahasiswa/Praktikan/Dashboard/Navigasi/dashboardnav_praktikan.dart';
 
 class LoginMahasiswa extends StatefulWidget {
   const LoginMahasiswa({super.key});
@@ -171,11 +172,12 @@ class _LoginMahasiswaState extends State<LoginMahasiswa> {
                                                 print(
                                                     'User signed in: ${userCredential.user?.email}');
                                               }
-                                              //     //== Navigator ke arah berikutnya
-                                              //                                               Navigator.pushNamed(
-                                              //   context,
-                                              //   '/register_mahasiswa',
-                                              // );
+                                              // ignore: use_build_context_synchronously
+                                              Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const DashboardNavigasiPraktikan()));
                                             } else {
                                               if (kDebugMode) {
                                                 print(

@@ -96,7 +96,7 @@ class _TabelKTugasPraktikanState extends State<TabelKTugasPraktikan> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 70.0, top: 20.0),
+            padding: const EdgeInsets.only(left: 30.0, right: 30.0, top: 35.0),
             child: Container(
               height: 47.0,
               width: 1195.0,
@@ -127,7 +127,7 @@ class _TabelKTugasPraktikanState extends State<TabelKTugasPraktikan> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 70.0, right: 100.0, top: 20.0),
+            padding: const EdgeInsets.only(left: 30.0, right: 30.0, top: 20.0),
             child: SizedBox(
               width: double.infinity,
               child: filteredPengumpulan.isNotEmpty
