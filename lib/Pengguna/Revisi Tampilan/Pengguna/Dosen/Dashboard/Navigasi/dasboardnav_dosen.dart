@@ -1,27 +1,27 @@
-import 'package:flutter/material.dart';
-import '../../Absensi/Screen/absensi_admin.dart';
-import '../../Arsip Praktikum/Screen/arsip_praktikum_admin.dart';
-import '../../Dashboard/Screen/dashboard_admin.dart';
-import '../../Hasil Studi/Screen/hasil_studi_admin.dart';
-import '../../Pengaturan/pengaturan_admin.dart';
-import '../Screen/jadwal_praktikum_admin.dart';
+// ignore_for_file: library_private_types_in_public_api
 
-class JadwalPraktikumNavigasiAdmin extends StatefulWidget {
-  const JadwalPraktikumNavigasiAdmin({super.key});
+import 'package:flutter/material.dart';
+import '../../../../../Admin/Hasil Studi/Screen/hasil_studi_admin.dart';
+import '../../../../../Dosen/Pengaturan/Screen/pengaturan_ds.dart';
+import '../../Absensi/Screen/absensi_dosen.dart';
+import '../../Asistensi Laporan/Screen/asisten_laporan_dosen.dart';
+import '../../File Pengumpulan/Screen/file_pengumpulan_dosen.dart';
+import '../Screen/dashboard_dosen.dart';
+
+class DashboardDosenNavigasi extends StatefulWidget {
+  const DashboardDosenNavigasi({super.key});
 
   @override
-  State<JadwalPraktikumNavigasiAdmin> createState() =>
-      _JadwalPraktikumNavigasiAdminState();
+  State<DashboardDosenNavigasi> createState() => _DashboardDosenNavigasiState();
 }
 
-class _JadwalPraktikumNavigasiAdminState
-    extends State<JadwalPraktikumNavigasiAdmin> {
+class _DashboardDosenNavigasiState extends State<DashboardDosenNavigasi> {
   late Widget currentPage;
 
   @override
   void initState() {
     super.initState();
-    currentPage = const JadwalPraktikumScreen();
+    currentPage = const DashboardDosenScreen();
   }
 
   @override
@@ -78,21 +78,9 @@ class _JadwalPraktikumNavigasiAdminState
                             icon: const Icon(
                               Icons.grid_view_outlined,
                             ),
-                            page: const DashboardAdmin(),
+                            page: const DashboardDosenScreen(),
                             updatePage: updatePage,
-                            isActive: currentPage is DashboardAdmin,
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          DashboardListTile(
-                            title: 'Jadwal',
-                            icon: const Icon(
-                              Icons.calendar_month,
-                            ),
-                            page: const JadwalPraktikumScreen(),
-                            updatePage: updatePage,
-                            isActive: currentPage is JadwalPraktikumScreen,
+                            isActive: currentPage is DashboardDosenScreen,
                           ),
                           const SizedBox(
                             height: 15,
@@ -102,21 +90,33 @@ class _JadwalPraktikumNavigasiAdminState
                             icon: const Icon(
                               Icons.people,
                             ),
-                            page: const DataAbsensiPraktikum(),
+                            page: const AbsensiScreenDosen(),
                             updatePage: updatePage,
-                            isActive: currentPage is DataAbsensiPraktikum,
+                            isActive: currentPage is AbsensiScreenDosen,
                           ),
                           const SizedBox(
                             height: 15,
                           ),
                           DashboardListTile(
-                            title: 'Arsip Praktikum',
+                            title: 'File Pengumpulan',
                             icon: const Icon(
                               Icons.file_copy,
                             ),
-                            page: const ArsipPraktikumAdmin(),
+                            page: const FilePengumpulanScreenDosen(),
                             updatePage: updatePage,
-                            isActive: currentPage is ArsipPraktikumAdmin,
+                            isActive: currentPage is FilePengumpulanScreenDosen,
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          DashboardListTile(
+                            title: 'Asistensi Laporan',
+                            icon: const Icon(
+                              Icons.archive,
+                            ),
+                            page: const AsistensiLaporanDosen(),
+                            updatePage: updatePage,
+                            isActive: currentPage is AsistensiLaporanDosen,
                           ),
                           const SizedBox(
                             height: 15,
@@ -126,9 +126,9 @@ class _JadwalPraktikumNavigasiAdminState
                             icon: const Icon(
                               Icons.score,
                             ),
-                            page: const HasilStudiAdminScreen(),
+                            page: const HasilStudiAdmin(),
                             updatePage: updatePage,
-                            isActive: currentPage is HasilStudiAdminScreen,
+                            isActive: currentPage is HasilStudiAdmin,
                           ),
                           const SizedBox(
                             height: 15,
@@ -138,9 +138,9 @@ class _JadwalPraktikumNavigasiAdminState
                             icon: const Icon(
                               Icons.settings,
                             ),
-                            page: const PengaturanAdmin(),
+                            page: const PengaturanDosen(),
                             updatePage: updatePage,
-                            isActive: currentPage is PengaturanAdmin,
+                            isActive: currentPage is PengaturanDosen,
                           ),
                           const SizedBox(
                             height: 15,
@@ -185,7 +185,6 @@ class DashboardListTile extends StatefulWidget {
   final bool isActive;
 
   @override
-  // ignore: library_private_types_in_public_api
   _DashboardListTileState createState() => _DashboardListTileState();
 }
 

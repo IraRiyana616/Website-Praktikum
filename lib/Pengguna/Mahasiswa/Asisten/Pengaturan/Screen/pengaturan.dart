@@ -24,22 +24,6 @@ class _PengaturanState extends State<Pengaturan> {
   TextEditingController noHandphoneController = TextEditingController();
   //== Firebase Authentikasi ==//
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // Fungsi untuk logout dari akun Firebase
-  Future<void> _logout() async {
-    try {
-      await _auth.signOut();
-      // Navigasi kembali ke halaman login atau halaman lain setelah logout berhasil
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/login');
-    } catch (e) {
-      // Tangani kesalahan logout
-      if (kDebugMode) {
-        print('Error during logout: $e');
-      }
-    }
-  }
-
 //== Menampilkan Data dari Database ==//
   Future<void> _loadUserData() async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -197,6 +181,19 @@ class _PengaturanState extends State<Pengaturan> {
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching nama mahasiswa: $e');
+      }
+    }
+  }
+
+  //== Fungsi Logout ==//
+  Future<void> _logout() async {
+    try {
+      await _auth.signOut();
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushReplacementNamed('/login-mahasiswa');
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error during logout: $e');
       }
     }
   }
@@ -587,7 +584,7 @@ class _PengaturanState extends State<Pengaturan> {
                 ),
               ),
               const SizedBox(
-                height: 20.0,
+                height: 2000.0,
               )
             ],
           ),

@@ -71,7 +71,7 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
       await _auth.signOut();
       // Navigasi kembali ke halaman login atau halaman lain setelah logout berhasil
       // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/login');
+      Navigator.of(context).pushReplacementNamed('/login-dosen');
     } catch (e) {
       // Tangani kesalahan logout
       if (kDebugMode) {
@@ -211,7 +211,7 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
             automaticallyImplyLeading: false,
             backgroundColor: const Color(0xFFF7F8FA),
             title: Padding(
-              padding: const EdgeInsets.only(top: 8.0, left: 20.0),
+              padding: const EdgeInsets.only(top: 8.0, left: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -588,7 +588,7 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
                 ),
               ),
               const SizedBox(
-                height: 20.0,
+                height: 2000.0,
               )
             ],
           ),

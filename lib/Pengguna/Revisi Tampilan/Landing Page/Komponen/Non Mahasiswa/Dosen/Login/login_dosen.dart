@@ -1,8 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../../Pengguna/Dosen/Dashboard/Navigasi/dasboardnav_dosen.dart';
 
 class LoginDosen extends StatefulWidget {
   const LoginDosen({super.key});
@@ -171,6 +175,11 @@ class _LoginDosenState extends State<LoginDosen> {
                                                     'User signed in: ${userCredential.user?.email}');
                                               }
                                               //== Navigator ke arah berikutnya
+                                              Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const DashboardDosenNavigasi()));
                                             } else {
                                               if (kDebugMode) {
                                                 print(
@@ -182,7 +191,6 @@ class _LoginDosenState extends State<LoginDosen> {
                                               print(
                                                   'Authentication failed: ${userCredential.toString()}');
                                             }
-                                            // ignore: use_build_context_synchronously
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(const SnackBar(
                                               content: Text(

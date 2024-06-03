@@ -1,25 +1,65 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Tabel/tabel_arsip_praktikum_admin.dart';
+import '../Tabel/tabel_asistensi_dosen.dart';
 
-class ArsipPraktikumAdmin extends StatefulWidget {
-  const ArsipPraktikumAdmin({super.key});
+class AsistensiLaporanDosen extends StatefulWidget {
+  const AsistensiLaporanDosen({super.key});
 
   @override
-  State<ArsipPraktikumAdmin> createState() => _ArsipPraktikumAdminState();
+  State<AsistensiLaporanDosen> createState() => _AsistensiLaporanDosenState();
 }
 
-class _ArsipPraktikumAdminState extends State<ArsipPraktikumAdmin> {
+class _AsistensiLaporanDosenState extends State<AsistensiLaporanDosen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  //== Fungsi Nama Mahasiswa ==//
+  User? _currentUser;
+  String _namaMahasiswa = '';
 
+  //== Nama Akun ==//
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUser();
+  }
+
+  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
+  void _getCurrentUser() async {
+    setState(() {
+      _currentUser = _auth.currentUser;
+    });
+    if (_currentUser != null) {
+      await _getNamaMahasiswa(_currentUser!.uid);
+    }
+  }
+
+  // Fungsi untuk mengambil nama mahasiswa dari database
+  Future<void> _getNamaMahasiswa(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('akun_dosen').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          _namaMahasiswa = doc.get('nama');
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching nama dosen: $e');
+      }
+    }
+  }
+
+  //== Fungsi Logout ==//
   Future<void> _logout() async {
     try {
       await _auth.signOut();
       // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/login-admin');
+      Navigator.of(context).pushReplacementNamed('/login-dosen');
     } catch (e) {
       if (kDebugMode) {
         print('Error during logout: $e');
@@ -45,7 +85,7 @@ class _ArsipPraktikumAdminState extends State<ArsipPraktikumAdmin> {
                 ),
                 Expanded(
                   child: Text(
-                    "Arsip Praktikum",
+                    'File Pengumpulan',
                     style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -54,28 +94,26 @@ class _ArsipPraktikumAdminState extends State<ArsipPraktikumAdmin> {
                   ),
                 ),
                 const Spacer(),
-                Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
-                  child: Text(
-                    'Admin',
+                if (_currentUser != null) ...[
+                  Text(
+                    _namaMahasiswa.isNotEmpty
+                        ? _namaMahasiswa
+                        : (_currentUser!.email ?? ''),
                     style: GoogleFonts.quicksand(
-                      fontSize: 17.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
                   ),
-                ),
-                IconButton(
-                  onPressed: _logout,
-                  icon: const Icon(
-                    Icons.logout,
-                    color: Color(0xFF031F31),
+                  IconButton(
+                      onPressed: _logout,
+                      icon: const Icon(
+                        Icons.logout,
+                        color: Color(0xFF031F31),
+                      )),
+                  const SizedBox(
+                    width: 10.0,
                   ),
-                  tooltip: 'Logout',
-                ),
-                const SizedBox(
-                  width: 10.0,
-                ),
+                ],
               ],
             ),
           ),
@@ -95,7 +133,7 @@ class _ArsipPraktikumAdminState extends State<ArsipPraktikumAdmin> {
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 1105.0),
                     color: Colors.white,
-                    child: const TabelArsipPraktikum(),
+                    child: const TabelAsistensiLaporanDosen(),
                   ),
                 ),
               ],

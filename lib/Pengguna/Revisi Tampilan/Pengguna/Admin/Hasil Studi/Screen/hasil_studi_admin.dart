@@ -3,16 +3,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Tabel/tabel_arsip_praktikum_admin.dart';
+import '../Tabel/tabel_hasil_studi_admin.dart';
 
-class ArsipPraktikumAdmin extends StatefulWidget {
-  const ArsipPraktikumAdmin({super.key});
+class HasilStudiAdminScreen extends StatefulWidget {
+  const HasilStudiAdminScreen({super.key});
 
   @override
-  State<ArsipPraktikumAdmin> createState() => _ArsipPraktikumAdminState();
+  State<HasilStudiAdminScreen> createState() => _HasilStudiAdminScreenState();
 }
 
-class _ArsipPraktikumAdminState extends State<ArsipPraktikumAdmin> {
+class _HasilStudiAdminScreenState extends State<HasilStudiAdminScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> _logout() async {
@@ -45,7 +45,7 @@ class _ArsipPraktikumAdminState extends State<ArsipPraktikumAdmin> {
                 ),
                 Expanded(
                   child: Text(
-                    "Arsip Praktikum",
+                    "Hasil Studi",
                     style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -95,7 +95,7 @@ class _ArsipPraktikumAdminState extends State<ArsipPraktikumAdmin> {
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 1105.0),
                     color: Colors.white,
-                    child: const TabelArsipPraktikum(),
+                    child: const TabelHasilStudiAdmin(),
                   ),
                 ),
               ],

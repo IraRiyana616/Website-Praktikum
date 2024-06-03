@@ -3,16 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Komponen/Tugas/tugas_admin.dart';
-
-class TabelArsipPraktikum extends StatefulWidget {
-  const TabelArsipPraktikum({super.key});
+class TabelHasilStudiAdmin extends StatefulWidget {
+  const TabelHasilStudiAdmin({super.key});
 
   @override
-  State<TabelArsipPraktikum> createState() => _TabelArsipPraktikumState();
+  State<TabelHasilStudiAdmin> createState() => _TabelHasilStudiAdminState();
 }
 
-class _TabelArsipPraktikumState extends State<TabelArsipPraktikum> {
+class _TabelHasilStudiAdminState extends State<TabelHasilStudiAdmin> {
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
 
@@ -113,7 +111,7 @@ class _TabelArsipPraktikumState extends State<TabelArsipPraktikum> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Arsip Praktikum',
+            child: Text('Data Hasil Studi',
                 style: GoogleFonts.quicksand(
                     fontSize: 18, fontWeight: FontWeight.bold)),
           ),
@@ -260,28 +258,28 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
                 style: TextStyle(
                     color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
           ), onTap: () {
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                TugasAdminScreen(
-                    kodeKelas: fileInfo.kelas, mataKuliah: fileInfo.matkul),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = Offset(0.0, 0.0);
-              const end = Offset.zero;
-              const curve = Curves.ease;
+        // Navigator.push(
+        //   context,
+        //   PageRouteBuilder(
+        //     pageBuilder: (context, animation, secondaryAnimation) =>
+        //         TugasAdminScreen(
+        //             kodeKelas: fileInfo.kelas, mataKuliah: fileInfo.matkul),
+        //     transitionsBuilder:
+        //         (context, animation, secondaryAnimation, child) {
+        //       const begin = Offset(0.0, 0.0);
+        //       const end = Offset.zero;
+        //       const curve = Curves.ease;
 
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        //       var tween =
+        //           Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-              return SlideTransition(
-                position: animation.drive(tween),
-                child: child,
-              );
-            },
-          ),
-        );
+        //       return SlideTransition(
+        //         position: animation.drive(tween),
+        //         child: child,
+        //       );
+        //     },
+        //   ),
+        // );
       }),
       DataCell(
         SizedBox(
