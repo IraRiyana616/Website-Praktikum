@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../../Admin/Absensi/Screen/absensi_admin.dart';
 import '../../../../../Admin/Hasil Studi/Screen/hasil_studi_admin.dart';
 import '../../Absensi/Screen/absensi_admin.dart';
+import '../../Arsip Praktikum/Screen/arsip_praktikum_admin.dart';
 import '../../Dashboard/Screen/dashboard_admin.dart';
 import '../../Pengaturan/pengaturan_admin.dart';
 import '../Screen/jadwal_praktikum_admin.dart';
@@ -112,11 +112,11 @@ class _JadwalPraktikumNavigasiAdminState
                           DashboardListTile(
                             title: 'Arsip Praktikum',
                             icon: const Icon(
-                              Icons.archive,
+                              Icons.file_copy,
                             ),
-                            page: const AbsensiAdmin(),
+                            page: const ArsipPraktikumAdmin(),
                             updatePage: updatePage,
-                            isActive: currentPage is AbsensiAdmin,
+                            isActive: currentPage is ArsipPraktikumAdmin,
                           ),
                           const SizedBox(
                             height: 15,

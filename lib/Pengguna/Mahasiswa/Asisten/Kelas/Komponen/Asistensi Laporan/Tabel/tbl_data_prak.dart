@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Asistensi%20Laporan/Komponen/Screen/asistensi_lapor.dart';
 
 class TabelDataPraktikan extends StatefulWidget {
@@ -13,10 +14,12 @@ class TabelDataPraktikan extends StatefulWidget {
 
 class _TabelDataPraktikanState extends State<TabelDataPraktikan> {
   List<DataPraktikan> filteredDataPraktikan = [];
+  List<DataPraktikan> demoDataPraktikan = [];
 
   @override
   void initState() {
     super.initState();
+    textController.addListener(_onTextChanged);
     fetchDataFromFirestore();
   }
 
@@ -38,13 +41,89 @@ class _TabelDataPraktikanState extends State<TabelDataPraktikan> {
     });
   }
 
+  //== Fungsi Controller pada Search ==//
+  final TextEditingController textController = TextEditingController();
+  bool _isTextFieldNotEmpty = false;
+
+  //== Fungsi dari Filtering Search ==//
+  void filterData(String query) {
+    setState(() {
+      filteredDataPraktikan = demoDataPraktikan
+          .where(
+              (data) => (data.nama.toLowerCase().contains(query.toLowerCase())))
+          .toList();
+    });
+  }
+
+  void clearSearchField() {
+    setState(() {
+      textController.clear();
+      filterData('');
+    });
+  }
+
+  void _onTextChanged() {
+    setState(() {
+      _isTextFieldNotEmpty = textController.text.isNotEmpty;
+      filterData(textController.text);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            //== Search ==//
+            Padding(
+              padding: const EdgeInsets.only(top: 40.0, right: 10.0),
+              child: SizedBox(
+                width: 300.0,
+                height: 35.0,
+                child: Row(children: [
+                  Text(
+                    'Search :',
+                    style: GoogleFonts.quicksand(
+                        fontSize: 16.0, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    width: 8.0,
+                  ),
+                  Expanded(
+                      child: TextField(
+                    onChanged: (value) {
+                      filterData(value);
+                    },
+                    controller: textController,
+                    decoration: InputDecoration(
+                        hintText: '',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 0, horizontal: 10.0),
+                        suffixIcon: Visibility(
+                            visible: _isTextFieldNotEmpty,
+                            child: IconButton(
+                                onPressed: clearSearchField,
+                                icon: const Icon(Icons.clear))),
+                        labelStyle: const TextStyle(fontSize: 16.0),
+                        filled: true,
+                        fillColor: Colors.white),
+                  )),
+                  const SizedBox(
+                    width: 27.0,
+                  )
+                ]),
+              ),
+            ),
+          ],
+        ),
         Center(
           child: Padding(
-            padding: const EdgeInsets.only(left: 18.0, right: 25.0, top: 35.0),
+            padding: const EdgeInsets.only(left: 30.0, right: 30.0, top: 15.0),
             child: SizedBox(
                 width: 1250.0,
                 child: filteredDataPraktikan.isNotEmpty
@@ -138,14 +217,31 @@ DataRow dataFileDataRow(
         DataCell(GestureDetector(
           onTap: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AsistensiLaporan(
-                          kodeKelas: fileInfo.kode,
-                          nama: fileInfo.nama,
-                          modul: fileInfo.matkul,
-                          nim: fileInfo.nim,
-                        )));
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    AsistensiLaporan(
+                  kodeKelas: fileInfo.kode,
+                  nama: fileInfo.nama,
+                  modul: fileInfo.matkul,
+                  nim: fileInfo.nim,
+                ),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(0.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.ease;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+              ),
+            );
           },
           child: const MouseRegion(
             cursor: SystemMouseCursors.click,

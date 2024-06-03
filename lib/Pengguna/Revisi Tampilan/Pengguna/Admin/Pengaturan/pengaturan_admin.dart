@@ -130,7 +130,7 @@ class _PengaturanAdminState extends State<PengaturanAdmin> {
       body: SingleChildScrollView(
         child: Container(
           color: const Color(0xFFE3E8EF),
-          width: 2000.0,
+          constraints: const BoxConstraints.expand(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

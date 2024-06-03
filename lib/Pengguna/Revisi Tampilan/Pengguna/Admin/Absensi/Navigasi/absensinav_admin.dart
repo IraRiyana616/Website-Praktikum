@@ -1,8 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-import '../../../../../Admin/Absensi/Screen/absensi_admin.dart';
 import '../../../../../Admin/Hasil Studi/Screen/hasil_studi_admin.dart';
+import '../../Arsip Praktikum/Screen/arsip_praktikum_admin.dart';
 import '../../Dashboard/Screen/dashboard_admin.dart';
 import '../../Jadwal Praktikum/Screen/jadwal_praktikum_admin.dart';
 import '../../Pengaturan/pengaturan_admin.dart';
@@ -112,11 +112,11 @@ class _AbsensiPraktikumNavState extends State<AbsensiPraktikumNav> {
                           DashboardListTile(
                             title: 'Arsip Praktikum',
                             icon: const Icon(
-                              Icons.archive,
+                              Icons.file_copy,
                             ),
-                            page: const AbsensiAdmin(),
+                            page: const ArsipPraktikumAdmin(),
                             updatePage: updatePage,
-                            isActive: currentPage is AbsensiAdmin,
+                            isActive: currentPage is ArsipPraktikumAdmin,
                           ),
                           const SizedBox(
                             height: 15,

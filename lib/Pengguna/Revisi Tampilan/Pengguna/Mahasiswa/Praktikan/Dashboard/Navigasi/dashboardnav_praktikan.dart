@@ -1,5 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../../../Mahasiswa/Asisten/Pengaturan/Screen/pengaturan.dart';
+import '../../../Asisten/Dashboard/Navigasi/dashboardnav_asisten.dart';
 import '../../Absensi/Screen/absensi_praktikan.dart';
 import '../../Asistensi/Screen/asistensi_praktikan.dart';
 import '../../File Pengumpulan/Screen/pengumpulan_praktikan.dart';
@@ -102,17 +108,18 @@ class _DashboardNavigasiPraktikanState
                                     ),
                                   );
                                 }).toList(),
-                                onChanged: (String? newValue) {
+                                onChanged: (String? newValue) async {
                                   setState(() {
                                     currentRole = newValue!;
-                                    if (currentRole == 'Praktikan') {
+                                  });
+                                  if (currentRole == 'Asisten') {
+                                    await _checkAsisten(context);
+                                  } else {
+                                    setState(() {
                                       currentPage =
                                           const DashboardPraktikanScreen();
-                                    } else {
-                                      //== Navigator Untuk Asisten ==//
-                                      currentPage = const Pengaturan();
-                                    }
-                                  });
+                                    });
+                                  }
                                 },
                               ),
                             ],
@@ -228,6 +235,108 @@ class _DashboardNavigasiPraktikanState
           );
         },
       ),
+    );
+  }
+
+  Future<void> _checkAsisten(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      if (kDebugMode) {
+        print('User is logged in: ${user.uid}');
+      }
+      try {
+        // Ambil dokumen pengguna dari Firestore
+        final userDoc = await FirebaseFirestore.instance
+            .collection('akun_mahasiswa')
+            .doc(user.uid)
+            .get();
+
+        if (userDoc.exists) {
+          if (kDebugMode) {
+            print('User document exists.');
+          }
+          final nim = userDoc.data()?['nim']; // Ambil NIM dari dokumen pengguna
+          if (kDebugMode) {
+            print('NIM: $nim');
+          }
+
+          if (nim != null && nim is int) {
+            // Memeriksa apakah nim ada di koleksi akun_mahasiswa dan dataAsisten
+            final akunMahasiswaSnapshot = await FirebaseFirestore.instance
+                .collection('akun_mahasiswa')
+                .doc(user.uid)
+                .get();
+            final tokenAsistenSnapshot = await FirebaseFirestore.instance
+                .collection('dataAsisten')
+                .where('nim', isEqualTo: nim)
+                .get();
+
+            if (akunMahasiswaSnapshot.exists &&
+                tokenAsistenSnapshot.docs.isNotEmpty) {
+              if (kDebugMode) {
+                print('Both akunMahasiswa and tokenAsisten documents exist.');
+              }
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DasboardAsistenNavigasi(),
+                ),
+              );
+            } else {
+              if (kDebugMode) {
+                print('One or both of the documents do not exist.');
+              }
+              _showNotRegisteredDialog(context);
+            }
+          } else {
+            if (kDebugMode) {
+              print('NIM is null or not an integer.');
+            }
+            _showNotRegisteredDialog(context);
+          }
+        } else {
+          if (kDebugMode) {
+            print('User document does not exist.');
+          }
+          _showNotRegisteredDialog(context);
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error: $e');
+        }
+        _showNotRegisteredDialog(context);
+      }
+    } else {
+      if (kDebugMode) {
+        print('User is not logged in.');
+      }
+    }
+  }
+
+  void _showNotRegisteredDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: const Text('Anda tidak terdaftar sebagai asisten'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Memastikan bahwa setState dijalankan di dalam StatefulWidget
+                if (context is StatefulElement) {
+                  (context).state.setState(() {
+                    currentRole = 'Praktikan';
+                    currentPage = const DashboardPraktikanScreen();
+                  });
+                }
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 

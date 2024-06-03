@@ -4,29 +4,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import '../../../../../../Mahasiswa/Asisten/Pengaturan/Screen/pengaturan.dart';
 import '../../../Asisten/Dashboard/Navigasi/dashboardnav_asisten.dart';
-import '../../Absensi/Screen/absensi_praktikan.dart';
 import '../../Asistensi/Screen/asistensi_praktikan.dart';
 import '../../Dashboard/Screen/dashboard_praktikan.dart';
+import '../../File Pengumpulan/Screen/pengumpulan_praktikan.dart';
 import '../../Hasil Studi/hasil_studi_praktikan.dart';
-import '../Screen/pengumpulan_praktikan.dart';
+import '../Screen/absensi_praktikan.dart';
 
-class FilePengumpulanNavigasi extends StatefulWidget {
-  const FilePengumpulanNavigasi({super.key});
+class AbsensiPraktikanNavigasi extends StatefulWidget {
+  const AbsensiPraktikanNavigasi({super.key});
 
   @override
-  State<FilePengumpulanNavigasi> createState() =>
-      _FilePengumpulanNavigasiState();
+  State<AbsensiPraktikanNavigasi> createState() =>
+      _AbsensiPraktikanNavigasiState();
 }
 
-class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
+class _AbsensiPraktikanNavigasiState extends State<AbsensiPraktikanNavigasi> {
   late Widget currentPage;
   String currentRole = 'Praktikan';
   @override
   void initState() {
     super.initState();
-    currentPage = const FilePengumpulanPraktikan();
+    currentPage = const AsistensiPraktikanScreen();
   }
 
   @override

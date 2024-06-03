@@ -1,32 +1,28 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../../../../../../Mahasiswa/Asisten/Pengaturan/Screen/pengaturan.dart';
-import '../../../Asisten/Dashboard/Navigasi/dashboardnav_asisten.dart';
-import '../../Absensi/Screen/absensi_praktikan.dart';
-import '../../Asistensi/Screen/asistensi_praktikan.dart';
-import '../../Dashboard/Screen/dashboard_praktikan.dart';
-import '../../Hasil Studi/hasil_studi_praktikan.dart';
-import '../Screen/pengumpulan_praktikan.dart';
 
-class FilePengumpulanNavigasi extends StatefulWidget {
-  const FilePengumpulanNavigasi({super.key});
+import '../../../Praktikan/Dashboard/Navigasi/dashboardnav_praktikan.dart';
+import '../../Absensi Praktikum/Screen/absensi_praktikum_asisten.dart';
+import '../../Asistensi Laporan/Screen/asistensi_laporan_asisten.dart';
+import '../../Dashboard/Screen/dashboard_asisten.dart';
+import '../../File Pengumpulan/Screen/file_pengumpulan.dart';
+import '../../Jadwal Praktikum/jadwal_praktikum_asisten.dart';
+import '../Screen/hasil_studi_asisten.dart';
+
+class HasilStudiAsistenNav extends StatefulWidget {
+  const HasilStudiAsistenNav({super.key});
 
   @override
-  State<FilePengumpulanNavigasi> createState() =>
-      _FilePengumpulanNavigasiState();
+  State<HasilStudiAsistenNav> createState() => _HasilStudiAsistenNavState();
 }
 
-class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
+class _HasilStudiAsistenNavState extends State<HasilStudiAsistenNav> {
   late Widget currentPage;
-  String currentRole = 'Praktikan';
+  String currentRole = 'Asisten';
+
   @override
   void initState() {
     super.initState();
-    currentPage = const FilePengumpulanPraktikan();
+    currentPage = const HasilStudiAsistensi();
   }
 
   @override
@@ -40,7 +36,7 @@ class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
           return Row(
             children: [
               Container(
-                width: isWideScreen ? 210 : null,
+                width: isWideScreen ? 220 : null,
                 decoration: const BoxDecoration(
                   color: Color(0xFF031F31),
                 ),
@@ -106,18 +102,22 @@ class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
                                     ),
                                   );
                                 }).toList(),
-                                onChanged: (String? newValue) async {
+                                onChanged: (String? newValue) {
                                   setState(() {
                                     currentRole = newValue!;
+                                    if (currentRole == 'Asisten') {
+                                      currentPage = const DashboardAsisten();
+                                    } else {
+                                      //== Navigator Untuk Asisten ==//
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const DashboardNavigasiPraktikan(),
+                                        ),
+                                      );
+                                    }
                                   });
-                                  if (currentRole == 'Asisten') {
-                                    await _checkAsisten(context);
-                                  } else {
-                                    setState(() {
-                                      currentPage =
-                                          const DashboardPraktikanScreen();
-                                    });
-                                  }
                                 },
                               ),
                             ],
@@ -153,9 +153,21 @@ class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
                             icon: const Icon(
                               Icons.grid_view_outlined,
                             ),
-                            page: const DashboardPraktikanScreen(),
+                            page: const DashboardAsisten(),
                             updatePage: updatePage,
-                            isActive: currentPage is DashboardPraktikanScreen,
+                            isActive: currentPage is DashboardAsisten,
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          DashboardListTile(
+                            title: 'Jadwal Praktikum',
+                            icon: const Icon(
+                              Icons.calendar_month,
+                            ),
+                            page: const JadwalPraktikumAsisten(),
+                            updatePage: updatePage,
+                            isActive: currentPage is JadwalPraktikumAsisten,
                           ),
                           const SizedBox(
                             height: 15,
@@ -165,9 +177,10 @@ class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
                             icon: const Icon(
                               Icons.people,
                             ),
-                            page: const AbsensiPraktikumScreen(),
+                            page: const AbsensiPraktikumAsistenScreen(),
                             updatePage: updatePage,
-                            isActive: currentPage is AbsensiPraktikumScreen,
+                            isActive:
+                                currentPage is AbsensiPraktikumAsistenScreen,
                           ),
                           const SizedBox(
                             height: 15,
@@ -177,9 +190,9 @@ class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
                             icon: const Icon(
                               Icons.file_copy,
                             ),
-                            page: const FilePengumpulanPraktikan(),
+                            page: const FilePengumpulanScreen(),
                             updatePage: updatePage,
-                            isActive: currentPage is FilePengumpulanPraktikan,
+                            isActive: currentPage is FilePengumpulanScreen,
                           ),
                           const SizedBox(
                             height: 15,
@@ -189,9 +202,9 @@ class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
                             icon: const Icon(
                               Icons.archive,
                             ),
-                            page: const AsistensiPraktikanScreen(),
+                            page: const AsistensiLaporanScreen(),
                             updatePage: updatePage,
-                            isActive: currentPage is AsistensiPraktikanScreen,
+                            isActive: currentPage is AsistensiLaporanScreen,
                           ),
                           const SizedBox(
                             height: 15,
@@ -201,21 +214,9 @@ class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
                             icon: const Icon(
                               Icons.score,
                             ),
-                            page: const HasilStudiPraktikan(),
+                            page: const HasilStudiAsistensi(),
                             updatePage: updatePage,
-                            isActive: currentPage is HasilStudiPraktikan,
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          DashboardListTile(
-                            title: 'Settings',
-                            icon: const Icon(
-                              Icons.settings,
-                            ),
-                            page: const Pengaturan(),
-                            updatePage: updatePage,
-                            isActive: currentPage is Pengaturan,
+                            isActive: currentPage is HasilStudiAsistensi,
                           ),
                           const SizedBox(
                             height: 15,
@@ -233,108 +234,6 @@ class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
           );
         },
       ),
-    );
-  }
-
-  Future<void> _checkAsisten(BuildContext context) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      if (kDebugMode) {
-        print('User is logged in: ${user.uid}');
-      }
-      try {
-        // Ambil dokumen pengguna dari Firestore
-        final userDoc = await FirebaseFirestore.instance
-            .collection('akun_mahasiswa')
-            .doc(user.uid)
-            .get();
-
-        if (userDoc.exists) {
-          if (kDebugMode) {
-            print('User document exists.');
-          }
-          final nim = userDoc.data()?['nim']; // Ambil NIM dari dokumen pengguna
-          if (kDebugMode) {
-            print('NIM: $nim');
-          }
-
-          if (nim != null && nim is int) {
-            // Memeriksa apakah nim ada di koleksi akun_mahasiswa dan dataAsisten
-            final akunMahasiswaSnapshot = await FirebaseFirestore.instance
-                .collection('akun_mahasiswa')
-                .doc(user.uid)
-                .get();
-            final tokenAsistenSnapshot = await FirebaseFirestore.instance
-                .collection('dataAsisten')
-                .where('nim', isEqualTo: nim)
-                .get();
-
-            if (akunMahasiswaSnapshot.exists &&
-                tokenAsistenSnapshot.docs.isNotEmpty) {
-              if (kDebugMode) {
-                print('Both akunMahasiswa and tokenAsisten documents exist.');
-              }
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DasboardAsistenNavigasi(),
-                ),
-              );
-            } else {
-              if (kDebugMode) {
-                print('One or both of the documents do not exist.');
-              }
-              _showNotRegisteredDialog(context);
-            }
-          } else {
-            if (kDebugMode) {
-              print('NIM is null or not an integer.');
-            }
-            _showNotRegisteredDialog(context);
-          }
-        } else {
-          if (kDebugMode) {
-            print('User document does not exist.');
-          }
-          _showNotRegisteredDialog(context);
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error: $e');
-        }
-        _showNotRegisteredDialog(context);
-      }
-    } else {
-      if (kDebugMode) {
-        print('User is not logged in.');
-      }
-    }
-  }
-
-  void _showNotRegisteredDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Error'),
-          content: const Text('Anda tidak terdaftar sebagai asisten'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Memastikan bahwa setState dijalankan di dalam StatefulWidget
-                if (context is StatefulElement) {
-                  (context).state.setState(() {
-                    currentRole = 'Praktikan';
-                    currentPage = const DashboardPraktikanScreen();
-                  });
-                }
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
     );
   }
 

@@ -3,18 +3,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Form%20Komponen/Deskripsi/form_deskripsi.dart';
-import '../../../../Revisi Tampilan/Pengguna/Mahasiswa/Asisten/Dashboard/Komponen/Kelas Praktikum/Deskripsi Kelas/deskripsi_kelas_asisten.dart';
 
-class TabelKelasAsisten extends StatefulWidget {
-  const TabelKelasAsisten({Key? key}) : super(key: key);
+import '../Komponen/Praktikan/Screen/absensi_praktikan.dart';
+
+class TabelAbsensiPraktikumAsisten extends StatefulWidget {
+  const TabelAbsensiPraktikumAsisten({super.key});
 
   @override
-  State<TabelKelasAsisten> createState() => _TabelKelasAsistenState();
+  State<TabelAbsensiPraktikumAsisten> createState() =>
+      _TabelAbsensiPraktikumAsistenState();
 }
 
-class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
-  //== List Tabel ==//
+class _TabelAbsensiPraktikumAsistenState
+    extends State<TabelAbsensiPraktikumAsisten> {
+//== List Tabel ==//
   List<DataKelas> demoDataKelas = [];
   List<DataKelas> filteredDataKelas = [];
 
@@ -157,7 +159,7 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Kelas Praktikum',
+            child: Text('Data Absensi Praktikum',
                 style: GoogleFonts.quicksand(
                     fontSize: 18.0, fontWeight: FontWeight.bold)),
           ),
@@ -283,12 +285,6 @@ class _TabelKelasAsistenState extends State<TabelKelasAsisten> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
-                              DataColumn(
-                                label: Text(
-                                  "  Aksi",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
                             ],
                             source: DataSource(filteredDataKelas, context),
                             rowsPerPage:
@@ -362,7 +358,7 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                DeskripsiKelasAsisten(
+                AbsensiPraktikanScreen(
               kodeKelas: fileInfo.kode,
               mataKuliah: fileInfo.matkul,
             ),
@@ -389,20 +385,6 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
       DataCell(SizedBox(
           width: 220.0,
           child: Text(getLimitedText(fileInfo.dosenpengampu2, 30)))),
-      DataCell(IconButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => FormDeskripsiKelas(
-                      kodeKelas: fileInfo.kode, mataKuliah: fileInfo.matkul)));
-        },
-        icon: const Icon(
-          Icons.edit_document,
-          color: Colors.grey,
-        ),
-        tooltip: 'Tambah Data',
-      ))
     ],
   );
 }
