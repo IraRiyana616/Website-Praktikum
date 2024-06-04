@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../Komponen/Nilai Harian/nilai_akhir_asisten.dart';
+
 class TabelHasilStudiScreen extends StatefulWidget {
   const TabelHasilStudiScreen({super.key});
 
@@ -350,30 +352,30 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
                 style: TextStyle(
                     color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
           ), onTap: () {
-        // Navigator.push(
-        //   context,
-        //   PageRouteBuilder(
-        //     pageBuilder: (context, animation, secondaryAnimation) =>
-        //         LatihanAsistenScreen(
-        //       kodeKelas: fileInfo.kode,
-        //       mataKuliah: fileInfo.matkul,
-        //     ),
-        //     transitionsBuilder:
-        //         (context, animation, secondaryAnimation, child) {
-        //       const begin = Offset(0.0, 0.0);
-        //       const end = Offset.zero;
-        //       const curve = Curves.ease;
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                NilaiHarianScreen(
+              kodeKelas: fileInfo.kode,
+              matakuliah: fileInfo.matkul,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
 
-        //       var tween =
-        //           Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-        //       return SlideTransition(
-        //         position: animation.drive(tween),
-        //         child: child,
-        //       );
-        //     },
-        //   ),
-        // );
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       }),
       DataCell(SizedBox(
           width: 220.0,

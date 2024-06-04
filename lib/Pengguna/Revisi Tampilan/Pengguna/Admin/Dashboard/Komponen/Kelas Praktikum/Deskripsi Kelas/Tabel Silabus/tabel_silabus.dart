@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../../../../../Admin/Kelas/Komponen/Deskripsi/Modul/Latihan/latihan_admin.dart';
 import '../../../../../../../../Admin/Kelas/Komponen/Deskripsi/Modul/Tabel Silabus/Form Edit Tabel/form_edit_admin.dart';
 
 class TabelSilabusScreen extends StatefulWidget {
@@ -222,7 +223,41 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
     ),
     cells: [
       DataCell(
-        Text(getLimitedText(fileInfo.modul, 50)),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    PengumpulanLatihanAdmin(
+                  kodeKelas: fileInfo.kode,
+                  modul: fileInfo.modul,
+                ),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(0.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.ease;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+              ),
+            );
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: SizedBox(
+              width: 250.0,
+              child: Text(getLimitedText(fileInfo.modul, 50)),
+            ),
+          ),
+        ),
       ),
       DataCell(SizedBox(width: 170.0, child: Text(fileInfo.tanggal))),
       DataCell(SizedBox(width: 170.0, child: Text(fileInfo.jadwal))),

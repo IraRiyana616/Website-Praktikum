@@ -4,21 +4,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../Navigasi/absensinav_asisten.dart';
-import '../../Asisten/form_asisten.dart';
-import '../Tabel/tabel_absensi_praktikan.dart';
+import '../../../../Dashboard/Navigasi/dashboardnav_praktikan.dart';
+import '../../Screen/absenku_praktikan.dart';
+import '../Tabel/tabel_absen_praktikan.dart';
 
-class AbsensiPraktikanScreen extends StatefulWidget {
+class TabelAbsensiPraktikanScreen extends StatefulWidget {
   final String kodeKelas;
   final String mataKuliah;
-  const AbsensiPraktikanScreen(
+  const TabelAbsensiPraktikanScreen(
       {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
-  State<AbsensiPraktikanScreen> createState() => _AbsensiPraktikanScreenState();
+  State<TabelAbsensiPraktikanScreen> createState() =>
+      _TabelAbsensiPraktikanScreenState();
 }
 
-class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
+class _TabelAbsensiPraktikanScreenState
+    extends State<TabelAbsensiPraktikanScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   //== Fungsi Nama Mahasiswa ==//
@@ -60,7 +62,7 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
   }
 
   //Fungsi Untuk Bottom Navigation
-  int _selectedIndex = 0; // untuk mengatur index bottom navigation
+  int _selectedIndex = 1; // untuk mengatur index bottom navigation
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -70,7 +72,7 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                AbsensiPraktikanScreen(
+                AbsenkuPraktikan(
                     kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -93,7 +95,7 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                AbsensiAsistenScreen(
+                TabelAbsensiPraktikanScreen(
               kodeKelas: widget.kodeKelas,
               mataKuliah: widget.mataKuliah,
             ),
@@ -131,7 +133,7 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        const AbsensiPraktikumNavigasi(),
+                        const DashboardNavigasiPraktikan(),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       const begin = Offset(0.0, 0.0);
@@ -201,13 +203,12 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                       padding: const EdgeInsets.only(top: 15.0),
                       child: Center(
                         child: Container(
-                          constraints: const BoxConstraints(maxWidth: 1350.0),
+                          constraints: const BoxConstraints(maxWidth: 1300.0),
                           color: Colors.white,
                           child: Column(
                             children: [
                               TabelAbsensiPraktikan(
                                 kodeKelas: widget.kodeKelas,
-                                mataKuliah: widget.mataKuliah,
                               ),
                               const SizedBox(
                                 height: 30.0,
@@ -227,12 +228,12 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Praktikan',
+            icon: Icon(Icons.person),
+            label: 'Form Absensi',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Asisten',
+            icon: Icon(Icons.book),
+            label: 'Tabel Absensi',
           ),
         ],
         currentIndex: _selectedIndex,

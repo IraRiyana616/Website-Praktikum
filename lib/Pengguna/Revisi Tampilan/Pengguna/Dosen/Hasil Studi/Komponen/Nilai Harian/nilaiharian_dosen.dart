@@ -4,21 +4,21 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../Navigasi/absensinav_asisten.dart';
-import '../../Asisten/form_asisten.dart';
-import '../Tabel/tabel_absensi_praktikan.dart';
+import '../../../../../../Admin/Hasil Studi/Komponen/Nilai Harian/Tabel/tabel_nilai_harian_admin.dart';
+import '../../Screen/hasil_studi_dosen.dart';
+import '../Nilai Akhir/nilaiakhir_dosen.dart';
 
-class AbsensiPraktikanScreen extends StatefulWidget {
+class NilaiHarianDosenScreen extends StatefulWidget {
   final String kodeKelas;
   final String mataKuliah;
-  const AbsensiPraktikanScreen(
+  const NilaiHarianDosenScreen(
       {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
-  State<AbsensiPraktikanScreen> createState() => _AbsensiPraktikanScreenState();
+  State<NilaiHarianDosenScreen> createState() => _NilaiHarianDosenScreenState();
 }
 
-class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
+class _NilaiHarianDosenScreenState extends State<NilaiHarianDosenScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   //== Fungsi Nama Mahasiswa ==//
@@ -46,7 +46,7 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
   Future<void> _getNamaMahasiswa(String uid) async {
     try {
       DocumentSnapshot doc =
-          await _firestore.collection('akun_mahasiswa').doc(uid).get();
+          await _firestore.collection('akun_dosen').doc(uid).get();
       if (doc.exists) {
         setState(() {
           _namaMahasiswa = doc.get('nama');
@@ -54,7 +54,7 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching nama mahasiswa: $e');
+        print('Error fetching nama dosen: $e');
       }
     }
   }
@@ -70,8 +70,10 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                AbsensiPraktikanScreen(
-                    kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah),
+                NilaiHarianDosenScreen(
+              kodeKelas: widget.kodeKelas,
+              mataKuliah: widget.mataKuliah,
+            ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               const begin = Offset(0.0, 0.0);
@@ -93,7 +95,7 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                AbsensiAsistenScreen(
+                NilaiAkhirScreenDosen(
               kodeKelas: widget.kodeKelas,
               mataKuliah: widget.mataKuliah,
             ),
@@ -131,7 +133,7 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        const AbsensiPraktikumNavigasi(),
+                        const HasilStudiScreenDosen(),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       const begin = Offset(0.0, 0.0);
@@ -168,7 +170,6 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
                   )),
-                  const Spacer(),
                   if (screenWidth > 600) const SizedBox(width: 400.0),
                   if (_currentUser != null) ...[
                     Text(
@@ -198,22 +199,20 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
-                      child: Center(
-                        child: Container(
-                          constraints: const BoxConstraints(maxWidth: 1350.0),
-                          color: Colors.white,
-                          child: Column(
-                            children: [
-                              TabelAbsensiPraktikan(
-                                kodeKelas: widget.kodeKelas,
-                                mataKuliah: widget.mataKuliah,
-                              ),
-                              const SizedBox(
-                                height: 30.0,
-                              )
-                            ],
-                          ),
+                      padding: const EdgeInsets.only(
+                          left: 25.0, top: 15.0, right: 15.0),
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 1350.0),
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            TabelNilaiHarianAdmin(
+                              kodeKelas: widget.kodeKelas,
+                            ),
+                            const SizedBox(
+                              height: 30.0,
+                            )
+                          ],
                         ),
                       ),
                     ),
@@ -227,12 +226,12 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Praktikan',
+            icon: Icon(Icons.book),
+            label: 'Nilai Harian',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Asisten',
+            icon: Icon(Icons.task),
+            label: 'Nilai AKhir',
           ),
         ],
         currentIndex: _selectedIndex,

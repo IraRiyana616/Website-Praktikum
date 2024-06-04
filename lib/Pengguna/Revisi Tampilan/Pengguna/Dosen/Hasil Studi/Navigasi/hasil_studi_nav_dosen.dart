@@ -1,29 +1,29 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+
 import '../../../../../Dosen/Pengaturan/Screen/pengaturan_ds.dart';
 import '../../Absensi/Screen/absensi_dosen.dart';
 import '../../Asistensi Laporan/Screen/asisten_laporan_dosen.dart';
 import '../../Dashboard/Screen/dashboard_dosen.dart';
-import '../../Hasil Studi/Screen/hasil_studi_dosen.dart';
-import '../Screen/file_pengumpulan_dosen.dart';
+import '../../File Pengumpulan/Screen/file_pengumpulan_dosen.dart';
+import '../Screen/hasil_studi_dosen.dart';
 
-class FilePengumpulanDosenNavigasi extends StatefulWidget {
-  const FilePengumpulanDosenNavigasi({super.key});
+class HasilStudiNavigasiDosen extends StatefulWidget {
+  const HasilStudiNavigasiDosen({super.key});
 
   @override
-  State<FilePengumpulanDosenNavigasi> createState() =>
-      _FilePengumpulanDosenNavigasiState();
+  State<HasilStudiNavigasiDosen> createState() =>
+      _HasilStudiNavigasiDosenState();
 }
 
-class _FilePengumpulanDosenNavigasiState
-    extends State<FilePengumpulanDosenNavigasi> {
+class _HasilStudiNavigasiDosenState extends State<HasilStudiNavigasiDosen> {
   late Widget currentPage;
 
   @override
   void initState() {
     super.initState();
-    currentPage = const FilePengumpulanScreenDosen();
+    currentPage = const HasilStudiScreenDosen();
   }
 
   @override

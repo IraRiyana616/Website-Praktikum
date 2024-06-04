@@ -220,7 +220,7 @@ class _DataAsistenPraktikanScreenState
                                 ),
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                       const Padding(

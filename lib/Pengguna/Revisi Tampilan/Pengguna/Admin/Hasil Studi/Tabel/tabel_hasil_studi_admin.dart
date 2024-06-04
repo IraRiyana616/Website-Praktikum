@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../Komponen/Nilai Harian/nilai_harian.dart';
+
 class TabelHasilStudiAdmin extends StatefulWidget {
   const TabelHasilStudiAdmin({super.key});
 
@@ -258,28 +260,28 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
                 style: TextStyle(
                     color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
           ), onTap: () {
-        // Navigator.push(
-        //   context,
-        //   PageRouteBuilder(
-        //     pageBuilder: (context, animation, secondaryAnimation) =>
-        //         TugasAdminScreen(
-        //             kodeKelas: fileInfo.kelas, mataKuliah: fileInfo.matkul),
-        //     transitionsBuilder:
-        //         (context, animation, secondaryAnimation, child) {
-        //       const begin = Offset(0.0, 0.0);
-        //       const end = Offset.zero;
-        //       const curve = Curves.ease;
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                NilaiHarianScreen(
+                    kodeKelas: fileInfo.kelas, mataKuliah: fileInfo.matkul),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
 
-        //       var tween =
-        //           Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-        //       return SlideTransition(
-        //         position: animation.drive(tween),
-        //         child: child,
-        //       );
-        //     },
-        //   ),
-        // );
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       }),
       DataCell(
         SizedBox(

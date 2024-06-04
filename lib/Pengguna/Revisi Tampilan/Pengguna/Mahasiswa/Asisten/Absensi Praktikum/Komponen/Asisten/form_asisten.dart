@@ -5,24 +5,23 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../../../Dashboard/Navigasi/dashboardnav_praktikan.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Pengguna/Revisi%20Tampilan/Pengguna/Mahasiswa/Asisten/Absensi%20Praktikum/Komponen/Asisten/Tabel/tabel_asisten.dart';
+import '../../Navigasi/absensinav_asisten.dart';
+import '../Praktikan/Screen/absensi_praktikan.dart';
 
-import '../Tabel/Screen/tabel_absensi.dart';
-
-class AbsenkuPraktikan extends StatefulWidget {
+class AbsensiAsistenScreen extends StatefulWidget {
   final String kodeKelas;
   final String mataKuliah;
-
-  const AbsenkuPraktikan(
+  const AbsensiAsistenScreen(
       {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
-  State<AbsenkuPraktikan> createState() => _AbsenkuPraktikanState();
+  State<AbsensiAsistenScreen> createState() => _AbsensiAsistenScreenState();
 }
 
-class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
+class _AbsensiAsistenScreenState extends State<AbsensiAsistenScreen> {
   String? selectedModul;
   String selectedAbsen = 'Status Kehadiran';
   String selectedPertemuan = 'Pertemuan Praktikum';
@@ -104,7 +103,7 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
       try {
         final firebase_storage.Reference storageRef =
             firebase_storage.FirebaseStorage.instance.ref().child(
-                'absensiPraktikan/${widget.kodeKelas}/${widget.mataKuliah}/$fileName');
+                'absensiAsisten/${widget.kodeKelas}/${widget.mataKuliah}/$fileName');
 
         await storageRef.putData(file.bytes!);
 
@@ -130,7 +129,7 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
         return;
       }
 
-      await FirebaseFirestore.instance.collection('absensiMahasiswa').add({
+      await FirebaseFirestore.instance.collection('absensiAsisten').add({
         'namaFile': _fileName,
         'waktuAbsensi': DateTime.now(),
         'nim': userNim,
@@ -193,7 +192,7 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
   }
 
   //Fungsi Untuk Bottom Navigation
-  int _selectedIndex = 0; // untuk mengatur index bottom navigation
+  int _selectedIndex = 1; // untuk mengatur index bottom navigation
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -203,7 +202,7 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                AbsenkuPraktikan(
+                AbsensiPraktikanScreen(
                     kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -226,7 +225,7 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                TabelAbsensiPraktikanScreen(
+                AbsensiAsistenScreen(
               kodeKelas: widget.kodeKelas,
               mataKuliah: widget.mataKuliah,
             ),
@@ -266,7 +265,7 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        const DashboardNavigasiPraktikan(),
+                        const AbsensiPraktikumNavigasi(),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       const begin = Offset(0.0, 0.0);
@@ -639,6 +638,14 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
                                   )),
                             ),
                           ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 30.0, right: 30.0, top: 40.0),
+                            child: TabelAbsensiAsistenScreen(
+                              kodeKelas: widget.kodeKelas,
+                              mataKuliah: widget.mataKuliah,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -652,12 +659,12 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Form Absensi',
+            icon: Icon(Icons.people),
+            label: 'Praktikan',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'Tabel Absensi',
+            icon: Icon(Icons.person),
+            label: 'Asisten',
           ),
         ],
         currentIndex: _selectedIndex,

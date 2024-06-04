@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TabelAbsensiPraktikanScreenDosen extends StatefulWidget {
@@ -18,36 +17,8 @@ class TabelAbsensiPraktikanScreenDosen extends StatefulWidget {
 
 class _TabelAbsensiPraktikanScreenDosenState
     extends State<TabelAbsensiPraktikanScreenDosen> {
-  //== List Tabel ==//
   List<AbsensiMahasiswa> demoAbsensiMahasiswa = [];
   List<AbsensiMahasiswa> filteredAbsensiMahasiswa = [];
-  //== Search Komponen ==//
-  bool _isTextFieldNotEmpty = false;
-  final TextEditingController _textController = TextEditingController();
-  void _onTextChanged() {
-    setState(() {
-      _isTextFieldNotEmpty = _textController.text.isNotEmpty;
-      _filterData(_textController.text);
-    });
-  }
-
-  void filterData(String query) {
-    setState(() {
-      filteredAbsensiMahasiswa = demoAbsensiMahasiswa
-          .where((data) => (data.nama
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
-              data.nim.toString().toLowerCase().contains(query.toLowerCase())))
-          .toList();
-    });
-  }
-
-  void clearSearchField() {
-    setState(() {
-      _textController.clear();
-      filterData('');
-    });
-  }
 
   //Judul Materi
   String selectedModul = 'Judul Modul';
@@ -56,7 +27,7 @@ class _TabelAbsensiPraktikanScreenDosenState
   @override
   void initState() {
     super.initState();
-    _textController.addListener(_onTextChanged);
+    textController.addListener(_onTextChanged);
     _fetchDataFromFirestore();
   }
 
@@ -75,20 +46,24 @@ class _TabelAbsensiPraktikanScreenDosenState
           if (!availableModuls.contains(modul)) {
             availableModuls.add(modul);
           }
+          Timestamp? waktuAbsensiTimestamp =
+              data?['waktuAbsensi'] as Timestamp?;
+          DateTime waktuAbsensi = waktuAbsensiTimestamp != null
+              ? waktuAbsensiTimestamp.toDate()
+              : DateTime.now();
           return AbsensiMahasiswa(
-            kode: data?['kode'] ?? '',
-            nama: data?['nama'] ?? '',
-            nim: data?['nim'] ?? 0,
-            file: data?['namaFile'] ?? '',
-            modul: modul,
-            timestamp: (data?['timestamp'] as Timestamp).toDate(),
-            tanggal: data?['tanggal'] ?? '',
-            keterangan: data?['keterangan'] ?? '',
-          );
+              kode: data?['kodeKelas'] ?? '',
+              nama: data?['nama'] ?? '',
+              nim: data?['nim'] ?? 0,
+              modul: modul,
+              timestamp: waktuAbsensi,
+              matkul: data?['mataKuliah'] ?? '',
+              pertemuan: data?['pertemuan'] ?? '',
+              keterangan: data?['keterangan'] ?? '',
+              file: data?['namaFile'] ?? '');
         },
       ).toList();
-// Mengurutkan data berdasarkan nama secara ascending
-      absensiMahasiswaList.sort((a, b) => a.nama.compareTo(b.nama));
+
       setState(() {
         demoAbsensiMahasiswa = absensiMahasiswaList;
         filteredAbsensiMahasiswa = demoAbsensiMahasiswa;
@@ -115,97 +90,110 @@ class _TabelAbsensiPraktikanScreenDosenState
     }
   }
 
+  //== Fungsi Controller pada Search ==//
+  final TextEditingController textController = TextEditingController();
+  bool _isTextFieldNotEmpty = false;
+
+  //== Fungsi dari Filtering Search ==//
+  void filterData(String query) {
+    setState(() {
+      filteredAbsensiMahasiswa = demoAbsensiMahasiswa
+          .where((data) =>
+              (data.nama.toLowerCase().contains(query.toLowerCase()) ||
+                  data.keterangan.toLowerCase().contains(query.toLowerCase())))
+          .toList();
+    });
+  }
+
+  void clearSearchField() {
+    setState(() {
+      textController.clear();
+      filterData('');
+    });
+  }
+
   void _sortDataByName() {
     setState(() {
       filteredAbsensiMahasiswa.sort((a, b) => a.nama.compareTo(b.nama));
     });
   }
 
-  Color getRowColor(int index) {
-    // Define your conditions for different colors here
-    if (index % 2 == 0) {
-      return Colors.grey.shade200;
-    } else {
-      return Colors.transparent;
-    }
+  void _onTextChanged() {
+    setState(() {
+      _isTextFieldNotEmpty = textController.text.isNotEmpty;
+      filterData(textController.text);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    _sortDataByName();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 35.0, left: 35.0),
-          child: Text(
-            'Data Absensi Praktikum',
-            style: GoogleFonts.quicksand(
-                fontSize: 18.0, fontWeight: FontWeight.bold),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 35.0, top: 20.0),
-          child: Container(
-            height: 47.0,
-            width: 1235.0,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: DropdownButton<String>(
-              value: selectedModul,
-              onChanged: (modul) => _filterData(modul),
-              items:
-                  availableModuls.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 15.0),
-                    child: Text(value),
-                  ),
-                );
-              }).toList(),
-              style: const TextStyle(color: Colors.black),
-              icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
-              iconSize: 24,
-              elevation: 16,
-              isExpanded: true,
-              underline: Container(),
+    _sortDataByName(); // Panggil fungsi untuk mengurutkan data berdasarkan nama
+    return Container(
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 30.0, top: 35.0, right: 30.0),
+            child: Container(
+              height: 47.0,
+              width: 1300.0,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: DropdownButton<String>(
+                value: selectedModul,
+                onChanged: (modul) => _filterData(modul),
+                items: availableModuls
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 15.0),
+                      child: Text(value),
+                    ),
+                  );
+                }).toList(),
+                style: const TextStyle(color: Colors.black),
+                icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                iconSize: 24,
+                elevation: 16,
+                isExpanded: true,
+                underline: Container(),
+              ),
             ),
           ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            //== Text Search ==//
-            Padding(
-              padding: const EdgeInsets.only(top: 20.0, right: 40.0),
-              child: SizedBox(
-                width: 270.0,
-                height: 35.0,
-                child: Row(
-                  children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              //== Search ==//
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0, left: 1000.0),
+                child: SizedBox(
+                  width: 300.0,
+                  height: 35.0,
+                  child: Row(children: [
                     const Text(
                       'Search :',
-                      style: TextStyle(
-                          fontSize: 16.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16.0),
                     ),
                     const SizedBox(
-                      width: 10.0,
+                      width: 8.0,
                     ),
                     Expanded(
                         child: TextField(
                       onChanged: (value) {
                         filterData(value);
                       },
-                      controller: _textController,
+                      controller: textController,
                       decoration: InputDecoration(
                           hintText: '',
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5.0)),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
                           contentPadding: const EdgeInsets.symmetric(
-                              vertical: 0, horizontal: 10),
+                              vertical: 0, horizontal: 10.0),
                           suffixIcon: Visibility(
                               visible: _isTextFieldNotEmpty,
                               child: IconButton(
@@ -214,77 +202,80 @@ class _TabelAbsensiPraktikanScreenDosenState
                           labelStyle: const TextStyle(fontSize: 16.0),
                           filled: true,
                           fillColor: Colors.white),
-                    ))
-                  ],
+                    )),
+                    const SizedBox(
+                      width: 27.0,
+                    )
+                  ]),
                 ),
               ),
-            )
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 35.0, right: 35.0, top: 15.0),
-          child: SizedBox(
-            width: double.infinity,
-            child: filteredAbsensiMahasiswa.isNotEmpty
-                ? PaginatedDataTable(
-                    columnSpacing: 10,
-                    columns: const [
-                      DataColumn(
-                        label: Text(
-                          'Timestamp',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'NIM',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Nama',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Text(
-                          'Keterangan',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      DataColumn(
-                          label: Text(
-                        'Bukti Absensi',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      )),
-                    ],
-                    source: DataSource(filteredAbsensiMahasiswa),
-                    rowsPerPage:
-                        calculateRowsPerPage(filteredAbsensiMahasiswa.length),
-                  )
-                : const Center(
-                    child: Text(
-                      'No data available',
-                      style: TextStyle(
-                          fontSize: 16.0, fontWeight: FontWeight.bold),
-                    ),
-                  ),
+            ],
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.only(left: 30.0, right: 30.0, top: 25.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: filteredAbsensiMahasiswa.isNotEmpty
+                  ? PaginatedDataTable(
+                      columnSpacing: 10,
+                      columns: const [
+                        DataColumn(
+                          label: Text(
+                            'Timestamp',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'NIM',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Nama',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Keterangan',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                            label: Text(
+                          'Bukti Foto',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ))
+                      ],
+                      source: DataSource(filteredAbsensiMahasiswa),
+                      rowsPerPage:
+                          calculateRowsPerPage(filteredAbsensiMahasiswa.length),
+                    )
+                  : const Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 30.0),
+                        child: Text(
+                          'No data available',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 25; // Set your default value here
+    const int defaultRowsPerPage = 25;
 
-    if (rowCount <= defaultRowsPerPage) {
-      return rowCount;
-    } else {
-      // You can adjust this logic based on your requirements
-      return defaultRowsPerPage;
-    }
+    return rowCount <= defaultRowsPerPage ? rowCount : defaultRowsPerPage;
   }
 }
 
@@ -294,20 +285,21 @@ class AbsensiMahasiswa {
   final int nim;
   final String modul;
   final DateTime timestamp;
-  final String file;
-  final String tanggal;
+  final String matkul;
   final String keterangan;
+  final String file;
+  final String pertemuan;
 
-  AbsensiMahasiswa({
-    required this.kode,
-    required this.nama,
-    required this.nim,
-    required this.modul,
-    required this.timestamp,
-    required this.file,
-    required this.tanggal,
-    required this.keterangan,
-  });
+  AbsensiMahasiswa(
+      {required this.kode,
+      required this.file,
+      required this.nama,
+      required this.nim,
+      required this.modul,
+      required this.timestamp,
+      required this.matkul,
+      required this.keterangan,
+      required this.pertemuan});
 }
 
 DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
@@ -321,7 +313,8 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
       DataCell(
         SizedBox(
           width: 140.0,
-          child: Text(getLimitedText(fileInfo.timestamp.toString(), 19)),
+          child: Text(getLimitedText(
+              fileInfo.timestamp.toString(), 19)), // Menggunakan timestamp
         ),
       ),
       DataCell(SizedBox(width: 80.0, child: Text(fileInfo.nim.toString()))),
@@ -332,67 +325,55 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
         ),
       ),
       DataCell(Text(fileInfo.keterangan)),
-      DataCell(
-        Row(
-          children: [
-            const Icon(
-              Icons.download,
-              color: Colors.grey,
+      DataCell(Row(
+        children: [
+          const Icon(
+            Icons.download,
+            color: Colors.grey,
+          ),
+          GestureDetector(
+            onTap: () => downloadFile(
+              fileInfo.kode,
+              fileInfo.file,
+              fileInfo.nim,
             ),
-            const SizedBox(
-              width: 5.0,
-            ),
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () {
-                  downloadFile(fileInfo.kode, fileInfo.file, fileInfo.nim);
-                },
-                child: const Text(
-                  'Download',
-                  style: TextStyle(
-                      color: Colors.blue, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+            child: const MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 5.0),
+                  child: Text(
+                    'Download',
+                    style: TextStyle(
+                        color: Colors.blue, fontWeight: FontWeight.bold),
+                  ),
+                )),
+          )
+        ],
+      ))
     ],
   );
 }
 
-//== Fungsi Download File ==//
-void downloadFile(String kodeKelas, String fileName, int userNim) async {
-  if (kodeKelas.isEmpty) {
-    if (kDebugMode) {
-      print('Error: kodeKelas is null or empty.');
-    }
-    return;
-  }
-
-  // Membuat referensi ke file di Firebase Storage
+Future<void> downloadFile(String kodeKelas, String fileName, int nim) async {
   final ref = FirebaseStorage.instance
       .ref()
-      .child('Absensi Mahasiswa/$kodeKelas/$userNim/$fileName');
+      .child('$kodeKelas/Absensi Mahasiswa/$nim/$fileName');
 
   try {
     final url = await ref.getDownloadURL();
-
-    // Logging the URL for debugging purposes
-    if (kDebugMode) {
-      print('Download URL: $url');
-    }
-
-    // Checking if URL can be launched and launching it
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
+    // ignore: deprecated_member_use
+    if (await canLaunch(url)) {
+      // ignore: deprecated_member_use
+      await launch(url);
     } else {
       throw 'Could not launch $url';
     }
   } catch (e) {
     if (kDebugMode) {
-      print('Error downloading file: $e');
+      if (kDebugMode) {
+        print('Error downloading file: $e');
+      }
+      print('Tried path: $kodeKelas/Absensi Mahasiswa/$nim/$fileName');
     }
   }
 }

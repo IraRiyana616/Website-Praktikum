@@ -44,13 +44,19 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
           if (!availableModuls.contains(modul)) {
             availableModuls.add(modul);
           }
+          Timestamp? waktuAbsensiTimestamp =
+              data?['waktuAbsensi'] as Timestamp?;
+          DateTime waktuAbsensi = waktuAbsensiTimestamp != null
+              ? waktuAbsensiTimestamp.toDate()
+              : DateTime.now();
           return AbsensiMahasiswa(
-              kode: data?['kode'] ?? '',
+              kode: data?['kodeKelas'] ?? '',
               nama: data?['nama'] ?? '',
               nim: data?['nim'] ?? 0,
               modul: modul,
-              timestamp: (data?['timestamp'] as Timestamp).toDate(),
-              tanggal: data?['tanggal'] ?? '',
+              timestamp: waktuAbsensi,
+              matkul: data?['mataKuliah'] ?? '',
+              pertemuan: data?['pertemuan'] ?? '',
               keterangan: data?['keterangan'] ?? '',
               file: data?['namaFile'] ?? '');
         },
@@ -129,7 +135,7 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
             padding: const EdgeInsets.only(left: 30.0, top: 35.0, right: 30.0),
             child: Container(
               height: 47.0,
-              width: 1195.0,
+              width: 1300.0,
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(8.0),
@@ -161,7 +167,7 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
             children: [
               //== Search ==//
               Padding(
-                padding: const EdgeInsets.only(top: 20.0, left: 945.0),
+                padding: const EdgeInsets.only(top: 20.0, left: 1040.0),
                 child: SizedBox(
                   width: 300.0,
                   height: 35.0,
@@ -277,20 +283,21 @@ class AbsensiMahasiswa {
   final int nim;
   final String modul;
   final DateTime timestamp;
-  final String tanggal;
+  final String matkul;
   final String keterangan;
   final String file;
+  final String pertemuan;
 
-  AbsensiMahasiswa({
-    required this.kode,
-    required this.file,
-    required this.nama,
-    required this.nim,
-    required this.modul,
-    required this.timestamp,
-    required this.tanggal,
-    required this.keterangan,
-  });
+  AbsensiMahasiswa(
+      {required this.kode,
+      required this.file,
+      required this.nama,
+      required this.nim,
+      required this.modul,
+      required this.timestamp,
+      required this.matkul,
+      required this.keterangan,
+      required this.pertemuan});
 }
 
 DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {

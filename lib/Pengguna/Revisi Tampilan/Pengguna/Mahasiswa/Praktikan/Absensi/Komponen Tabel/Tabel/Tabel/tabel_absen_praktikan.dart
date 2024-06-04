@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class TabelAbsensiPraktikan extends StatefulWidget {
   final String kodeKelas;
-  const TabelAbsensiPraktikan({super.key, required this.kodeKelas});
+  const TabelAbsensiPraktikan({Key? key, required this.kodeKelas})
+      : super(key: key);
 
   @override
   State<TabelAbsensiPraktikan> createState() => _TabelAbsensiPraktikanState();
@@ -13,11 +15,13 @@ class TabelAbsensiPraktikan extends StatefulWidget {
 class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
   List<AbsensiPraktikan> demoAbsensiPraktikan = [];
   List<AbsensiPraktikan> filteredAbsensiPraktikan = [];
+
   int nim = 0;
 
   @override
   void initState() {
     super.initState();
+    textController.addListener(_onTextChanged);
     fetchData();
   }
 
@@ -45,15 +49,51 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
             nama: data['nama'] ?? '',
             nim: data['nim'] ?? 0,
             modul: data['judulMateri'] ?? '',
-            tanggal: data['tanggal'] ?? '',
-            timestap: (data['timestamp'] as Timestamp).toDate(),
+            timestap: (data['waktuAbsensi'] as Timestamp).toDate(),
             keterangan: data['keterangan'] ?? '',
+            file: data['namaFile'] ?? '',
+            matakuliah: data['mataKuliah'] ?? '',
+            pertemuan: data['pertemuan'] ?? '',
           );
         }).toList();
 
         filteredAbsensiPraktikan = List.from(demoAbsensiPraktikan);
       });
+
+      // Print hasil fetch data
+      if (kDebugMode) {
+        print('Fetched data: $filteredAbsensiPraktikan');
+      }
     }
+  }
+
+  //== Fungsi Controller pada Search ==//
+  final TextEditingController textController = TextEditingController();
+  bool _isTextFieldNotEmpty = false;
+
+  //== Fungsi dari Filtering Search ==//
+  void filterData(String query) {
+    setState(() {
+      filteredAbsensiPraktikan = demoAbsensiPraktikan
+          .where((data) =>
+              (data.modul.toLowerCase().contains(query.toLowerCase()) ||
+                  data.pertemuan.toLowerCase().contains(query.toLowerCase())))
+          .toList();
+    });
+  }
+
+  void clearSearchField() {
+    setState(() {
+      textController.clear();
+      filterData('');
+    });
+  }
+
+  void _onTextChanged() {
+    setState(() {
+      _isTextFieldNotEmpty = textController.text.isNotEmpty;
+      filterData(textController.text);
+    });
   }
 
   @override
@@ -63,9 +103,56 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              //== Search ==//
+              Padding(
+                padding: const EdgeInsets.only(top: 40.0, right: 10.0),
+                child: SizedBox(
+                  width: 300.0,
+                  height: 35.0,
+                  child: Row(children: [
+                    const Text(
+                      'Search :',
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                    const SizedBox(
+                      width: 8.0,
+                    ),
+                    Expanded(
+                        child: TextField(
+                      onChanged: (value) {
+                        filterData(value);
+                      },
+                      controller: textController,
+                      decoration: InputDecoration(
+                          hintText: '',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 0, horizontal: 10.0),
+                          suffixIcon: Visibility(
+                              visible: _isTextFieldNotEmpty,
+                              child: IconButton(
+                                  onPressed: clearSearchField,
+                                  icon: const Icon(Icons.clear))),
+                          labelStyle: const TextStyle(fontSize: 16.0),
+                          filled: true,
+                          fillColor: Colors.white),
+                    )),
+                    const SizedBox(
+                      width: 27.0,
+                    )
+                  ]),
+                ),
+              ),
+            ],
+          ),
           Padding(
-            padding:
-                const EdgeInsets.only(left: 70.0, right: 100.0, bottom: 20.0),
+            padding: const EdgeInsets.only(
+                left: 30.0, right: 30.0, bottom: 20.0, top: 30.0),
             child: SizedBox(
               width: double.infinity,
               child: filteredAbsensiPraktikan.isNotEmpty
@@ -81,6 +168,12 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
                         DataColumn(
                           label: Text(
                             'Judul Modul',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Pertemuan',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -127,8 +220,10 @@ class AbsensiPraktikan {
   final int nim;
   final String modul;
   final DateTime timestap;
-  final String tanggal;
   final String keterangan;
+  final String file;
+  final String matakuliah;
+  final String pertemuan;
 
   AbsensiPraktikan({
     required this.kode,
@@ -136,8 +231,10 @@ class AbsensiPraktikan {
     required this.nim,
     required this.modul,
     required this.timestap,
-    required this.tanggal,
     required this.keterangan,
+    required this.file,
+    required this.matakuliah,
+    required this.pertemuan,
   });
 }
 
@@ -159,6 +256,12 @@ DataRow dataFileDataRow(AbsensiPraktikan fileInfo, int index) {
         SizedBox(
           width: 250.0,
           child: Text(getLimitedText(fileInfo.modul, 25)),
+        ),
+      ),
+      DataCell(
+        SizedBox(
+          width: 250.0,
+          child: Text(getLimitedText(fileInfo.pertemuan, 25)),
         ),
       ),
       DataCell(Text(fileInfo.keterangan)),

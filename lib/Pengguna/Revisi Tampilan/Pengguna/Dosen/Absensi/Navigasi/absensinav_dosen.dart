@@ -1,11 +1,11 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-import '../../../../../Admin/Hasil Studi/Screen/hasil_studi_admin.dart';
 import '../../../../../Dosen/Pengaturan/Screen/pengaturan_ds.dart';
 import '../../Asistensi Laporan/Screen/asisten_laporan_dosen.dart';
 import '../../Dashboard/Screen/dashboard_dosen.dart';
 import '../../File Pengumpulan/Screen/file_pengumpulan_dosen.dart';
+import '../../Hasil Studi/Screen/hasil_studi_dosen.dart';
 import '../Screen/absensi_dosen.dart';
 
 class AbsensiNavigasiDosen extends StatefulWidget {
@@ -126,9 +126,9 @@ class _AbsensiNavigasiDosenState extends State<AbsensiNavigasiDosen> {
                             icon: const Icon(
                               Icons.score,
                             ),
-                            page: const HasilStudiAdmin(),
+                            page: const HasilStudiScreenDosen(),
                             updatePage: updatePage,
-                            isActive: currentPage is HasilStudiAdmin,
+                            isActive: currentPage is HasilStudiScreenDosen,
                           ),
                           const SizedBox(
                             height: 15,
