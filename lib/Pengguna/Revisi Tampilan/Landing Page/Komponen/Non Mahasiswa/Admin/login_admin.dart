@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../Pengguna/Admin/Dashboard/Navigasi/dasboardnav_admin.dart';
-import '../../../../Routes/routes.dart';
 
 class LoginAdmin extends StatefulWidget {
   const LoginAdmin({Key? key}) : super(key: key);
@@ -19,9 +18,6 @@ class _LoginAdminState extends State<LoginAdmin> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  //== Authentikasi Service ==//
-  final authService = AuthService();
 
   //== Password ==//
   bool _obscurePassword = true;
@@ -180,15 +176,12 @@ class _LoginAdminState extends State<LoginAdmin> {
                                               print(
                                                   'User signed in:${userCredential.user?.email}');
                                             }
-                                            await authService
-                                                .login(); // Await login to ensure it's completed
-                                            if (mounted) {
-                                              Navigator.pushReplacement(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const DashboardNavigasiAdmin()));
-                                            }
+                                            // ignore: use_build_context_synchronously
+                                            Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const DashboardNavigasiAdmin()));
                                           } else {
                                             if (kDebugMode) {
                                               print(

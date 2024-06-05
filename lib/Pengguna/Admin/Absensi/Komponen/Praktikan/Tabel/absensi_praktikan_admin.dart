@@ -76,13 +76,14 @@ class _TabelAbsensiPraktikanAdminState
             availableModuls.add(modul);
           }
           return AbsensiMahasiswa(
-            kode: data?['kode'] ?? '',
+            kode: data?['kodeKelas'] ?? '',
             nama: data?['nama'] ?? '',
             nim: data?['nim'] ?? 0,
             file: data?['namaFile'] ?? '',
             modul: modul,
-            timestamp: (data?['timestamp'] as Timestamp).toDate(),
-            tanggal: data?['tanggal'] ?? '',
+            timestamp: (data?['waktuAbsensi'] as Timestamp).toDate(),
+            matakuliah: data?['mataKuliah'] ?? '',
+            pertemuan: data?['pertemuan'] ?? '',
             keterangan: data?['keterangan'] ?? '',
           );
         },
@@ -254,6 +255,12 @@ class _TabelAbsensiPraktikanAdminState
                         ),
                       ),
                       DataColumn(
+                        label: Text(
+                          'Pertemuan',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      DataColumn(
                           label: Text(
                         'Bukti Absensi',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -301,7 +308,8 @@ class AbsensiMahasiswa {
   final String modul;
   final DateTime timestamp;
   final String file;
-  final String tanggal;
+  final String matakuliah;
+  final String pertemuan;
   final String keterangan;
 
   AbsensiMahasiswa({
@@ -311,7 +319,8 @@ class AbsensiMahasiswa {
     required this.modul,
     required this.timestamp,
     required this.file,
-    required this.tanggal,
+    required this.matakuliah,
+    required this.pertemuan,
     required this.keterangan,
   });
 }
@@ -338,6 +347,7 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
         ),
       ),
       DataCell(Text(fileInfo.keterangan)),
+      DataCell(Text(fileInfo.pertemuan)),
       DataCell(
         Row(
           children: [
@@ -352,7 +362,11 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 onTap: () {
-                  downloadFile(fileInfo.kode, fileInfo.file, fileInfo.nim);
+                  downloadFile(
+                    fileInfo.kode,
+                    fileInfo.matakuliah,
+                    fileInfo.file,
+                  );
                 },
                 child: const Text(
                   'Download',
@@ -377,30 +391,17 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
 }
 
 //== Fungsi Download File ==//
-void downloadFile(String kodeKelas, String fileName, int userNim) async {
-  if (kodeKelas.isEmpty) {
-    if (kDebugMode) {
-      print('Error: kodeKelas is null or empty.');
-    }
-    return;
-  }
-
-  // Membuat referensi ke file di Firebase Storage
+void downloadFile(String kodeKelas, String matakuliah, String fileName) async {
   final ref = FirebaseStorage.instance
       .ref()
-      .child('Absensi Mahasiswa/$kodeKelas/$userNim/$fileName');
+      .child('absensiPraktikan/$kodeKelas/$matakuliah/$fileName');
 
   try {
     final url = await ref.getDownloadURL();
-
-    // Logging the URL for debugging purposes
-    if (kDebugMode) {
-      print('Download URL: $url');
-    }
-
-    // Checking if URL can be launched and launching it
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
+    // ignore: deprecated_member_use
+    if (await canLaunch(url)) {
+      // ignore: deprecated_member_use
+      await launch(url);
     } else {
       throw 'Could not launch $url';
     }

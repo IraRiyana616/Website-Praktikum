@@ -392,7 +392,6 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
                   AbsensiPraktikanScreenDosen(
                 kodeKelas: fileInfo.kelas,
                 mataKuliah: fileInfo.matkul,
-                kodeAsisten: fileInfo.asisten,
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {

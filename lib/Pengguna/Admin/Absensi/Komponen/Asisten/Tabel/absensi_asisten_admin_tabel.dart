@@ -1,13 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TabelAbsensiAsistenAdmin extends StatefulWidget {
-  final String kodeAsisten;
+  final String kodeKelas;
   final String mataKuliah;
   const TabelAbsensiAsistenAdmin(
-      {super.key, required this.kodeAsisten, required this.mataKuliah});
+      {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
   State<TabelAbsensiAsistenAdmin> createState() =>
@@ -34,7 +36,7 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
           await FirebaseFirestore.instance
               .collection('absensiAsisten')
-              .where('kodeAsisten', isEqualTo: widget.kodeAsisten)
+              .where('kodeKelas', isEqualTo: widget.kodeKelas)
               .get();
 
       List<AbsensiMahasiswa> absensiMahasiswaList = [];
@@ -46,12 +48,13 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
           availableModuls.add(modul);
         }
         absensiMahasiswaList.add(AbsensiMahasiswa(
-          kode: data?['kodeAsisten'] ?? '',
+          kode: data?['kodeKelas'] ?? '',
           nama: data?['nama'] ?? '',
           nim: data?['nim'] ?? 0,
           modul: modul,
-          timestamp: (data?['timestamp'] as Timestamp).toDate(),
-          tanggal: data?['tanggal'] ?? '',
+          timestamp: (data?['waktuAbsensi'] as Timestamp).toDate(),
+          matakuliah: data?['mataKuliah'] ?? '',
+          pertemuan: data?['pertemuan'] ?? '',
           keterangan: data?['keterangan'] ?? '',
           file: data?['namaFile'] ?? '',
         ));
@@ -253,6 +256,12 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
                         ),
                       ),
                       DataColumn(
+                        label: Text(
+                          'Pertemuan',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      DataColumn(
                           label: Text(
                         'Bukti Absensi',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -299,7 +308,8 @@ class AbsensiMahasiswa {
   final int nim;
   final String modul;
   final DateTime timestamp;
-  final String tanggal;
+  final String matakuliah;
+  final String pertemuan;
   final String keterangan;
   final String file;
 
@@ -310,7 +320,8 @@ class AbsensiMahasiswa {
     required this.nim,
     required this.modul,
     required this.timestamp,
-    required this.tanggal,
+    required this.matakuliah,
+    required this.pertemuan,
     required this.keterangan,
   });
 }
@@ -338,6 +349,7 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
         ),
       ),
       DataCell(Text(fileInfo.keterangan)),
+      DataCell(Text(fileInfo.pertemuan)),
       DataCell(
         Row(
           children: [
@@ -352,7 +364,11 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 onTap: () {
-                  // downloadFile(fileInfo.kode, fileInfo.file, fileInfo.nim);
+                  downloadFile(
+                    fileInfo.kode,
+                    fileInfo.matakuliah,
+                    fileInfo.file,
+                  );
                 },
                 child: const Text(
                   'Download',
@@ -374,6 +390,27 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
       ))
     ],
   );
+}
+
+void downloadFile(String kodeKelas, String matakuliah, String fileName) async {
+  final ref = FirebaseStorage.instance
+      .ref()
+      .child('absensiAsisten/$kodeKelas/$matakuliah/$fileName');
+
+  try {
+    final url = await ref.getDownloadURL();
+    // ignore: deprecated_member_use
+    if (await canLaunch(url)) {
+      // ignore: deprecated_member_use
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error downloading file: $e');
+    }
+  }
 }
 
 String getLimitedText(String text, int limit) {

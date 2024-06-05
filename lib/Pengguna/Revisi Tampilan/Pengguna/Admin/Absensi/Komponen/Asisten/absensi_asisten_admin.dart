@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../../Admin/Absensi/Komponen/Asisten/Tabel/absensi_asisten_admin_tabel.dart';
+import '../../Navigasi/absensinav_admin.dart';
 import '../Praktikan/absensi_praktikan.dart';
 
 class AbsensiAsistenScreen extends StatefulWidget {
@@ -90,8 +91,27 @@ class _AbsensiAsistenScreenState extends State<AbsensiAsistenScreen> {
             automaticallyImplyLeading: false,
             leading: IconButton(
               onPressed: () {
-                Navigator.pushReplacementNamed(
-                    context, '/data-absensi-praktikum');
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const AbsensiPraktikumNav(),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(0.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                  ),
+                );
               },
               icon: const Icon(
                 Icons.arrow_back,
@@ -149,7 +169,7 @@ class _AbsensiAsistenScreenState extends State<AbsensiAsistenScreen> {
                         child: Column(
                           children: [
                             TabelAbsensiAsistenAdmin(
-                              kodeAsisten: widget.kodeAsisten,
+                              kodeKelas: widget.kodeKelas,
                               mataKuliah: widget.mataKuliah,
                             ),
                             const SizedBox(

@@ -139,7 +139,7 @@ class _AbsensiAsistenAdminState extends State<AbsensiAsistenAdmin> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TabelAbsensiAsistenAdmin(
-                        kodeAsisten: widget.kodeAsisten,
+                        kodeKelas: widget.kodeKelas,
                         mataKuliah: widget.mataKuliah,
                       ),
                       const SizedBox(

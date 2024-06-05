@@ -125,11 +125,31 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
 
   Future<void> saveDataToFirestore() async {
     try {
-      if (selectedModul == null) {
-        _showSnackbar('Pilih modul praktikum terlebih dahulu', Colors.red);
+      if (selectedModul!.isEmpty ||
+          selectedAbsen.isEmpty ||
+          selectedPertemuan.isEmpty) {
+        _showSnackbar('Harap lengkapi semua field', Colors.red);
         return;
       }
 
+      // Cek apakah data sudah ada
+      QuerySnapshot<Map<String, dynamic>> existingData = await FirebaseFirestore
+          .instance
+          .collection('absensiMahasiswa')
+          .where('nim', isEqualTo: userNim)
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
+          .where('mataKuliah', isEqualTo: widget.mataKuliah)
+          .where('judulMateri', isEqualTo: selectedModul)
+          .limit(1)
+          .get();
+
+      if (existingData.docs.isNotEmpty) {
+        _showSnackbar(
+            'Data sudah ada, absensi hanya dapat dilakukan sekali', Colors.red);
+        return;
+      }
+
+      // Jika data belum ada, simpan data ke Firestore
       await FirebaseFirestore.instance.collection('absensiMahasiswa').add({
         'namaFile': _fileName,
         'waktuAbsensi': DateTime.now(),
@@ -418,7 +438,7 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
                                         items: modulItems,
                                         onChanged: (newValue) {
                                           setState(() {
-                                            selectedModul = newValue;
+                                            selectedModul = newValue!;
                                           });
                                         },
                                         isExpanded: true,

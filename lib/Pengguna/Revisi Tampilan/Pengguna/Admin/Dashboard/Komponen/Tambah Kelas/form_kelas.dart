@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../Navigasi/dasboardnav_admin.dart';
+
 class FormDataKelas extends StatefulWidget {
   const FormDataKelas({Key? key}) : super(key: key);
 
@@ -101,7 +103,27 @@ class _FormDataKelasState extends State<FormDataKelas> {
         child: AppBar(
           leading: IconButton(
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/dashboard');
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const DashboardNavigasiAdmin(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ),
+              );
             },
             icon: const Icon(
               Icons.arrow_back,

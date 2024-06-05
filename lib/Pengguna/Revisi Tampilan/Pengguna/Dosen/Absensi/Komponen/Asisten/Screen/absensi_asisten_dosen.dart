@@ -9,14 +9,10 @@ import '../../Praktikan/Screen/absensi_praktikan_dosen.dart';
 import '../Tabel/tabel_absensi_asisten_dosen.dart';
 
 class AbsensiAsistenScreenDosen extends StatefulWidget {
-  final String kodeAsisten;
   final String kodeKelas;
   final String mataKuliah;
   const AbsensiAsistenScreenDosen(
-      {super.key,
-      required this.kodeAsisten,
-      required this.mataKuliah,
-      required this.kodeKelas});
+      {super.key, required this.mataKuliah, required this.kodeKelas});
 
   @override
   State<AbsensiAsistenScreenDosen> createState() =>
@@ -38,7 +34,6 @@ class _AbsensiAsistenScreenDosenState extends State<AbsensiAsistenScreenDosen> {
                 AbsensiPraktikanScreenDosen(
               kodeKelas: widget.kodeKelas,
               mataKuliah: widget.mataKuliah,
-              kodeAsisten: widget.kodeAsisten,
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -63,7 +58,6 @@ class _AbsensiAsistenScreenDosenState extends State<AbsensiAsistenScreenDosen> {
             pageBuilder: (context, animation, secondaryAnimation) =>
                 AbsensiAsistenScreenDosen(
               mataKuliah: widget.mataKuliah,
-              kodeAsisten: widget.kodeAsisten,
               kodeKelas: widget.kodeKelas,
             ),
             transitionsBuilder:
@@ -214,7 +208,7 @@ class _AbsensiAsistenScreenDosenState extends State<AbsensiAsistenScreenDosen> {
                         child: Column(
                           children: [
                             TabelAbsensiAsistenScreenDosen(
-                              kodeAsisten: widget.kodeAsisten,
+                              kodeKelas: widget.kodeKelas,
                               mataKuliah: widget.mataKuliah,
                             ),
                             const SizedBox(

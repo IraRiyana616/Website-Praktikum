@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../../Admin/Absensi/Komponen/Praktikan/Tabel/absensi_praktikan_admin.dart';
+import '../../Navigasi/absensinav_admin.dart';
 import '../Asisten/absensi_asisten_admin.dart';
 
 class AbsensiPraktikanScreen extends StatefulWidget {
@@ -89,8 +90,27 @@ class _AbsensiPraktikanScreenState extends State<AbsensiPraktikanScreen> {
             automaticallyImplyLeading: false,
             leading: IconButton(
               onPressed: () {
-                Navigator.pushReplacementNamed(
-                    context, '/data-absensi-praktikum');
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const AbsensiPraktikumNav(),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(0.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                  ),
+                );
               },
               icon: const Icon(
                 Icons.arrow_back,

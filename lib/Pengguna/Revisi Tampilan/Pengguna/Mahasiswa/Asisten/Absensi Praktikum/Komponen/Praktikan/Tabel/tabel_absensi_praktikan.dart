@@ -243,6 +243,11 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
                         ),
                         DataColumn(
                             label: Text(
+                          'Pertemuan',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                        DataColumn(
+                            label: Text(
                           'Bukti Foto',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ))
@@ -323,6 +328,7 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
         ),
       ),
       DataCell(Text(fileInfo.keterangan)),
+      DataCell(Text(fileInfo.pertemuan)),
       DataCell(Row(
         children: [
           const Icon(
@@ -330,11 +336,13 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
             color: Colors.grey,
           ),
           GestureDetector(
-            onTap: () => downloadFile(
-              fileInfo.kode,
-              fileInfo.file,
-              fileInfo.nim,
-            ),
+            onTap: () {
+              downloadFile(
+                fileInfo.kode,
+                fileInfo.matkul,
+                fileInfo.file,
+              );
+            },
             child: const MouseRegion(
                 cursor: SystemMouseCursors.click,
                 child: Padding(
@@ -352,10 +360,11 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
   );
 }
 
-Future<void> downloadFile(String kodeKelas, String fileName, int nim) async {
+//== Fungsi Download File ==//
+void downloadFile(String kodeKelas, String matakuliah, String fileName) async {
   final ref = FirebaseStorage.instance
       .ref()
-      .child('$kodeKelas/Absensi Mahasiswa/$nim/$fileName');
+      .child('absensiPraktikan/$kodeKelas/$matakuliah/$fileName');
 
   try {
     final url = await ref.getDownloadURL();
@@ -368,10 +377,7 @@ Future<void> downloadFile(String kodeKelas, String fileName, int nim) async {
     }
   } catch (e) {
     if (kDebugMode) {
-      if (kDebugMode) {
-        print('Error downloading file: $e');
-      }
-      print('Tried path: $kodeKelas/Absensi Mahasiswa/$nim/$fileName');
+      print('Error downloading file: $e');
     }
   }
 }
