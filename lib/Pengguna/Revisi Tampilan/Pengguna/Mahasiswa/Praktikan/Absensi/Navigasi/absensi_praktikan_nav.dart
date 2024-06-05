@@ -27,7 +27,7 @@ class _AbsensiPraktikanNavigasiState extends State<AbsensiPraktikanNavigasi> {
   @override
   void initState() {
     super.initState();
-    currentPage = const AsistensiPraktikanScreen();
+    currentPage = const AbsensiPraktikumScreen();
   }
 
   @override

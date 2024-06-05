@@ -481,7 +481,7 @@ class _NilaiAkhirScreenState extends State<NilaiAkhirScreen> {
                 height: 20.0,
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 25.0, right: 45.0),
+                padding: const EdgeInsets.only(left: 25.0, right: 25.0),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,

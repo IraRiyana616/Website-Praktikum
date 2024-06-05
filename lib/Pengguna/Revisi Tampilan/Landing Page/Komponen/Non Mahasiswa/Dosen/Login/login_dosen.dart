@@ -37,7 +37,7 @@ class _LoginDosenState extends State<LoginDosen> {
                   elevation: 5.0,
                   color: Colors.white,
                   child: SizedBox(
-                    height: constraints.maxHeight * 0.7,
+                    height: 450,
                     width: constraints.maxWidth * 0.6,
                     child: Row(
                       children: [

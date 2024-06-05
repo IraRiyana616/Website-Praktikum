@@ -6,9 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../Dashboard/Navigasi/dashboardnav_praktikan.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
+import '../../Navigasi/absensi_praktikan_nav.dart';
 import '../Tabel/Screen/tabel_absensi.dart';
 
 class AbsenkuPraktikan extends StatefulWidget {
@@ -286,7 +286,7 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        const DashboardNavigasiPraktikan(),
+                        const AbsensiPraktikanNavigasi(),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       const begin = Offset(0.0, 0.0);

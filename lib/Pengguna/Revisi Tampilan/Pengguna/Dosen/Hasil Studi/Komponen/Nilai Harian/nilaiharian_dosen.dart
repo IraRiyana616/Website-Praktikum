@@ -3,9 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../../../Admin/Hasil Studi/Komponen/Nilai Harian/Tabel/tabel_nilai_harian_admin.dart';
-import '../../Screen/hasil_studi_dosen.dart';
+import '../../Navigasi/hasil_studi_nav_dosen.dart';
 import '../Nilai Akhir/nilaiakhir_dosen.dart';
 
 class NilaiHarianDosenScreen extends StatefulWidget {
@@ -133,7 +132,7 @@ class _NilaiHarianDosenScreenState extends State<NilaiHarianDosenScreen> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        const HasilStudiScreenDosen(),
+                        const HasilStudiNavigasiDosen(),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       const begin = Offset(0.0, 0.0);

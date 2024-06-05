@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../../Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Modul/Tabel Modul/tabel_modul_mahasiswa.dart';
+import '../../../../../../Dosen/Dashboard/Komponen/Deskripsi/Tabel/tabel_modul.dart';
 import '../../Navigasi/dasboardnav_dosen.dart';
 import '../Data Asisten/data_asistensi_dosen.dart';
 import '../Data Mahasiswa/data_mahasiswa_dosen.dart';
@@ -473,7 +473,8 @@ class _DeskripsiKelasDosenState extends State<DeskripsiKelasDosen> {
                                 ),
                               ),
 
-                              TabelModulPraktikum(kodeKelas: widget.kodeKelas),
+                              TabelSilabusPraktikumDosen(
+                                  kodeKelas: widget.kodeKelas),
 
                               const SizedBox(height: 50.0)
                             ],

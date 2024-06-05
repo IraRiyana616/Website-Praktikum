@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import '../../Navigation/kelas_assnav.dart';
+import '../../../../../Revisi Tampilan/Pengguna/Mahasiswa/Asisten/Dashboard/Navigasi/dashboardnav_asisten.dart';
 import '../Pengumpulan/Latihan/form_latihan.dart';
 
 class FormDeskripsiKelas extends StatefulWidget {
@@ -358,9 +358,26 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
           leading: IconButton(
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const KelasAsistenNav()));
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const DasboardAsistenNavigasi(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ),
+              );
             },
             icon: const Icon(
               Icons.arrow_back,

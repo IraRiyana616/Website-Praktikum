@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../Mahasiswa/Asisten/Absensi/Screen/absensi_ass.dart';
+import '../../../../Revisi Tampilan/Pengguna/Admin/Jadwal Praktikum/Navigasi/jadwalpraktikumnav_admin.dart';
 
 class FormEditJadwalAdmin extends StatefulWidget {
   final String kodeKelas;
@@ -192,7 +193,27 @@ class _FormEditJadwalAdminState extends State<FormEditJadwalAdmin> {
           child: AppBar(
             leading: IconButton(
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/jadwal-praktikum');
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          const JadwalPraktikumNavigasiAdmin(),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin = Offset(0.0, 0.0);
+                        const end = Offset.zero;
+                        const curve = Curves.ease;
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+
+                        return SlideTransition(
+                          position: animation.drive(tween),
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
                 },
                 icon: const Icon(
                   Icons.arrow_back,

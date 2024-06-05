@@ -242,9 +242,8 @@ class _DataAsistenState extends State<DataAsisten> {
                                   cursor: SystemMouseCursors.click,
                                   child: Text(
                                     'Data Mahasiswa',
-                                    style: GoogleFonts.quicksand(
-                                        fontSize: 16.0,
-                                        fontWeight: FontWeight.bold),
+                                    style:
+                                        GoogleFonts.quicksand(fontSize: 16.0),
                                   ),
                                 ),
                               ),
@@ -288,8 +287,9 @@ class _DataAsistenState extends State<DataAsisten> {
                                   cursor: SystemMouseCursors.click,
                                   child: Text(
                                     'Data Asistensi',
-                                    style:
-                                        GoogleFonts.quicksand(fontSize: 16.0),
+                                    style: GoogleFonts.quicksand(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),

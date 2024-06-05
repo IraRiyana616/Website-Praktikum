@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Komponen/Deskripsi/Modul/Komponen/Latihan/latihan_mhs.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TabelSilabusPraktikumDosen extends StatefulWidget {
@@ -183,26 +182,7 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
       },
     ),
     cells: [
-      DataCell(
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => LatihanAsisten(
-                          kodeKelas: fileInfo.kode,
-                          modul: fileInfo.modul,
-                        )));
-          },
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: SizedBox(
-              width: 250.0,
-              child: Text(getLimitedText(fileInfo.modul, 50)),
-            ),
-          ),
-        ),
-      ),
+      DataCell(Text(getLimitedText(fileInfo.modul, 50))),
       DataCell(SizedBox(width: 170.0, child: Text(fileInfo.tanggal))),
       DataCell(SizedBox(width: 170.0, child: Text(fileInfo.jadwal))),
       DataCell(Row(

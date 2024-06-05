@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../../../Revisi Tampilan/Pengguna/Mahasiswa/Asisten/Dashboard/Navigasi/dashboardnav_asisten.dart';
 import '../../Deskripsi/form_deskripsi.dart';
 import '../Latihan/form_latihan.dart';
 import '../Tugas/form_tugas.dart';
@@ -34,23 +35,71 @@ class _FormPengumpulanLaporanState extends State<FormPengumpulanLaporan> {
       if (index == 0) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => FormPengumpulanLatihan(
-                  kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah)),
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                FormPengumpulanLatihan(
+                    kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
         );
       } else if (index == 1) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => FormPengumpulanTugas(
-                  kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah)),
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                FormPengumpulanTugas(
+                    kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
         );
       } else if (index == 2) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => FormPengumpulanLaporan(
-                  kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah)),
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                FormPengumpulanLaporan(
+                    kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
         );
       }
     });
@@ -256,14 +305,40 @@ class _FormPengumpulanLaporanState extends State<FormPengumpulanLaporan> {
         child: AppBar(
           automaticallyImplyLeading: false,
           backgroundColor: const Color(0xFFF7F8FA),
+          leading: IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const DasboardAsistenNavigasi(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.black,
+            ),
+          ),
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const SizedBox(
-                  width: 40.0,
-                ),
                 Expanded(
                     child: Text(
                   widget.mataKuliah,

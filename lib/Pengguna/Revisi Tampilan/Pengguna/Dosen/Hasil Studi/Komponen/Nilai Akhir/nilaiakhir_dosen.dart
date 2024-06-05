@@ -478,7 +478,6 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const SizedBox(width: 40.0),
                 Expanded(
                   child: Text(
                     widget.mataKuliah,
@@ -519,7 +518,7 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
                 height: 20.0,
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 25.0, right: 45.0),
+                padding: const EdgeInsets.only(left: 25.0, right: 25.0),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
