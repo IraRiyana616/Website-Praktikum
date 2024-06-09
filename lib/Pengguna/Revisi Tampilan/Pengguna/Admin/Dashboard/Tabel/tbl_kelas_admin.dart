@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../Komponen/Kelas Praktikum/Deskripsi Kelas/deskripsi_admin.dart';
 import '../Komponen/Tambah Data Asisten/form_asisten.dart';
 import '../Komponen/Tambah Kelas/form_kelas.dart';
@@ -472,7 +471,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          //== EDIT DATA ==//
+          //== TAMBAH DATA ==//
           IconButton(
             onPressed: () {
               Navigator.push(
@@ -504,11 +503,12 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
               );
             },
             icon: const Icon(
-              Icons.add_box,
+              Icons.edit_document,
               color: Colors.grey,
             ),
             tooltip: 'Tambah Data Asisten',
           ),
+
           //== REMOVE DATA ==//
           IconButton(
             onPressed: () {

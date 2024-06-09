@@ -36,9 +36,8 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
 
           QuerySnapshot<Map<String, dynamic>> querySnapshot =
               await FirebaseFirestore.instance.collection('nilaiAkhir').get();
-          Set<String> status = querySnapshot.docs
-              .map((doc) => doc['keterangan'].toString())
-              .toSet();
+          Set<String> status =
+              querySnapshot.docs.map((doc) => doc['status'].toString()).toSet();
           setState(() {
             availableKeterangans = [' Status Praktikum', ...status.toList()];
           });
@@ -69,7 +68,7 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
           // Check kesamaan NIM dengan pengguna yang sedang login
           Map<String, dynamic> transkripData = transkripDoc.data();
           if (selectedKeterangan == ' Status Praktikum' ||
-              transkripData['keterangan'] == selectedKeterangan) {
+              transkripData['status'] == selectedKeterangan) {
             data.add(TranskripNilai(
               kode: transkripData['kodeKelas'] ?? '',
               nama: transkripData['nama'] ?? '',
@@ -148,7 +147,7 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
                     });
                   },
                   underline: Container(),
-                  items: [' Status Praktikum', 'Lulus', 'Tidak Lulus']
+                  items: [' Status Praktikum', ' Lulus', ' Tidak Lulus']
                       .map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,

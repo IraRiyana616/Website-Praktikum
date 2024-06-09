@@ -21,10 +21,14 @@ class NilaiAkhirAsistenScreen extends StatefulWidget {
 }
 
 class _NilaiAkhirAsistenScreenState extends State<NilaiAkhirAsistenScreen> {
+  //== Data List Tabel ==//
   List<PenilaianAkhir> demoPenilaianAkhir = [];
   List<PenilaianAkhir> filteredPenilaianAkhir = [];
+
+  //== Fungsi DropdownButton ==//
   String selectedKeterangan = 'Tampilkan Semua';
   final ScrollController _controller = ScrollController();
+
   final StreamController<List<PenilaianAkhir>> _penilaianStreamController =
       StreamController<List<PenilaianAkhir>>();
 

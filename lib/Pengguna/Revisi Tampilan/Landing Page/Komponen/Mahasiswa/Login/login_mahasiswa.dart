@@ -34,7 +34,7 @@ class _LoginMahasiswaState extends State<LoginMahasiswa> {
                   elevation: 5.0,
                   color: Colors.white,
                   child: SizedBox(
-                    height: 450,
+                    height: 445,
                     width: constraints.maxWidth * 0.6,
                     child: Row(
                       children: [

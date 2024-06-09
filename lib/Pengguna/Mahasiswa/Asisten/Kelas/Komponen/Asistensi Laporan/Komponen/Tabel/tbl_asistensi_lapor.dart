@@ -301,16 +301,14 @@ DataRow dataFileDataRow(
               width: 2.0,
             ),
             MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                  onTap: () {
-                    showInfoDialog(fileInfo, context); // Pass context here
+                cursor: SystemMouseCursors.click,
+                child: IconButton(
+                  onPressed: () {
+                    showInfoDialog(fileInfo, context);
                   },
-                  child: const Icon(
-                    Icons.info,
-                    color: Colors.grey,
-                  )),
-            ),
+                  icon: const Icon(Icons.info, color: Colors.grey),
+                  tooltip: 'Info Asistensi',
+                )),
           ],
         ),
       )),
@@ -321,127 +319,114 @@ DataRow dataFileDataRow(
 Future<void> showInfoDialog(
     AsistensiLaporan fileInfo, BuildContext context) async {
   try {
-    final QuerySnapshot<Map<String, dynamic>> laporanSnapshot =
-        await FirebaseFirestore.instance
-            .collection('laporan')
-            .where('kodeKelas', isEqualTo: fileInfo.kode)
-            .where('judulMateri', isEqualTo: fileInfo.modul)
-            .where('statusRevisi', isEqualTo: fileInfo.status)
-            .get();
-
     final QuerySnapshot<Map<String, dynamic>> asistensiSnapshot =
         await FirebaseFirestore.instance
             .collection('asistensiLaporan')
             .where('kodeKelas', isEqualTo: fileInfo.kode)
             .where('judulMateri', isEqualTo: fileInfo.modul)
             .where('statusRevisi', isEqualTo: fileInfo.status)
+            .where('nim', isEqualTo: fileInfo.nim)
             .get();
 
-    if (laporanSnapshot.docs.isNotEmpty && asistensiSnapshot.docs.isNotEmpty) {
-      final DocumentSnapshot<Map<String, dynamic>> laporanDocument =
-          laporanSnapshot.docs.first;
+    if (asistensiSnapshot.size > 0) {
       final DocumentSnapshot<Map<String, dynamic>> asistensiDocument =
           asistensiSnapshot.docs.first;
 
-      final String statusRevisiLaporan = laporanDocument['statusRevisi'];
-      final String statusRevisiAsistensi = asistensiDocument['statusRevisi'];
+      final namaPemeriksa = asistensiDocument['namaAsisten'];
+      final waktuPengumpulan = asistensiDocument['waktuPengumpulan'];
+      final statusRevisi = asistensiDocument['statusRevisi'];
 
-      if (statusRevisiLaporan == statusRevisiAsistensi) {
-        final namaPemeriksa = asistensiDocument['namaAsisten'];
-        final waktuPengumpulan = asistensiDocument['waktuPengumpulan'];
-        final statusRevisi = asistensiDocument['statusRevisi'];
-
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text(
-                'Data Asisten',
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 13.0,
-                  ),
-                  Row(
-                    children: [
-                      const Text(
-                        'Nama Pemeriksa : ',
-                        style: TextStyle(fontSize: 14.0),
-                      ),
-                      const SizedBox(
-                        width: 5.0,
-                      ),
-                      Text(
-                        '$namaPemeriksa',
-                        style: const TextStyle(fontSize: 14.0),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 18.0,
-                  ),
-                  Row(
-                    children: [
-                      const Text(
-                        'Waktu Asistensi   :',
-                        style: TextStyle(fontSize: 14.0),
-                      ),
-                      const SizedBox(
-                        width: 5.0,
-                      ),
-                      Text(
-                        ' ${DateFormat('dd-MM-yyyy HH:mm:ss').format(waktuPengumpulan.toDate())}',
-                        style: const TextStyle(fontSize: 14.0),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 18.0,
-                  ),
-                  Row(
-                    children: [
-                      const Text(
-                        'Status Revisi         : ',
-                        style: TextStyle(fontSize: 14.0),
-                      ),
-                      const SizedBox(
-                        width: 5.0,
-                      ),
-                      Text(
-                        '$statusRevisi',
-                        style: const TextStyle(fontSize: 14.0),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 18.0,
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              'Data Asisten',
+              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  height: 13.0,
+                ),
+                Row(
+                  children: [
+                    const Text(
+                      'Nama Pemeriksa : ',
+                      style: TextStyle(fontSize: 14.0),
+                    ),
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    Text(
+                      '$namaPemeriksa',
+                      style: const TextStyle(fontSize: 14.0),
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 18.0,
+                ),
+                Row(
+                  children: [
+                    const Text(
+                      'Waktu Asistensi   :',
+                      style: TextStyle(fontSize: 14.0),
+                    ),
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    Text(
+                      ' ${DateFormat('dd-MM-yyyy HH:mm:ss').format(waktuPengumpulan.toDate())}',
+                      style: const TextStyle(fontSize: 14.0),
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 18.0,
+                ),
+                Row(
+                  children: [
+                    const Text(
+                      'Status Revisi         : ',
+                      style: TextStyle(fontSize: 14.0),
+                    ),
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    Text(
+                      '$statusRevisi',
+                      style: const TextStyle(fontSize: 14.0),
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 18.0,
                 ),
               ],
-            );
-          },
-        );
-      }
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     } else {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Data Asisten'),
-            content: const Text(
-                'Belum Melakukan Asistensi Laporan atau data laporan tidak ditemukan.'),
+            title: Text('Data Asistensi Laporan',
+                style: GoogleFonts.quicksand(fontWeight: FontWeight.bold)),
+            content: Text('Belum Melakukan Asistensi Laporan',
+                style: GoogleFonts.quicksand(fontSize: 16.0)),
             actions: [
               TextButton(
                 onPressed: () {
@@ -568,6 +553,38 @@ Future<void> uploadFile(
             .doc(user.uid)
             .get();
         nama = userDoc['nama'];
+      }
+
+      // Pengecekan data di Firestore
+      QuerySnapshot existingData = await FirebaseFirestore.instance
+          .collection('asistensiLaporan')
+          .where('kodeKelas', isEqualTo: kodeKelas)
+          .where('judulMateri', isEqualTo: modul)
+          .where('statusRevisi', isEqualTo: selectedRevisi)
+          .get();
+
+      if (existingData.docs.isNotEmpty) {
+        Navigator.pop(context); // Menutup dialog loading
+
+        // Menampilkan dialog bahwa data sudah ada
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Data Sudah Ada'),
+              content: const Text('Data telah terdapat pada database.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+        return;
       }
 
       final firebase_storage.Reference storageRef = firebase_storage

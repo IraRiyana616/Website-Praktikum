@@ -435,7 +435,7 @@ class _LatihanAsistenState extends State<LatihanAsisten> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20.0),
+                      const SizedBox(height: 800.0),
                     ],
                   ),
                 ),
