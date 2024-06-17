@@ -204,7 +204,7 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
               children: [
                 Expanded(
                     child: Text(
-                  'Token Praktikum Praktikan',
+                  'Token Kelas Praktikum',
                   style: GoogleFonts.quicksand(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,

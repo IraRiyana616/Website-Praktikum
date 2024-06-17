@@ -23,6 +23,7 @@ class AsistensiLaporanNavigasi extends StatefulWidget {
 class _AsistensiLaporanNavigasiState extends State<AsistensiLaporanNavigasi> {
   late Widget currentPage;
   String currentRole = 'Praktikan';
+
   @override
   void initState() {
     super.initState();
@@ -107,16 +108,18 @@ class _AsistensiLaporanNavigasiState extends State<AsistensiLaporanNavigasi> {
                                   );
                                 }).toList(),
                                 onChanged: (String? newValue) async {
-                                  setState(() {
-                                    currentRole = newValue!;
-                                  });
-                                  if (currentRole == 'Asisten') {
-                                    await _checkAsisten(context);
-                                  } else {
+                                  if (newValue != null) {
                                     setState(() {
-                                      currentPage =
-                                          const DashboardPraktikanScreen();
+                                      currentRole = newValue;
                                     });
+                                    if (currentRole == 'Asisten') {
+                                      await _checkAsisten(context);
+                                    } else {
+                                      setState(() {
+                                        currentPage =
+                                            const DashboardPraktikanScreen();
+                                      });
+                                    }
                                   }
                                 },
                               ),
@@ -322,13 +325,10 @@ class _AsistensiLaporanNavigasiState extends State<AsistensiLaporanNavigasi> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Memastikan bahwa setState dijalankan di dalam StatefulWidget
-                if (context is StatefulElement) {
-                  (context).state.setState(() {
-                    currentRole = 'Praktikan';
-                    currentPage = const DashboardPraktikanScreen();
-                  });
-                }
+                setState(() {
+                  currentRole = 'Praktikan';
+                  currentPage = const DashboardPraktikanScreen();
+                });
               },
               child: const Text('OK'),
             ),

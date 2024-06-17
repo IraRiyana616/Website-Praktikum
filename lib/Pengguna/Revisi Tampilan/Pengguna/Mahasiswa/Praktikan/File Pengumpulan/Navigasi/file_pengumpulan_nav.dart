@@ -23,6 +23,7 @@ class FilePengumpulanNavigasi extends StatefulWidget {
 class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
   late Widget currentPage;
   String currentRole = 'Praktikan';
+
   @override
   void initState() {
     super.initState();
@@ -107,16 +108,18 @@ class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
                                   );
                                 }).toList(),
                                 onChanged: (String? newValue) async {
-                                  setState(() {
-                                    currentRole = newValue!;
-                                  });
-                                  if (currentRole == 'Asisten') {
-                                    await _checkAsisten(context);
-                                  } else {
+                                  if (newValue != null) {
                                     setState(() {
-                                      currentPage =
-                                          const DashboardPraktikanScreen();
+                                      currentRole = newValue;
                                     });
+                                    if (currentRole == 'Asisten') {
+                                      await _checkAsisten(context);
+                                    } else {
+                                      setState(() {
+                                        currentPage =
+                                            const DashboardPraktikanScreen();
+                                      });
+                                    }
                                   }
                                 },
                               ),
@@ -318,17 +321,14 @@ class _FilePengumpulanNavigasiState extends State<FilePengumpulanNavigasi> {
         return AlertDialog(
           title: const Text('Error'),
           content: const Text('Anda tidak terdaftar sebagai asisten'),
-          actions: <Widget>[
+          actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Memastikan bahwa setState dijalankan di dalam StatefulWidget
-                if (context is StatefulElement) {
-                  (context).state.setState(() {
-                    currentRole = 'Praktikan';
-                    currentPage = const DashboardPraktikanScreen();
-                  });
-                }
+                setState(() {
+                  currentRole = 'Praktikan';
+                  currentPage = const DashboardPraktikanScreen();
+                });
               },
               child: const Text('OK'),
             ),

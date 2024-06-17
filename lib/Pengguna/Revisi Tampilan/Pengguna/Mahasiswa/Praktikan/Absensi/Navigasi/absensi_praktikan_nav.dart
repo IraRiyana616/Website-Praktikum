@@ -24,6 +24,7 @@ class AbsensiPraktikanNavigasi extends StatefulWidget {
 class _AbsensiPraktikanNavigasiState extends State<AbsensiPraktikanNavigasi> {
   late Widget currentPage;
   String currentRole = 'Praktikan';
+
   @override
   void initState() {
     super.initState();
@@ -108,16 +109,18 @@ class _AbsensiPraktikanNavigasiState extends State<AbsensiPraktikanNavigasi> {
                                   );
                                 }).toList(),
                                 onChanged: (String? newValue) async {
-                                  setState(() {
-                                    currentRole = newValue!;
-                                  });
-                                  if (currentRole == 'Asisten') {
-                                    await _checkAsisten(context);
-                                  } else {
+                                  if (newValue != null) {
                                     setState(() {
-                                      currentPage =
-                                          const DashboardPraktikanScreen();
+                                      currentRole = newValue;
                                     });
+                                    if (currentRole == 'Asisten') {
+                                      await _checkAsisten(context);
+                                    } else {
+                                      setState(() {
+                                        currentPage =
+                                            const DashboardPraktikanScreen();
+                                      });
+                                    }
                                   }
                                 },
                               ),
@@ -244,7 +247,7 @@ class _AbsensiPraktikanNavigasiState extends State<AbsensiPraktikanNavigasi> {
         print('User is logged in: ${user.uid}');
       }
       try {
-        // Ambil dokumen pengguna dari Firestore
+        //== Ambil dokumen pengguna dari Firestore ==//
         final userDoc = await FirebaseFirestore.instance
             .collection('akun_mahasiswa')
             .doc(user.uid)
@@ -254,13 +257,14 @@ class _AbsensiPraktikanNavigasiState extends State<AbsensiPraktikanNavigasi> {
           if (kDebugMode) {
             print('User document exists.');
           }
-          final nim = userDoc.data()?['nim']; // Ambil NIM dari dokumen pengguna
+          final nim =
+              userDoc.data()?['nim']; //== Ambil NIM dari dokumen pengguna ==//
           if (kDebugMode) {
             print('NIM: $nim');
           }
 
           if (nim != null && nim is int) {
-            // Memeriksa apakah nim ada di koleksi akun_mahasiswa dan dataAsisten
+            //== Memeriksa apakah nim ada di koleksi akun_mahasiswa dan dataAsisten ==//
             final akunMahasiswaSnapshot = await FirebaseFirestore.instance
                 .collection('akun_mahasiswa')
                 .doc(user.uid)
@@ -319,17 +323,21 @@ class _AbsensiPraktikanNavigasiState extends State<AbsensiPraktikanNavigasi> {
         return AlertDialog(
           title: const Text('Error'),
           content: const Text('Anda tidak terdaftar sebagai asisten'),
-          actions: <Widget>[
+          actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Memastikan bahwa setState dijalankan di dalam StatefulWidget
-                if (context is StatefulElement) {
-                  (context).state.setState(() {
-                    currentRole = 'Praktikan';
-                    currentPage = const DashboardPraktikanScreen();
-                  });
-                }
+                // //== Memastikan bahwa setState dijalankan di dalam StatefulWidget ==//
+                // if (context is StatefulElement) {
+                //   (context).state.setState(() {
+                //     currentRole = 'Praktikan';
+                //     currentPage = const DashboardPraktikanScreen();
+                //   });
+                // }
+                setState(() {
+                  currentRole = 'Praktikan';
+                  currentPage = const DashboardPraktikanScreen();
+                });
               },
               child: const Text('OK'),
             ),

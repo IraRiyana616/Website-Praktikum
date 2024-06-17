@@ -109,16 +109,18 @@ class _DashboardNavigasiPraktikanState
                                   );
                                 }).toList(),
                                 onChanged: (String? newValue) async {
-                                  setState(() {
-                                    currentRole = newValue!;
-                                  });
-                                  if (currentRole == 'Asisten') {
-                                    await _checkAsisten(context);
-                                  } else {
+                                  if (newValue != null) {
                                     setState(() {
-                                      currentPage =
-                                          const DashboardPraktikanScreen();
+                                      currentRole = newValue;
                                     });
+                                    if (currentRole == 'Asisten') {
+                                      await _checkAsisten(context);
+                                    } else {
+                                      setState(() {
+                                        currentPage =
+                                            const DashboardPraktikanScreen();
+                                      });
+                                    }
                                   }
                                 },
                               ),
@@ -324,13 +326,10 @@ class _DashboardNavigasiPraktikanState
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Memastikan bahwa setState dijalankan di dalam StatefulWidget
-                if (context is StatefulElement) {
-                  (context).state.setState(() {
-                    currentRole = 'Praktikan';
-                    currentPage = const DashboardPraktikanScreen();
-                  });
-                }
+                setState(() {
+                  currentRole = 'Praktikan';
+                  currentPage = const DashboardPraktikanScreen();
+                });
               },
               child: const Text('OK'),
             ),

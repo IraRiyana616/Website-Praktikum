@@ -220,12 +220,15 @@ class _TabelFilePengumpulanState extends State<TabelFilePengumpulan> {
                             rowsPerPage:
                                 calculateRowsPerPage(filteredDataKelas.length),
                           )
-                        : const Center(
-                            child: Text(
-                              'No data available',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
+                        : const Padding(
+                            padding: EdgeInsets.only(top: 10.0),
+                            child: Center(
+                              child: Text(
+                                'No data available',
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
