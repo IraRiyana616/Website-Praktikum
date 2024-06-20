@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../Mahasiswa/Asisten/File Pengumpulan/Komponen/Tugas/Tabel/tabel_tugas_asisten.dart';
 import '../../Navigasi/arsip_pengumpulannav_admin.dart';
-import '../Laporan/laporan_admin.dart';
+import '../Latihan/latihan_admin.dart';
 
-class TugasAdminScreen extends StatefulWidget {
+class LaporanAdminScreen extends StatefulWidget {
   final String kodeKelas;
   final String mataKuliah;
-  const TugasAdminScreen(
+  const LaporanAdminScreen(
       {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
-  State<TugasAdminScreen> createState() => _TugasAdminScreenState();
+  State<LaporanAdminScreen> createState() => _LaporanAdminScreenState();
 }
 
-class _TugasAdminScreenState extends State<TugasAdminScreen> {
+class _LaporanAdminScreenState extends State<LaporanAdminScreen> {
   //Fungsi Untuk Bottom Navigation
-  int _selectedIndex = 0; // untuk mengatur index bottom navigation
+  int _selectedIndex = 1; // untuk mengatur index bottom navigation
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -183,11 +182,11 @@ class _TugasAdminScreenState extends State<TugasAdminScreen> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.book),
-            label: 'Tugas',
+            label: 'Latihan',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.bookmark),
-            label: 'Laporan',
+            label: 'Tugas',
           ),
         ],
         currentIndex: _selectedIndex,

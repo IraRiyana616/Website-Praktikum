@@ -239,6 +239,12 @@ class _TabelAbsensiPraktikanScreenDosenState
                         ),
                         DataColumn(
                           label: Text(
+                            'Pertemuan',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
                             'Keterangan',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
@@ -325,6 +331,7 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
         ),
       ),
       DataCell(Text(fileInfo.keterangan)),
+      DataCell(Text(fileInfo.pertemuan)),
       DataCell(Row(
         children: [
           const Icon(

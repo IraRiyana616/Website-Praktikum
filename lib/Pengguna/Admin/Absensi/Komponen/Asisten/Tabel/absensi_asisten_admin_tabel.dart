@@ -17,12 +17,17 @@ class TabelAbsensiAsistenAdmin extends StatefulWidget {
 }
 
 class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
+  //== List Tabel ==//
   List<AbsensiMahasiswa> demoAbsensiMahasiswa = [];
   List<AbsensiMahasiswa> filteredAbsensiMahasiswa = [];
 
-  //Judul Materi
+  //== Judul Materi ==//
   String selectedModul = 'Judul Modul';
   List<String> availableModuls = ['Judul Modul'];
+
+  //== Search Komponen ==//
+  bool _isTextFieldNotEmpty = false;
+  final TextEditingController _textController = TextEditingController();
 
   @override
   void initState() {
@@ -31,6 +36,37 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
     _fetchDataFromFirestore();
   }
 
+  @override
+  void dispose() {
+    _textController.removeListener(_onTextChanged);
+    _textController.dispose();
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    setState(() {
+      _isTextFieldNotEmpty = _textController.text.isNotEmpty;
+      _filterData();
+    });
+  }
+
+  //== Filtering data ==//
+  void _filterData() {
+    String query = _textController.text.toLowerCase();
+    List<AbsensiMahasiswa> tempList = demoAbsensiMahasiswa.where((data) {
+      bool matchesText = data.nama.toLowerCase().contains(query) ||
+          data.keterangan.toLowerCase().contains(query) ||
+          data.nim.toString().toLowerCase().contains(query);
+      bool matchesModul =
+          selectedModul == 'Judul Modul' || data.modul == selectedModul;
+      return matchesText && matchesModul;
+    }).toList();
+    setState(() {
+      filteredAbsensiMahasiswa = tempList;
+    });
+  }
+
+  //== Menampilkan data dari database 'absensiAsisten' ==//
   Future<void> _fetchDataFromFirestore() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
@@ -48,6 +84,7 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
           availableModuls.add(modul);
         }
         absensiMahasiswaList.add(AbsensiMahasiswa(
+          id: doc.id,
           kode: data?['kodeKelas'] ?? '',
           nama: data?['nama'] ?? '',
           nim: data?['nim'] ?? 0,
@@ -74,52 +111,16 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
     }
   }
 
-  void _filterData(String? modul) {
-    if (modul != null) {
-      setState(() {
-        selectedModul = modul;
-        if (modul == 'Judul Modul') {
-          filteredAbsensiMahasiswa = demoAbsensiMahasiswa;
-        } else {
-          filteredAbsensiMahasiswa = demoAbsensiMahasiswa
-              .where((absensi) => absensi.modul == modul)
-              .toList();
-        }
-      });
-    }
+  void clearSearchField() {
+    setState(() {
+      _textController.clear();
+      _filterData();
+    });
   }
 
   void _sortDataByName() {
     setState(() {
       filteredAbsensiMahasiswa.sort((a, b) => a.nama.compareTo(b.nama));
-    });
-  }
-
-  //== Search Komponen ==//
-  bool _isTextFieldNotEmpty = false;
-  final TextEditingController _textController = TextEditingController();
-  void _onTextChanged() {
-    setState(() {
-      _isTextFieldNotEmpty = _textController.text.isNotEmpty;
-      _filterData(_textController.text);
-    });
-  }
-
-  void filterData(String query) {
-    setState(() {
-      filteredAbsensiMahasiswa = demoAbsensiMahasiswa
-          .where((data) => (data.nama
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
-              data.nim.toString().toLowerCase().contains(query.toLowerCase())))
-          .toList();
-    });
-  }
-
-  void clearSearchField() {
-    setState(() {
-      _textController.clear();
-      filterData('');
     });
   }
 
@@ -157,7 +158,12 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
             ),
             child: DropdownButton<String>(
               value: selectedModul,
-              onChanged: (modul) => _filterData(modul),
+              onChanged: (modul) {
+                setState(() {
+                  selectedModul = modul!;
+                  _filterData();
+                });
+              },
               items:
                   availableModuls.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
@@ -199,13 +205,13 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
                     Expanded(
                         child: TextField(
                       onChanged: (value) {
-                        filterData(value);
+                        _filterData();
                       },
                       controller: _textController,
                       decoration: InputDecoration(
                           hintText: '',
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5.0)),
+                              borderRadius: BorderRadius.circular(10.0)),
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 0, horizontal: 10),
                           suffixIcon: Visibility(
@@ -273,7 +279,8 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
                         ),
                       ),
                     ],
-                    source: DataSource(filteredAbsensiMahasiswa),
+                    source: DataSource(
+                        filteredAbsensiMahasiswa, deleteData, context),
                     rowsPerPage:
                         calculateRowsPerPage(filteredAbsensiMahasiswa.length),
                   )
@@ -300,9 +307,25 @@ class _TabelAbsensiAsistenAdminState extends State<TabelAbsensiAsistenAdmin> {
       return defaultRowsPerPage;
     }
   }
+
+  //== Menghapus Data dari database 'absensiAsisten' ==//
+  void deleteData(String id) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('absensiAsisten')
+          .doc(id)
+          .delete();
+      _fetchDataFromFirestore();
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error deleting data:$error');
+      }
+    }
+  }
 }
 
 class AbsensiMahasiswa {
+  final String id;
   final String kode;
   final String nama;
   final int nim;
@@ -314,6 +337,7 @@ class AbsensiMahasiswa {
   final String file;
 
   AbsensiMahasiswa({
+    required this.id,
     required this.kode,
     required this.file,
     required this.nama,
@@ -326,7 +350,8 @@ class AbsensiMahasiswa {
   });
 }
 
-DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
+DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index,
+    Function(String) onDelete, BuildContext context) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -381,7 +406,33 @@ DataRow dataFileDataRow(AbsensiMahasiswa fileInfo, int index) {
         ),
       ),
       DataCell(IconButton(
-        onPressed: () {},
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text(
+                    'Hapus Data',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+                  ),
+                  content: const Text('Apakah Anda yakin ingin menghapusnya?'),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          onDelete(fileInfo.id);
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Hapus')),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Batal'))
+                  ],
+                );
+              });
+        },
         icon: const Icon(
           Icons.delete,
           color: Colors.grey,
@@ -423,8 +474,10 @@ Color getRowColor(int index) {
 
 class DataSource extends DataTableSource {
   final List<AbsensiMahasiswa> data;
+  final Function(String) onDelete;
+  final BuildContext context;
 
-  DataSource(this.data);
+  DataSource(this.data, this.onDelete, this.context);
 
   @override
   DataRow? getRow(int index) {
@@ -432,7 +485,7 @@ class DataSource extends DataTableSource {
       return null;
     }
     final fileInfo = data[index];
-    return dataFileDataRow(fileInfo, index);
+    return dataFileDataRow(fileInfo, index, onDelete, context);
   }
 
   @override

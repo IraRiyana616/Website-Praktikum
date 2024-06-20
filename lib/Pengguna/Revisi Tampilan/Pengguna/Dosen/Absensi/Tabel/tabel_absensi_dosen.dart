@@ -241,7 +241,7 @@ class _TabelAbsensiScreenDosenState extends State<TabelAbsensiScreenDosen> {
                                 decoration: InputDecoration(
                                   hintText: '',
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(0.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 0, horizontal: 10),

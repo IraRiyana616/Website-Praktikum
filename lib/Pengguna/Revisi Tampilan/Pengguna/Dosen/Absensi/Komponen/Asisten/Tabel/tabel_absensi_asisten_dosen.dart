@@ -206,7 +206,7 @@ class _TabelAbsensiAsistenScreenDosenState
                       decoration: InputDecoration(
                           hintText: '',
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5.0)),
+                              borderRadius: BorderRadius.circular(10.0)),
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 0, horizontal: 10),
                           suffixIcon: Visibility(

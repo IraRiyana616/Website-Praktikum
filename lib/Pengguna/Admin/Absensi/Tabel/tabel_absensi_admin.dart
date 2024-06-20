@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../Revisi Tampilan/Pengguna/Admin/Absensi/Akses Absensi/Edit Akses/Screen/edit_akses_admin.dart';
+import '../../../Revisi Tampilan/Pengguna/Admin/Absensi/Akses Absensi/Tambah Akses/tambah_akses_absensi.dart';
 import '../../../Revisi Tampilan/Pengguna/Admin/Absensi/Komponen/Praktikan/absensi_praktikan.dart';
 
 class TabelDataAbsensiAdmin extends StatefulWidget {
@@ -190,6 +192,11 @@ class _TabelDataAbsensiAdminState extends State<TabelDataAbsensiAdmin> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
+                              DataColumn(
+                                  label: Text(
+                                "      Aksi",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ))
                             ],
                             source: DataSource(filteredClassData, context),
                             rowsPerPage:
@@ -302,6 +309,77 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
           ),
         ),
       ),
+      DataCell(Row(
+        children: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      TambahAksesAbsensiMahasiswa(
+                    kodeKelas: fileInfo.kelas,
+                    mataKuliah: fileInfo.matkul,
+                    kodeAsisten: fileInfo.asisten,
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.add_box,
+              color: Colors.grey,
+            ),
+            tooltip: 'Tambah Akses Absensi',
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      EditAksesScreenAdmin(
+                    kodeKelas: fileInfo.kelas,
+                    mataKuliah: fileInfo.matkul,
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.edit_document,
+              color: Colors.grey,
+            ),
+            tooltip: 'Edit Akses Absensi',
+          ),
+        ],
+      ))
     ],
   );
 }

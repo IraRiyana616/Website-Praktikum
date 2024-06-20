@@ -1,28 +1,29 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
+
 import '../../Absensi/Screen/absensi_admin.dart';
-import '../../Asistensi Laporan/Screen/asistensi_laporan_admin.dart';
+import '../../Arsip Praktikum/Screen/arsip_praktikum_admin.dart';
 import '../../Dashboard/Screen/dashboard_admin.dart';
 import '../../Hasil Studi/Screen/hasil_studi_admin.dart';
 import '../../Jadwal Praktikum/Screen/jadwal_praktikum_admin.dart';
 import '../../Pengaturan/pengaturan_admin.dart';
-import '../Screen/arsip_praktikum_admin.dart';
+import '../Screen/asistensi_laporan_admin.dart';
 
-class ArsipPraktikumNavigasi extends StatefulWidget {
-  const ArsipPraktikumNavigasi({super.key});
+class AsistensiLaporanNavigasiAdmin extends StatefulWidget {
+  const AsistensiLaporanNavigasiAdmin({super.key});
 
   @override
-  State<ArsipPraktikumNavigasi> createState() => _ArsipPraktikumNavigasiState();
+  State<AsistensiLaporanNavigasiAdmin> createState() =>
+      _AsistensiLaporanNavigasiAdminState();
 }
 
-class _ArsipPraktikumNavigasiState extends State<ArsipPraktikumNavigasi> {
+class _AsistensiLaporanNavigasiAdminState
+    extends State<AsistensiLaporanNavigasiAdmin> {
   late Widget currentPage;
 
   @override
   void initState() {
     super.initState();
-    currentPage = const ArsipPraktikumAdmin();
+    currentPage = const AsistensiLaporanAdmin();
   }
 
   @override
@@ -198,6 +199,7 @@ class DashboardListTile extends StatefulWidget {
   final bool isActive;
 
   @override
+  // ignore: library_private_types_in_public_api
   _DashboardListTileState createState() => _DashboardListTileState();
 }
 

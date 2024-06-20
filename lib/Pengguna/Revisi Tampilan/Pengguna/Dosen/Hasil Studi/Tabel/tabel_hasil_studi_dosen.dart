@@ -14,10 +14,15 @@ class TabelHasilStudiDosen extends StatefulWidget {
 }
 
 class _TabelHasilStudiDosenState extends State<TabelHasilStudiDosen> {
+  //== List Data tabel ==//
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
+
+  //== Search ==//
   final TextEditingController _textController = TextEditingController();
   bool _isTextFieldNotEmpty = false;
+
+  //== DropdownButton Tahun Ajaran ==//
   String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
@@ -240,7 +245,7 @@ class _TabelHasilStudiDosenState extends State<TabelHasilStudiDosen> {
                                 decoration: InputDecoration(
                                   hintText: '',
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(0.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 0, horizontal: 10),

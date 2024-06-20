@@ -1,44 +1,44 @@
 // ignore_for_file: use_build_context_synchronously
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:intl/intl.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-class TabelAsistensiLaporan extends StatefulWidget {
+class TabelDetailAsistensiLaporanDosen extends StatefulWidget {
   final String kodeKelas;
   final String nama;
   final String modul;
   final int nim;
-
-  const TabelAsistensiLaporan({
-    Key? key,
-    required this.kodeKelas,
-    required this.nama,
-    required this.modul,
-    required this.nim,
-  }) : super(key: key);
+  const TabelDetailAsistensiLaporanDosen(
+      {super.key,
+      required this.kodeKelas,
+      required this.nama,
+      required this.modul,
+      required this.nim});
 
   @override
-  State<TabelAsistensiLaporan> createState() => _TabelAsistensiLaporanState();
+  State<TabelDetailAsistensiLaporanDosen> createState() =>
+      _TabelDetailAsistensiLaporanDosenState();
 }
 
-class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
+class _TabelDetailAsistensiLaporanDosenState
+    extends State<TabelDetailAsistensiLaporanDosen> {
+  //== List Data Tabel ==//
   List<AsistensiLaporan> demoAsistensiLaporan = [];
   List<AsistensiLaporan> filteredAsistenLaporan = [];
+
+  //=====//
   late int userNim;
   late String userName;
   late String selectedRevisi = 'Status Revisi';
   String selectedModul = 'Tampilkan Semua';
   List<String> availableModuls = ['Tampilkan Semua'];
 
+  //== Filtering Data ==//
   void _filterData(String? modul) {
     if (modul != null) {
       setState(() {
@@ -127,7 +127,7 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
                             ),
                             DataColumn(
                               label: Text(
-                                '      File Asistensi',
+                                'Data Asisten',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -290,88 +290,37 @@ DataRow dataFileDataRow(AsistensiLaporan fileInfo, int index,
           ),
         ],
       )),
-      DataCell(Padding(
-        padding: const EdgeInsets.only(left: 15.0),
-        child: Row(
-          children: [
-            MouseRegion(
+      DataCell(Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          //== Icon Informasi ==//
+          const MouseRegion(
               cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () {
-                  uploadFile(
-                    fileInfo.kode,
-                    fileInfo.file,
-                    fileInfo.modul,
-                    fileInfo.nim,
-                    context,
-                  );
-                },
-                child: const Icon(
-                  Icons.upload,
-                  color: Colors.grey,
-                ),
+              child: Icon(Icons.info, color: Colors.grey)),
+          const SizedBox(
+            width: 5.0,
+          ),
+          //== Text 'INFO ASISTENSI ==//
+          GestureDetector(
+            onTap: () {
+              showInfoDialog(fileInfo, context);
+            },
+            child: const MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Text(
+                'Info Asistensi',
+                style:
+                    TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(
-              width: 2.0,
-            ),
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: IconButton(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text(
-                            'Hapus Data',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16.0),
-                          ),
-                          content: const Text(
-                              'Apakah Anda yakin ingin menghapusnya ?'),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  onDelete(fileInfo.id);
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('Hapus')),
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('Batal'))
-                          ],
-                        );
-                      });
-                },
-                icon: const Icon(
-                  Icons.delete,
-                  color: Colors.grey,
-                ),
-                tooltip: 'Hapus Data',
-              ),
-            ),
-            const SizedBox(
-              width: 2.0,
-            ),
-            MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: IconButton(
-                  onPressed: () {
-                    showInfoDialog(fileInfo, context);
-                  },
-                  icon: const Icon(Icons.info, color: Colors.grey),
-                  tooltip: 'Info Asistensi',
-                )),
-          ],
-        ),
+          )
+        ],
       )),
     ],
   );
 }
 
+//== Fungsi Menampilkan Informasi ==//
 Future<void> showInfoDialog(
     AsistensiLaporan fileInfo, BuildContext context) async {
   try {
@@ -461,6 +410,34 @@ Future<void> showInfoDialog(
                 const SizedBox(
                   height: 18.0,
                 ),
+                Row(
+                  children: [
+                    const Text(
+                      'Download File       : ',
+                      style: TextStyle(fontSize: 14.0),
+                    ),
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        downloadFileAsisten(
+                            fileInfo.kode, fileInfo.file, fileInfo.modul);
+                      },
+                      child: const MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: Text(
+                          'Download',
+                          style: TextStyle(
+                              color: Colors.blue, fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 18.0,
+                ),
               ],
             ),
             actions: [
@@ -502,250 +479,30 @@ Future<void> showInfoDialog(
   }
 }
 
-Future<void> uploadFile(
-  String kodeKelas,
-  String fileName,
-  String modul,
-  int nim,
-  BuildContext context,
-) async {
-  String selectedRevisi = 'Status Asistensi';
-
-  // Menampilkan dialog untuk memilih status revisi
-  await showDialog<String>(
-    context: context,
-    builder: (BuildContext context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: const Text('Pilih Status Revisi'),
-            content: DropdownButton<String>(
-              isExpanded: true,
-              value: selectedRevisi,
-              onChanged: (String? value) {
-                setState(() {
-                  selectedRevisi = value!;
-                });
-              },
-              items: <String>[
-                'Status Asistensi',
-                'Revisi 1',
-                'Revisi 2',
-                'Revisi 3',
-                'Revisi 4',
-                'Revisi 5',
-                'ACC'
-              ].map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  // Menutup dialog tanpa melanjutkan proses ke upload file
-                  Navigator.pop(context);
-                },
-                child: const Text('Batal'),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (selectedRevisi != 'Status Asistensi') {
-                    Navigator.pop(context, selectedRevisi);
-                  } else {
-                    // Bisa tambahkan feedback untuk user bahwa harus memilih status revisi
-                  }
-                },
-                child: const Text('Simpan'),
-              ),
-            ],
-          );
-        },
-      );
-    },
-  );
-
-  // Jika user membatalkan dialog, maka keluar dari fungsi uploadFile
-  if (selectedRevisi == 'Status Asistensi') {
-    return;
-  }
-
-  // Menampilkan loading dialog
-  showDialog(
-    context: context,
-    barrierDismissible: false, // Mencegah dialog ditutup secara manual
-    builder: (BuildContext context) {
-      return Dialog(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              LoadingAnimationWidget.fourRotatingDots(
-                color: Colors.blue,
-                size: 50,
-              ),
-              const SizedBox(width: 20),
-              const Text("Uploading..."),
-            ],
-          ),
-        ),
-      );
-    },
-  );
+//== Fungsi Download File data dari Asisten ==//
+void downloadFileAsisten(
+    String kodeKelas, String fileName, String judulMateri) async {
+  final ref = FirebaseStorage.instance
+      .ref()
+      .child('asistensiLaporan/$kodeKelas/$judulMateri/$fileName');
 
   try {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      PlatformFile file = result.files.first;
-      User? user = FirebaseAuth.instance.currentUser;
-      String nama = '';
-
-      if (user != null) {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('akun_mahasiswa')
-            .doc(user.uid)
-            .get();
-        nama = userDoc['nama'];
-      }
-
-      // Pengecekan data di Firestore
-      QuerySnapshot existingData = await FirebaseFirestore.instance
-          .collection('asistensiLaporan')
-          .where('kodeKelas', isEqualTo: kodeKelas)
-          .where('judulMateri', isEqualTo: modul)
-          .where('statusRevisi', isEqualTo: selectedRevisi)
-          .get();
-
-      if (existingData.docs.isNotEmpty) {
-        Navigator.pop(context); // Menutup dialog loading
-
-        // Menampilkan dialog bahwa data sudah ada
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Data Sudah Ada'),
-              content: const Text('Data telah terdapat pada database.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-        return;
-      }
-
-      final firebase_storage.Reference storageRef = firebase_storage
-          .FirebaseStorage.instance
-          .ref()
-          .child('asistensiLaporan/$kodeKelas/$modul/$fileName');
-
-      await storageRef.putData(Uint8List.fromList(file.bytes!));
-
-      String nextDocumentId = '';
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        DocumentReference counterRef = FirebaseFirestore.instance
-            .collection('counters')
-            .doc('asistensiLaporan');
-        DocumentSnapshot counterSnapshot = await transaction.get(counterRef);
-        int currentCount =
-            counterSnapshot.exists ? counterSnapshot.get('count') : 0;
-        nextDocumentId = '${currentCount + 1}';
-        transaction.set(counterRef, {'count': currentCount + 1});
-      });
-
-      await FirebaseFirestore.instance
-          .collection('asistensiLaporan')
-          .doc(nextDocumentId)
-          .set({
-        'namaFile': fileName,
-        'waktuPengumpulan': DateTime.now(),
-        'namaAsisten': nama,
-        'kodeKelas': kodeKelas,
-        'judulMateri': modul,
-        'statusRevisi': selectedRevisi,
-        'nim': nim
-      });
-
-      Navigator.pop(context); // Menutup dialog loading
-
-      // Menampilkan dialog sukses setelah file di-upload
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return SizedBox(
-            height: 20.0,
-            width: 50.0,
-            child: AlertDialog(
-              title: Column(
-                children: [
-                  Center(
-                    child: SizedBox(
-                      height: 120.0,
-                      width: 120.0,
-                      child: Image.asset(
-                        'assets/images/upload.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Center(
-                    child: Text(
-                      'Data berhasil diupload.',
-                      style: GoogleFonts.quicksand(
-                          fontSize: 17.0, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
-        },
-      );
+    final url = await ref.getDownloadURL();
+    // ignore: deprecated_member_use
+    if (await canLaunch(url)) {
+      // ignore: deprecated_member_use
+      await launch(url);
     } else {
-      Navigator.pop(
-          context); // Menutup dialog loading jika tidak ada file yang dipilih
+      throw 'Could not launch $url';
     }
   } catch (e) {
-    Navigator.pop(context); // Menutup dialog loading jika terjadi error
-
-    // Menampilkan pesan error
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Error'),
-          content: Text('Error uploading file: $e'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
+    if (kDebugMode) {
+      print('Error downloading file: $e');
+    }
   }
 }
 
+//== Fungsi Download File 'Asistensi Laporan dari Praktikan' ==//
 void downloadFile(String kodeKelas, String fileName, String judulMateri) async {
   final ref = FirebaseStorage.instance
       .ref()

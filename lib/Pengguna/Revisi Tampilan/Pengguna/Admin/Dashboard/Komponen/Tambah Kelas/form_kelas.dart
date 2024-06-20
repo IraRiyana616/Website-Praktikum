@@ -372,9 +372,6 @@ class _FormDataKelasState extends State<FormDataKelas> {
                                                           10.0)),
                                               filled: true,
                                               fillColor: Colors.white),
-                                          inputFormatters: [
-                                            LengthLimitingTextInputFormatter(20)
-                                          ],
                                         ),
                                       ),
                                     ),

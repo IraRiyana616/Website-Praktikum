@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../Absensi/Screen/absensi_admin.dart';
 import '../../Arsip Praktikum/Screen/arsip_praktikum_admin.dart';
+import '../../Asistensi Laporan/Screen/asistensi_laporan_admin.dart';
 import '../../Dashboard/Screen/dashboard_admin.dart';
 import '../../Hasil Studi/Screen/hasil_studi_admin.dart';
 import '../../Pengaturan/pengaturan_admin.dart';
@@ -110,13 +111,25 @@ class _JadwalPraktikumNavigasiAdminState
                             height: 15,
                           ),
                           DashboardListTile(
-                            title: 'Arsip Praktikum',
+                            title: 'File Pengumpulan',
                             icon: const Icon(
                               Icons.file_copy,
                             ),
                             page: const ArsipPraktikumAdmin(),
                             updatePage: updatePage,
                             isActive: currentPage is ArsipPraktikumAdmin,
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          DashboardListTile(
+                            title: 'Asistensi Laporan',
+                            icon: const Icon(
+                              Icons.archive,
+                            ),
+                            page: const AsistensiLaporanAdmin(),
+                            updatePage: updatePage,
+                            isActive: currentPage is AsistensiLaporanAdmin,
                           ),
                           const SizedBox(
                             height: 15,

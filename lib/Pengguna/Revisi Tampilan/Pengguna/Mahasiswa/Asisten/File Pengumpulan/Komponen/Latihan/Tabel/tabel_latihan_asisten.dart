@@ -310,16 +310,24 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
       DataCell(
         SizedBox(
           width: 130.0,
-          child: Text(getLimitedText(fileInfo.waktu, 19,
-              style: const TextStyle(color: Colors.black))),
+          child: Text(
+              getLimitedText(
+                fileInfo.waktu,
+                19,
+              ),
+              style: const TextStyle(color: Colors.black)),
         ),
       ),
       DataCell(Text(fileInfo.nim.toString())),
       DataCell(
         SizedBox(
           width: 200.0,
-          child: Text(getLimitedText(fileInfo.nama, 25,
-              style: const TextStyle(color: Colors.black))),
+          child: Text(
+              getLimitedText(
+                fileInfo.nama,
+                25,
+              ),
+              style: const TextStyle(color: Colors.black)),
         ),
       ),
       DataCell(Row(
@@ -337,11 +345,11 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
             },
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
-              child: Text(getLimitedText(
-                  fileInfo.file,
-                  style: const TextStyle(
-                      color: Colors.blue, fontWeight: FontWeight.bold),
-                  20)),
+              child: Text(
+                getLimitedText(fileInfo.file, 30),
+                style: const TextStyle(
+                    color: Colors.blue, fontWeight: FontWeight.bold),
+              ),
             ),
           )
         ],
@@ -371,7 +379,7 @@ void downloadFile(String kodeKelas, String fileName, String judulMateri) async {
   }
 }
 
-String getLimitedText(String text, int limit, {required TextStyle style}) {
+String getLimitedText(String text, int limit) {
   return text.length <= limit ? text : text.substring(0, limit);
 }
 

@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Komponen/data_asistensi_dosen.dart';
+import '../Komponen/Data Mahasiswa/Screen/data_asistensi_dosen.dart';
 
 class TabelAsistensiLaporanDosen extends StatefulWidget {
   const TabelAsistensiLaporanDosen({super.key});
@@ -16,10 +16,15 @@ class TabelAsistensiLaporanDosen extends StatefulWidget {
 
 class _TabelAsistensiLaporanDosenState
     extends State<TabelAsistensiLaporanDosen> {
+  //== List Data Tabel ==//
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
+
+  //== Search ==//
   final TextEditingController _textController = TextEditingController();
   bool _isTextFieldNotEmpty = false;
+
+  //== Dropdown Button Tahun Ajaran ==//
   String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
@@ -27,6 +32,7 @@ class _TabelAsistensiLaporanDosenState
   String nip = '';
   User? user = FirebaseAuth.instance.currentUser;
 
+  //== Menampilkan data dari database ==//
   Future<void> fetchUserNIPFromDatabase(
       String userUid, String? selectedYear) async {
     try {
@@ -242,7 +248,7 @@ class _TabelAsistensiLaporanDosenState
                                 decoration: InputDecoration(
                                   hintText: '',
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(0.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 0, horizontal: 10),

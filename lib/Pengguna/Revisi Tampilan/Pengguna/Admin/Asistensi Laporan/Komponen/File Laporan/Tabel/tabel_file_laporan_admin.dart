@@ -1,44 +1,46 @@
 // ignore_for_file: use_build_context_synchronously
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-class TabelAsistensiLaporan extends StatefulWidget {
+class TabelFileLaporanAdmin extends StatefulWidget {
   final String kodeKelas;
   final String nama;
   final String modul;
   final int nim;
-
-  const TabelAsistensiLaporan({
-    Key? key,
-    required this.kodeKelas,
-    required this.nama,
-    required this.modul,
-    required this.nim,
-  }) : super(key: key);
+  const TabelFileLaporanAdmin(
+      {super.key,
+      required this.kodeKelas,
+      required this.nama,
+      required this.modul,
+      required this.nim});
 
   @override
-  State<TabelAsistensiLaporan> createState() => _TabelAsistensiLaporanState();
+  State<TabelFileLaporanAdmin> createState() => _TabelFileLaporanAdminState();
 }
 
-class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
+class _TabelFileLaporanAdminState extends State<TabelFileLaporanAdmin> {
+  //== List Data Tabel ==//
   List<AsistensiLaporan> demoAsistensiLaporan = [];
   List<AsistensiLaporan> filteredAsistenLaporan = [];
+
+  //=====//
   late int userNim;
   late String userName;
   late String selectedRevisi = 'Status Revisi';
   String selectedModul = 'Tampilkan Semua';
   List<String> availableModuls = ['Tampilkan Semua'];
 
+  //== Filtering Data ==//
   void _filterData(String? modul) {
     if (modul != null) {
       setState(() {
@@ -127,7 +129,7 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
                             ),
                             DataColumn(
                               label: Text(
-                                '      File Asistensi',
+                                '         File Asistensi',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -296,24 +298,14 @@ DataRow dataFileDataRow(AsistensiLaporan fileInfo, int index,
           children: [
             MouseRegion(
               cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () {
-                  uploadFile(
-                    fileInfo.kode,
-                    fileInfo.file,
-                    fileInfo.modul,
-                    fileInfo.nim,
-                    context,
-                  );
+              child: IconButton(
+                onPressed: () {
+                  uploadFile(fileInfo.kode, fileInfo.file, fileInfo.modul,
+                      fileInfo.nim, context);
                 },
-                child: const Icon(
-                  Icons.upload,
-                  color: Colors.grey,
-                ),
+                icon: const Icon(Icons.upload, color: Colors.grey),
+                tooltip: 'Upload File',
               ),
-            ),
-            const SizedBox(
-              width: 2.0,
             ),
             MouseRegion(
               cursor: SystemMouseCursors.click,
@@ -353,9 +345,6 @@ DataRow dataFileDataRow(AsistensiLaporan fileInfo, int index,
                 tooltip: 'Hapus Data',
               ),
             ),
-            const SizedBox(
-              width: 2.0,
-            ),
             MouseRegion(
                 cursor: SystemMouseCursors.click,
                 child: IconButton(
@@ -372,6 +361,7 @@ DataRow dataFileDataRow(AsistensiLaporan fileInfo, int index,
   );
 }
 
+//== Fungsi Menampilkan Informasi ==//
 Future<void> showInfoDialog(
     AsistensiLaporan fileInfo, BuildContext context) async {
   try {
@@ -502,6 +492,7 @@ Future<void> showInfoDialog(
   }
 }
 
+//== Fungsi Upload File ==//
 Future<void> uploadFile(
   String kodeKelas,
   String fileName,
@@ -629,7 +620,7 @@ Future<void> uploadFile(
             return AlertDialog(
               title: const Text('Data Sudah Ada'),
               content: const Text('Data telah terdapat pada database.'),
-              actions: <Widget>[
+              actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -746,6 +737,7 @@ Future<void> uploadFile(
   }
 }
 
+//== Fungsi Download File ==//
 void downloadFile(String kodeKelas, String fileName, String judulMateri) async {
   final ref = FirebaseStorage.instance
       .ref()

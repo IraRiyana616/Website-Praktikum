@@ -633,15 +633,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
                       ),
                     ),
                     actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.only(bottom: 10.0),
-                          child: Text("Batal"),
-                        ),
-                      ),
+                      //== Hapus ==//
                       TextButton(
                         onPressed: () {
                           onDelete(fileInfo.id);
@@ -650,6 +642,16 @@ DataRow dataFileDataRow(DataClass fileInfo, int index,
                         child: const Padding(
                           padding: EdgeInsets.only(bottom: 10.0),
                           child: Text("Hapus"),
+                        ),
+                      ),
+                      //== Batal ==//
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.only(bottom: 10.0),
+                          child: Text("Batal"),
                         ),
                       ),
                     ],

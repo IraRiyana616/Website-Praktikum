@@ -2,23 +2,27 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Pengguna/Revisi%20Tampilan/Pengguna/Admin/Asistensi%20Laporan/Komponen/Data%20Mahasiswa%20Asisten/Screen/data_mahasiswa_asistensi_laporan.dart';
 
-import '../Komponen/Latihan/latihan_admin.dart';
-
-class TabelArsipPraktikum extends StatefulWidget {
-  const TabelArsipPraktikum({super.key});
+class TabelAsistensiLaporanAdmin extends StatefulWidget {
+  const TabelAsistensiLaporanAdmin({super.key});
 
   @override
-  State<TabelArsipPraktikum> createState() => _TabelArsipPraktikumState();
+  State<TabelAsistensiLaporanAdmin> createState() =>
+      _TabelAsistensiLaporanAdminState();
 }
 
-class _TabelArsipPraktikumState extends State<TabelArsipPraktikum> {
+class _TabelAsistensiLaporanAdminState
+    extends State<TabelAsistensiLaporanAdmin> {
+  //== List Data Tabel ==//
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
 
+  //== Dropdown Button Tahun Ajaran ==//
   String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
+  //== Menampilkan dropdown button Tahun Ajaran dari database ==//
   Future<void> fetchAvailableYears() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
@@ -37,6 +41,7 @@ class _TabelArsipPraktikumState extends State<TabelArsipPraktikum> {
     }
   }
 
+  //== Database 'dataKelas' ==//
   Future<void> fetchDataFromFirebase(String? selectedYear) async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
@@ -87,6 +92,7 @@ class _TabelArsipPraktikumState extends State<TabelArsipPraktikum> {
     await fetchDataFromFirebase(selectedYear);
   }
 
+  //== Filter Data ==//
   void filterData(String query) {
     setState(() {
       filteredClassData = demoClassData
@@ -113,7 +119,7 @@ class _TabelArsipPraktikumState extends State<TabelArsipPraktikum> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Arsip Praktikum',
+            child: Text('Data Asistensi Laporan',
                 style: GoogleFonts.quicksand(
                     fontSize: 18, fontWeight: FontWeight.bold)),
           ),
@@ -264,8 +270,10 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                TugasAdminScreen(
-                    kodeKelas: fileInfo.kelas, mataKuliah: fileInfo.matkul),
+                DataMahasiswaAsistensiLaporan(
+              kodeKelas: fileInfo.kelas,
+              mataKuliah: fileInfo.matkul,
+            ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               const begin = Offset(0.0, 0.0);

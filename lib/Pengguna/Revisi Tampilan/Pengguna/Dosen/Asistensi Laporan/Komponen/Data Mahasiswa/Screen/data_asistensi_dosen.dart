@@ -1,81 +1,65 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../Navigasi/asistensinav_dosen.dart';
+import '../Tabel/tabel_data_mahasiswa_dosen.dart';
 
-import '../../../../../../Mahasiswa/Asisten/Kelas/Komponen/Asistensi Laporan/Tabel/tbl_data_prak.dart';
-import '../../Navigasi/arsip_pengumpulannav_admin.dart';
-import '../Tugas/tugas_admin.dart';
-
-class LaporanAdminScreen extends StatefulWidget {
+class DataAsistenDosen extends StatefulWidget {
   final String kodeKelas;
   final String mataKuliah;
-  const LaporanAdminScreen(
+  const DataAsistenDosen(
       {super.key, required this.kodeKelas, required this.mataKuliah});
 
   @override
-  State<LaporanAdminScreen> createState() => _LaporanAdminScreenState();
+  State<DataAsistenDosen> createState() => _DataAsistenDosenState();
 }
 
-class _LaporanAdminScreenState extends State<LaporanAdminScreen> {
-  //Fungsi Untuk Bottom Navigation
-  int _selectedIndex = 1; // untuk mengatur index bottom navigation
-  void _onItemTapped(int index) {
+class _DataAsistenDosenState extends State<DataAsistenDosen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  //== Fungsi Nama Mahasiswa ==//
+  User? _currentUser;
+  String _namaMahasiswa = '';
+
+  //== Nama Akun ==//
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUser();
+  }
+
+  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
+  void _getCurrentUser() async {
     setState(() {
-      _selectedIndex = index;
-      // Memilih halaman sesuai dengan index yang dipilih
-      if (index == 0) {
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                TugasAdminScreen(
-                    kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = Offset(0.0, 0.0);
-              const end = Offset.zero;
-              const curve = Curves.ease;
-
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-              return SlideTransition(
-                position: animation.drive(tween),
-                child: child,
-              );
-            },
-          ),
-        );
-      } else if (index == 1) {
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                LaporanAdminScreen(
-              kodeKelas: widget.kodeKelas,
-              mataKuliah: widget.mataKuliah,
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = Offset(0.0, 0.0);
-              const end = Offset.zero;
-              const curve = Curves.ease;
-
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-              return SlideTransition(
-                position: animation.drive(tween),
-                child: child,
-              );
-            },
-          ),
-        );
-      }
+      _currentUser = _auth.currentUser;
     });
+    if (_currentUser != null) {
+      await _getNamaMahasiswa(_currentUser!.uid);
+    }
+  }
+
+  // Fungsi untuk mengambil nama mahasiswa dari database
+  Future<void> _getNamaMahasiswa(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('akun_dosen').doc(uid).get();
+      if (doc.exists) {
+        setState(() {
+          _namaMahasiswa = doc.get('nama');
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching nama dosen: $e');
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: PreferredSize(
           preferredSize: const Size.fromHeight(70.0),
@@ -87,7 +71,7 @@ class _LaporanAdminScreenState extends State<LaporanAdminScreen> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        const ArsipPraktikumNavigasi(),
+                        const AsistensiLaporanNavigasiDosen(),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       const begin = Offset(0.0, 0.0);
@@ -125,18 +109,19 @@ class _LaporanAdminScreenState extends State<LaporanAdminScreen> {
                         color: Colors.black),
                   )),
                   const Spacer(),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: Text(
-                      'Admin',
+                  if (screenWidth > 600) const SizedBox(width: 400.0),
+                  if (_currentUser != null) ...[
+                    Text(
+                      _namaMahasiswa.isNotEmpty
+                          ? _namaMahasiswa
+                          : (_currentUser!.email ?? ''),
                       style: GoogleFonts.quicksand(
-                        fontSize: 17.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
                     ),
-                  ),
-                  const SizedBox(width: 10.0)
+                    if (screenWidth > 600) const SizedBox(width: 10.0)
+                  ],
                 ],
               ),
             ),
@@ -156,12 +141,13 @@ class _LaporanAdminScreenState extends State<LaporanAdminScreen> {
                       padding: const EdgeInsets.only(top: 15.0),
                       child: Center(
                         child: Container(
-                          constraints: const BoxConstraints(maxWidth: 1300.0),
+                          constraints: const BoxConstraints(maxWidth: 1250.0),
                           color: Colors.white,
                           child: Column(
                             children: [
-                              TabelDataPraktikan(
+                              TabelDataMahasiswaDosenAsistensiLaporan(
                                 kodeKelas: widget.kodeKelas,
+                                mataKuliah: widget.mataKuliah,
                               ),
                               const SizedBox(
                                 height: 30.0,
@@ -177,21 +163,6 @@ class _LaporanAdminScreenState extends State<LaporanAdminScreen> {
             ),
           );
         },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'Tugas',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Laporan',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFF3CBEA9),
-        onTap: _onItemTapped,
       ),
     );
   }

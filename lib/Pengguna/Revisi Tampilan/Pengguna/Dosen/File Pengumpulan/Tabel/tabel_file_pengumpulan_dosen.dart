@@ -15,10 +15,15 @@ class TabelFilePengumpulanDosen extends StatefulWidget {
 }
 
 class _TabelFilePengumpulanDosenState extends State<TabelFilePengumpulanDosen> {
+  //== List Data Tabel ==//
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
+
+  //== Search ==//
   final TextEditingController _textController = TextEditingController();
   bool _isTextFieldNotEmpty = false;
+
+  //== Dropdown Button Tahun Ajaran ==//
   String selectedYear = 'Tahun Ajaran';
   List<String> availableYears = [];
 
@@ -241,7 +246,7 @@ class _TabelFilePengumpulanDosenState extends State<TabelFilePengumpulanDosen> {
                                 decoration: InputDecoration(
                                   hintText: '',
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(0.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 0, horizontal: 10),
