@@ -68,20 +68,10 @@ class _TambahAksesAbsensiMahasiswaState
   void _updateTimeText() {
     if (startTime != null && endTime != null) {
       final format = DateFormat('hh:mm a');
-      final startTimeFormatted = format.format(DateTime(
-        0,
-        0,
-        0,
-        startTime!.hour,
-        startTime!.minute,
-      ));
-      final endTimeFormatted = format.format(DateTime(
-        0,
-        0,
-        0,
-        endTime!.hour,
-        endTime!.minute,
-      ));
+      final startTimeFormatted =
+          format.format(DateTime(0, 0, 0, startTime!.hour, startTime!.minute));
+      final endTimeFormatted =
+          format.format(DateTime(0, 0, 0, endTime!.hour, endTime!.minute));
 
       waktuPraktikumController.text = '$startTimeFormatted - $endTimeFormatted';
     }
@@ -97,8 +87,11 @@ class _TambahAksesAbsensiMahasiswaState
   //== Menampilkan data dari 'silabusPraktikum' ==//
   Future<void> fetchJudulMateri() async {
     try {
-      QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('silabusPraktikum').get();
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('silabusPraktikum')
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
+          .get();
+
       //== Judul Materi ==//
       List<String> tempList =
           snapshot.docs.map((doc) => doc['judulMateri'] as String).toList();
@@ -106,6 +99,7 @@ class _TambahAksesAbsensiMahasiswaState
       List<String> waktuList = snapshot.docs
           .map((doc) => doc['tanggalPraktikum'] as String)
           .toList();
+
       setState(() {
         judulMateriList = tempList;
         waktuPraktikumList = waktuList;

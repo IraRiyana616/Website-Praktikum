@@ -392,7 +392,9 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
                                 width: 360.0,
                                 child: StreamBuilder<QuerySnapshot>(
                                   stream: FirebaseFirestore.instance
-                                      .collection('silabusPraktikum')
+                                      .collection('AksesAbsensi')
+                                      .where('kodeKelas',
+                                          isEqualTo: widget.kodeKelas)
                                       .snapshots(),
                                   builder: (context, snapshot) {
                                     if (!snapshot.hasData) {

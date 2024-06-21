@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -309,79 +311,143 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
           ),
         ),
       ),
-      DataCell(Row(
-        children: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      TambahAksesAbsensiMahasiswa(
-                    kodeKelas: fileInfo.kelas,
-                    mataKuliah: fileInfo.matkul,
-                    kodeAsisten: fileInfo.asisten,
-                  ),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    const begin = Offset(0.0, 0.0);
-                    const end = Offset.zero;
-                    const curve = Curves.ease;
+      DataCell(
+        Row(
+          children: [
+            IconButton(
+              onPressed: () async {
+                bool dataExists = await checkDataExistence(fileInfo.kelas);
+                if (dataExists) {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          TambahAksesAbsensiMahasiswa(
+                        kodeKelas: fileInfo.kelas,
+                        mataKuliah: fileInfo.matkul,
+                        kodeAsisten: fileInfo.asisten,
+                      ),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin = Offset(0.0, 0.0);
+                        const end = Offset.zero;
+                        const curve = Curves.ease;
 
-                    var tween = Tween(begin: begin, end: end)
-                        .chain(CurveTween(curve: curve));
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
 
-                    return SlideTransition(
-                      position: animation.drive(tween),
-                      child: child,
-                    );
-                  },
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.add_box,
-              color: Colors.grey,
+                        return SlideTransition(
+                          position: animation.drive(tween),
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text(
+                          'Peringatan',
+                          style: GoogleFonts.quicksand(
+                              fontWeight: FontWeight.bold),
+                        ),
+                        content: SizedBox(
+                          height: 165.0,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: 120.0,
+                                width: 120.0,
+                                child: Image.asset(
+                                  'assets/images/9169206.jpg',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.only(top: 10.0),
+                                child:
+                                    Text('Data belum terdapat pada database'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+              icon: const Icon(
+                Icons.add_box,
+                color: Colors.grey,
+              ),
+              tooltip: 'Tambah Akses Absensi',
             ),
-            tooltip: 'Tambah Akses Absensi',
-          ),
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      EditAksesScreenAdmin(
-                    kodeKelas: fileInfo.kelas,
-                    mataKuliah: fileInfo.matkul,
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        EditAksesScreenAdmin(
+                      kodeKelas: fileInfo.kelas,
+                      mataKuliah: fileInfo.matkul,
+                      kodeAsisten: fileInfo.asisten,
+                    ),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(0.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
                   ),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    const begin = Offset(0.0, 0.0);
-                    const end = Offset.zero;
-                    const curve = Curves.ease;
-
-                    var tween = Tween(begin: begin, end: end)
-                        .chain(CurveTween(curve: curve));
-
-                    return SlideTransition(
-                      position: animation.drive(tween),
-                      child: child,
-                    );
-                  },
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.edit_document,
-              color: Colors.grey,
+                );
+              },
+              icon: const Icon(
+                Icons.edit_document,
+                color: Colors.grey,
+              ),
+              tooltip: 'Edit Akses Absensi',
             ),
-            tooltip: 'Edit Akses Absensi',
-          ),
-        ],
-      ))
+          ],
+        ),
+      )
     ],
   );
+}
+
+Future<bool> checkDataExistence(String kodeKelas) async {
+  try {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('silabusPraktikum')
+        .where('kodeKelas', isEqualTo: kodeKelas)
+        .get();
+
+    return querySnapshot.docs.isNotEmpty;
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error checking data existence: $e');
+    }
+    return false;
+  }
 }
 
 String getLimitedText(String text, int limit) {
