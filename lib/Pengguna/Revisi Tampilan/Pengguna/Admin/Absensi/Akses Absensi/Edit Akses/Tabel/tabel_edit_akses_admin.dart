@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -22,34 +24,39 @@ class TabelAksesAbsensiMahasiswa extends StatefulWidget {
 
 class _TabelAksesAbsensiMahasiswaState
     extends State<TabelAksesAbsensiMahasiswa> {
-  //== List Data Tabel ==//
+  TextEditingController waktuPraktikumController = TextEditingController();
   List<AksesAbsensi> filteredAksesAbsensi = [];
-  List<AksesAbsensi> demoAksesAbsensi = [];
+  late StreamSubscription<QuerySnapshot> subscription;
 
   @override
   void initState() {
     super.initState();
-    fetchDataFromFirestore();
+    subscribeToFirestoreUpdates();
   }
 
-  void fetchDataFromFirestore() async {
-    final querySnapshot = await FirebaseFirestore.instance
+  void subscribeToFirestoreUpdates() {
+    subscription = FirebaseFirestore.instance
         .collection('AksesAbsensi')
         .where('kodeKelas', isEqualTo: widget.kodeKelas)
         .where('kodeAsisten', isEqualTo: widget.kodeAsisten)
         .where('mataKuliah', isEqualTo: widget.mataKuliah)
-        .get();
+        .snapshots()
+        .listen((querySnapshot) {
+      final data = querySnapshot.docs
+          .map((doc) => AksesAbsensi.fromFirestore(doc))
+          .toList();
 
-    final data = querySnapshot.docs
-        .map((doc) => AksesAbsensi.fromFirestore(doc))
-        .toList();
-
-    setState(() {
-      filteredAksesAbsensi = data;
+      setState(() {
+        filteredAksesAbsensi = data;
+      });
     });
   }
 
-  
+  @override
+  void dispose() {
+    subscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,57 +68,65 @@ class _TabelAksesAbsensiMahasiswaState
           child: Text(
             'Data Akses Absensi Mahasiswa',
             style: GoogleFonts.quicksand(
-                fontWeight: FontWeight.bold, fontSize: 18.0),
+              fontWeight: FontWeight.bold,
+              fontSize: 18.0,
+            ),
           ),
         ),
         Center(
           child: Padding(
             padding: const EdgeInsets.only(left: 30.0, right: 30.0, top: 25.0),
             child: SizedBox(
-                width: 1250.0,
-                child: filteredAksesAbsensi.isNotEmpty
-                    ? PaginatedDataTable(
-                        columnSpacing: 10,
-                        columns: const [
-                          DataColumn(
-                              label: Text('Judul Modul',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold))),
-                          DataColumn(
-                              label: Text('Pertemuan Praktikum',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold))),
-                          DataColumn(
-                              label: Text(
+              width: 1250.0,
+              child: filteredAksesAbsensi.isNotEmpty
+                  ? PaginatedDataTable(
+                      columnSpacing: 10,
+                      columns: const [
+                        DataColumn(
+                          label: Text('Judul Modul',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        DataColumn(
+                          label: Text('Pertemuan Praktikum',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        DataColumn(
+                          label: Text(
                             'Tanggal Praktikum',
                             style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
-                              label: Text(
-                            'Akses Absensi Praktikum',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
-                              label: Text(
-                            '     Aksi',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ))
-                        ],
-                        source: DataSource(filteredAksesAbsensi, context,
-                            deleteData),
-                        rowsPerPage:
-                            calculateRowsPerPage(filteredAksesAbsensi.length),
-                      )
-                    : const Padding(
-                        padding: EdgeInsets.only(top: 15.0),
-                        child: Center(
-                          child: Text(
-                            'No data available',
-                            style: TextStyle(
-                                fontSize: 16.0, fontWeight: FontWeight.bold),
                           ),
                         ),
-                      )),
+                        DataColumn(
+                          label: Text(
+                            'Akses Absensi Praktikum',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            '     Aksi',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
+                      source:
+                          DataSource(filteredAksesAbsensi, context, deleteData),
+                      rowsPerPage:
+                          calculateRowsPerPage(filteredAksesAbsensi.length),
+                    )
+                  : const Padding(
+                      padding: EdgeInsets.only(top: 15.0),
+                      child: Center(
+                        child: Text(
+                          'No data available',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+            ),
           ),
         )
       ],
@@ -120,28 +135,21 @@ class _TabelAksesAbsensiMahasiswaState
 
   int calculateRowsPerPage(int rowCount) {
     const int defaultRowsPerPage = 25;
-    if (rowCount <= defaultRowsPerPage) {
-      return rowCount;
-    } else {
-      return defaultRowsPerPage;
-    }
+    return rowCount <= defaultRowsPerPage ? rowCount : defaultRowsPerPage;
   }
 
-  //== Fungsi untuk menghapus data ==//
   void deleteData(String id) async {
     try {
-      await FirebaseFirestore.instance.doc(id).delete();
-      fetchDataFromFirestore();
+      await FirebaseFirestore.instance
+          .collection('AksesAbsensi')
+          .doc(id)
+          .delete();
     } catch (error) {
       if (kDebugMode) {
         print('Error deleting: $error');
       }
     }
   }
-
- 
-
-  
 }
 
 class AksesAbsensi {
@@ -154,15 +162,16 @@ class AksesAbsensi {
   String jadwal;
   String id;
 
-  AksesAbsensi(
-      {required this.kode,
-      required this.matkul,
-      required this.asisten,
-      required this.modul,
-      required this.pertemuan,
-      required this.waktu,
-      required this.jadwal,
-      required this.id});
+  AksesAbsensi({
+    required this.kode,
+    required this.matkul,
+    required this.asisten,
+    required this.modul,
+    required this.pertemuan,
+    required this.waktu,
+    required this.jadwal,
+    required this.id,
+  });
 
   factory AksesAbsensi.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -182,91 +191,170 @@ class AksesAbsensi {
 DataRow dataFileDataRow(AksesAbsensi fileInfo, int index, BuildContext context,
     Function(String) onDelete) {
   return DataRow(
-      color: MaterialStateProperty.resolveWith<Color?>(
-        (Set<MaterialState> states) {
-          return getRowColor(index);
-        },
-      ),
-      cells: [
-        DataCell(SizedBox(
-            width: 200.0, child: Text(getLimitedText(fileInfo.modul, 30)))),
-        DataCell(SizedBox(
-            width: 100.0,
-            child: Text(
-              fileInfo.pertemuan,
-            ))),
-        DataCell(SizedBox(
-          width: 150.0,
-          child: Text(fileInfo.jadwal),
-        )),
-        DataCell(SizedBox(
-          width: 150.0,
-          child: Text(fileInfo.waktu),
-        )),
-        DataCell(Row(
-          children: [
-            //== Edit Akses Absensi ==//
-            IconButton(
-              onPressed: () {
-               
-              },
-              icon: const Icon(
-                Icons.edit_document,
-                color: Colors.grey,
-              ),
-              tooltip: 'Edit Akses Absensi',
+    color: MaterialStateProperty.resolveWith<Color?>(
+      (Set<MaterialState> states) {
+        return getRowColor(index);
+      },
+    ),
+    cells: [
+      DataCell(SizedBox(
+        width: 200.0,
+        child: Text(getLimitedText(fileInfo.modul, 30)),
+      )),
+      DataCell(SizedBox(
+        width: 100.0,
+        child: Text(
+          fileInfo.pertemuan,
+        ),
+      )),
+      DataCell(SizedBox(
+        width: 150.0,
+        child: Text(fileInfo.jadwal),
+      )),
+      DataCell(SizedBox(
+        width: 150.0,
+        child: Text(fileInfo.waktu),
+      )),
+      DataCell(Row(
+        children: [
+          IconButton(
+            onPressed: () {
+              showEditDialog(context, fileInfo);
+            },
+            icon: const Icon(
+              Icons.edit_document,
+              color: Colors.grey,
             ),
-            //== Hapus Akses Absensi ==//
-            IconButton(
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text(
-                          'Hapus Akses Absensi',
-                          style: GoogleFonts.quicksand(
-                              fontSize: 20.0, fontWeight: FontWeight.bold),
+            tooltip: 'Edit Akses Absensi',
+          ),
+          IconButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text(
+                      'Hapus Akses Absensi',
+                      style: GoogleFonts.quicksand(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    content: const SizedBox(
+                      height: 30.0,
+                      width: 260.0,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 10.0),
+                        child: Text('Anda yakin ingin menghapus data?'),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          onDelete(fileInfo.id);
+                          Navigator.of(context).pop();
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.only(bottom: 10.0),
+                          child: Text('Hapus'),
                         ),
-                        content: const SizedBox(
-                          height: 30.0,
-                          width: 260.0,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 10.0),
-                            child: Text('Anda yakin ingin menghapus data?'),
-                          ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.only(bottom: 10.0),
+                          child: Text('Batal'),
                         ),
-                        actions: [
-                          TextButton(
-                              onPressed: () {
-                                onDelete(fileInfo.id);
-                                Navigator.of(context).pop();
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.only(bottom: 10.0),
-                                child: Text('Hapus'),
-                              )),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.only(bottom: 10.0),
-                                child: Text('Batal'),
-                              ))
-                        ],
-                      );
-                    });
-              },
-              icon: const Icon(
-                Icons.delete,
-                color: Colors.grey,
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            icon: const Icon(
+              Icons.delete,
+              color: Colors.grey,
+            ),
+            tooltip: 'Hapus Akses Absensi',
+          ),
+        ],
+      )),
+    ],
+  );
+}
+
+void showEditDialog(BuildContext context, AksesAbsensi fileInfo) {
+  TextEditingController waktuController =
+      TextEditingController(text: fileInfo.waktu);
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          'Edit Akses Absensi',
+          style: GoogleFonts.quicksand(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: SizedBox(
+          height: 70.0,
+          width: 320.0,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: TextField(
+              controller: waktuController,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(
+                  Icons.access_time,
+                  color: Colors.grey,
+                ),
+                hintText: 'Masukkan Waktu Akses',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                filled: true,
+                fillColor: Colors.white,
               ),
-              tooltip: 'Hapus Akses Absensi',
-            )
-          ],
-        ))
-      ]);
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              // Ambil nilai baru dari TextField
+              String newWaktu = waktuController.text;
+
+              // Update field 'waktuAbsensi' di Firestore
+              await FirebaseFirestore.instance
+                  .collection('AksesAbsensi')
+                  .doc(fileInfo.id)
+                  .update({'waktuAbsensi': newWaktu});
+
+              // ignore: use_build_context_synchronously
+              Navigator.of(context).pop();
+            },
+            child: const Padding(
+              padding: EdgeInsets.only(bottom: 10.0),
+              child: Text('Simpan'),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Padding(
+              padding: EdgeInsets.only(bottom: 10.0),
+              child: Text('Batal'),
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 String getLimitedText(String text, int limit) {
@@ -274,11 +362,7 @@ String getLimitedText(String text, int limit) {
 }
 
 Color getRowColor(int index) {
-  if (index % 2 == 0) {
-    return Colors.grey.shade200;
-  } else {
-    return Colors.transparent;
-  }
+  return index % 2 == 0 ? Colors.grey.shade200 : Colors.transparent;
 }
 
 class DataSource extends DataTableSource {

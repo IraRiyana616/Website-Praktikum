@@ -44,6 +44,7 @@ class _TambahAksesAbsensiMahasiswaState
   //== Memilih Waktu ==//
   TimeOfDay? startTime;
   TimeOfDay? endTime;
+
   Future<void> _selectTime(BuildContext context,
       {required bool isStartTime}) async {
     final TimeOfDay? picked = await showTimePicker(
@@ -112,16 +113,36 @@ class _TambahAksesAbsensiMahasiswaState
   }
 
   //== Fungsi Untuk Menyimpan Data Ke Firestore 'Akses Absensi Mahasiswa' ==//
-  Future<void> saveDataToFirestore() async {
+  Future<void> saveDataToFirestore(BuildContext context) async {
     try {
-      // Check if document with the same jadwalPraktikum and judulMateri exists
+      // Validasi data terhadap koleksi 'silabusPraktikum'
+      QuerySnapshot silabusCheck = await FirebaseFirestore.instance
+          .collection('silabusPraktikum')
+          .where('judulMateri', isEqualTo: selectedJudulMateri)
+          .where('tanggalPraktikum', isEqualTo: selectedWaktuPraktikum)
+          .get();
+
+      if (silabusCheck.docs.isEmpty) {
+        // Tampilkan snackbar jika data tidak sesuai dengan yang terdapat pada database
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('Data tidak sesuai dengan yang terdapat pada database'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      // Jika validasi lolos, lanjutkan untuk menyimpan data
       QuerySnapshot duplicateCheck = await FirebaseFirestore.instance
           .collection('AksesAbsensi')
           .where('jadwalPraktikum', isEqualTo: selectedWaktuPraktikum)
           .where('judulMateri', isEqualTo: selectedJudulMateri)
           .get();
 
-      // If no duplicates found, proceed to save data
+      // Jika tidak ditemukan duplikasi, lanjutkan untuk menyimpan data
       if (duplicateCheck.docs.isEmpty) {
         await FirebaseFirestore.instance.collection('AksesAbsensi').add({
           'kodeKelas': widget.kodeKelas,
@@ -133,12 +154,12 @@ class _TambahAksesAbsensiMahasiswaState
           'waktuAbsensi': waktuPraktikumController.text,
         });
         setState(() {
-          selectedJudulMateri = null;
-          selectedPertemuan = null;
           selectedWaktuPraktikum = null;
+          selectedPertemuan = null;
+          selectedJudulMateri = null;
           waktuPraktikumController.clear();
         });
-        // Show success message or navigate to another screen
+        // Tampilkan pesan sukses atau navigasi ke layar lain
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Data berhasil disimpan'),
@@ -147,7 +168,7 @@ class _TambahAksesAbsensiMahasiswaState
           ),
         );
       } else {
-        // Show error message that duplicate entry exists
+        // Tampilkan pesan error bahwa data duplikat telah ada
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Data telah terdapat pada database'),
@@ -160,6 +181,13 @@ class _TambahAksesAbsensiMahasiswaState
       if (kDebugMode) {
         print('Error saving data: $e');
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Terjadi kesalahan: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -632,7 +660,8 @@ class _TambahAksesAbsensiMahasiswaState
                                                           null &&
                                                       waktuPraktikumController
                                                           .text.isNotEmpty) {
-                                                    saveDataToFirestore();
+                                                    saveDataToFirestore(
+                                                        context);
                                                   } else {
                                                     ScaffoldMessenger.of(
                                                             context)
