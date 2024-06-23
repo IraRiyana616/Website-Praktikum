@@ -52,7 +52,6 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
             timestap: (data['waktuAbsensi'] as Timestamp).toDate(),
             keterangan: data['keterangan'] ?? '',
             file: data['namaFile'] ?? '',
-            matakuliah: data['mataKuliah'] ?? '',
             pertemuan: data['pertemuan'] ?? '',
           );
         }).toList();
@@ -222,7 +221,7 @@ class AbsensiPraktikan {
   final DateTime timestap;
   final String keterangan;
   final String file;
-  final String matakuliah;
+
   final String pertemuan;
 
   AbsensiPraktikan({
@@ -233,7 +232,6 @@ class AbsensiPraktikan {
     required this.timestap,
     required this.keterangan,
     required this.file,
-    required this.matakuliah,
     required this.pertemuan,
   });
 }

@@ -122,20 +122,71 @@ class _AbsensiAsistenScreenState extends State<AbsensiAsistenScreen> {
     }
   }
 
+//== Fungsi untuk menyimpan data ke database 'absensiAsisten'
   Future<void> saveDataToFirestore() async {
     try {
-      if (selectedModul == null) {
-        _showSnackbar('Pilih modul praktikum terlebih dahulu', Colors.red);
+      if (selectedModul!.isEmpty ||
+          selectedAbsen.isEmpty ||
+          selectedPertemuan.isEmpty) {
+        _showSnackbar('Harap lengkapi semua field', Colors.red);
         return;
       }
 
+      // Cek apakah modul dan pertemuan sesuai dengan data di Firestore
+      QuerySnapshot<Map<String, dynamic>> aksesAbsensiData =
+          await FirebaseFirestore.instance
+              .collection('AksesAbsensi')
+              .where('judulMateri', isEqualTo: selectedModul)
+              .where('pertemuan', isEqualTo: selectedPertemuan)
+              .limit(1)
+              .get();
+
+      if (aksesAbsensiData.docs.isEmpty) {
+        _showSnackbar('Judul Modul dan Pertemuan tidak sesuai', Colors.red);
+        return;
+      }
+
+      // Ambil data waktu akses absensi dari Firestore
+      Timestamp waktuAksesAbsensi =
+          aksesAbsensiData.docs[0]['waktuAksesAbsensi'];
+
+      // Ambil waktu tutup akses absensi dari Firestore
+      Timestamp waktuTutupAksesAbsensi =
+          aksesAbsensiData.docs[0]['waktuTutupAksesAbsensi'];
+
+      // Cek apakah waktu sekarang berada di dalam rentang waktu akses absensi
+      Timestamp waktuSekarang = Timestamp.now();
+
+      if (waktuSekarang.seconds < waktuAksesAbsensi.seconds ||
+          waktuSekarang.seconds > waktuTutupAksesAbsensi.seconds) {
+        _showSnackbar('Waktu absensi telah melewati atau belum waktunya absen',
+            Colors.red);
+        return;
+      }
+
+      // Cek apakah data sudah ada
+      QuerySnapshot<Map<String, dynamic>> existingData = await FirebaseFirestore
+          .instance
+          .collection('absensiAsisten')
+          .where('nim', isEqualTo: userNim)
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
+          .where('judulMateri', isEqualTo: selectedModul)
+          .limit(1)
+          .get();
+
+      if (existingData.docs.isNotEmpty) {
+        _showSnackbar(
+            'Data sudah ada, absensi hanya dapat dilakukan sekali', Colors.red);
+        return;
+      }
+
+      // Jika data belum ada, simpan data ke Firestore
       await FirebaseFirestore.instance.collection('absensiAsisten').add({
         'namaFile': _fileName,
         'waktuAbsensi': DateTime.now(),
         'nim': userNim,
         'nama': userName,
         'kodeKelas': widget.kodeKelas,
-        'mataKuliah': widget.mataKuliah,
         'pertemuan': selectedPertemuan,
         'keterangan': selectedAbsen,
         'judulMateri': selectedModul

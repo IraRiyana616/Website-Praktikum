@@ -23,25 +23,14 @@ class AbsenkuPraktikan extends StatefulWidget {
 }
 
 class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
-  //== Fungsi selectedModul ==//
   String? selectedModul;
-
-  //== Fungsi selectedAbsensi ==//
   String selectedAbsen = 'Status Kehadiran';
-
-  //== Fungsi selectedPertemuan ==//
   String selectedPertemuan = 'Pertemuan Praktikum';
-
-  //== Nama dari File Nama ==//
   String _fileName = "";
-
-  //== Fungsi dari enable ElevatedButton ==//
-  bool isButtonEnabled = false;
 
   late int userNim;
   late String userName;
 
-  //== Fungsi untuk mendapatkan data Authentikasi dari 'akun_mahasiswa' ==//
   Future<void> _getData() async {
     try {
       String userUid = FirebaseAuth.instance.currentUser!.uid;
@@ -79,10 +68,8 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
     super.initState();
     _getData();
     _getCurrentUser();
-    checkWaktuAbsensi();
   }
 
-//== Fungsi untuk upload file ==//
   Future<void> uploadFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
@@ -93,7 +80,6 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
         _fileName = fileName;
       });
 
-      // Show the uploading dialog
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -121,11 +107,11 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
 
         await storageRef.putData(file.bytes!);
 
-        Navigator.of(context).pop(); // Close the dialog
+        Navigator.of(context).pop();
 
         _showSnackbar('File berhasil diupload', Colors.green);
       } catch (e) {
-        Navigator.of(context).pop(); // Close the dialog
+        Navigator.of(context).pop();
 
         _showSnackbar('Error uploading file: $e', Colors.red);
 
@@ -135,33 +121,8 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
       }
     }
   }
-  //== Fungsi Check Waktu Absensi ==//
 
-  Future<void> checkWaktuAbsensi() async {
-    try {
-      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-          .collection('AksesAbsensi')
-          .doc('waktuAbsensi')
-          .get();
-
-      if (documentSnapshot.exists) {
-        var data = documentSnapshot.data() as Map<String, dynamic>;
-        var waktuAbsensi = data['waktuAbsensi'];
-
-        // Gantikan dengan kondisi yang sesuai dengan nilai yang Anda inginkan
-        if (waktuAbsensi == 'desired_value') {
-          setState(() {
-            isButtonEnabled = true;
-          });
-        }
-      }
-    } catch (e) {
-      // Handle error jika terjadi
-      print('Error: $e');
-    }
-  }
-
-//== Fungsi untuk menyimpan data ke 'absensiMahasiswa' ==//
+  //== Fungsi untuk menyimpan data ke 'absensiMahasiswa' ==//
   Future<void> saveDataToFirestore() async {
     try {
       if (selectedModul!.isEmpty ||
@@ -182,6 +143,24 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
 
       if (aksesAbsensiData.docs.isEmpty) {
         _showSnackbar('Judul Modul dan Pertemuan tidak sesuai', Colors.red);
+        return;
+      }
+
+      // Ambil data waktu akses absensi dari Firestore
+      Timestamp waktuAksesAbsensi =
+          aksesAbsensiData.docs[0]['waktuAksesAbsensi'];
+
+      // Ambil waktu tutup akses absensi dari Firestore
+      Timestamp waktuTutupAksesAbsensi =
+          aksesAbsensiData.docs[0]['waktuTutupAksesAbsensi'];
+
+      // Cek apakah waktu sekarang berada di dalam rentang waktu akses absensi
+      Timestamp waktuSekarang = Timestamp.now();
+
+      if (waktuSekarang.seconds < waktuAksesAbsensi.seconds ||
+          waktuSekarang.seconds > waktuTutupAksesAbsensi.seconds) {
+        _showSnackbar('Waktu absensi telah melewati atau belum waktunya absen',
+            Colors.red);
         return;
       }
 
@@ -230,13 +209,9 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  //== Fungsi Nama Mahasiswa ==//
   User? _currentUser;
   String _namaMahasiswa = '';
 
-  //== Nama Akun ==//
-
-  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
   void _getCurrentUser() async {
     setState(() {
       _currentUser = _auth.currentUser;
@@ -246,7 +221,6 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
     }
   }
 
-  // Fungsi untuk mengambil nama mahasiswa dari database
   Future<void> _getNamaMahasiswa(String uid) async {
     try {
       DocumentSnapshot doc =
@@ -263,12 +237,10 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
     }
   }
 
-  //Fungsi Untuk Bottom Navigation
-  int _selectedIndex = 0; // untuk mengatur index bottom navigation
+  int _selectedIndex = 0;
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // Memilih halaman sesuai dengan index yang dipilih
       if (index == 0) {
         Navigator.push(
           context,
@@ -411,366 +383,314 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 35.0),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 30.0, top: 10.0),
-                            child: Text(
-                              "Formulir Absensi Praktikum",
-                              style: GoogleFonts.quicksand(
-                                  fontWeight: FontWeight.bold, fontSize: 20.0),
-                            ),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(
-                                left: 30.0, right: 30.0, top: 10.0),
-                            child: Divider(thickness: 0.5, color: Colors.grey),
-                          ),
-                          Row(children: [
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Padding(
                               padding:
-                                  const EdgeInsets.only(left: 395.0, top: 40.0),
-                              child: Text("Modul",
-                                  style: GoogleFonts.quicksand(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold)),
+                                  const EdgeInsets.only(left: 30.0, top: 10.0),
+                              child: Text(
+                                "Formulir Absensi Praktikum",
+                                style: GoogleFonts.quicksand(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20.0),
+                              ),
                             ),
-                            const SizedBox(width: 70.0),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 40.0),
-                              child: SizedBox(
-                                width: 360.0,
-                                child: StreamBuilder<QuerySnapshot>(
-                                  stream: FirebaseFirestore.instance
-                                      .collection('AksesAbsensi')
-                                      .where('kodeKelas',
-                                          isEqualTo: widget.kodeKelas)
-                                      .snapshots(),
-                                  builder: (context, snapshot) {
-                                    if (!snapshot.hasData) {
-                                      return const CircularProgressIndicator();
-                                    }
+                            const Padding(
+                              padding: EdgeInsets.only(
+                                  left: 30.0, right: 30.0, top: 10.0),
+                              child:
+                                  Divider(thickness: 0.5, color: Colors.grey),
+                            ),
+                            Row(children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 395.0, top: 40.0),
+                                child: Text("Modul",
+                                    style: GoogleFonts.quicksand(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                              const SizedBox(width: 70.0),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 40.0),
+                                child: SizedBox(
+                                  width: 360.0,
+                                  child: StreamBuilder<QuerySnapshot>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection('AksesAbsensi')
+                                        .where('kodeKelas',
+                                            isEqualTo: widget.kodeKelas)
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData) {
+                                        return const CircularProgressIndicator();
+                                      }
 
-                                    List<DropdownMenuItem<String>> modulItems =
-                                        snapshot.data!.docs
-                                            .map((DocumentSnapshot document) {
-                                      String judulMateri =
-                                          document['judulMateri'];
-                                      return DropdownMenuItem<String>(
-                                        value: judulMateri,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 15.0),
-                                          child: Text(
-                                            judulMateri,
-                                            style:
-                                                const TextStyle(fontSize: 16.0),
+                                      List<DropdownMenuItem<String>>
+                                          modulItems = snapshot.data!.docs
+                                              .map((DocumentSnapshot document) {
+                                        String judulMateri =
+                                            document['judulMateri'];
+                                        return DropdownMenuItem<String>(
+                                          value: judulMateri,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 15.0),
+                                            child: Text(
+                                              judulMateri,
+                                              style: const TextStyle(
+                                                  fontSize: 16.0),
+                                            ),
                                           ),
+                                        );
+                                      }).toList();
+
+                                      return Container(
+                                        height: 47.0,
+                                        width: 360.0,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: Colors.grey.shade700),
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                        ),
+                                        child: DropdownButton<String>(
+                                          value: selectedModul,
+                                          hint: const Text(
+                                            '     Pilih Modul Praktikum',
+                                            style: TextStyle(
+                                              fontSize: 15.0,
+                                            ),
+                                          ),
+                                          items: modulItems,
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              selectedModul = newValue!;
+                                            });
+                                          },
+                                          isExpanded: true,
+                                          dropdownColor: Colors.white,
+                                          style: TextStyle(
+                                              color: Colors.grey.shade700,
+                                              fontSize: 14.0),
+                                          underline: Container(),
+                                          icon: const Icon(
+                                              Icons.arrow_drop_down,
+                                              color: Colors.grey),
+                                          iconSize: 24,
                                         ),
                                       );
-                                    }).toList();
-
-                                    return Container(
+                                    },
+                                  ),
+                                ),
+                              )
+                            ]),
+                            Row(children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 395.0, top: 20.0),
+                                child: Text("Pertemuan",
+                                    style: GoogleFonts.quicksand(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                              const SizedBox(width: 31.0),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20.0),
+                                child: SizedBox(
+                                    width: 360.0,
+                                    child: Container(
                                       height: 47.0,
-                                      width: 360.0,
+                                      width: 980.0,
                                       decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: Colors.grey.shade700),
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      ),
+                                          border: Border.all(
+                                              color: Colors.grey.shade700),
+                                          borderRadius:
+                                              BorderRadius.circular(8.0)),
                                       child: DropdownButton<String>(
-                                        value: selectedModul,
-                                        hint: const Text(
-                                          '     Pilih Modul Praktikum',
-                                          style: TextStyle(
-                                            fontSize: 15.0,
-                                          ),
-                                        ),
-                                        items: modulItems,
-                                        onChanged: (newValue) {
+                                        value: selectedPertemuan,
+                                        onChanged: (String? newValue) {
                                           setState(() {
-                                            selectedModul = newValue!;
+                                            selectedPertemuan = newValue!;
                                           });
                                         },
-                                        isExpanded: true,
-                                        dropdownColor: Colors.white,
+                                        items: [
+                                          'Pertemuan Praktikum',
+                                          'Pertemuan 1',
+                                          'Pertemuan 2',
+                                          'Pertemuan 3',
+                                          'Pertemuan 4',
+                                          'Pertemuan 5',
+                                          'Pertemuan 6',
+                                          'Pertemuan 7',
+                                          'Pertemuan 8',
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem(
+                                              value: value,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 15.0),
+                                                child: Text(
+                                                  value,
+                                                  style: const TextStyle(
+                                                      fontSize: 16.0),
+                                                ),
+                                              ));
+                                        }).toList(),
                                         style: TextStyle(
-                                            color: Colors.grey.shade700,
-                                            fontSize: 14.0),
-                                        underline: Container(),
+                                            color: Colors.grey.shade700),
                                         icon: const Icon(Icons.arrow_drop_down,
                                             color: Colors.grey),
                                         iconSize: 24,
+                                        elevation: 16,
+                                        isExpanded: true,
+                                        underline: Container(),
                                       ),
-                                    );
-                                  },
-                                ),
+                                    )),
+                              )
+                            ]),
+                            Row(children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 395.0, top: 20.0),
+                                child: Text("Keterangan",
+                                    style: GoogleFonts.quicksand(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold)),
                               ),
-                            )
-                          ]),
-                          Row(children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 395.0, top: 20.0),
-                              child: Text("Pertemuan",
-                                  style: GoogleFonts.quicksand(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                            const SizedBox(width: 31.0),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20.0),
-                              child: SizedBox(
-                                  width: 360.0,
-                                  child: Container(
-                                    height: 47.0,
-                                    width: 980.0,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: Colors.grey.shade700),
-                                        borderRadius:
-                                            BorderRadius.circular(8.0)),
-                                    child: DropdownButton<String>(
-                                      value: selectedPertemuan,
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          selectedPertemuan = newValue!;
-                                        });
-                                      },
-                                      items: [
-                                        'Pertemuan Praktikum',
-                                        'Pertemuan 1',
-                                        'Pertemuan 2',
-                                        'Pertemuan 3',
-                                        'Pertemuan 4',
-                                        'Pertemuan 5',
-                                        'Pertemuan 6',
-                                        'Pertemuan 7',
-                                        'Pertemuan 8',
-                                      ].map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                        return DropdownMenuItem(
-                                            value: value,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 15.0),
-                                              child: Text(
-                                                value,
-                                                style: const TextStyle(
-                                                    fontSize: 16.0),
-                                              ),
-                                            ));
-                                      }).toList(),
-                                      style: TextStyle(
-                                          color: Colors.grey.shade700),
-                                      icon: const Icon(Icons.arrow_drop_down,
-                                          color: Colors.grey),
-                                      iconSize: 24,
-                                      elevation: 16,
-                                      isExpanded: true,
-                                      underline: Container(),
-                                    ),
-                                  )),
-                            )
-                          ]),
-                          Row(children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 395.0, top: 20.0),
-                              child: Text("Keterangan",
-                                  style: GoogleFonts.quicksand(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                            const SizedBox(width: 26.0),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20.0),
-                              child: SizedBox(
-                                  width: 360.0,
-                                  child: Container(
-                                    height: 47.0,
-                                    width: 980.0,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: Colors.grey.shade700),
-                                        borderRadius:
-                                            BorderRadius.circular(8.0)),
-                                    child: DropdownButton<String>(
-                                      value: selectedAbsen,
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          selectedAbsen = newValue!;
-                                        });
-                                      },
-                                      items: [
-                                        'Status Kehadiran',
-                                        'Hadir',
-                                        'Sakit'
-                                      ].map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                        return DropdownMenuItem(
-                                            value: value,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 15.0),
-                                              child: Text(
-                                                value,
-                                                style: const TextStyle(
-                                                    fontSize: 16.0),
-                                              ),
-                                            ));
-                                      }).toList(),
-                                      style: TextStyle(
-                                          color: Colors.grey.shade700),
-                                      icon: const Icon(Icons.arrow_drop_down,
-                                          color: Colors.grey),
-                                      iconSize: 24,
-                                      elevation: 16,
-                                      isExpanded: true,
-                                      underline: Container(),
-                                    ),
-                                  )),
-                            )
-                          ]),
-                          Row(children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 395.0, top: 20.0),
-                              child: Text("Bukti Absensi",
-                                  style: GoogleFonts.quicksand(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                            const SizedBox(width: 16.0),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20.0),
-                              child: SizedBox(
-                                width: 360.0,
-                                child: Stack(
-                                  children: [
-                                    TextField(
-                                      controller: TextEditingController(
-                                          text: _fileName),
-                                      decoration: InputDecoration(
-                                          hintText: ' Nama File',
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0)),
-                                          filled: true,
-                                          fillColor: Colors.white),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 5.0, left: 234.0),
-                                      child: SizedBox(
-                                          height: 40.0,
-                                          width: 120.0,
-                                          child: ElevatedButton(
-                                            style: ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStateProperty
-                                                        .all<Color>(const Color(
-                                                            0xFF3CBEA9))),
-                                            onPressed: () async {
-                                              await uploadFile();
-                                              setState(() {});
-                                            },
-                                            child: Text('Upload Foto',
-                                                style: GoogleFonts.quicksand(
-                                                    fontSize: 13.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white)),
-                                          )),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            )
-                          ]),
-                          Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: SizedBox(
-                              height: 45.0,
-                              width: 150.0,
-                              child: isButtonEnabled
-                                  ? ElevatedButton(
-                                      style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                                const Color(0xFF3CBEA9)),
-                                      ),
-                                      onPressed: isButtonEnabled
-                                          ? saveDataToFirestore
-                                          : null,
-                                      child: Text(
-                                        'Simpan',
-                                        style: TextStyle(
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    )
-                                  : Container(
+                              const SizedBox(width: 26.0),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20.0),
+                                child: SizedBox(
+                                    width: 360.0,
+                                    child: Container(
+                                      height: 47.0,
+                                      width: 980.0,
                                       decoration: BoxDecoration(
-                                        color: Colors.grey,
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
+                                          border: Border.all(
+                                              color: Colors.grey.shade700),
+                                          borderRadius:
+                                              BorderRadius.circular(8.0)),
+                                      child: DropdownButton<String>(
+                                        value: selectedAbsen,
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            selectedAbsen = newValue!;
+                                          });
+                                        },
+                                        items: [
+                                          'Status Kehadiran',
+                                          'Hadir',
+                                          'Sakit'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem(
+                                              value: value,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 15.0),
+                                                child: Text(
+                                                  value,
+                                                  style: const TextStyle(
+                                                      fontSize: 16.0),
+                                                ),
+                                              ));
+                                        }).toList(),
+                                        style: TextStyle(
+                                            color: Colors.grey.shade700),
+                                        icon: const Icon(Icons.arrow_drop_down,
+                                            color: Colors.grey),
+                                        iconSize: 24,
+                                        elevation: 16,
+                                        isExpanded: true,
+                                        underline: Container(),
                                       ),
-                                      child: Center(
+                                    )),
+                              )
+                            ]),
+                            Row(children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 395.0, top: 20.0),
+                                child: Text("Bukti Absensi",
+                                    style: GoogleFonts.quicksand(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                              const SizedBox(width: 16.0),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20.0),
+                                child: SizedBox(
+                                  width: 360.0,
+                                  child: Stack(
+                                    children: [
+                                      TextField(
+                                        controller: TextEditingController(
+                                            text: _fileName),
+                                        decoration: InputDecoration(
+                                            hintText: ' Nama File',
+                                            border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        10.0)),
+                                            filled: true,
+                                            fillColor: Colors.white),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 5.0, left: 234.0),
+                                        child: SizedBox(
+                                            height: 40.0,
+                                            width: 120.0,
+                                            child: ElevatedButton(
+                                              style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all<
+                                                              Color>(
+                                                          const Color(
+                                                              0xFF3CBEA9))),
+                                              onPressed: () async {
+                                                await uploadFile();
+                                                setState(() {});
+                                              },
+                                              child: Text('Upload Foto',
+                                                  style: GoogleFonts.quicksand(
+                                                      fontSize: 13.0,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white)),
+                                            )),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ]),
+                            Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: SizedBox(
+                                  height: 45.0,
+                                  width: 150.0,
+                                  child: SizedBox(
+                                    height: 75.0,
+                                    width: 150.0,
+                                    child: ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all<
+                                                        Color>(
+                                                    const Color(0xFF3CBEA9))),
+                                        onPressed: saveDataToFirestore,
                                         child: Text(
-                                          'Upload File',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14.0,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                          'Simpan',
+                                          style: GoogleFonts.quicksand(
+                                              fontSize: 14.0,
+                                              fontWeight: FontWeight.bold),
+                                        )),
+                                  )),
                             ),
-                          ),
-
-                          // Padding(
-                          //   padding: const EdgeInsets.only(
-                          //       left: 747.0, top: 25.0, bottom: 30.0),
-                          //   child: SizedBox(
-                          //     height: 40.0,
-                          //     width: 130.0,
-                          //     child: ElevatedButton(
-                          //       style: ButtonStyle(
-                          //           backgroundColor:
-                          //               MaterialStateProperty.all<Color>(
-                          //                   const Color(0xFF3CBEA9))),
-                          //       onPressed: isButtonEnabled
-                          //           ? saveDataToFirestore
-                          //           : null,
-                          //       child: Text(
-                          //         "Simpan",
-                          //         style: GoogleFonts.quicksand(
-                          //             fontSize: 14.0,
-                          //             fontWeight: FontWeight.bold),
-                          //       ),
-                          //     ),
-                          //     // ElevatedButton(
-                          //     //     style: ButtonStyle(
-                          //     //         backgroundColor:
-                          //     //             MaterialStateProperty.all<Color>(
-                          //     //                 const Color(0xFF3CBEA9))),
-                          //     //     onPressed: () {
-                          //     //       saveDataToFirestore();
-                          //     //     },
-                          //     //     child: Text(
-                          //     //       "Simpan",
-                          //     //       style: GoogleFonts.quicksand(
-                          //     //           fontSize: 14.0,
-                          //     //           fontWeight: FontWeight.bold),
-                          //     //     )),
-                          //   ),
-                          // ),
-                        ],
-                      ),
+                          ]),
                     ),
                   ),
                 ),

@@ -174,7 +174,7 @@ class _FormEditAksesAbsensiState extends State<FormEditAksesAbsensi> {
             .doc(docId)
             .update({
           'kodeKelas': widget.kodeKelas,
-          'kodeAsisten': widget.kodeAsisten,
+
           'judulMateri': widget.judulMateri,
           'pertemuan': pertemuanController.text,
           'waktuAksesAbsensi': Timestamp.fromDate(

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TabelDataMahasiswaAdmin extends StatefulWidget {
   final String kodeKelas;
@@ -175,7 +176,7 @@ class _TabelDataMahasiswaAdminState extends State<TabelDataMahasiswaAdmin> {
                               ),
                             ),
                           ],
-                          source: DataSource(filteredDataMahasiswa),
+                          source: DataSource(filteredDataMahasiswa, context),
                           rowsPerPage: calculateRowsPerPage(
                               filteredDataMahasiswa.length),
                         )
@@ -221,7 +222,8 @@ class DataMahasiswa {
   });
 }
 
-DataRow dataFileDataRow(DataMahasiswa fileInfo, int index) {
+DataRow dataFileDataRow(
+    DataMahasiswa fileInfo, int index, BuildContext context) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -234,12 +236,47 @@ DataRow dataFileDataRow(DataMahasiswa fileInfo, int index) {
       DataCell(SizedBox(
           width: 250.0, child: Text(getLimitedText(fileInfo.nama, 30)))),
       DataCell(SizedBox(
-          width: 250.0, child: Text(getLimitedText(fileInfo.email, 30)))),
-      DataCell(SizedBox(width: 140.0, child: Text(fileInfo.nohp.toString()))),
+          width: 250.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(getLimitedText(fileInfo.email, 30)),
+              IconButton(
+                  onPressed: () {
+                    copyToClipboard(fileInfo.email);
+                  },
+                  icon: const Icon(
+                    Icons.copy_rounded,
+                    color: Colors.grey,
+                  ))
+            ],
+          ))),
+      DataCell(SizedBox(
+          width: 140.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(fileInfo.nohp.toString()),
+              IconButton(
+                  onPressed: () {
+                    copyToClipboard(fileInfo.nohp.toString());
+                  },
+                  icon: const Icon(
+                    Icons.copy_rounded,
+                    color: Colors.grey,
+                  ))
+            ],
+          ))),
     ],
   );
 }
 
+//== Fungsi untuk copy Data ==//
+void copyToClipboard(String text) {
+  Clipboard.setData(ClipboardData(text: text));
+}
+
+//== Fungsi untuk memberi limit pada text ==//
 String getLimitedText(String text, int limit) {
   return text.length <= limit ? text : text.substring(0, limit);
 }
@@ -254,8 +291,9 @@ Color getRowColor(int index) {
 
 class DataSource extends DataTableSource {
   final List<DataMahasiswa> data;
+  final BuildContext context;
 
-  DataSource(this.data);
+  DataSource(this.data, this.context);
 
   @override
   DataRow? getRow(int index) {
@@ -263,7 +301,7 @@ class DataSource extends DataTableSource {
       return null;
     }
     final fileInfo = data[index];
-    return dataFileDataRow(fileInfo, index);
+    return dataFileDataRow(fileInfo, index, context);
   }
 
   @override

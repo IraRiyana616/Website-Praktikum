@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TabelDataAsistenAdmin extends StatefulWidget {
   final String kodeKelas;
@@ -242,12 +243,47 @@ DataRow dataFileDataRow(DataMahasiswa fileInfo, int index) {
       DataCell(SizedBox(
           width: 250.0, child: Text(getLimitedText(fileInfo.nama, 30)))),
       DataCell(SizedBox(
-          width: 250.0, child: Text(getLimitedText(fileInfo.email, 30)))),
-      DataCell(SizedBox(width: 140.0, child: Text(fileInfo.nohp.toString()))),
+          width: 250.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(getLimitedText(fileInfo.email, 30)),
+              IconButton(
+                  onPressed: () {
+                    copyToClipboard(fileInfo.email);
+                  },
+                  icon: const Icon(
+                    Icons.copy_rounded,
+                    color: Colors.grey,
+                  ))
+            ],
+          ))),
+      DataCell(SizedBox(
+          width: 140.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(fileInfo.nohp.toString()),
+              IconButton(
+                  onPressed: () {
+                    copyToClipboard(fileInfo.nohp.toString());
+                  },
+                  icon: const Icon(
+                    Icons.copy_rounded,
+                    color: Colors.grey,
+                  ))
+            ],
+          ))),
     ],
   );
 }
 
+//== Fungsi untuk menduplikasi data ==//
+void copyToClipboard(String text) {
+  Clipboard.setData(ClipboardData(text: text));
+}
+
+//== Fungsi untuk membatasi text ==//
 String getLimitedText(String text, int limit) {
   return text.length <= limit ? text : text.substring(0, limit);
 }

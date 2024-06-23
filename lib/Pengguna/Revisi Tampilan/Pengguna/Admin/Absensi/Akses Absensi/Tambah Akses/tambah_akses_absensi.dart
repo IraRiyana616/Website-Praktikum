@@ -111,24 +111,6 @@ class _TambahAksesAbsensiMahasiswaState
   //== Fungsi Untuk Menyimpan Data Ke Firestore 'Akses Absensi Mahasiswa' ==//
   Future<void> saveDataToFirestore(BuildContext context) async {
     try {
-      // Validasi data terhadap koleksi 'silabusPraktikum'
-      QuerySnapshot silabusCheck = await FirebaseFirestore.instance
-          .collection('silabusPraktikum')
-          .where('judulMateri', isEqualTo: selectedJudulMateri)
-          .get();
-
-      if (silabusCheck.docs.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content:
-                Text('Data tidak sesuai dengan yang terdapat pada database'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
-          ),
-        );
-        return;
-      }
-
       // Validasi waktu dengan menggunakan DateFormat
       DateFormat dateFormat = DateFormat('dd MMMM yyyy hh:mm a');
       DateTime waktuAkses =
@@ -159,35 +141,15 @@ class _TambahAksesAbsensiMahasiswaState
         return;
       }
 
-      // Jika validasi lolos, lanjutkan untuk menyimpan data
+      // Validasi jika data sudah ada di 'AksesAbsensi'
       QuerySnapshot duplicateCheck = await FirebaseFirestore.instance
           .collection('AksesAbsensi')
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
           .where('judulMateri', isEqualTo: selectedJudulMateri)
+          .where('pertemuan', isEqualTo: selectedPertemuan)
           .get();
 
-      if (duplicateCheck.docs.isEmpty) {
-        await FirebaseFirestore.instance.collection('AksesAbsensi').add({
-          'kodeKelas': widget.kodeKelas,
-          'kodeAsisten': widget.kodeAsisten,
-          'judulMateri': selectedJudulMateri,
-          'pertemuan': selectedPertemuan,
-          'waktuAksesAbsensi': waktuAkses,
-          'waktuTutupAksesAbsensi': waktuTutupAkses
-        });
-        setState(() {
-          selectedPertemuan = null;
-          selectedJudulMateri = null;
-          waktuAksesPraktikumController.clear();
-          waktuTutupAksesPraktikumController.clear();
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Data berhasil disimpan'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
-      } else {
+      if (duplicateCheck.docs.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Data telah terdapat pada database'),
@@ -195,7 +157,32 @@ class _TambahAksesAbsensiMahasiswaState
             duration: Duration(seconds: 2),
           ),
         );
+        return;
       }
+
+      // Jika validasi lolos, lanjutkan untuk menyimpan data
+      await FirebaseFirestore.instance.collection('AksesAbsensi').add({
+        'kodeKelas': widget.kodeKelas,
+        'judulMateri': selectedJudulMateri,
+        'pertemuan': selectedPertemuan,
+        'waktuAksesAbsensi': waktuAkses,
+        'waktuTutupAksesAbsensi': waktuTutupAkses
+      });
+
+      setState(() {
+        selectedPertemuan = null;
+        selectedJudulMateri = null;
+        waktuAksesPraktikumController.clear();
+        waktuTutupAksesPraktikumController.clear();
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Data berhasil disimpan'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error saving data: $e');
