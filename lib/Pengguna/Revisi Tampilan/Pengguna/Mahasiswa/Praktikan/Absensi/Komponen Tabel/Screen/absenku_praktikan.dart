@@ -23,14 +23,25 @@ class AbsenkuPraktikan extends StatefulWidget {
 }
 
 class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
+  //== Fungsi selectedModul ==//
   String? selectedModul;
+
+  //== Fungsi selectedAbsensi ==//
   String selectedAbsen = 'Status Kehadiran';
+
+  //== Fungsi selectedPertemuan ==//
   String selectedPertemuan = 'Pertemuan Praktikum';
+
+  //== Nama dari File Nama ==//
   String _fileName = "";
+
+  //== Fungsi dari enable ElevatedButton ==//
+  bool isButtonEnabled = false;
 
   late int userNim;
   late String userName;
 
+  //== Fungsi untuk mendapatkan data Authentikasi dari 'akun_mahasiswa' ==//
   Future<void> _getData() async {
     try {
       String userUid = FirebaseAuth.instance.currentUser!.uid;
@@ -68,8 +79,10 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
     super.initState();
     _getData();
     _getCurrentUser();
+    checkWaktuAbsensi();
   }
 
+//== Fungsi untuk upload file ==//
   Future<void> uploadFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
@@ -122,7 +135,33 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
       }
     }
   }
+  //== Fungsi Check Waktu Absensi ==//
 
+  Future<void> checkWaktuAbsensi() async {
+    try {
+      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+          .collection('AksesAbsensi')
+          .doc('waktuAbsensi')
+          .get();
+
+      if (documentSnapshot.exists) {
+        var data = documentSnapshot.data() as Map<String, dynamic>;
+        var waktuAbsensi = data['waktuAbsensi'];
+
+        // Gantikan dengan kondisi yang sesuai dengan nilai yang Anda inginkan
+        if (waktuAbsensi == 'desired_value') {
+          setState(() {
+            isButtonEnabled = true;
+          });
+        }
+      }
+    } catch (e) {
+      // Handle error jika terjadi
+      print('Error: $e');
+    }
+  }
+
+//== Fungsi untuk menyimpan data ke 'absensiMahasiswa' ==//
   Future<void> saveDataToFirestore() async {
     try {
       if (selectedModul!.isEmpty ||
@@ -132,13 +171,26 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
         return;
       }
 
+      // Cek apakah modul dan pertemuan sesuai dengan data di Firestore
+      QuerySnapshot<Map<String, dynamic>> aksesAbsensiData =
+          await FirebaseFirestore.instance
+              .collection('AksesAbsensi')
+              .where('judulMateri', isEqualTo: selectedModul)
+              .where('pertemuan', isEqualTo: selectedPertemuan)
+              .limit(1)
+              .get();
+
+      if (aksesAbsensiData.docs.isEmpty) {
+        _showSnackbar('Judul Modul dan Pertemuan tidak sesuai', Colors.red);
+        return;
+      }
+
       // Cek apakah data sudah ada
       QuerySnapshot<Map<String, dynamic>> existingData = await FirebaseFirestore
           .instance
           .collection('absensiMahasiswa')
           .where('nim', isEqualTo: userNim)
           .where('kodeKelas', isEqualTo: widget.kodeKelas)
-          .where('mataKuliah', isEqualTo: widget.mataKuliah)
           .where('judulMateri', isEqualTo: selectedModul)
           .limit(1)
           .get();
@@ -156,7 +208,6 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
         'nim': userNim,
         'nama': userName,
         'kodeKelas': widget.kodeKelas,
-        'mataKuliah': widget.mataKuliah,
         'pertemuan': selectedPertemuan,
         'keterangan': selectedAbsen,
         'judulMateri': selectedModul
@@ -638,29 +689,86 @@ class _AbsenkuPraktikanState extends State<AbsenkuPraktikan> {
                               ),
                             )
                           ]),
-                          //== ElevatedButton 'SIMPAN' ==//
                           Padding(
-                            padding: const EdgeInsets.only(
-                                left: 747.0, top: 25.0, bottom: 30.0),
+                            padding: const EdgeInsets.all(20.0),
                             child: SizedBox(
-                              height: 40.0,
-                              width: 130.0,
-                              child: ElevatedButton(
-                                  style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              const Color(0xFF3CBEA9))),
-                                  onPressed: () {
-                                    saveDataToFirestore();
-                                  },
-                                  child: Text(
-                                    "Simpan",
-                                    style: GoogleFonts.quicksand(
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.bold),
-                                  )),
+                              height: 45.0,
+                              width: 150.0,
+                              child: isButtonEnabled
+                                  ? ElevatedButton(
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                const Color(0xFF3CBEA9)),
+                                      ),
+                                      onPressed: isButtonEnabled
+                                          ? saveDataToFirestore
+                                          : null,
+                                      child: Text(
+                                        'Simpan',
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    )
+                                  : Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Upload File',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14.0,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                             ),
                           ),
+
+                          // Padding(
+                          //   padding: const EdgeInsets.only(
+                          //       left: 747.0, top: 25.0, bottom: 30.0),
+                          //   child: SizedBox(
+                          //     height: 40.0,
+                          //     width: 130.0,
+                          //     child: ElevatedButton(
+                          //       style: ButtonStyle(
+                          //           backgroundColor:
+                          //               MaterialStateProperty.all<Color>(
+                          //                   const Color(0xFF3CBEA9))),
+                          //       onPressed: isButtonEnabled
+                          //           ? saveDataToFirestore
+                          //           : null,
+                          //       child: Text(
+                          //         "Simpan",
+                          //         style: GoogleFonts.quicksand(
+                          //             fontSize: 14.0,
+                          //             fontWeight: FontWeight.bold),
+                          //       ),
+                          //     ),
+                          //     // ElevatedButton(
+                          //     //     style: ButtonStyle(
+                          //     //         backgroundColor:
+                          //     //             MaterialStateProperty.all<Color>(
+                          //     //                 const Color(0xFF3CBEA9))),
+                          //     //     onPressed: () {
+                          //     //       saveDataToFirestore();
+                          //     //     },
+                          //     //     child: Text(
+                          //     //       "Simpan",
+                          //     //       style: GoogleFonts.quicksand(
+                          //     //           fontSize: 14.0,
+                          //     //           fontWeight: FontWeight.bold),
+                          //     //     )),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),

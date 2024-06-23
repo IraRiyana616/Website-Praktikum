@@ -5,36 +5,72 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../Navigasi/absensinav_admin.dart';
 
-class TambahAksesAbsensiMahasiswa extends StatefulWidget {
+class FormEditAksesAbsensi extends StatefulWidget {
   final String kodeKelas;
   final String kodeAsisten;
-  final String mataKuliah;
-  const TambahAksesAbsensiMahasiswa(
+  final String judulMateri;
+  const FormEditAksesAbsensi(
       {super.key,
       required this.kodeKelas,
       required this.kodeAsisten,
-      required this.mataKuliah});
+      required this.judulMateri});
 
   @override
-  State<TambahAksesAbsensiMahasiswa> createState() =>
-      _TambahAksesAbsensiMahasiswaState();
+  State<FormEditAksesAbsensi> createState() => _FormEditAksesAbsensiState();
 }
 
-class _TambahAksesAbsensiMahasiswaState
-    extends State<TambahAksesAbsensiMahasiswa> {
+class _FormEditAksesAbsensiState extends State<FormEditAksesAbsensi> {
   //== TextField Controller ==//
+
+  //== Waktu Akses Praktikum ==//
   TextEditingController waktuAksesPraktikumController = TextEditingController();
+
+  //== Waktu Tutup Akses Praktikum ==//
   TextEditingController waktuTutupAksesPraktikumController =
       TextEditingController();
 
-  //== Pilih Judul Modul ==//
-  String? selectedJudulMateri;
-  List<String> judulMateriList = [];
+  //== Judul Materi ==//
+  TextEditingController judulMateriController = TextEditingController();
 
-  //== Pilih Pertemuan ==//
-  String? selectedPertemuan;
+  //== Pertemuan =//
+  TextEditingController pertemuanController = TextEditingController();
+
+//== Menampilkan data dari database ==//
+  Future<void> _loadUserData() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> userData = await FirebaseFirestore
+          .instance
+          .collection('AksesAbsensi')
+          .where('kodeKelas', isEqualTo: widget.kodeKelas)
+          .where('judulMateri', isEqualTo: widget.judulMateri)
+          .get();
+
+      if (userData.docs.isNotEmpty) {
+        var data = userData.docs.first.data();
+        setState(() {
+          judulMateriController.text = data['judulMateri'] ?? '';
+          pertemuanController.text = data['pertemuan'] ?? '';
+
+          // Konversi Timestamp ke String untuk waktu akses absensi
+          waktuAksesPraktikumController.text =
+              (data['waktuAksesAbsensi'] as Timestamp?)?.toDate().toString() ??
+                  '';
+
+          // Konversi Timestamp ke String untuk waktu tutup akses absensi
+          waktuTutupAksesPraktikumController.text =
+              (data['waktuTutupAksesAbsensi'] as Timestamp?)
+                      ?.toDate()
+                      .toString() ??
+                  '';
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error fetching user data: $e");
+      }
+    }
+  }
 
   //== Memilih Waktu dan Tanggal ==//
   // Fungsi untuk memilih tanggal
@@ -83,59 +119,21 @@ class _TambahAksesAbsensiMahasiswaState
   @override
   void initState() {
     super.initState();
-    fetchJudulMateri();
-  }
-
-  //== Menampilkan data dari 'silabusPraktikum' ==//
-  Future<void> fetchJudulMateri() async {
-    try {
-      QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('silabusPraktikum')
-          .where('kodeKelas', isEqualTo: widget.kodeKelas)
-          .get();
-
-      //== Judul Materi ==//
-      List<String> tempList =
-          snapshot.docs.map((doc) => doc['judulMateri'] as String).toList();
-
-      setState(() {
-        judulMateriList = tempList;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-    }
+    _loadUserData();
   }
 
   //== Fungsi Untuk Menyimpan Data Ke Firestore 'Akses Absensi Mahasiswa' ==//
   Future<void> saveDataToFirestore(BuildContext context) async {
     try {
-      // Validasi data terhadap koleksi 'silabusPraktikum'
-      QuerySnapshot silabusCheck = await FirebaseFirestore.instance
-          .collection('silabusPraktikum')
-          .where('judulMateri', isEqualTo: selectedJudulMateri)
-          .get();
-
-      if (silabusCheck.docs.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content:
-                Text('Data tidak sesuai dengan yang terdapat pada database'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
-          ),
-        );
-        return;
-      }
-
-      // Validasi waktu dengan menggunakan DateFormat
       DateFormat dateFormat = DateFormat('dd MMMM yyyy hh:mm a');
+
+      // Ambil teks dari controller untuk parsing
       DateTime waktuAkses =
           dateFormat.parse(waktuAksesPraktikumController.text);
       DateTime waktuTutupAkses =
           dateFormat.parse(waktuTutupAksesPraktikumController.text);
 
+      // Validasi waktu akses dan waktu tutup akses
       if (waktuAkses.isAtSameMomentAs(waktuTutupAkses)) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -159,43 +157,46 @@ class _TambahAksesAbsensiMahasiswaState
         return;
       }
 
-      // Jika validasi lolos, lanjutkan untuk menyimpan data
-      QuerySnapshot duplicateCheck = await FirebaseFirestore.instance
+      // Query untuk mencari dokumen dengan judulMateri yang sesuai
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('AksesAbsensi')
-          .where('judulMateri', isEqualTo: selectedJudulMateri)
+          .where('judulMateri', isEqualTo: widget.judulMateri)
           .get();
 
-      if (duplicateCheck.docs.isEmpty) {
-        await FirebaseFirestore.instance.collection('AksesAbsensi').add({
+      // Lakukan update jika ada dokumen yang sesuai
+      if (querySnapshot.docs.isNotEmpty) {
+        // Ambil dokumen pertama karena judulMateri seharusnya unik
+        var docId = querySnapshot.docs[0].id;
+
+        // Lakukan update data
+        await FirebaseFirestore.instance
+            .collection('AksesAbsensi')
+            .doc(docId)
+            .update({
           'kodeKelas': widget.kodeKelas,
           'kodeAsisten': widget.kodeAsisten,
-          'judulMateri': selectedJudulMateri,
-          'pertemuan': selectedPertemuan,
-          'waktuAksesAbsensi': waktuAkses,
-          'waktuTutupAksesAbsensi': waktuTutupAkses
+          'judulMateri': widget.judulMateri,
+          'pertemuan': pertemuanController.text,
+          'waktuAksesAbsensi': Timestamp.fromDate(
+              waktuAkses), // Gunakan Timestamp untuk menyimpan DateTime di Firestore
+          'waktuTutupAksesAbsensi': Timestamp.fromDate(waktuTutupAkses),
         });
-        setState(() {
-          selectedPertemuan = null;
-          selectedJudulMateri = null;
-          waktuAksesPraktikumController.clear();
-          waktuTutupAksesPraktikumController.clear();
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Data berhasil disimpan'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Data telah terdapat pada database'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
-          ),
-        );
       }
+
+      // Bersihkan controller setelah data berhasil disimpan
+      judulMateriController.clear();
+      pertemuanController.clear();
+      waktuAksesPraktikumController.clear();
+      waktuTutupAksesPraktikumController.clear();
+
+      // Tampilkan snackbar untuk notifikasi data berhasil disimpan
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Data berhasil disimpan'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error saving data: $e');
@@ -222,27 +223,7 @@ class _TambahAksesAbsensiMahasiswaState
             automaticallyImplyLeading: false,
             leading: IconButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const AbsensiPraktikumNav(),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(0.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.ease;
-
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-
-                      return SlideTransition(
-                        position: animation.drive(tween),
-                        child: child,
-                      );
-                    },
-                  ),
-                );
+                Navigator.pop(context);
               },
               icon: const Icon(
                 Icons.arrow_back,
@@ -256,7 +237,7 @@ class _TambahAksesAbsensiMahasiswaState
                 children: [
                   Expanded(
                     child: Text(
-                      widget.mataKuliah,
+                      widget.kodeKelas,
                       style: GoogleFonts.quicksand(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -376,42 +357,21 @@ class _TambahAksesAbsensiMahasiswaState
                                                                     250.0
                                                                 ? 350.0
                                                                 : screenWidth,
-                                                            child:
-                                                                DropdownButtonFormField<
-                                                                    String>(
-                                                              value:
-                                                                  selectedJudulMateri,
-                                                              decoration:
-                                                                  InputDecoration(
-                                                                      hintText:
-                                                                          'Pilih Judul Materi',
-                                                                      border:
-                                                                          OutlineInputBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(10.0),
-                                                                      ),
-                                                                      filled:
-                                                                          true,
-                                                                      fillColor:
-                                                                          Colors
-                                                                              .white),
-                                                              onChanged: (String?
-                                                                  newValue) {
-                                                                setState(() {
-                                                                  selectedJudulMateri =
-                                                                      newValue;
-                                                                });
-                                                              },
-                                                              items: judulMateriList
-                                                                  .map((String
-                                                                      value) {
-                                                                return DropdownMenuItem<
-                                                                        String>(
-                                                                    value:
-                                                                        value,
-                                                                    child: Text(
-                                                                        value));
-                                                              }).toList(),
+                                                            child: TextField(
+                                                              controller:
+                                                                  judulMateriController,
+                                                              readOnly: true,
+                                                              decoration: InputDecoration(
+                                                                  hintText:
+                                                                      'Masukkan Judul Materi',
+                                                                  border: OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              10)),
+                                                                  fillColor:
+                                                                      Colors
+                                                                          .grey,
+                                                                  filled: true),
                                                             )),
                                                       ),
                                                       //== Pertemuan ==//
@@ -446,49 +406,22 @@ class _TambahAksesAbsensiMahasiswaState
                                                                     250.0
                                                                 ? 350.0
                                                                 : screenWidth,
-                                                            child:
-                                                                DropdownButtonFormField(
-                                                                    decoration: InputDecoration(
-                                                                        border: OutlineInputBorder(
-                                                                            borderRadius: BorderRadius.circular(
-                                                                                10.0)),
-                                                                        filled:
-                                                                            true,
-                                                                        fillColor: Colors
-                                                                            .white),
-                                                                    hint: const Text(
-                                                                        'Pilih Pertemuan'),
-                                                                    items: [
-                                                                      'Pertemuan 1',
-                                                                      'Pertemuan 2',
-                                                                      'Pertemuan 3',
-                                                                      'Pertemuan 4',
-                                                                      'Pertemuan 5',
-                                                                      'Pertemuan 6',
-                                                                      'Pertemuan 7',
-                                                                      'Pertemuan 8',
-                                                                    ].map<
-                                                                        DropdownMenuItem<
-                                                                            String>>((String
-                                                                        value) {
-                                                                      return DropdownMenuItem<
-                                                                              String>(
-                                                                          value:
-                                                                              value,
-                                                                          child:
-                                                                              Text(value));
-                                                                    }).toList(),
-                                                                    onChanged:
-                                                                        (String?
-                                                                            newValue) {
-                                                                      setState(
-                                                                          () {
-                                                                        selectedPertemuan =
-                                                                            newValue;
-                                                                      });
-                                                                    },
-                                                                    value:
-                                                                        selectedPertemuan)),
+                                                            child: TextField(
+                                                              controller:
+                                                                  pertemuanController,
+                                                              readOnly: true,
+                                                              decoration: InputDecoration(
+                                                                  hintText:
+                                                                      'Masukkan Judul Materi',
+                                                                  border: OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              10)),
+                                                                  fillColor:
+                                                                      Colors
+                                                                          .grey,
+                                                                  filled: true),
+                                                            )),
                                                       ),
                                                     ],
                                                   ),
@@ -641,9 +574,10 @@ class _TambahAksesAbsensiMahasiswaState
                                                               ),
                                                               onPressed: () {
                                                                 // Validate and save data to Firestore
-                                                                if (selectedJudulMateri != null &&
-                                                                    selectedPertemuan !=
-                                                                        null &&
+                                                                if (judulMateriController.text.isNotEmpty &&
+                                                                    pertemuanController
+                                                                        .text
+                                                                        .isNotEmpty &&
                                                                     waktuAksesPraktikumController
                                                                         .text
                                                                         .isNotEmpty &&

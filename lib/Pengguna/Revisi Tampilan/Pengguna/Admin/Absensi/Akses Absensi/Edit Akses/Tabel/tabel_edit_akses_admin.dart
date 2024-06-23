@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Pengguna/Revisi%20Tampilan/Pengguna/Admin/Absensi/Akses%20Absensi/Edit%20Akses/Tabel/Form%20Edit%20Akses/form_edit.dart';
 
 class TabelAksesAbsensiMahasiswa extends StatefulWidget {
   final String kodeKelas;
@@ -39,7 +40,6 @@ class _TabelAksesAbsensiMahasiswaState
         .collection('AksesAbsensi')
         .where('kodeKelas', isEqualTo: widget.kodeKelas)
         .where('kodeAsisten', isEqualTo: widget.kodeAsisten)
-        .where('mataKuliah', isEqualTo: widget.mataKuliah)
         .snapshots()
         .listen((querySnapshot) {
       final data = querySnapshot.docs
@@ -92,13 +92,13 @@ class _TabelAksesAbsensiMahasiswaState
                         ),
                         DataColumn(
                           label: Text(
-                            'Tanggal Praktikum',
+                            'Akses Absensi Praktikum',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                         DataColumn(
                           label: Text(
-                            'Akses Absensi Praktikum',
+                            'Tutup Akses Absensi Praktikum',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -154,21 +154,21 @@ class _TabelAksesAbsensiMahasiswaState
 
 class AksesAbsensi {
   String kode;
-  String matkul;
   String asisten;
   String modul;
   String pertemuan;
-  String waktu;
+  DateTime waktuAkses;
+  DateTime waktuTutupAkses;
   String jadwal;
   String id;
 
   AksesAbsensi({
     required this.kode,
-    required this.matkul,
     required this.asisten,
     required this.modul,
     required this.pertemuan,
-    required this.waktu,
+    required this.waktuAkses,
+    required this.waktuTutupAkses,
     required this.jadwal,
     required this.id,
   });
@@ -178,11 +178,14 @@ class AksesAbsensi {
     return AksesAbsensi(
       id: doc.id,
       kode: data['kodeKelas'] ?? '',
-      matkul: data['mataKuliah'] ?? '',
       asisten: data['kodeAsisten'] ?? '',
       modul: data['judulMateri'] ?? '',
       pertemuan: data['pertemuan'] ?? '',
-      waktu: data['waktuAbsensi'] ?? '',
+      waktuAkses:
+          (data['waktuAksesAbsensi'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      waktuTutupAkses:
+          (data['waktuTutupAksesAbsensi'] as Timestamp?)?.toDate() ??
+              DateTime.now(),
       jadwal: data['jadwalPraktikum'] ?? '',
     );
   }
@@ -208,18 +211,44 @@ DataRow dataFileDataRow(AksesAbsensi fileInfo, int index, BuildContext context,
         ),
       )),
       DataCell(SizedBox(
-        width: 150.0,
-        child: Text(fileInfo.jadwal),
+        width: 200.0,
+        child:
+            Text(getLimitedText(fileInfo.waktuAkses.toString().toString(), 19)),
       )),
       DataCell(SizedBox(
-        width: 150.0,
-        child: Text(fileInfo.waktu),
+        width: 200.0,
+        child: Text(
+            getLimitedText(fileInfo.waktuTutupAkses.toString().toString(), 19)),
       )),
       DataCell(Row(
         children: [
           IconButton(
             onPressed: () {
-              showEditDialog(context, fileInfo);
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      FormEditAksesAbsensi(
+                    kodeKelas: fileInfo.kode,
+                    kodeAsisten: fileInfo.asisten,
+                    judulMateri: fileInfo.modul,
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ),
+              );
             },
             icon: const Icon(
               Icons.edit_document,
@@ -282,78 +311,6 @@ DataRow dataFileDataRow(AksesAbsensi fileInfo, int index, BuildContext context,
         ],
       )),
     ],
-  );
-}
-
-void showEditDialog(BuildContext context, AksesAbsensi fileInfo) {
-  TextEditingController waktuController =
-      TextEditingController(text: fileInfo.waktu);
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(
-          'Edit Akses Absensi',
-          style: GoogleFonts.quicksand(
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: SizedBox(
-          height: 70.0,
-          width: 320.0,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: TextField(
-              controller: waktuController,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(
-                  Icons.access_time,
-                  color: Colors.grey,
-                ),
-                hintText: 'Masukkan Waktu Akses',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              // Ambil nilai baru dari TextField
-              String newWaktu = waktuController.text;
-
-              // Update field 'waktuAbsensi' di Firestore
-              await FirebaseFirestore.instance
-                  .collection('AksesAbsensi')
-                  .doc(fileInfo.id)
-                  .update({'waktuAbsensi': newWaktu});
-
-              // ignore: use_build_context_synchronously
-              Navigator.of(context).pop();
-            },
-            child: const Padding(
-              padding: EdgeInsets.only(bottom: 10.0),
-              child: Text('Simpan'),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Padding(
-              padding: EdgeInsets.only(bottom: 10.0),
-              child: Text('Batal'),
-            ),
-          ),
-        ],
-      );
-    },
   );
 }
 
