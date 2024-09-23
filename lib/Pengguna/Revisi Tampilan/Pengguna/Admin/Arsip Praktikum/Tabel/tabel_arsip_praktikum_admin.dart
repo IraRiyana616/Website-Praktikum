@@ -196,7 +196,7 @@ class _TabelArsipPraktikumState extends State<TabelArsipPraktikum> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Nama Dosen Pengampu",
+                                  "Nama Dosen Pengampu 1",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),

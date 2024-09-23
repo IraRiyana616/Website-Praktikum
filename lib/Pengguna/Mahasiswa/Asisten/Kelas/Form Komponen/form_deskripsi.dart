@@ -165,27 +165,28 @@ class _FormDeskripsiKelasState extends State<FormDeskripsiKelas> {
           automaticallyImplyLeading: false,
           leading: IconButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      const DasboardAsistenNavigasi(),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    const begin = Offset(0.0, 0.0);
-                    const end = Offset.zero;
-                    const curve = Curves.ease;
+              Navigator.pop(context);
+              // Navigator.push(
+              //   context,
+              //   PageRouteBuilder(
+              //     pageBuilder: (context, animation, secondaryAnimation) =>
+              //         const DasboardAsistenNavigasi(),
+              //     transitionsBuilder:
+              //         (context, animation, secondaryAnimation, child) {
+              //       const begin = Offset(0.0, 0.0);
+              //       const end = Offset.zero;
+              //       const curve = Curves.ease;
 
-                    var tween = Tween(begin: begin, end: end)
-                        .chain(CurveTween(curve: curve));
+              //       var tween = Tween(begin: begin, end: end)
+              //           .chain(CurveTween(curve: curve));
 
-                    return SlideTransition(
-                      position: animation.drive(tween),
-                      child: child,
-                    );
-                  },
-                ),
-              );
+              //       return SlideTransition(
+              //         position: animation.drive(tween),
+              //         child: child,
+              //       );
+              //     },
+              //   ),
+              // );
             },
             icon: const Icon(
               Icons.arrow_back,

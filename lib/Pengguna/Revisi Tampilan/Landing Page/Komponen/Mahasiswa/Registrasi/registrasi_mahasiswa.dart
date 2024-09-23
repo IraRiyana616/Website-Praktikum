@@ -19,6 +19,7 @@ class _RegisterMahasiswaState extends State<RegisterMahasiswa> {
   final TextEditingController _nimController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _noHpController = TextEditingController();
   final TextEditingController _angkatanController = TextEditingController();
 
@@ -95,6 +96,7 @@ class _RegisterMahasiswaState extends State<RegisterMahasiswa> {
       _nimController.clear();
       _emailController.clear();
       _passwordController.clear();
+      _newPasswordController.clear();
       _noHpController.clear();
       _angkatanController.clear();
 
@@ -114,6 +116,9 @@ class _RegisterMahasiswaState extends State<RegisterMahasiswa> {
       }
     }
   }
+
+//== Password ==//
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +154,7 @@ class _RegisterMahasiswaState extends State<RegisterMahasiswa> {
                                 ),
                                 //== Row 1
                                 SizedBox(
-                                  height: 450.0,
+                                  height: 480.0,
                                   width:
                                       MediaQuery.of(context).size.width * 0.3,
                                   child: Column(
@@ -274,45 +279,44 @@ class _RegisterMahasiswaState extends State<RegisterMahasiswa> {
                                           ),
                                         ),
                                       ),
+                                      //== Nomor Handphone ==//
                                       Padding(
-                                          padding: const EdgeInsets.only(
-                                            top: 45.0,
-                                            left: 45.0,
-                                          ),
-                                          child: Row(children: [
-                                            const Text(
-                                              'Sudah memiliki akun?',
-                                              style: TextStyle(
-                                                fontSize: 14.0,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 5.0),
-                                            MouseRegion(
-                                              cursor: SystemMouseCursors.click,
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  Navigator.pushNamed(
-                                                    context,
-                                                    '/login-mahasiswa',
-                                                  );
-                                                },
-                                                child: const Text(
-                                                  "Login",
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.blue,
-                                                  ),
+                                        padding: const EdgeInsets.only(
+                                            top: 25.0, left: 45.0),
+                                        child: SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.25,
+                                          child: TextField(
+                                            controller: _noHpController,
+                                            decoration: InputDecoration(
+                                              prefixIcon: const Padding(
+                                                padding:
+                                                    EdgeInsets.only(left: 10.0),
+                                                child: Icon(
+                                                  Icons.phone_android_outlined,
+                                                  color: Colors.grey,
                                                 ),
                                               ),
-                                            )
-                                          ]))
+                                              hintText:
+                                                  '  Masukkan Nomor Handphone',
+                                              hintStyle: const TextStyle(
+                                                  color: Colors.grey),
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20.0),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                                 //== Row 2
                                 SizedBox(
-                                  height: 450.0,
+                                  height: 480.0,
                                   width:
                                       MediaQuery.of(context).size.width * 0.3,
                                   child: Column(
@@ -371,27 +375,39 @@ class _RegisterMahasiswaState extends State<RegisterMahasiswa> {
                                               0.25,
                                           child: TextField(
                                             controller: _passwordController,
+                                            obscureText: _obscurePassword,
                                             decoration: InputDecoration(
-                                              prefixIcon: const Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 10.0),
-                                                child: Icon(
-                                                  Icons.lock,
-                                                  color: Colors.grey,
+                                                prefixIcon: const Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 10.0),
+                                                  child: Icon(
+                                                    Icons.lock,
+                                                    color: Colors.grey,
+                                                  ),
                                                 ),
-                                              ),
-                                              hintText: '  Masukkan Password',
-                                              hintStyle: const TextStyle(
-                                                  color: Colors.grey),
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(20.0),
-                                              ),
-                                            ),
+                                                hintText: '  Masukkan Password',
+                                                hintStyle: const TextStyle(
+                                                    color: Colors.grey),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20.0),
+                                                ),
+                                                suffixIcon: IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _obscurePassword =
+                                                            !_obscurePassword;
+                                                      });
+                                                    },
+                                                    icon: Icon(_obscurePassword
+                                                        ? Icons.visibility
+                                                        : Icons
+                                                            .visibility_off))),
                                           ),
                                         ),
                                       ),
-                                      //== Nomor Handphone ==//
+                                      //== Konfirmasi Password ==//
                                       Padding(
                                         padding: const EdgeInsets.only(
                                             top: 25.0, left: 45.0),
@@ -401,29 +417,73 @@ class _RegisterMahasiswaState extends State<RegisterMahasiswa> {
                                                   .width *
                                               0.25,
                                           child: TextField(
-                                            controller: _noHpController,
+                                            controller: _newPasswordController,
+                                            obscureText: _obscurePassword,
                                             decoration: InputDecoration(
-                                              prefixIcon: const Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 10.0),
-                                                child: Icon(
-                                                  Icons.phone_android_outlined,
-                                                  color: Colors.grey,
+                                                prefixIcon: const Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 10.0),
+                                                  child: Icon(
+                                                    Icons.lock,
+                                                    color: Colors.grey,
+                                                  ),
                                                 ),
-                                              ),
-                                              hintText:
-                                                  '  Masukkan Nomor Handphone',
-                                              hintStyle: const TextStyle(
-                                                  color: Colors.grey),
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(20.0),
-                                              ),
-                                            ),
+                                                hintText:
+                                                    '  Konfirmasi Password',
+                                                hintStyle: const TextStyle(
+                                                    color: Colors.grey),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20.0),
+                                                ),
+                                                suffixIcon: IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _obscurePassword =
+                                                            !_obscurePassword;
+                                                      });
+                                                    },
+                                                    icon: Icon(_obscurePassword
+                                                        ? Icons.visibility
+                                                        : Icons
+                                                            .visibility_off))),
                                           ),
                                         ),
                                       ),
-                                      // Add other text fields similarly
+                                      Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 15.0,
+                                            left: 45.0,
+                                          ),
+                                          child: Row(children: [
+                                            const Text(
+                                              'Sudah memiliki akun?',
+                                              style: TextStyle(
+                                                fontSize: 14.0,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 5.0),
+                                            MouseRegion(
+                                              cursor: SystemMouseCursors.click,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  Navigator.pushNamed(
+                                                    context,
+                                                    '/login-mahasiswa',
+                                                  );
+                                                },
+                                                child: const Text(
+                                                  "Login",
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.blue,
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          ])),
                                       Padding(
                                         padding: const EdgeInsets.only(
                                             left: 250.0, top: 25.0),

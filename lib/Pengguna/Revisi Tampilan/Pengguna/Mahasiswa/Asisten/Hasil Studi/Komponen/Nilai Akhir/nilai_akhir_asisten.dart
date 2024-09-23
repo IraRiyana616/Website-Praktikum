@@ -517,9 +517,6 @@ class _NilaiAkhirAsistenScreenState extends State<NilaiAkhirAsistenScreen> {
       final bytes = const Utf8Encoder().convert(csv);
       final blob = html.Blob([bytes]);
       final url = html.Url.createObjectUrlFromBlob(blob);
-      final anchor = html.AnchorElement(href: url)
-        ..setAttribute("download", "data_nilai.csv")
-        ..click();
       html.Url.revokeObjectUrl(url);
     } else {
       // Mendapatkan direktori untuk menyimpan file (Android/iOS)

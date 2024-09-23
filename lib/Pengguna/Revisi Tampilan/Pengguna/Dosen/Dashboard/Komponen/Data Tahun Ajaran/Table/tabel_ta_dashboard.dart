@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laksi/Pengguna/Mahasiswa/Asisten/Kelas/Form%20Komponen/form_deskripsi.dart';
 import '../../Deskripsi Kelas/deskripsi_dosen.dart';
 
 class TabelTADashboard extends StatefulWidget {
@@ -208,6 +209,11 @@ class _TabelTADashboardState extends State<TabelTADashboard> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
+                              DataColumn(
+                                  label: Text(
+                                'Aksi',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ))
                             ],
                             source:
                                 DataSource(filteredDataTahunAjaran, context),
@@ -340,6 +346,86 @@ DataRow dataFileDataRow(
           ),
         ),
       ),
+      DataCell(Row(
+        children: [
+          IconButton(
+            onPressed: () async {
+              final firestore = FirebaseFirestore.instance;
+
+              // Mengambil idKelas dari fileInfo
+              final idKelas = fileInfo.idkelas;
+
+              // Mengambil koleksi dataAsisten dan memeriksa keberadaan idKelas
+              final snapshot = await firestore
+                  .collection('deskripsiKelas')
+                  .where('idKelas', isEqualTo: idKelas)
+                  .get();
+
+              // Memeriksa apakah data dengan idKelas sudah ada
+              if (snapshot.docs.isNotEmpty) {
+                // Menampilkan dialog jika data sudah ada
+                // ignore: use_build_context_synchronously
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text(
+                      'Data Sudah Ada',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 22.0),
+                    ),
+                    content: const Padding(
+                      padding: EdgeInsets.only(top: 10.0),
+                      child: Text(
+                          'Anda telah memasukkan data pada database.\n\nLakukan perubahan data pada Edit Deskripsi Kelas.'),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                // Navigasi ke FormDataAsisten jika data belum ada
+                // ignore: use_build_context_synchronously
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        FormDeskripsiKelas(
+                      idkelas: fileInfo.idkelas,
+                      kodeKelas: fileInfo.kode,
+                      mataKuliah: fileInfo.matkul,
+                    ),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(0.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                  ),
+                );
+              }
+            },
+            icon: const Icon(
+              Icons.add_box,
+              color: Colors.grey,
+            ),
+            tooltip: 'Tambah Data',
+          )
+        ],
+      ))
     ],
   );
 }

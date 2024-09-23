@@ -195,7 +195,7 @@ class _TabelAbsensiAdminState extends State<TabelAbsensiAdmin> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Nama Dosen Pengampu",
+                                  "Nama Dosen Pengampu 1",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),

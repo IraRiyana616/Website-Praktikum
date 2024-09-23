@@ -158,6 +158,9 @@ class _LandingPageState extends State<LandingPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
+                                  const SizedBox(
+                                    width: 50,
+                                  ),
                                   serviceBox(
                                     'Mahasiswa',
                                     'assets/images/mahasiswa.png',
@@ -176,14 +179,8 @@ class _LandingPageState extends State<LandingPage> {
                                     },
                                     constraints.maxWidth * 0.28,
                                   ),
-                                  serviceBox(
-                                    'Admin',
-                                    'assets/images/dosen.png',
-                                    () {
-                                      Navigator.pushReplacementNamed(
-                                          context, '/login-admin');
-                                    },
-                                    constraints.maxWidth * 0.28,
+                                  const SizedBox(
+                                    width: 50,
                                   ),
                                 ],
                               )
@@ -195,26 +192,6 @@ class _LandingPageState extends State<LandingPage> {
                                     () {
                                       Navigator.pushReplacementNamed(
                                           context, '/login-mahasiswa');
-                                    },
-                                    constraints.maxWidth * 0.6,
-                                  ),
-                                  const SizedBox(height: 20.0),
-                                  serviceBox(
-                                    'Dosen',
-                                    'assets/images/admin.png',
-                                    () {
-                                      Navigator.pushReplacementNamed(
-                                          context, '/login-dosen');
-                                    },
-                                    constraints.maxWidth * 0.6,
-                                  ),
-                                  const SizedBox(height: 20.0),
-                                  serviceBox(
-                                    'Admin',
-                                    'assets/images/dosen.png',
-                                    () {
-                                      Navigator.pushReplacementNamed(
-                                          context, '/login-admin');
                                     },
                                     constraints.maxWidth * 0.6,
                                   ),

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Revisi%20Tampilan/Pengguna/Dosen/Dashboard/Tabel/tabel_dashboard_dosen.dart';
+import '../Tabel/tabel_dashboard_dosen.dart';
 
 class DashboardDosenScreen extends StatefulWidget {
   const DashboardDosenScreen({super.key});

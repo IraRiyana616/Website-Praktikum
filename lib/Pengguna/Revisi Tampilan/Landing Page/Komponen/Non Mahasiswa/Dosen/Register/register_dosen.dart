@@ -19,16 +19,17 @@ class _RegisterDosenState extends State<RegisterDosen> {
   final TextEditingController _nipController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _noHpController = TextEditingController();
 
   // Firestore instance
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Fungsi untuk pengguna registrasi data untuk Firestore dan Firebase Authentikasi
+// Fungsi untuk pengguna registrasi data ke Firestore dan Firebase Auth
   Future<void> _registerUser() async {
     try {
-      // Validasi NIM
+      // Validasi NIP
       QuerySnapshot nipSnapshot = await _firestore
           .collection('akun_dosen')
           .where('nip', isEqualTo: _nipController.text)
@@ -42,6 +43,7 @@ class _RegisterDosenState extends State<RegisterDosen> {
         ));
         return;
       }
+
       // Check for duplicate email
       QuerySnapshot emailSnapshot = await _firestore
           .collection('akun_dosen')
@@ -56,11 +58,12 @@ class _RegisterDosenState extends State<RegisterDosen> {
         ));
         return;
       }
+
       // Create user with email and password
       UserCredential authResult = await _auth.createUserWithEmailAndPassword(
           email: _emailController.text, password: _passwordController.text);
 
-      // Create user with email and password
+      // Save user data to Firestore
       await _firestore.collection('akun_dosen').doc(authResult.user?.uid).set({
         'nama': _namaController.text,
         'nip': _nipController.text,
@@ -69,7 +72,7 @@ class _RegisterDosenState extends State<RegisterDosen> {
         'no_hp': _noHpController.text,
       });
 
-      // Reset textfields to empty after successful registration
+      // Clear text fields
       _namaController.clear();
       _nipController.clear();
       _emailController.clear();
@@ -81,11 +84,9 @@ class _RegisterDosenState extends State<RegisterDosen> {
         backgroundColor: Colors.green,
         duration: Duration(seconds: 3),
       ));
-      //== Login Dosen ==//
-      Navigator.pushNamed(
-        context,
-        '/login_dosen',
-      );
+
+      // Navigasi ke halaman login dosen
+      Navigator.pushNamed(context, '/login-dosen');
     } catch (e) {
       if (kDebugMode) {
         print('Error: $e');
@@ -97,6 +98,25 @@ class _RegisterDosenState extends State<RegisterDosen> {
       ));
     }
   }
+
+// Fungsi untuk validasi password
+  void _validatePasswordAndRegister(BuildContext context) {
+    if (_passwordController.text != _newPasswordController.text) {
+      // Jika password dan konfirmasi password tidak sama, tampilkan Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Password yang dimasukkan tidak sama"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      // Jika validasi berhasil, panggil fungsi registrasi
+      _registerUser();
+    }
+  }
+
+//== Password ==//
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +294,10 @@ class _RegisterDosenState extends State<RegisterDosen> {
                                                     BorderRadius.circular(20.0),
                                               ),
                                             ),
-                                            onPressed: _registerUser,
+                                            // Panggil fungsi validasi dan registrasi
+                                            onPressed: () =>
+                                                _validatePasswordAndRegister(
+                                                    context),
                                             child: const Text(
                                               "Register",
                                               style: TextStyle(
@@ -284,7 +307,7 @@ class _RegisterDosenState extends State<RegisterDosen> {
                                             ),
                                           ),
                                         ),
-                                      )
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -349,23 +372,79 @@ class _RegisterDosenState extends State<RegisterDosen> {
                                               0.25,
                                           child: TextField(
                                             controller: _passwordController,
+                                            obscureText: _obscurePassword,
                                             decoration: InputDecoration(
-                                              prefixIcon: const Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 10.0),
-                                                child: Icon(
-                                                  Icons.lock,
-                                                  color: Colors.grey,
+                                                prefixIcon: const Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 10.0),
+                                                  child: Icon(
+                                                    Icons.lock,
+                                                    color: Colors.grey,
+                                                  ),
                                                 ),
-                                              ),
-                                              hintText: '  Masukkan Password',
-                                              hintStyle: const TextStyle(
-                                                  color: Colors.grey),
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(20.0),
-                                              ),
-                                            ),
+                                                hintText: '  Masukkan Password',
+                                                hintStyle: const TextStyle(
+                                                    color: Colors.grey),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20.0),
+                                                ),
+                                                suffixIcon: IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _obscurePassword =
+                                                            !_obscurePassword;
+                                                      });
+                                                    },
+                                                    icon: Icon(_obscurePassword
+                                                        ? Icons.visibility
+                                                        : Icons
+                                                            .visibility_off))),
+                                          ),
+                                        ),
+                                      ),
+                                      //== Konfirmasi Password ==//
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 25.0, left: 45.0),
+                                        child: SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.25,
+                                          child: TextField(
+                                            controller: _newPasswordController,
+                                            obscureText: _obscurePassword,
+                                            decoration: InputDecoration(
+                                                prefixIcon: const Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 10.0),
+                                                  child: Icon(
+                                                    Icons.lock,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                                hintText:
+                                                    '  Konfirmasi Password',
+                                                hintStyle: const TextStyle(
+                                                    color: Colors.grey),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20.0),
+                                                ),
+                                                suffixIcon: IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _obscurePassword =
+                                                            !_obscurePassword;
+                                                      });
+                                                    },
+                                                    icon: Icon(_obscurePassword
+                                                        ? Icons.visibility
+                                                        : Icons
+                                                            .visibility_off))),
                                           ),
                                         ),
                                       ),

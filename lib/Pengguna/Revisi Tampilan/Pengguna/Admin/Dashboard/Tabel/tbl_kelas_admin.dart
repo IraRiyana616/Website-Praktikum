@@ -246,7 +246,7 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Nama Dosen Pengampu",
+                                  "Nama Dosen Pengampu 1",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),

@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../Komponen/Data Tahun Ajaran/Screen/data_dashboard.dart';
 
 class TabelDashboardDosen extends StatefulWidget {
@@ -287,12 +286,13 @@ class DataClass {
   String nip;
   String dosenPengampu;
   String dosenPengampu2;
-  DataClass(
-      {required this.kode,
-      required this.matkul,
-      required this.nip,
-      required this.dosenPengampu,
-      required this.dosenPengampu2});
+  DataClass({
+    required this.kode,
+    required this.matkul,
+    required this.nip,
+    required this.dosenPengampu,
+    required this.dosenPengampu2,
+  });
 }
 
 DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
@@ -353,7 +353,7 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
         child: Text(
           getLimitedText(fileInfo.dosenPengampu2, 33),
         ),
-      ))
+      )),
     ],
   );
 }
