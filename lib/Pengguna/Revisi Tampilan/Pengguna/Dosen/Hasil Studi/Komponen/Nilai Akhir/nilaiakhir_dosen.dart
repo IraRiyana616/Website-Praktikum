@@ -1,50 +1,317 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:csv/csv.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:universal_html/html.dart' as html;
 import '../../Navigasi/hasil_studi_nav_dosen.dart';
 import '../Nilai Harian/nilaiharian_dosen.dart';
 
 class NilaiAkhirScreenDosen extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String mataKuliah;
   const NilaiAkhirScreenDosen(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.idkelas, required this.mataKuliah});
 
   @override
   State<NilaiAkhirScreenDosen> createState() => _NilaiAkhirScreenDosenState();
 }
 
 class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
+  //==List Data Table ==//
   List<PenilaianAkhir> demoPenilaianAkhir = [];
   List<PenilaianAkhir> filteredPenilaianAkhir = [];
+  //== DropdownButton ==//
   String selectedKeterangan = 'Tampilkan Semua';
+  //== ScrollController ==//
   final ScrollController _controller = ScrollController();
   final StreamController<List<PenilaianAkhir>> _penilaianStreamController =
       StreamController<List<PenilaianAkhir>>();
 
+  StreamSubscription<QuerySnapshot>? _nilaiHarianSubscription;
+
   @override
   void dispose() {
     _penilaianStreamController.close();
+    _nilaiHarianSubscription?.cancel();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
+    // Hapus subscription yang lama jika ada sebelum membuat yang baru
+    _nilaiHarianSubscription?.cancel();
+
+    _nilaiHarianSubscription = FirebaseFirestore.instance
+        .collection('nilaiHarian')
+        .where('idKelas', isEqualTo: widget.idkelas)
+        .snapshots()
+        .listen((snapshot) {
+      // Check if there are changes in the 'nilaiHarian' collection
+      if (snapshot.docChanges.isNotEmpty) {
+        updateNilaiAkhir();
+      }
+    });
+
     checkAndFetchData();
-    _getCurrentUser();
+  }
+
+  Future<void> updateNilaiAkhir() async {
+    try {
+      final nilaiHarianSnapshots = await FirebaseFirestore.instance
+          .collection('nilaiHarian')
+          .where('idKelas', isEqualTo: widget.idkelas)
+          .get();
+
+      if (nilaiHarianSnapshots.docs.isNotEmpty) {
+        final List<PenilaianAkhir> data = nilaiHarianSnapshots.docs.map((doc) {
+          final data = doc.data();
+          final nilaiAkhirData = calculateHuruf(
+            data['modul1'] ?? 0.0,
+            data['modul2'] ?? 0.0,
+            data['modul3'] ?? 0.0,
+            data['modul4'] ?? 0.0,
+            data['modul5'] ?? 0.0,
+            data['modul6'] ?? 0.0,
+            data['modul7'] ?? 0.0,
+            data['modul8'] ?? 0.0,
+            data['pretest'] ?? 0.0,
+            data['projectAkhir'] ?? 0.0,
+            data['laporanResmi'] ?? 0.0,
+          );
+          return PenilaianAkhir(
+            nim: data['nim'] ?? '',
+            nama: data['nama'] ?? '',
+            kode: widget.idkelas,
+            matkul: widget.mataKuliah,
+            modul1: data['modul1'] ?? 0.0,
+            modul2: data['modul2'] ?? 0.0,
+            modul3: data['modul3'] ?? 0.0,
+            modul4: data['modul4'] ?? 0.0,
+            modul5: data['modul5'] ?? 0.0,
+            modul6: data['modul6'] ?? 0.0,
+            modul7: data['modul7'] ?? 0.0,
+            modul8: data['modul8'] ?? 0.0,
+            pretest: data['pretest'] ?? 0.0,
+            project: data['projectAkhir'] ?? 0.0,
+            resmi: data['laporanResmi'] ?? 0.0,
+            akhir: calculateNilaiAkhir(
+                data['modul1'] ?? 0.0,
+                data['modul2'] ?? 0.0,
+                data['modul3'] ?? 0.0,
+                data['modul4'] ?? 0.0,
+                data['modul5'] ?? 0.0,
+                data['modul6'] ?? 0.0,
+                data['modul7'] ?? 0.0,
+                data['modul8'] ?? 0.0,
+                data['pretest'] ?? 0.0,
+                data['projectAkhir'] ?? 0.0,
+                data['laporanResmi'] ?? 0.0),
+            huruf: nilaiAkhirData['nilaiHuruf'] ?? '',
+            status: nilaiAkhirData['status'] ?? '',
+          );
+        }).toList();
+
+        // Mengurutkan data berdasarkan nama secara ascending
+        data.sort((a, b) => a.nama.compareTo(b.nama));
+
+        // Simpan data ke dalam 'nilaiAkhir' Firestore
+        await saveDataToNilaiAkhir(data);
+
+        // Tampilkan data pada tabel
+        _penilaianStreamController.add(data); // Memperbarui tampilan UI
+      } else {
+        // Ambil data dari 'nilaiHarian'
+        await addDataFromNilaiHarian();
+        // Fetch data lagi setelah menambahkan data baru
+        await updateNilaiAkhir();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error: $e');
+      }
+    }
+  }
+
+  Future<void> saveDataToNilaiAkhir(List<PenilaianAkhir> data) async {
+    try {
+      final batch = FirebaseFirestore.instance.batch();
+
+      for (PenilaianAkhir nilai in data) {
+        // Cek apakah data nilaiAkhir sudah ada di Firestore
+        final existingData = await FirebaseFirestore.instance
+            .collection('nilaiAkhir')
+            .where('nim', isEqualTo: nilai.nim)
+            .where('idKelas', isEqualTo: nilai.kode)
+            .get();
+
+        if (existingData.docs.isNotEmpty) {
+          // Jika data sudah ada, update nilai-nilai modul
+          final existingDoc = existingData.docs.first.reference;
+          batch.update(existingDoc, {
+            'modul1': nilai.modul1,
+            'modul2': nilai.modul2,
+            'modul3': nilai.modul3,
+            'modul4': nilai.modul4,
+            'modul5': nilai.modul5,
+            'modul6': nilai.modul6,
+            'modul7': nilai.modul7,
+            'modul8': nilai.modul8,
+            'pretest': nilai.pretest,
+            'projectAkhir': nilai.project,
+            'laporanResmi': nilai.resmi,
+            'nilaiAkhir': nilai.akhir,
+            'nilaiHuruf': nilai.huruf,
+            'status': nilai.status,
+          });
+        } else {
+          // Jika data belum ada, tambahkan data baru
+          final newDocRef =
+              FirebaseFirestore.instance.collection('nilaiAkhir').doc();
+          batch.set(newDocRef, {
+            'nim': nilai.nim,
+            'nama': nilai.nama,
+            'idKelas': nilai.kode,
+            'matakuliah': nilai.matkul,
+            'modul1': nilai.modul1,
+            'modul2': nilai.modul2,
+            'modul3': nilai.modul3,
+            'modul4': nilai.modul4,
+            'modul5': nilai.modul5,
+            'modul6': nilai.modul6,
+            'modul7': nilai.modul7,
+            'modul8': nilai.modul8,
+            'pretest': nilai.pretest,
+            'projectAkhir': nilai.project,
+            'laporanResmi': nilai.resmi,
+            'nilaiAkhir': nilai.akhir,
+            'nilaiHuruf': nilai.huruf,
+            'status': nilai.status,
+          });
+        }
+      }
+
+      await batch.commit();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error: $e');
+      }
+    }
+  }
+
+  Future<void> addDataFromNilaiHarian() async {
+    try {
+      final nilaiHarianSnapshot = await FirebaseFirestore.instance
+          .collection('nilaiHarian')
+          .where('idKelas', isEqualTo: widget.idkelas)
+          .get();
+
+      if (nilaiHarianSnapshot.docs.isNotEmpty) {
+        final batch = FirebaseFirestore.instance.batch();
+
+        for (var doc in nilaiHarianSnapshot.docs) {
+          final data = doc.data();
+          final nilaiAkhirData = calculateHuruf(
+              data['modul1'] ?? 0.0,
+              data['modul2'] ?? 0.0,
+              data['modul3'] ?? 0.0,
+              data['modul4'] ?? 0.0,
+              data['modul5'] ?? 0.0,
+              data['modul6'] ?? 0.0,
+              data['modul7'] ?? 0.0,
+              data['modul8'] ?? 0.0,
+              data['pretest'] ?? 0.0,
+              data['projectAkhir'] ?? 0.0,
+              data['laporanResmi'] ?? 0.0);
+          final nilaiAkhir = calculateNilaiAkhir(
+              data['modul1'] ?? 0.0,
+              data['modul2'] ?? 0.0,
+              data['modul3'] ?? 0.0,
+              data['modul4'] ?? 0.0,
+              data['modul5'] ?? 0.0,
+              data['modul6'] ?? 0.0,
+              data['modul7'] ?? 0.0,
+              data['modul8'] ?? 0.0,
+              data['pretest'] ?? 0.0,
+              data['projectAkhir'] ?? 0.0,
+              data['laporanResmi'] ?? 0.0);
+
+          // Cek apakah data nilaiAkhir sudah ada di Firestore
+          final existingData = await FirebaseFirestore.instance
+              .collection('nilaiAkhir')
+              .where('nim', isEqualTo: data['nim'])
+              .where('idKelas', isEqualTo: widget.idkelas)
+              .get();
+
+          if (existingData.docs.isNotEmpty) {
+            // Jika data sudah ada, update nilai-nilai modul
+            final existingDoc = existingData.docs.first;
+            batch.update(existingDoc.reference, {
+              'modul1': data['modul1'],
+              'modul2': data['modul2'],
+              'modul3': data['modul3'],
+              'modul4': data['modul4'],
+              'modul5': data['modul5'],
+              'modul6': data['modul6'],
+              'modul7': data['modul7'],
+              'modul8': data['modul8'],
+              'pretest': data['pretest'],
+              'projectAkhir': data['projectAkhir'],
+              'laporanResmi': data['laporanResmi'],
+              'nilaiAkhir': nilaiAkhir,
+              'nilaiHuruf': nilaiAkhirData['nilaiHuruf'],
+              'status': nilaiAkhirData['status'],
+            });
+          } else {
+            // Jika data belum ada, tambahkan data baru
+            final penilaianAkhirRef =
+                FirebaseFirestore.instance.collection('nilaiAkhir').doc();
+            batch.set(penilaianAkhirRef, {
+              'nim': data['nim'],
+              'nama': data['nama'],
+              'idKelas': widget.idkelas,
+              'matakuliah': widget.mataKuliah,
+              'modul1': data['modul1'],
+              'modul2': data['modul2'],
+              'modul3': data['modul3'],
+              'modul4': data['modul4'],
+              'modul5': data['modul5'],
+              'modul6': data['modul6'],
+              'modul7': data['modul7'],
+              'modul8': data['modul8'],
+              'pretest': data['pretest'],
+              'projectAkhir': data['projectAkhir'],
+              'laporanResmi': data['laporanResmi'],
+              'status': nilaiAkhirData['status'],
+              'nilaiAkhir': nilaiAkhir,
+              'nilaiHuruf': nilaiAkhirData['nilaiHuruf'],
+            });
+          }
+        }
+
+        await batch.commit();
+        // Refresh data setelah menambahkan entri baru
+        await checkAndFetchData();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error: $e');
+      }
+    }
   }
 
   Future<void> checkAndFetchData() async {
     try {
       final nilaiAkhirSnapshots = await FirebaseFirestore.instance
           .collection('nilaiAkhir')
-          .where('kodeKelas', isEqualTo: widget.kodeKelas)
+          .where('idKelas', isEqualTo: widget.idkelas)
           .get();
 
       if (nilaiAkhirSnapshots.docs.isNotEmpty) {
@@ -66,7 +333,8 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
           return PenilaianAkhir(
             nim: data['nim'] ?? '',
             nama: data['nama'] ?? '',
-            kode: widget.kodeKelas,
+            kode: widget.idkelas,
+            matkul: widget.mataKuliah,
             modul1: data['modul1'] ?? 0.0,
             modul2: data['modul2'] ?? 0.0,
             modul3: data['modul3'] ?? 0.0,
@@ -115,157 +383,11 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
     }
   }
 
-  Future<void> saveDataToNilaiAkhir(List<PenilaianAkhir> data) async {
-    try {
-      // Hapus data lama dari 'nilaiAkhir' Firestore
-      await FirebaseFirestore.instance
-          .collection('nilaiAkhir')
-          .where('kodeKelas', isEqualTo: widget.kodeKelas)
-          .get()
-          .then((snapshot) {
-        for (DocumentSnapshot doc in snapshot.docs) {
-          doc.reference.delete();
-        }
-      });
-
-      // Simpan data baru ke dalam 'nilaiAkhir' Firestore
-      for (PenilaianAkhir nilai in data) {
-        await FirebaseFirestore.instance.collection('nilaiAkhir').add({
-          'nim': nilai.nim,
-          'nama': nilai.nama,
-          'kodeKelas': nilai.kode,
-          'modul1': nilai.modul1,
-          'modul2': nilai.modul2,
-          'modul3': nilai.modul3,
-          'modul4': nilai.modul4,
-          'modul5': nilai.modul5,
-          'modul6': nilai.modul6,
-          'modul7': nilai.modul7,
-          'modul8': nilai.modul8,
-          'pretest': nilai.pretest,
-          'projectAkhir': nilai.project,
-          'laporanResmi': nilai.resmi,
-          'nilaiAkhir': nilai.akhir,
-          'nilaiHuruf': nilai.huruf,
-          'status': nilai.status,
-        });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error: $e');
-      }
-    }
-  }
-
-  Future<void> addDataFromNilaiHarian() async {
-    try {
-      final nilaiHarianSnapshot = await FirebaseFirestore.instance
-          .collection('nilaiHarian')
-          .where('kodeKelas', isEqualTo: widget.kodeKelas)
-          .get();
-
-      if (nilaiHarianSnapshot.docs.isNotEmpty) {
-        final batch = FirebaseFirestore.instance.batch();
-
-        for (var doc in nilaiHarianSnapshot.docs) {
-          final data = doc.data();
-          final nilaiAkhirData = calculateHuruf(
-              data['modul1'] ?? 0.0,
-              data['modul2'] ?? 0.0,
-              data['modul3'] ?? 0.0,
-              data['modul4'] ?? 0.0,
-              data['modul5'] ?? 0.0,
-              data['modul6'] ?? 0.0,
-              data['modul7'] ?? 0.0,
-              data['modul8'] ?? 0.0,
-              data['pretest'] ?? 0.0,
-              data['projectAkhir'] ?? 0.0,
-              data['laporanResmi'] ?? 0.0);
-          final nilaiAkhir = calculateNilaiAkhir(
-              data['modul1'] ?? 0.0,
-              data['modul2'] ?? 0.0,
-              data['modul3'] ?? 0.0,
-              data['modul4'] ?? 0.0,
-              data['modul5'] ?? 0.0,
-              data['modul6'] ?? 0.0,
-              data['modul7'] ?? 0.0,
-              data['modul8'] ?? 0.0,
-              data['pretest'] ?? 0.0,
-              data['projectAkhir'] ?? 0.0,
-              data['laporanResmi'] ?? 0.0);
-
-          // Cek apakah data nilaiAkhir sudah ada di firestore
-          final existingData = await FirebaseFirestore.instance
-              .collection('nilaiAkhir')
-              .where('nim', isEqualTo: data['nim'])
-              .where('kodeKelas', isEqualTo: widget.kodeKelas)
-              .get();
-
-          if (existingData.docs.isNotEmpty) {
-            // Jika data sudah ada, update nilai-nilai modul
-            final existingDoc = existingData.docs.first;
-            final existingModul1 = existingDoc['modul1'] ?? 0.0;
-            final existingModul2 = existingDoc['modul2'] ?? 0.0;
-            final existingModul3 = existingDoc['modul3'] ?? 0.0;
-            final existingModul4 = existingDoc['modul4'] ?? 0.0;
-            final existingModul5 = existingDoc['modul5'] ?? 0.0;
-            final existingModul6 = existingDoc['modul6'] ?? 0.0;
-            final existingModul7 = existingDoc['modul7'] ?? 0.0;
-            final existingModul8 = existingDoc['modul8'] ?? 0.0;
-
-            batch.update(existingDoc.reference, {
-              'modul1': existingModul1 + data['modul1'] ?? 0.0,
-              'modul2': existingModul2 + data['modul2'] ?? 0.0,
-              'modul3': existingModul3 + data['modul3'] ?? 0.0,
-              'modul4': existingModul4 + data['modul4'] ?? 0.0,
-              'modul5': existingModul5 + data['modul5'] ?? 0.0,
-              'modul6': existingModul6 + data['modul6'] ?? 0.0,
-              'modul7': existingModul7 + data['modul7'] ?? 0.0,
-              'modul8': existingModul8 + data['modul8'] ?? 0.0,
-            });
-          } else {
-            // Jika data belum ada, tambahkan data baru
-            final penilaianAkhirRef =
-                FirebaseFirestore.instance.collection('nilaiAkhir').doc();
-            batch.set(penilaianAkhirRef, {
-              'nim': data['nim'] ?? '',
-              'nama': data['nama'] ?? '',
-              'kodeKelas': widget.kodeKelas,
-              'modul1': data['modul1'] ?? 0.0,
-              'modul2': data['modul2'] ?? 0.0,
-              'modul3': data['modul3'] ?? 0.0,
-              'modul4': data['modul4'] ?? 0.0,
-              'modul5': data['modul5'] ?? 0.0,
-              'modul6': data['modul6'] ?? 0.0,
-              'modul7': data['modul7'] ?? 0.0,
-              'modul8': data['modul8'] ?? 0.0,
-              'pretest': data['pretest'] ?? 0.0,
-              'projectAkhir': data['projectAkhir'] ?? 0.0,
-              'laporanResmi': data['laporanResmi'] ?? 0.0,
-              'status': nilaiAkhirData['status'] ?? '',
-              'akhir':
-                  nilaiAkhir, // Menggunakan 'akhir' untuk menyimpan nilaiAkhir
-              'nilaiHuruf': nilaiAkhirData['nilaiHuruf'] ?? '',
-            });
-          }
-        }
-
-        await batch.commit();
-        // Refresh data setelah menambahkan entri baru
-        await checkAndFetchData();
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error: $e');
-      }
-    }
-  }
-
   Future<void> getDataFromFirebase() async {
     try {
       final penilaianStream = FirebaseFirestore.instance
           .collection('nilaiHarian')
-          .where('kodeKelas', isEqualTo: widget.kodeKelas)
+          .where('idKelas', isEqualTo: widget.idkelas)
           .snapshots()
           .map((snapshot) => snapshot.docs.map((doc) {
                 final data = doc.data();
@@ -285,7 +407,8 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
                 return PenilaianAkhir(
                   nim: data['nim'] ?? '',
                   nama: data['nama'] ?? '',
-                  kode: widget.kodeKelas,
+                  kode: widget.idkelas,
+                  matkul: widget.mataKuliah,
                   modul1: data['modul1'] ?? 0.0,
                   modul2: data['modul2'] ?? 0.0,
                   modul3: data['modul3'] ?? 0.0,
@@ -327,35 +450,85 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
     }
   }
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  //== Fungsi Nama Mahasiswa ==//
-  User? _currentUser;
-  String _namaMahasiswa = '';
+//== Fungsi Download dengan bentuk CSV ===//
+  Future<void> downloadData() async {
+    // Mengambil data dari Firestore
+    CollectionReference collectionRef =
+        FirebaseFirestore.instance.collection('nilaiAkhir');
+    QuerySnapshot querySnapshot = await collectionRef.get();
 
-  // Fungsi untuk mendapatkan pengguna yang sedang login dan mengambil data nama dari database
-  void _getCurrentUser() async {
-    setState(() {
-      _currentUser = _auth.currentUser;
-    });
-    if (_currentUser != null) {
-      await _getNamaMahasiswa(_currentUser!.uid);
+    // Menyiapkan data untuk diubah menjadi CSV
+    List<List<dynamic>> csvData = [
+      <String>[
+        'nim',
+        'nama',
+        'idKelas',
+        'matakuliah'
+            'pretest',
+        'laporanResmi',
+        'projectAkhir',
+        'modul1',
+        'modul2',
+        'modul3',
+        'modul4',
+        'modul5',
+        'modul6',
+        'modul7',
+        'modul8',
+        'nilaiAkhir',
+        'nilaiHuruf',
+        'status'
+      ],
+    ];
+
+    for (var doc in querySnapshot.docs) {
+      var data = doc.data() as Map<String, dynamic>;
+      csvData.add([
+        data['nim'] ?? 0,
+        data['nama'] ?? '',
+        data['idKelas'] ?? '',
+        data['matakuliah'] ?? '',
+        data['pretest'] ?? 0.0,
+        data['laporanResmi'] ?? 0.0,
+        data['projectAkhir'] ?? 0.0,
+        data['modul1'] ?? 0.0,
+        data['modul2'] ?? 0.0,
+        data['modul3'] ?? 0.0,
+        data['modul4'] ?? 0.0,
+        data['modul5'] ?? 0.0,
+        data['modul6'] ?? 0.0,
+        data['modul7'] ?? 0.0,
+        data['modul8'] ?? 0.0,
+        data['nilaiAkhir'] ?? 0.0,
+        data['nilaiHuruf'] ?? '',
+        data['status'] ?? '',
+      ]);
     }
-  }
 
-  // Fungsi untuk mengambil nama mahasiswa dari database
-  Future<void> _getNamaMahasiswa(String uid) async {
-    try {
-      DocumentSnapshot doc =
-          await _firestore.collection('akun_dosen').doc(uid).get();
-      if (doc.exists) {
-        setState(() {
-          _namaMahasiswa = doc.get('nama');
-        });
-      }
-    } catch (e) {
+    // Konversi data ke dalam format CSV
+    String csv = const ListToCsvConverter().convert(csvData);
+
+    if (kIsWeb) {
+      // Mendukung pengunduhan di web
+      final bytes = const Utf8Encoder().convert(csv);
+      final blob = html.Blob([bytes]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute("download", "data_nilai.csv")
+        ..click();
+      html.Url.revokeObjectUrl(url);
+    } else {
+      // Mendapatkan direktori untuk menyimpan file (Android/iOS)
+      final directory = await getApplicationDocumentsDirectory();
+      final path = "${directory.path}/data_nilai.csv";
+      final file = File(path);
+
+      // Menulis data CSV ke dalam file
+      await file.writeAsString(csv);
+
+      // Notifikasi sukses
       if (kDebugMode) {
-        print('Error fetching nama dosen: $e');
+        print("File telah didownload di: $path");
       }
     }
   }
@@ -372,7 +545,7 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 NilaiHarianDosenScreen(
-              kodeKelas: widget.kodeKelas,
+              idkelas: widget.idkelas,
               mataKuliah: widget.mataKuliah,
             ),
             transitionsBuilder:
@@ -397,7 +570,7 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 NilaiAkhirScreenDosen(
-              kodeKelas: widget.kodeKelas,
+              idkelas: widget.idkelas,
               mataKuliah: widget.mataKuliah,
             ),
             transitionsBuilder:
@@ -422,7 +595,6 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -488,19 +660,17 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
                     ),
                   ),
                 ),
-                if (screenWidth > 600) const SizedBox(width: 400.0),
-                if (_currentUser != null) ...[
-                  Text(
-                    _namaMahasiswa.isNotEmpty
-                        ? _namaMahasiswa
-                        : (_currentUser!.email ?? ''),
-                    style: GoogleFonts.quicksand(
-                        fontSize: 17.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
-                  ),
-                  if (screenWidth > 600) const SizedBox(width: 10.0)
-                ],
+                const SizedBox(
+                  width: 700.0,
+                ),
+                Text(
+                  'Admin',
+                  style: GoogleFonts.quicksand(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+                const SizedBox(width: 30.0)
               ],
             ),
           ),
@@ -532,59 +702,95 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
                       ),
                       child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 8.0, bottom: 30.0, left: 880.0),
-                            child: Row(
-                              children: [
-                                const Text(
-                                  'Search :',
-                                  style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 15.0),
-                                  child: Container(
-                                    width: 260.0,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey),
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    child: DropdownButton<String>(
-                                      isExpanded: true,
-                                      style:
-                                          const TextStyle(color: Colors.black),
-                                      icon: const Icon(Icons.arrow_drop_down,
-                                          color: Colors.grey),
-                                      iconSize: 24,
-                                      elevation: 16,
-                                      value: selectedKeterangan,
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          selectedKeterangan = newValue!;
-                                        });
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: SizedBox(
+                                  height: 45.0,
+                                  width: 150.0,
+                                  child: ElevatedButton(
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                          const Color(0xFF3CBEA9),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        downloadData();
                                       },
-                                      underline: Container(),
-                                      items: <String>[
-                                        'Tampilkan Semua',
-                                        'Lulus',
-                                        'Tidak Lulus'
-                                      ].map((String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0),
-                                            child: Text(value),
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
+                                      child: const Text(
+                                        'Download File',
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      )),
                                 ),
-                              ],
-                            ),
+                              ),
+                              //== Search ==//
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 8.0, bottom: 30.0, left: 600.0),
+                                child: Row(
+                                  children: [
+                                    const Text(
+                                      'Search :',
+                                      style: TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(left: 15.0),
+                                      child: Container(
+                                        width: 260.0,
+                                        decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                        ),
+                                        child: DropdownButton<String>(
+                                          isExpanded: true,
+                                          style: const TextStyle(
+                                              color: Colors.black),
+                                          icon: const Icon(
+                                              Icons.arrow_drop_down,
+                                              color: Colors.grey),
+                                          iconSize: 24,
+                                          elevation: 16,
+                                          value: selectedKeterangan,
+                                          onChanged: (String? newValue) {
+                                            setState(() {
+                                              selectedKeterangan = newValue!;
+                                            });
+                                          },
+                                          underline: Container(),
+                                          items: <String>[
+                                            'Tampilkan Semua',
+                                            'Lulus',
+                                            'Tidak Lulus'
+                                          ].map((String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10.0),
+                                                child: Text(value),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                           Container(
                             decoration: BoxDecoration(
@@ -1135,7 +1341,7 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
                             .collection('nilaiAkhir')
                             .where('nim', isEqualTo: nilai.nim)
                             .where('nama', isEqualTo: nilai.nama)
-                            .where('kodeKelas', isEqualTo: widget.kodeKelas)
+                            .where('idKelas', isEqualTo: widget.idkelas)
                             .get();
 
                     if (querySnapshot.docs.isEmpty) {
@@ -1144,7 +1350,8 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
                           .add({
                         'nim': nilai.nim,
                         'nama': nilai.nama,
-                        'kodeKelas': widget.kodeKelas,
+                        'idKelas': widget.idkelas,
+                        'matakuliah': widget.mataKuliah,
                         'modul1': nilai.modul1,
                         'modul2': nilai.modul2,
                         'modul3': nilai.modul3,
@@ -1303,6 +1510,7 @@ class PenilaianAkhir {
   final int nim;
   final String nama;
   final String kode;
+  final String matkul;
 
   //=== Rata - Rata
   double modul1;
@@ -1329,6 +1537,7 @@ class PenilaianAkhir {
     required this.nim,
     required this.nama,
     required this.kode,
+    required this.matkul,
     //== Rata-Rata
     required this.modul1,
     required this.modul2,

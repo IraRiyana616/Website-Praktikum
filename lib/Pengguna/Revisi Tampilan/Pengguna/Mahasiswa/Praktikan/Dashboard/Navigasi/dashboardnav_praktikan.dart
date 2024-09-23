@@ -268,15 +268,31 @@ class _DashboardNavigasiPraktikanState
                 .collection('akun_mahasiswa')
                 .doc(user.uid)
                 .get();
-            final tokenAsistenSnapshot = await FirebaseFirestore.instance
-                .collection('dataAsisten')
-                .where('nim', isEqualTo: nim)
-                .get();
+            final dataAsistenSnapshots = await Future.wait([
+              FirebaseFirestore.instance
+                  .collection('dataAsisten')
+                  .where('nim', isEqualTo: nim)
+                  .get(),
+              FirebaseFirestore.instance
+                  .collection('dataAsisten')
+                  .where('nim2', isEqualTo: nim)
+                  .get(),
+              FirebaseFirestore.instance
+                  .collection('dataAsisten')
+                  .where('nim3', isEqualTo: nim)
+                  .get(),
+              FirebaseFirestore.instance
+                  .collection('dataAsisten')
+                  .where('nim4', isEqualTo: nim)
+                  .get()
+            ]);
 
-            if (akunMahasiswaSnapshot.exists &&
-                tokenAsistenSnapshot.docs.isNotEmpty) {
+            final asistenExists = dataAsistenSnapshots
+                .any((snapshot) => snapshot.docs.isNotEmpty);
+
+            if (akunMahasiswaSnapshot.exists && asistenExists) {
               if (kDebugMode) {
-                print('Both akunMahasiswa and tokenAsisten documents exist.');
+                print('Both akunMahasiswa and dataAsisten documents exist.');
               }
               Navigator.pushReplacement(
                 context,

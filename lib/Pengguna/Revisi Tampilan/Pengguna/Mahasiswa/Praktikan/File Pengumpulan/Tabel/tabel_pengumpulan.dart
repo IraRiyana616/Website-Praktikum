@@ -3,29 +3,34 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../Komponen/Latihan/latihan_praktikan.dart';
 
-class TabelFilePengumpulan extends StatefulWidget {
-  const TabelFilePengumpulan({super.key});
+class TabelMataKuliahPraktikan extends StatefulWidget {
+  const TabelMataKuliahPraktikan({Key? key}) : super(key: key);
 
   @override
-  State<TabelFilePengumpulan> createState() => _TabelFilePengumpulanState();
+  State<TabelMataKuliahPraktikan> createState() =>
+      _TabelMataKuliahPraktikanState();
 }
 
-class _TabelFilePengumpulanState extends State<TabelFilePengumpulan> {
-  List<DataKelas> demoDataKelas = [];
-  List<DataKelas> filteredDataKelas = [];
+class _TabelMataKuliahPraktikanState extends State<TabelMataKuliahPraktikan> {
+  List<DataKelasPraktikan> demoKelasPraktikan = [];
+  List<DataKelasPraktikan> filteredKelasPraktikan = [];
+  final TextEditingController textController = TextEditingController();
+  bool _isTextFieldNotEmpty = false;
 
-  //Dropdown Button Tahun Ajaran
-  String selectedYear = 'Tahun Ajaran';
-  List<String> availableYears = [];
+  @override
+  void initState() {
+    super.initState();
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userUid = user.uid;
+      fetchUserNIMFromDatabase(userUid);
+    }
+    textController.addListener(_onTextChanged);
+  }
 
-  String nim = ''; // Deklarasi variable nim di luar block if
-  User? user = FirebaseAuth.instance.currentUser;
-
-  Future<void> fetchUserNIMFromDatabase(
-      String userUid, String? selectedYear) async {
+  Future<void> fetchUserNIMFromDatabase(String userUid) async {
     try {
       if (userUid.isNotEmpty) {
         DocumentSnapshot<Map<String, dynamic>> userSnapshot =
@@ -33,18 +38,46 @@ class _TabelFilePengumpulanState extends State<TabelFilePengumpulan> {
                 .collection('akun_mahasiswa')
                 .doc(userUid)
                 .get();
+
         if (userSnapshot.exists) {
           int userNim = userSnapshot['nim'] as int;
-          nim = userNim.toString(); // Ubah ke string dan simpan ke dalam nim
 
-          QuerySnapshot<Map<String, dynamic>> querySnapshot =
-              await FirebaseFirestore.instance.collection('tokenKelas').get();
-          Set<String> years = querySnapshot.docs
-              .map((doc) => doc['tahunAjaran'].toString())
-              .toSet();
-          setState(() {
-            availableYears = ['Tahun Ajaran', ...years.toList()];
-          });
+          QuerySnapshot<Map<String, dynamic>> mahasiswaSnapshot =
+              await FirebaseFirestore.instance
+                  .collection('dataMahasiswaPraktikum')
+                  .where('nim', isEqualTo: userNim)
+                  .get();
+
+          if (mahasiswaSnapshot.docs.isNotEmpty) {
+            Set<String> idKelasSet = {};
+            for (var doc in mahasiswaSnapshot.docs) {
+              String idKelas = doc['idKelas'] as String;
+              idKelasSet.add(idKelas);
+            }
+
+            List<DataKelasPraktikan> data = [];
+            for (String idKelas in idKelasSet) {
+              QuerySnapshot<Map<String, dynamic>> kelasPraktikumSnapshot =
+                  await FirebaseFirestore.instance
+                      .collection('dataKelasPraktikum')
+                      .where('idKelas', isEqualTo: idKelas)
+                      .get();
+
+              data.addAll(
+                  kelasPraktikumSnapshot.docs.map((doc) => DataKelasPraktikan(
+                        kode: doc['kodeMatakuliah'] ?? '',
+                        idkelas: doc['idKelas'] ?? '',
+                        matkul: doc['matakuliah'] ?? '',
+                        tahunAjaran: doc['tahunAjaran'] ?? '',
+                      )));
+            }
+//== Urutkan fetchedData berdasarkan nama matakuliah ==//
+            data.sort((a, b) => a.matkul.compareTo(b.matkul));
+            setState(() {
+              demoKelasPraktikan = data;
+              filteredKelasPraktikan = demoKelasPraktikan;
+            });
+          }
         }
       }
     } catch (error) {
@@ -54,76 +87,37 @@ class _TabelFilePengumpulanState extends State<TabelFilePengumpulan> {
     }
   }
 
-  Future<void> fetchDataFromFirebase(String? selectedYear) async {
-    try {
-      QuerySnapshot<Map<String, dynamic>> tokenQuerySnapshot;
-      if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
-        tokenQuerySnapshot = await FirebaseFirestore.instance
-            .collection('tokenKelas')
-            .where('tahunAjaran', isEqualTo: selectedYear)
-            .get();
-      } else {
-        tokenQuerySnapshot =
-            await FirebaseFirestore.instance.collection('tokenKelas').get();
-      }
-
-      List<DataKelas> data = [];
-
-      // Pemrosesan pencocokan berdasarkan NIM
-      for (var tokenDoc in tokenQuerySnapshot.docs) {
-        // Menggunakan 'nim' sebagai int karena sudah diubah di fetchUserNIMFromDatabase
-        int tokenNim = tokenDoc['nim'] as int;
-
-        if (tokenNim.toString() == nim) {
-          // Check kesamaan NIM dengan pengguna yang sedang login
-          Map<String, dynamic> tokenData = tokenDoc.data();
-          data.add(DataKelas(
-            kode: tokenData['kodeKelas'] ?? '',
-            tahun: tokenData['tahunAjaran'] ?? '',
-            matkul: tokenData['mataKuliah'] ?? '',
-            dosenpengampu: tokenData['dosenPengampu'] ?? '',
-            dosenpengampu2: tokenData['dosenPengampu2'] ?? '',
-          ));
-        }
-      }
-
-      setState(() {
-        demoDataKelas = data;
-        filteredDataKelas = demoDataKelas;
-      });
-    } catch (error) {
-      if (kDebugMode) {
-        print('Error fetching data from Firebase: $error');
-      }
-    }
+  void clearSearchField() {
+    setState(() {
+      textController.clear();
+      filterData('');
+    });
   }
 
-  @override
-  void initState() {
-    super.initState();
+  void filterData(String query) {
+    setState(() {
+      filteredKelasPraktikan = demoKelasPraktikan
+          .where((data) =>
+              data.matkul.toLowerCase().contains(query.toLowerCase()) ||
+              data.kode.toLowerCase().contains(query.toLowerCase()) ||
+              data.tahunAjaran.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
 
-    // Ambil tahun ajaran yang tersedia
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      // Dapatkan NIM pengguna yang sedang Login
-      String userUid = user.uid;
-      fetchUserNIMFromDatabase(userUid, selectedYear).then((_) {
-        // Mengambil data dari Firebase
-        fetchDataFromFirebase(selectedYear);
-      });
-    }
+  void _onTextChanged() {
+    setState(() {
+      _isTextFieldNotEmpty = textController.text.isNotEmpty;
+      filterData(textController.text);
+    });
   }
 
   Future<void> _onRefresh() async {
-    await fetchDataFromFirebase(selectedYear);
+    await fetchUserNIMFromDatabase(FirebaseAuth.instance.currentUser!.uid);
   }
 
   Color getRowColor(int index) {
-    if (index % 2 == 0) {
-      return Colors.grey.shade200;
-    } else {
-      return Colors.transparent;
-    }
+    return index % 2 == 0 ? Colors.grey.shade200 : Colors.transparent;
   }
 
   @override
@@ -135,7 +129,7 @@ class _TabelFilePengumpulanState extends State<TabelFilePengumpulan> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Pengumpulan Praktikum',
+            child: Text('Data Matakuliah Praktikum',
                 style: GoogleFonts.quicksand(
                     fontSize: 18.0, fontWeight: FontWeight.bold)),
           ),
@@ -143,42 +137,56 @@ class _TabelFilePengumpulanState extends State<TabelFilePengumpulan> {
             onRefresh: _onRefresh,
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 15.0, left: 0.0),
-                  child: Container(
-                    height: 47.0,
-                    width: 1020.0,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: DropdownButton<String>(
-                      value: selectedYear,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedYear = newValue!;
-                          fetchDataFromFirebase(selectedYear);
-                        });
-                      },
-                      items: availableYears
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 15.0),
-                            child: Text(value),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Search TextField
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, left: 25.0),
+                      child: SizedBox(
+                        width: 300.0,
+                        height: 35.0,
+                        child: Row(children: [
+                          const Text(
+                            'Search :',
+                            style: TextStyle(fontSize: 16.0),
                           ),
-                        );
-                      }).toList(),
-                      style: const TextStyle(color: Colors.black),
-                      icon:
-                          const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                      iconSize: 24,
-                      elevation: 16,
-                      isExpanded: true,
-                      underline: Container(),
+                          const SizedBox(
+                            width: 10.0,
+                          ),
+                          Expanded(
+                            child: TextField(
+                              onChanged: (value) {
+                                filterData(value);
+                              },
+                              controller: textController,
+                              decoration: InputDecoration(
+                                hintText: '',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 10.0),
+                                suffixIcon: Visibility(
+                                  visible: _isTextFieldNotEmpty,
+                                  child: IconButton(
+                                    onPressed: clearSearchField,
+                                    icon: const Icon(Icons.clear),
+                                  ),
+                                ),
+                                labelStyle: const TextStyle(fontSize: 16.0),
+                                filled: true,
+                                fillColor: Colors.white,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 27.0,
+                          )
+                        ]),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
                 const SizedBox(
                   height: 15,
@@ -187,38 +195,32 @@ class _TabelFilePengumpulanState extends State<TabelFilePengumpulan> {
                   padding: const EdgeInsets.only(left: 18.0, right: 25.0),
                   child: SizedBox(
                     width: double.infinity,
-                    child: filteredDataKelas.isNotEmpty
+                    child: filteredKelasPraktikan.isNotEmpty
                         ? PaginatedDataTable(
                             columnSpacing: 10,
                             columns: const [
                               DataColumn(
                                 label: Text(
-                                  "Kode Praktikum",
+                                  "Kode Matakuliah",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
-                                  "MataKuliah",
+                                  "Matakuliah",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Dosen Pengampu 1",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  "Dosen Pengampu 2",
+                                  "Tahun Ajaran",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ],
-                            source: DataSource(filteredDataKelas, context),
-                            rowsPerPage:
-                                calculateRowsPerPage(filteredDataKelas.length),
+                            source: DataSource(filteredKelasPraktikan, context),
+                            rowsPerPage: calculateRowsPerPage(
+                                filteredKelasPraktikan.length),
                           )
                         : const Padding(
                             padding: EdgeInsets.only(top: 10.0),
@@ -244,31 +246,25 @@ class _TabelFilePengumpulanState extends State<TabelFilePengumpulan> {
 
   int calculateRowsPerPage(int rowCount) {
     const int defaultRowsPerPage = 50;
-
-    if (rowCount <= defaultRowsPerPage) {
-      return rowCount;
-    } else {
-      return defaultRowsPerPage;
-    }
+    return rowCount <= defaultRowsPerPage ? rowCount : defaultRowsPerPage;
   }
 }
 
-class DataKelas {
+class DataKelasPraktikan {
   String kode;
+  String idkelas;
   String matkul;
-  String tahun;
-  String dosenpengampu;
-  String dosenpengampu2;
+  String tahunAjaran;
 
-  DataKelas(
+  DataKelasPraktikan(
       {required this.kode,
-      required this.tahun,
+      required this.idkelas,
       required this.matkul,
-      required this.dosenpengampu,
-      required this.dosenpengampu2});
+      required this.tahunAjaran});
 }
 
-DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
+DataRow dataFileDataRow(
+    DataKelasPraktikan fileInfo, int index, BuildContext context) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -276,14 +272,16 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
-      DataCell(SizedBox(width: 140.0, child: Text(fileInfo.kode))),
+      DataCell(SizedBox(width: 120.0, child: Text(fileInfo.kode))),
       DataCell(
         SizedBox(
-          width: 170.0,
+          width: 250.0,
           child: Text(
             fileInfo.matkul,
             style: TextStyle(
-                color: Colors.lightBlue[700], fontWeight: FontWeight.bold),
+              color: Colors.lightBlue[700],
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         onTap: () {
@@ -292,8 +290,8 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
                   LatihanPraktikanScreen(
-                kodeKelas: fileInfo.kode,
-                mataKuliah: fileInfo.matkul,
+                matkul: fileInfo.matkul,
+                idkelas: fileInfo.idkelas,
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
@@ -313,12 +311,7 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
           );
         },
       ),
-      DataCell(SizedBox(
-          width: 250.0,
-          child: Text(getLimitedText(fileInfo.dosenpengampu, 40)))),
-      DataCell(SizedBox(
-          width: 250.0,
-          child: Text(getLimitedText(fileInfo.dosenpengampu2, 40)))),
+      DataCell(SizedBox(width: 150.0, child: Text(fileInfo.tahunAjaran))),
     ],
   );
 }
@@ -328,15 +321,11 @@ String getLimitedText(String text, int limit) {
 }
 
 Color getRowColor(int index) {
-  if (index % 2 == 0) {
-    return Colors.grey.shade200;
-  } else {
-    return Colors.transparent;
-  }
+  return index % 2 == 0 ? Colors.grey.shade200 : Colors.transparent;
 }
 
 class DataSource extends DataTableSource {
-  final List<DataKelas> data;
+  final List<DataKelasPraktikan> data;
   final BuildContext context;
 
   DataSource(this.data, this.context);

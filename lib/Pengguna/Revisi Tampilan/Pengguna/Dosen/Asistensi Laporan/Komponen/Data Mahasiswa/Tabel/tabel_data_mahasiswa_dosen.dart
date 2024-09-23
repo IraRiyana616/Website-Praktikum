@@ -1,14 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../Detail/Screen/detail_asistensi_dosen.dart';
 
 class TabelDataMahasiswaDosenAsistensiLaporan extends StatefulWidget {
-  final String kodeKelas;
-  final String mataKuliah;
+  final String idkelas;
+  final String matkul;
   const TabelDataMahasiswaDosenAsistensiLaporan(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.idkelas, required this.matkul});
 
   @override
   State<TabelDataMahasiswaDosenAsistensiLaporan> createState() =>
@@ -21,6 +22,8 @@ class _TabelDataMahasiswaDosenAsistensiLaporanState
   List<DataPraktikan> filteredDataPraktikan = [];
   List<DataPraktikan> demoDataPraktikan = [];
 
+  //== Fungsi untuk mengaktifkan loading ==//
+  bool isLoading = true;
   @override
   void initState() {
     super.initState();
@@ -28,22 +31,62 @@ class _TabelDataMahasiswaDosenAsistensiLaporanState
     fetchDataFromFirestore();
   }
 
-  void fetchDataFromFirestore() async {
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection('tokenKelas')
-        .where('kodeKelas', isEqualTo: widget.kodeKelas)
-        .get();
+//== Fungsi untuk menampilkan data dari database ==//
 
-    final data = querySnapshot.docs
-        .map((doc) => DataPraktikan.fromFirestore(doc))
-        .toList();
+//== Fungsi untuk memanggil Firestore ==//
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Future<void> fetchDataFromFirestore() async {
+    try {
+      var akunSnapshot = await _firestore.collection('akun_mahasiswa').get();
+      List<DataPraktikan> dataMahasiswaList = [];
 
-    // Mengurutkan data berdasarkan nama secara ascending
-    data.sort((a, b) => a.nama.compareTo(b.nama));
+      if (akunSnapshot.docs.isNotEmpty) {
+        for (var akunDoc in akunSnapshot.docs) {
+          var nim = akunDoc['nim'];
 
-    setState(() {
-      filteredDataPraktikan = data;
-    });
+          var dataMahasiswaSnapshot = await _firestore
+              .collection('dataMahasiswaPraktikum')
+              .where('nim', isEqualTo: nim)
+              .where('idKelas', isEqualTo: widget.idkelas)
+              .get();
+
+          if (dataMahasiswaSnapshot.docs.isNotEmpty) {
+            var combinedDocs = dataMahasiswaSnapshot.docs;
+
+            // Memperbaiki iterasi untuk memasukkan dataMahasiswa ke dalam list
+            // ignore: unused_local_variable
+            for (var dataMahasiswaDoc in combinedDocs) {
+              dataMahasiswaList.add(
+                DataPraktikan(
+                    nim: akunDoc['nim'] ?? 0,
+                    nama: akunDoc['nama'] ?? '',
+                    email: akunDoc['email'] ?? '',
+                    nohp: akunDoc['no_hp'] ?? 0,
+                    angkatan: akunDoc['angkatan'] ?? 0,
+                    password: akunDoc['password'] ?? '',
+                    //==//
+                    idkelas: widget.idkelas,
+                    matkul: widget.matkul),
+              );
+            }
+          }
+        }
+      }
+
+      dataMahasiswaList.sort((a, b) => a.nama.compareTo(b.nama));
+      setState(() {
+        demoDataPraktikan = dataMahasiswaList;
+        filteredDataPraktikan = dataMahasiswaList;
+        isLoading = false;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching data: $e');
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   //== Fungsi Controller pada Search ==//
@@ -128,37 +171,42 @@ class _TabelDataMahasiswaDosenAsistensiLaporanState
         ),
         Center(
           child: Padding(
-            padding: const EdgeInsets.only(left: 30.0, right: 30.0, top: 15.0),
+            padding: const EdgeInsets.only(
+                left: 30.0, right: 30.0, top: 15.0, bottom: 10.0),
             child: SizedBox(
                 width: 1250.0,
-                child: filteredDataPraktikan.isNotEmpty
-                    ? PaginatedDataTable(
-                        columnSpacing: 10,
-                        columns: const [
-                          DataColumn(
-                              label: Text('NIM',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold))),
-                          DataColumn(
-                              label: Text('Nama',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold))),
-                          DataColumn(
-                              label: Text(
-                            '',
-                          )),
-                        ],
-                        source: DataSource(filteredDataPraktikan, context),
-                        rowsPerPage:
-                            calculateRowsPerPage(filteredDataPraktikan.length),
+                child: isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(),
                       )
-                    : const Center(
-                        child: Text(
-                          'No data available',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
-                        ),
-                      )),
+                    : filteredDataPraktikan.isNotEmpty
+                        ? PaginatedDataTable(
+                            columnSpacing: 10,
+                            columns: const [
+                              DataColumn(
+                                  label: Text('NIM',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold))),
+                              DataColumn(
+                                  label: Text('Nama',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold))),
+                              DataColumn(
+                                  label: Text(
+                                '',
+                              )),
+                            ],
+                            source: DataSource(filteredDataPraktikan, context),
+                            rowsPerPage: calculateRowsPerPage(
+                                filteredDataPraktikan.length),
+                          )
+                        : const Center(
+                            child: Text(
+                              'No data available',
+                              style: TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                            ),
+                          )),
           ),
         )
       ],
@@ -178,33 +226,26 @@ class _TabelDataMahasiswaDosenAsistensiLaporanState
 class DataPraktikan {
   int nim;
   String nama;
-  String kode;
-  String tahun;
+  String email;
+  int nohp;
+  int angkatan;
+  String password;
+
+  //==//
+  String idkelas;
   String matkul;
-  String dosen;
-  String dosenPengampu;
 
   DataPraktikan(
       {required this.nim,
       required this.nama,
-      required this.kode,
-      required this.tahun,
-      required this.matkul,
-      required this.dosen,
-      required this.dosenPengampu});
+      required this.email,
+      required this.nohp,
+      required this.angkatan,
+      required this.password,
 
-  factory DataPraktikan.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return DataPraktikan(
-      nim: data['nim'] ?? 0,
-      nama: data['nama'] ?? '',
-      kode: data['kodeKelas'] ?? '',
-      tahun: data['tahunAjaran'] ?? '',
-      matkul: data['mataKuliah'] ?? '',
-      dosen: data['dosenPengampu'] ?? '',
-      dosenPengampu: data['dosenPengampu2'] ?? '',
-    );
-  }
+      //==//
+      required this.idkelas,
+      required this.matkul});
 }
 
 DataRow dataFileDataRow(
@@ -226,9 +267,8 @@ DataRow dataFileDataRow(
               PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     DetailAsistensiLaporanDosen(
-                  kodeKelas: fileInfo.kode,
+                  idkelas: fileInfo.idkelas,
                   nama: fileInfo.nama,
-                  modul: fileInfo.matkul,
                   nim: fileInfo.nim,
                   mataKuliah: fileInfo.matkul,
                 ),

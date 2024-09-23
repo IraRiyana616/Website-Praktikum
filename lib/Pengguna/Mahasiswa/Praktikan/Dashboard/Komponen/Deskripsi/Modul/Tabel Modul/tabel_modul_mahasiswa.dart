@@ -62,6 +62,7 @@ class _TabelModulPraktikumState extends State<TabelModulPraktikum> {
         documentId: doc.id,
       );
     }).toList();
+    dataList.sort((a, b) => a.modul.compareTo(b.modul));
 
     setState(() {
       demoDataSilabus = dataList;

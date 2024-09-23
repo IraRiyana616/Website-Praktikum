@@ -7,10 +7,10 @@ import '../../../Navigasi/asistensinav_dosen.dart';
 import '../Tabel/tabel_data_mahasiswa_dosen.dart';
 
 class DataAsistenDosen extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String mataKuliah;
   const DataAsistenDosen(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.idkelas, required this.mataKuliah});
 
   @override
   State<DataAsistenDosen> createState() => _DataAsistenDosenState();
@@ -146,8 +146,8 @@ class _DataAsistenDosenState extends State<DataAsistenDosen> {
                           child: Column(
                             children: [
                               TabelDataMahasiswaDosenAsistensiLaporan(
-                                kodeKelas: widget.kodeKelas,
-                                mataKuliah: widget.mataKuliah,
+                                idkelas: widget.idkelas,
+                                matkul: widget.mataKuliah,
                               ),
                               const SizedBox(
                                 height: 30.0,

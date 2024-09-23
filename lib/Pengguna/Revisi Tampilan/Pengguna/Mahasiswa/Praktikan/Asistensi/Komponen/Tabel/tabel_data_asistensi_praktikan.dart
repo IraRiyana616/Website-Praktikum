@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TabelDataAsistensiLaporan extends StatefulWidget {
-  final String kodeKelas;
-  final String mataKuliah;
+  final String idkelas;
+  final String matkul;
   const TabelDataAsistensiLaporan(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.idkelas, required this.matkul});
 
   @override
   State<TabelDataAsistensiLaporan> createState() =>
@@ -53,19 +53,19 @@ class _TabelDataAsistensiLaporanState extends State<TabelDataAsistensiLaporan> {
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
             .collection('asistensiLaporan')
             .where('nim', isEqualTo: nim)
-            .where('kodeKelas', isEqualTo: widget.kodeKelas)
+            .where('idKelas', isEqualTo: widget.idkelas)
             .get();
 
         setState(() {
           demoAsistensi = querySnapshot.docs.map((doc) {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
             return Asistensi(
-              kode: data['kodeKelas'] ?? '',
+              kode: data['idKelas'] ?? '',
               asistensi: data['namaAsisten'] ?? '',
               nim: data['nim'] ?? 0,
-              modul: data['judulMateri'] ?? '',
+              modul: data['judulModul'] ?? '',
               file: data['namaFile'] ?? '',
-              waktu: (data['waktuPengumpulan'] as Timestamp),
+              waktu: (data['waktuAsistensi'] as Timestamp),
               status: data['statusRevisi'] ?? '',
             );
           }).toList();
@@ -110,7 +110,7 @@ class _TabelDataAsistensiLaporanState extends State<TabelDataAsistensiLaporan> {
             padding: const EdgeInsets.only(left: 30.0, right: 30.0, top: 35.0),
             child: Container(
               height: 47.0,
-              width: 1195.0,
+              width: 1230.0,
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(8.0),
@@ -243,7 +243,7 @@ DataRow dataFileDataRow(Asistensi fileInfo, int index) {
       ),
       DataCell(
         SizedBox(
-          width: 230.0,
+          width: 275.0,
           child: Text(getLimitedText(fileInfo.modul, 25,
               style: const TextStyle(color: Colors.black))),
         ),

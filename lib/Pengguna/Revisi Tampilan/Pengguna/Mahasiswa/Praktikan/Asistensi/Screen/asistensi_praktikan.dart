@@ -134,7 +134,7 @@ class _AsistensiPraktikanScreenState extends State<AsistensiPraktikanScreen> {
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 1105.0),
                     color: Colors.white,
-                    child: const TabelAsistensiLaporan(),
+                    child: const TabelMataKuliahPraktikan(),
                   ),
                 ),
               ],

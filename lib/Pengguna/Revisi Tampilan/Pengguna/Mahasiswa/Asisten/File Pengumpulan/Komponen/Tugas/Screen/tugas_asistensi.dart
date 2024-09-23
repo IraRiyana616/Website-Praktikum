@@ -3,16 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../Navigasi/file_pengumpulannav_asisten.dart';
 import '../../Latihan/Screen/latihan_asisten.dart';
 import '../Tabel/tabel_tugas_asisten.dart';
 
 class TugasAsistenScreen extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String mataKuliah;
   const TugasAsistenScreen(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.idkelas, required this.mataKuliah});
 
   @override
   State<TugasAsistenScreen> createState() => _TugasAsistenScreenState();
@@ -71,7 +70,7 @@ class _TugasAsistenScreenState extends State<TugasAsistenScreen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 LatihanAsistenScreen(
-                    kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah),
+                    idkelas: widget.idkelas, mataKuliah: widget.mataKuliah),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               const begin = Offset(0.0, 0.0);
@@ -94,7 +93,7 @@ class _TugasAsistenScreenState extends State<TugasAsistenScreen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 TugasAsistenScreen(
-              kodeKelas: widget.kodeKelas,
+              idkelas: widget.idkelas,
               mataKuliah: widget.mataKuliah,
             ),
             transitionsBuilder:
@@ -206,7 +205,7 @@ class _TugasAsistenScreenState extends State<TugasAsistenScreen> {
                           child: Column(
                             children: [
                               TabelTugasAsistenScreen(
-                                kodeKelas: widget.kodeKelas,
+                                idkelas: widget.idkelas,
                                 mataKuliah: widget.mataKuliah,
                               ),
                               const SizedBox(

@@ -3,8 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../../../../../Admin/Data Mahasiswa/Praktikan/Tabel/tabel_data_mahasiswa_admin.dart';
+import '../../../../Admin/Dashboard/Komponen/Kelas Praktikum/Data Mahasiswa/Tabel/tabel_mahasiswa.dart';
 import '../../Navigasi/dasboardnav_dosen.dart';
 import '../Data Asisten/data_asistensi_dosen.dart';
 import '../Deskripsi Kelas/deskripsi_dosen.dart';
@@ -12,8 +11,12 @@ import '../Deskripsi Kelas/deskripsi_dosen.dart';
 class DataMahasiswaScreenDosen extends StatefulWidget {
   final String kodeKelas;
   final String mataKuliah;
+  final String idkelas;
   const DataMahasiswaScreenDosen(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key,
+      required this.kodeKelas,
+      required this.mataKuliah,
+      required this.idkelas});
 
   @override
   State<DataMahasiswaScreenDosen> createState() =>
@@ -171,9 +174,9 @@ class _DataMahasiswaScreenDosenState extends State<DataMahasiswaScreenDosen> {
                                       pageBuilder: (context, animation,
                                               secondaryAnimation) =>
                                           DeskripsiKelasDosen(
-                                        kodeKelas: widget.kodeKelas,
-                                        mataKuliah: widget.mataKuliah,
-                                      ),
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                              idKelas: widget.idkelas),
                                       transitionsBuilder: (context, animation,
                                           secondaryAnimation, child) {
                                         const begin = Offset(0.0, 0.0);
@@ -216,9 +219,9 @@ class _DataMahasiswaScreenDosenState extends State<DataMahasiswaScreenDosen> {
                                       pageBuilder: (context, animation,
                                               secondaryAnimation) =>
                                           DataMahasiswaScreenDosen(
-                                        kodeKelas: widget.kodeKelas,
-                                        mataKuliah: widget.mataKuliah,
-                                      ),
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                              idkelas: widget.idkelas),
                                       transitionsBuilder: (context, animation,
                                           secondaryAnimation, child) {
                                         const begin = Offset(0.0, 0.0);
@@ -262,9 +265,9 @@ class _DataMahasiswaScreenDosenState extends State<DataMahasiswaScreenDosen> {
                                       pageBuilder: (context, animation,
                                               secondaryAnimation) =>
                                           DataAsistenScreenDosen(
-                                        kodeKelas: widget.kodeKelas,
-                                        mataKuliah: widget.mataKuliah,
-                                      ),
+                                              kodeKelas: widget.kodeKelas,
+                                              mataKuliah: widget.mataKuliah,
+                                              idkelas: widget.idkelas),
                                       transitionsBuilder: (context, animation,
                                           secondaryAnimation, child) {
                                         const begin = Offset(0.0, 0.0);
@@ -307,7 +310,11 @@ class _DataMahasiswaScreenDosenState extends State<DataMahasiswaScreenDosen> {
                       const SizedBox(
                         height: 20.0,
                       ),
-                      TabelDataMahasiswaAdmin(kodeKelas: widget.kodeKelas),
+                      TabelDataMahasiswa(
+                        mataKuliah: widget.mataKuliah,
+                        idkelas: widget.idkelas,
+                        kode: widget.kodeKelas,
+                      ),
                       const SizedBox(
                         height: 20.0,
                       )

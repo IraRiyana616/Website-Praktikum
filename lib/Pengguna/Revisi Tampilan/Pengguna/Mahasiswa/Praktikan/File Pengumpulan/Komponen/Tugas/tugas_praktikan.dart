@@ -9,10 +9,13 @@ import '../../Navigasi/file_pengumpulan_nav.dart';
 import '../Latihan/latihan_praktikan.dart';
 
 class TugasPraktikanScreen extends StatefulWidget {
-  final String kodeKelas;
-  final String mataKuliah;
-  const TugasPraktikanScreen(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+  final String idkelas;
+  final String matkul;
+  const TugasPraktikanScreen({
+    super.key,
+    required this.idkelas,
+    required this.matkul,
+  });
 
   @override
   State<TugasPraktikanScreen> createState() => _TugasPraktikanScreenState();
@@ -71,7 +74,9 @@ class _TugasPraktikanScreenState extends State<TugasPraktikanScreen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 LatihanPraktikanScreen(
-                    kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah),
+              idkelas: widget.idkelas,
+              matkul: widget.matkul,
+            ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               const begin = Offset(0.0, 0.0);
@@ -94,8 +99,8 @@ class _TugasPraktikanScreenState extends State<TugasPraktikanScreen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 TugasPraktikanScreen(
-              kodeKelas: widget.kodeKelas,
-              mataKuliah: widget.mataKuliah,
+              idkelas: widget.idkelas,
+              matkul: widget.matkul,
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -162,7 +167,7 @@ class _TugasPraktikanScreenState extends State<TugasPraktikanScreen> {
                 children: [
                   Expanded(
                       child: Text(
-                    widget.mataKuliah,
+                    widget.matkul,
                     style: GoogleFonts.quicksand(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -206,7 +211,7 @@ class _TugasPraktikanScreenState extends State<TugasPraktikanScreen> {
                           child: Column(
                             children: [
                               TabelKTugasPraktikan(
-                                kodeKelas: widget.kodeKelas,
+                                idkelas: widget.idkelas,
                               ),
                               const SizedBox(
                                 height: 30.0,

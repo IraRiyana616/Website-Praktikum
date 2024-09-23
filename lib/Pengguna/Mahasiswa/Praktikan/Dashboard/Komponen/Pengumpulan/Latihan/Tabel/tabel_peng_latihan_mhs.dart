@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TabelKLatihanPraktikan extends StatefulWidget {
-  final String kodeKelas;
-  const TabelKLatihanPraktikan({super.key, required this.kodeKelas});
+  final String idkelas;
+  final String matkul;
+  const TabelKLatihanPraktikan(
+      {super.key, required this.idkelas, required this.matkul});
 
   @override
   State<TabelKLatihanPraktikan> createState() => _TabelKLatihanPraktikanState();
@@ -38,26 +40,28 @@ class _TabelKLatihanPraktikanState extends State<TabelKLatihanPraktikan> {
       nim = userDoc['nim'];
 
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('latihan')
+          .collection('dataPengumpulan')
           .where('nim', isEqualTo: nim)
-          .where('kodeKelas', isEqualTo: widget.kodeKelas)
+          .where('idKelas', isEqualTo: widget.idkelas)
+          .where('jenisPengumpulan', isEqualTo: 'Latihan')
           .get();
 
       Set<String> modulSet = {'Judul Modul'};
       List<Pengumpulan> pengumpulanList = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        String modul = data['judulMateri'] ?? '';
+        String modul = data['judulModul'] ?? '';
         modulSet.add(modul);
         return Pengumpulan(
-          kode: data['kodeKelas'] ?? '',
+          kode: data['idKelas'] ?? '',
           nama: data['nama'] ?? '',
           nim: data['nim'] ?? 0,
           modul: modul,
           file: data['namaFile'] ?? '',
-          waktu: data['waktuPengumpulan'] ?? Timestamp.now(),
+          jenis: data['jenisPengumpulan'] ?? '',
+          waktu: data['waktuPengumpulan'] ?? '',
         );
       }).toList();
-
+      pengumpulanList.sort((a, b) => a.modul.compareTo(b.modul));
       setState(() {
         demoPengumpulan = pengumpulanList;
         filteredPengumpulan = List.from(demoPengumpulan);
@@ -188,17 +192,18 @@ class Pengumpulan {
   final String nama;
   final int nim;
   final String file;
-  final Timestamp waktu;
+  final String waktu;
   final String modul;
+  final String jenis;
 
-  Pengumpulan({
-    required this.kode,
-    required this.nama,
-    required this.nim,
-    required this.file,
-    required this.waktu,
-    required this.modul,
-  });
+  Pengumpulan(
+      {required this.kode,
+      required this.nama,
+      required this.nim,
+      required this.file,
+      required this.waktu,
+      required this.modul,
+      required this.jenis});
 }
 
 DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
@@ -211,8 +216,8 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
     cells: [
       DataCell(
         SizedBox(
-          width: 130.0,
-          child: Text(getLimitedText(fileInfo.waktu.toDate().toString(), 19,
+          width: 150.0,
+          child: Text(getLimitedText(fileInfo.waktu, 23,
               style: const TextStyle(color: Colors.black))),
         ),
       ),
@@ -251,10 +256,10 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
   );
 }
 
-void downloadFile(String kodeKelas, String fileName, String judulMateri) async {
+void downloadFile(String idkelas, String fileName, String judulMateri) async {
   final ref = FirebaseStorage.instance
       .ref()
-      .child('latihan/$kodeKelas/$judulMateri/$fileName');
+      .child('latihan/$idkelas/$judulMateri/$fileName');
 
   try {
     final url = await ref.getDownloadURL();

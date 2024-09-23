@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Tabel/tblkelas_mhs.dart';
+import '../Tabel/tabel_dashboard.dart';
 
 class DashboardPraktikanScreen extends StatefulWidget {
   const DashboardPraktikanScreen({super.key});
@@ -133,7 +133,7 @@ class _DashboardPraktikanScreenState extends State<DashboardPraktikanScreen> {
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 1105.0),
                     color: Colors.white,
-                    child: const TabelKelasPraktikan(),
+                    child: const TabelMataKuliahPraktikan(),
                   ),
                 ),
               ],

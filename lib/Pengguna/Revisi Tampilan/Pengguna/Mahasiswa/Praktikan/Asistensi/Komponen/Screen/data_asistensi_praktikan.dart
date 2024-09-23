@@ -8,10 +8,10 @@ import '../../Navigasi/asistensinav_praktikan.dart';
 import '../Tabel/tabel_data_asistensi_praktikan.dart';
 
 class DataAsistensiLaporanPraktikan extends StatefulWidget {
-  final String kodeKelas;
-  final String mataKuliah;
+  final String idkelas;
+  final String matakuliah;
   const DataAsistensiLaporanPraktikan(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.idkelas, required this.matakuliah});
 
   @override
   State<DataAsistensiLaporanPraktikan> createState() =>
@@ -105,7 +105,7 @@ class _DataAsistensiLaporanPraktikanState
                 children: [
                   Expanded(
                       child: Text(
-                    widget.mataKuliah,
+                    widget.matakuliah,
                     style: GoogleFonts.quicksand(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -144,14 +144,13 @@ class _DataAsistensiLaporanPraktikanState
                       padding: const EdgeInsets.only(top: 15.0),
                       child: Center(
                         child: Container(
-                          constraints: const BoxConstraints(maxWidth: 1200.0),
+                          constraints: const BoxConstraints(maxWidth: 1280.0),
                           color: Colors.white,
                           child: Column(
                             children: [
                               TabelDataAsistensiLaporan(
-                                kodeKelas: widget.kodeKelas,
-                                mataKuliah: widget.mataKuliah,
-                              ),
+                                  idkelas: widget.idkelas,
+                                  matkul: widget.matakuliah),
                               const SizedBox(
                                 height: 30.0,
                               )

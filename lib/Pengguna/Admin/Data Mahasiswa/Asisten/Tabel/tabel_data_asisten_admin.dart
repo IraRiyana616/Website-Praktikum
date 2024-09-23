@@ -51,7 +51,7 @@ class _TabelDataAsistenAdminState extends State<TabelDataAsistenAdmin> {
         ));
       }
     }
-
+    demoDataMahasiswa.sort((a, b) => a.nama.compareTo(b.nama));
     // Update state untuk merender data
     setState(() {
       filteredDataMahasiswa = List.from(demoDataMahasiswa);

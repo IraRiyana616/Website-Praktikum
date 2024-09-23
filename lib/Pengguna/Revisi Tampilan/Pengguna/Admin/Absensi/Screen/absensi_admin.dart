@@ -2,8 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../../../../Admin/Absensi/Tabel/tabel_absensi_admin.dart';
+import '../Tabel/tabel_absensi.dart';
 
 class DataAbsensiPraktikum extends StatefulWidget {
   const DataAbsensiPraktikum({super.key});
@@ -93,7 +92,7 @@ class _DataAbsensiPraktikumState extends State<DataAbsensiPraktikum> {
                       child: Container(
                         constraints: const BoxConstraints(maxWidth: 1105.0),
                         color: Colors.white,
-                        child: const TabelDataAbsensiAdmin(),
+                        child: const TabelAbsensiAdmin(),
                       ),
                     ),
                   ],

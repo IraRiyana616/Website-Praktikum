@@ -133,7 +133,7 @@ class _AbsensiPraktikumScreenState extends State<AbsensiPraktikumScreen> {
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 1105.0),
                     color: Colors.white,
-                    child: const TabelAbsensiPraktikan(),
+                    child: const TabelMataKuliahPraktikan(),
                   ),
                 ),
               ],

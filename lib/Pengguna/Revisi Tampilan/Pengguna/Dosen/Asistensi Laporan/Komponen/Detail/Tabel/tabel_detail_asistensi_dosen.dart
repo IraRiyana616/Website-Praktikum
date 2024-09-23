@@ -9,16 +9,15 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TabelDetailAsistensiLaporanDosen extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String nama;
-  final String modul;
   final int nim;
-  const TabelDetailAsistensiLaporanDosen(
-      {super.key,
-      required this.kodeKelas,
-      required this.nama,
-      required this.modul,
-      required this.nim});
+  const TabelDetailAsistensiLaporanDosen({
+    super.key,
+    required this.idkelas,
+    required this.nama,
+    required this.nim,
+  });
 
   @override
   State<TabelDetailAsistensiLaporanDosen> createState() =>
@@ -168,8 +167,8 @@ class _TabelDetailAsistensiLaporanDosenState
   Future<void> checkAndFetchData() async {
     final QuerySnapshot<Map<String, dynamic>> laporanSnapshot =
         await FirebaseFirestore.instance
-            .collection('laporan')
-            .where('kodeKelas', isEqualTo: widget.kodeKelas)
+            .collection('pengumpulanLaporan')
+            .where('idKelas', isEqualTo: widget.idkelas)
             .where('nama', isEqualTo: widget.nama)
             .where('nim', isEqualTo: widget.nim)
             .get();
@@ -180,12 +179,12 @@ class _TabelDetailAsistensiLaporanDosenState
         Map<String, dynamic> data = document.data() as Map<String, dynamic>;
         return AsistensiLaporan(
           id: document.id,
-          modul: data['judulMateri'] ?? '',
-          kode: data['kodeKelas'] ?? '',
+          modul: data['judulModul'] ?? '',
+          kode: data['idKelas'] ?? '',
           koreksi: data['namaAsisten'] ?? '',
           file: data['namaFile'] ?? '',
           nim: data['nim'] ?? '',
-          waktu: (data['waktuPengumpulan'] as Timestamp).toDate(),
+          waktu: data['waktuAsistensi'] ?? '',
           status: data['statusRevisi'] ?? '',
         );
       }).toList();
@@ -210,7 +209,10 @@ class _TabelDetailAsistensiLaporanDosenState
   //== Menghapus Data dari Database 'Laporan' ==//
   void deleteData(String id) async {
     try {
-      await FirebaseFirestore.instance.collection('laporan').doc(id).delete();
+      await FirebaseFirestore.instance
+          .collection('pengumpulanLaporan')
+          .doc(id)
+          .delete();
       checkAndFetchData();
     } catch (error) {
       if (kDebugMode) {
@@ -221,13 +223,13 @@ class _TabelDetailAsistensiLaporanDosenState
 }
 
 class AsistensiLaporan {
-  final String id;
+  String id;
   String modul;
   String kode;
   int nim;
   String file;
   String koreksi;
-  DateTime waktu;
+  String waktu;
   String status;
 
   AsistensiLaporan({
@@ -327,8 +329,8 @@ Future<void> showInfoDialog(
     final QuerySnapshot<Map<String, dynamic>> asistensiSnapshot =
         await FirebaseFirestore.instance
             .collection('asistensiLaporan')
-            .where('kodeKelas', isEqualTo: fileInfo.kode)
-            .where('judulMateri', isEqualTo: fileInfo.modul)
+            .where('idKelas', isEqualTo: fileInfo.kode)
+            .where('judulModul', isEqualTo: fileInfo.modul)
             .where('statusRevisi', isEqualTo: fileInfo.status)
             .where('nim', isEqualTo: fileInfo.nim)
             .get();
@@ -338,7 +340,7 @@ Future<void> showInfoDialog(
           asistensiSnapshot.docs.first;
 
       final namaPemeriksa = asistensiDocument['namaAsisten'];
-      final waktuPengumpulan = asistensiDocument['waktuPengumpulan'];
+      final waktuPengumpulan = asistensiDocument['waktuAsistensi'];
       final statusRevisi = asistensiDocument['statusRevisi'];
 
       showDialog(
@@ -481,10 +483,10 @@ Future<void> showInfoDialog(
 
 //== Fungsi Download File data dari Asisten ==//
 void downloadFileAsisten(
-    String kodeKelas, String fileName, String judulMateri) async {
+    String idKelas, String fileName, String judulMateri) async {
   final ref = FirebaseStorage.instance
       .ref()
-      .child('asistensiLaporan/$kodeKelas/$judulMateri/$fileName');
+      .child('asistensiLaporan/$idKelas/$judulMateri/$fileName');
 
   try {
     final url = await ref.getDownloadURL();
@@ -503,10 +505,10 @@ void downloadFileAsisten(
 }
 
 //== Fungsi Download File 'Asistensi Laporan dari Praktikan' ==//
-void downloadFile(String kodeKelas, String fileName, String judulMateri) async {
+void downloadFile(String idKelas, String fileName, String judulMateri) async {
   final ref = FirebaseStorage.instance
       .ref()
-      .child('laporan/$kodeKelas/$judulMateri/$fileName');
+      .child('laporan/$idKelas/$judulMateri/$fileName');
 
   try {
     final url = await ref.getDownloadURL();

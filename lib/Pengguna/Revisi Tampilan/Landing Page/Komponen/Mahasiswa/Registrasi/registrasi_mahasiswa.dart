@@ -43,6 +43,8 @@ class _RegisterMahasiswaState extends State<RegisterMahasiswa> {
       int nim = int.parse(_nimController.text);
       // Parse Angkatan to integer
       int angkatan = int.parse(_angkatanController.text);
+      // Parse Nomor Handphone
+      int noHandphone = int.parse(_noHpController.text);
       // Check for duplicate NIM
       QuerySnapshot nimSnapshot = await _firestore
           .collection('akun_mahasiswa')
@@ -84,7 +86,7 @@ class _RegisterMahasiswaState extends State<RegisterMahasiswa> {
         'nim': nim,
         'email': _emailController.text,
         'password': _passwordController.text,
-        'no_hp': _noHpController.text,
+        'no_hp': noHandphone,
         'angkatan': angkatan,
       });
 

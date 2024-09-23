@@ -4,7 +4,6 @@ import '../../Asistensi Laporan/Screen/asistensi_laporan_asisten.dart';
 import '../../Dashboard/Screen/dashboard_asisten.dart';
 import '../../File Pengumpulan/Screen/file_pengumpulan.dart';
 import '../../Hasil Studi/Screen/hasil_studi_asisten.dart';
-import '../../Jadwal Praktikum/jadwal_praktikum_asisten.dart';
 import '../Screen/absensi_praktikum_asisten.dart';
 
 class AbsensiPraktikumNavigasi extends StatefulWidget {
@@ -156,18 +155,6 @@ class _AbsensiPraktikumNavigasiState extends State<AbsensiPraktikumNavigasi> {
                             page: const DashboardAsisten(),
                             updatePage: updatePage,
                             isActive: currentPage is DashboardAsisten,
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          DashboardListTile(
-                            title: 'Jadwal Praktikum',
-                            icon: const Icon(
-                              Icons.calendar_month,
-                            ),
-                            page: const JadwalPraktikumAsisten(),
-                            updatePage: updatePage,
-                            isActive: currentPage is JadwalPraktikumAsisten,
                           ),
                           const SizedBox(
                             height: 15,

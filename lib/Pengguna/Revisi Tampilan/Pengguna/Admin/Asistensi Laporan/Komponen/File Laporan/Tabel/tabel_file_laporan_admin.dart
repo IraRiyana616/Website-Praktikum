@@ -2,7 +2,6 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,15 +12,13 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class TabelFileLaporanAdmin extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String nama;
-  final String modul;
   final int nim;
   const TabelFileLaporanAdmin(
       {super.key,
-      required this.kodeKelas,
+      required this.idkelas,
       required this.nama,
-      required this.modul,
       required this.nim});
 
   @override
@@ -105,7 +102,7 @@ class _TabelFileLaporanAdminState extends State<TabelFileLaporanAdmin> {
                           columns: const [
                             DataColumn(
                               label: Text(
-                                'Timestamp',
+                                'Waktu Pengumpulan',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -170,8 +167,8 @@ class _TabelFileLaporanAdminState extends State<TabelFileLaporanAdmin> {
   Future<void> checkAndFetchData() async {
     final QuerySnapshot<Map<String, dynamic>> laporanSnapshot =
         await FirebaseFirestore.instance
-            .collection('laporan')
-            .where('kodeKelas', isEqualTo: widget.kodeKelas)
+            .collection('pengumpulanLaporan')
+            .where('idKelas', isEqualTo: widget.idkelas)
             .where('nama', isEqualTo: widget.nama)
             .where('nim', isEqualTo: widget.nim)
             .get();
@@ -182,12 +179,12 @@ class _TabelFileLaporanAdminState extends State<TabelFileLaporanAdmin> {
         Map<String, dynamic> data = document.data() as Map<String, dynamic>;
         return AsistensiLaporan(
           id: document.id,
-          modul: data['judulMateri'] ?? '',
-          kode: data['kodeKelas'] ?? '',
+          modul: data['judulModul'] ?? '',
+          kode: data['idKelas'] ?? '',
           koreksi: data['namaAsisten'] ?? '',
           file: data['namaFile'] ?? '',
           nim: data['nim'] ?? '',
-          waktu: (data['waktuPengumpulan'] as Timestamp).toDate(),
+          waktu: data['waktuAsistensi'] ?? '',
           status: data['statusRevisi'] ?? '',
         );
       }).toList();
@@ -212,7 +209,10 @@ class _TabelFileLaporanAdminState extends State<TabelFileLaporanAdmin> {
   //== Menghapus Data dari Database 'Laporan' ==//
   void deleteData(String id) async {
     try {
-      await FirebaseFirestore.instance.collection('laporan').doc(id).delete();
+      await FirebaseFirestore.instance
+          .collection('pengumpulanLaporan')
+          .doc(id)
+          .delete();
       checkAndFetchData();
     } catch (error) {
       if (kDebugMode) {
@@ -223,13 +223,13 @@ class _TabelFileLaporanAdminState extends State<TabelFileLaporanAdmin> {
 }
 
 class AsistensiLaporan {
-  final String id;
+  String id;
   String modul;
   String kode;
   int nim;
   String file;
   String koreksi;
-  DateTime waktu;
+  String waktu;
   String status;
 
   AsistensiLaporan({
@@ -256,7 +256,7 @@ DataRow dataFileDataRow(AsistensiLaporan fileInfo, int index,
       DataCell(SizedBox(
         width: 150.0,
         child: Text(
-          getLimitedText(fileInfo.waktu.toString(), 19),
+          getLimitedText(fileInfo.waktu, 23),
         ),
       )),
       DataCell(SizedBox(
@@ -368,8 +368,8 @@ Future<void> showInfoDialog(
     final QuerySnapshot<Map<String, dynamic>> asistensiSnapshot =
         await FirebaseFirestore.instance
             .collection('asistensiLaporan')
-            .where('kodeKelas', isEqualTo: fileInfo.kode)
-            .where('judulMateri', isEqualTo: fileInfo.modul)
+            .where('idKelas', isEqualTo: fileInfo.kode)
+            .where('judulModul', isEqualTo: fileInfo.modul)
             .where('statusRevisi', isEqualTo: fileInfo.status)
             .where('nim', isEqualTo: fileInfo.nim)
             .get();
@@ -379,7 +379,7 @@ Future<void> showInfoDialog(
           asistensiSnapshot.docs.first;
 
       final namaPemeriksa = asistensiDocument['namaAsisten'];
-      final waktuPengumpulan = asistensiDocument['waktuPengumpulan'];
+      final waktuPengumpulan = asistensiDocument['waktuAsistensi'];
       final statusRevisi = asistensiDocument['statusRevisi'];
 
       showDialog(
@@ -494,7 +494,7 @@ Future<void> showInfoDialog(
 
 //== Fungsi Upload File ==//
 Future<void> uploadFile(
-  String kodeKelas,
+  String idkelas,
   String fileName,
   String modul,
   int nim,
@@ -503,60 +503,64 @@ Future<void> uploadFile(
   String selectedRevisi = 'Status Asistensi';
 
   // Menampilkan dialog untuk memilih status revisi
-  await showDialog<String>(
-    context: context,
-    builder: (BuildContext context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: const Text('Pilih Status Revisi'),
-            content: DropdownButton<String>(
-              isExpanded: true,
-              value: selectedRevisi,
-              onChanged: (String? value) {
-                setState(() {
-                  selectedRevisi = value!;
-                });
-              },
-              items: <String>[
-                'Status Asistensi',
-                'Revisi 1',
-                'Revisi 2',
-                'Revisi 3',
-                'Revisi 4',
-                'Revisi 5',
-                'ACC'
-              ].map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  // Menutup dialog tanpa melanjutkan proses ke upload file
-                  Navigator.pop(context);
-                },
-                child: const Text('Batal'),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (selectedRevisi != 'Status Asistensi') {
-                    Navigator.pop(context, selectedRevisi);
-                  } else {
-                    // Bisa tambahkan feedback untuk user bahwa harus memilih status revisi
-                  }
-                },
-                child: const Text('Simpan'),
-              ),
-            ],
+  selectedRevisi = await showDialog<String>(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                title: const Text('Pilih Status Revisi'),
+                content: DropdownButton<String>(
+                  isExpanded: true,
+                  value: selectedRevisi,
+                  onChanged: (String? value) {
+                    setState(() {
+                      selectedRevisi = value!;
+                    });
+                  },
+                  items: <String>[
+                    'Status Asistensi',
+                    'Revisi 1',
+                    'Revisi 2',
+                    'Revisi 3',
+                    'Revisi 4',
+                    'Revisi 5',
+                    'ACC'
+                  ].map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(
+                          context); // Menutup dialog tanpa melanjutkan proses ke upload file
+                    },
+                    child: const Text('Batal'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      if (selectedRevisi != 'Status Asistensi') {
+                        Navigator.pop(context, selectedRevisi);
+                      } else {
+                        // Bisa tambahkan feedback untuk user bahwa harus memilih status revisi
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Harap pilih status revisi')));
+                      }
+                    },
+                    child: const Text('Simpan'),
+                  ),
+                ],
+              );
+            },
           );
         },
-      );
-    },
-  );
+      ) ??
+      'Status Asistensi';
 
   // Jika user membatalkan dialog, maka keluar dari fungsi uploadFile
   if (selectedRevisi == 'Status Asistensi') {
@@ -591,22 +595,12 @@ Future<void> uploadFile(
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
       PlatformFile file = result.files.first;
-      User? user = FirebaseAuth.instance.currentUser;
-      String nama = '';
-
-      if (user != null) {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('akun_mahasiswa')
-            .doc(user.uid)
-            .get();
-        nama = userDoc['nama'];
-      }
 
       // Pengecekan data di Firestore
       QuerySnapshot existingData = await FirebaseFirestore.instance
           .collection('asistensiLaporan')
-          .where('kodeKelas', isEqualTo: kodeKelas)
-          .where('judulMateri', isEqualTo: modul)
+          .where('idKelas', isEqualTo: idkelas)
+          .where('judulModul', isEqualTo: modul)
           .where('statusRevisi', isEqualTo: selectedRevisi)
           .get();
 
@@ -637,31 +631,16 @@ Future<void> uploadFile(
       final firebase_storage.Reference storageRef = firebase_storage
           .FirebaseStorage.instance
           .ref()
-          .child('asistensiLaporan/$kodeKelas/$modul/$fileName');
+          .child('asistensiLaporan/$idkelas/$modul/$fileName');
 
       await storageRef.putData(Uint8List.fromList(file.bytes!));
 
-      String nextDocumentId = '';
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        DocumentReference counterRef = FirebaseFirestore.instance
-            .collection('counters')
-            .doc('asistensiLaporan');
-        DocumentSnapshot counterSnapshot = await transaction.get(counterRef);
-        int currentCount =
-            counterSnapshot.exists ? counterSnapshot.get('count') : 0;
-        nextDocumentId = '${currentCount + 1}';
-        transaction.set(counterRef, {'count': currentCount + 1});
-      });
-
-      await FirebaseFirestore.instance
-          .collection('asistensiLaporan')
-          .doc(nextDocumentId)
-          .set({
+      await FirebaseFirestore.instance.collection('asistensiLaporan').add({
         'namaFile': fileName,
-        'waktuPengumpulan': DateTime.now(),
-        'namaAsisten': nama,
-        'kodeKelas': kodeKelas,
-        'judulMateri': modul,
+        'waktuAsistensi': DateTime.now(),
+        'namaAsisten': 'Admin',
+        'idKelas': idkelas,
+        'judulModul': modul,
         'statusRevisi': selectedRevisi,
         'nim': nim
       });
@@ -672,40 +651,36 @@ Future<void> uploadFile(
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return SizedBox(
-            height: 20.0,
-            width: 50.0,
-            child: AlertDialog(
-              title: Column(
-                children: [
-                  Center(
-                    child: SizedBox(
-                      height: 120.0,
-                      width: 120.0,
-                      child: Image.asset(
-                        'assets/images/upload.png',
-                        fit: BoxFit.cover,
-                      ),
+          return AlertDialog(
+            title: Column(
+              children: [
+                Center(
+                  child: SizedBox(
+                    height: 120.0,
+                    width: 120.0,
+                    child: Image.asset(
+                      'assets/images/upload.png',
+                      fit: BoxFit.cover,
                     ),
                   ),
-                  Center(
-                    child: Text(
-                      'Data berhasil diupload.',
-                      style: GoogleFonts.quicksand(
-                          fontSize: 17.0, fontWeight: FontWeight.bold),
-                    ),
+                ),
+                Center(
+                  child: Text(
+                    'Data berhasil diupload.',
+                    style: GoogleFonts.quicksand(
+                        fontSize: 17.0, fontWeight: FontWeight.bold),
                   ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
                 ),
               ],
             ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
           );
         },
       );
@@ -738,10 +713,10 @@ Future<void> uploadFile(
 }
 
 //== Fungsi Download File ==//
-void downloadFile(String kodeKelas, String fileName, String judulMateri) async {
+void downloadFile(String idkelas, String fileName, String judulModul) async {
   final ref = FirebaseStorage.instance
       .ref()
-      .child('laporan/$kodeKelas/$judulMateri/$fileName');
+      .child('laporan/$idkelas/$judulModul/$fileName');
 
   try {
     final url = await ref.getDownloadURL();

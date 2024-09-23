@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TabelTugasAsistenScreen extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String mataKuliah;
   const TabelTugasAsistenScreen(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.idkelas, required this.mataKuliah});
 
   @override
   State<TabelTugasAsistenScreen> createState() =>
@@ -28,44 +28,30 @@ class _TabelTugasAsistenScreenState extends State<TabelTugasAsistenScreen> {
   String selectedModul = 'Judul Modul';
   List<String> availableModuls = ['Judul Modul'];
 
-//== Fungsi Menghapus Data ==//
-  Future<void> deleteDataFromFirestore(String documentId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('tugas')
-          .doc(documentId)
-          .delete();
-      fetchDataFromFirestore();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error deleting document: $e');
-      }
-    }
-  }
-
 //== Fungsi Menampilkan Data dari Database 'tugas' ==//
   Future<void> fetchDataFromFirestore() async {
     final QuerySnapshot silabusSnapshot = await FirebaseFirestore.instance
-        .collection('tugas')
-        .where('kodeKelas', isEqualTo: widget.kodeKelas)
+        .collection('dataPengumpulan')
+        .where('idKelas', isEqualTo: widget.idkelas)
+        .where('jenisPengumpulan', isEqualTo: 'Tugas')
         .get();
 
     final List<Pengumpulan> dataList = silabusSnapshot.docs.map((doc) {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      final String kodeKelas = data['kodeKelas'];
-      final String judulMateri = data['judulMateri'] ?? '';
-      if (!availableModuls.contains(judulMateri)) {
-        availableModuls.add(judulMateri);
+      final String idkelas = data['idKelas'];
+      final String judulModul = data['judulModul'] ?? '';
+      if (!availableModuls.contains(judulModul)) {
+        availableModuls.add(judulModul);
       }
       return Pengumpulan(
-        kode: kodeKelas,
+        id: doc.id,
+        kode: idkelas,
         nama: data['nama'] ?? '',
         nim: data['nim'] ?? 0,
         file: data['namaFile'] ?? '',
-        modul: judulMateri,
-        waktu: data['waktuPengumpulan'] != null
-            ? (data['waktuPengumpulan'] as Timestamp).toDate().toString()
-            : '',
+        jenis: data['jenisPengumpulan'] ?? '',
+        modul: judulModul,
+        waktu: data['waktuPengumpulan'] ?? '',
       );
     }).toList();
 // Mengurutkan data berdasarkan nama secara ascending
@@ -293,6 +279,8 @@ class Pengumpulan {
   final String file;
   final String waktu;
   final String modul;
+  final String id;
+  final String jenis;
 
   Pengumpulan(
       {required this.kode,
@@ -300,7 +288,9 @@ class Pengumpulan {
       required this.nim,
       required this.file,
       required this.waktu,
-      required this.modul});
+      required this.modul,
+      required this.id,
+      required this.jenis});
 }
 
 DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {

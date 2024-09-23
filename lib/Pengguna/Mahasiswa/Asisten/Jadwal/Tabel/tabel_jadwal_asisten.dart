@@ -53,37 +53,44 @@ class _TabelJadwalPraktikumAsistenState
       QuerySnapshot<Map<String, dynamic>> asistenSnapshot =
           await FirebaseFirestore.instance.collection('dataAsisten').get();
 
-      Set<String> kodeKelasSet = asistenSnapshot.docs
-          .map((doc) => doc['kodeKelas'].toString())
-          .toSet();
+      // Extract the list of kodeKelas
+      List<String> kodeKelasList = asistenSnapshot.docs
+          .map((doc) => doc.data()['kodeKelas'] as String)
+          .toList();
 
+      // Define QuerySnapshot for jadwalPraktikum
       QuerySnapshot<Map<String, dynamic>> jadwalSnapshot;
 
+      // Check if a specific year is selected
       if (selectedYear != null && selectedYear != 'Tahun Ajaran') {
+        // Fetch jadwalPraktikum where tahunAjaran matches the selected year and kodeKelas is in kodeKelasList
         jadwalSnapshot = await FirebaseFirestore.instance
             .collection('dataJadwalPraktikum')
             .where('tahunAjaran', isEqualTo: selectedYear)
-            .where('kodeKelas', whereIn: kodeKelasSet.toList())
+            .where('kodeKelas', whereIn: kodeKelasList)
             .get();
       } else {
+        // Fetch jadwalPraktikum where kodeKelas is in kodeKelasList
         jadwalSnapshot = await FirebaseFirestore.instance
             .collection('dataJadwalPraktikum')
-            .where('kodeKelas', whereIn: kodeKelasSet.toList())
+            .where('kodeKelas', whereIn: kodeKelasList)
             .get();
       }
 
+      // Transform the fetched data into a list of DataClass
       List<DataClass> data = jadwalSnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data();
         return DataClass(
             id: doc.id,
-            kelas: data['kodeKelas'],
-            tahun: data['tahunAjaran'],
-            matkul: data['mataKuliah'],
-            jadwal: data['hariPraktikum'],
-            waktu: data['waktuPraktikum'],
-            semester: data['semester']);
+            kelas: data['kodeKelas'] ?? '',
+            tahun: data['tahunAjaran'] ?? '',
+            matkul: data['mataKuliah'] ?? '',
+            jadwal: data['hariPraktikum'] ?? '',
+            waktu: data['waktuPraktikum'] ?? '',
+            semester: data['semester'] ?? 0);
       }).toList();
 
+      // Update the state with the fetched data
       setState(() {
         demoClassData = data;
         filteredClassData = demoClassData;

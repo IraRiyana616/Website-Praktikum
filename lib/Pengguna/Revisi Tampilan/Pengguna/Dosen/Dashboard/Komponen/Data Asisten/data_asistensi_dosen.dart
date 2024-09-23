@@ -3,8 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../../../../../Admin/Data Mahasiswa/Asisten/Tabel/tabel_data_asisten_admin.dart';
+import '../../../../Admin/Dashboard/Komponen/Kelas Praktikum/Data Asisten/Tabel/tabel_asisten.dart';
 import '../../Navigasi/dasboardnav_dosen.dart';
 import '../Data Mahasiswa/data_mahasiswa_dosen.dart';
 import '../Deskripsi Kelas/deskripsi_dosen.dart';
@@ -12,8 +11,12 @@ import '../Deskripsi Kelas/deskripsi_dosen.dart';
 class DataAsistenScreenDosen extends StatefulWidget {
   final String kodeKelas;
   final String mataKuliah;
+  final String idkelas;
   const DataAsistenScreenDosen(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key,
+      required this.kodeKelas,
+      required this.mataKuliah,
+      required this.idkelas});
 
   @override
   State<DataAsistenScreenDosen> createState() => _DataAsistenScreenDosenState();
@@ -172,6 +175,7 @@ class _DataAsistenScreenDosenState extends State<DataAsistenScreenDosen> {
                                           DeskripsiKelasDosen(
                                         kodeKelas: widget.kodeKelas,
                                         mataKuliah: widget.mataKuliah,
+                                        idKelas: widget.idkelas,
                                       ),
                                       transitionsBuilder: (context, animation,
                                           secondaryAnimation, child) {
@@ -217,6 +221,7 @@ class _DataAsistenScreenDosenState extends State<DataAsistenScreenDosen> {
                                           DataMahasiswaScreenDosen(
                                         kodeKelas: widget.kodeKelas,
                                         mataKuliah: widget.mataKuliah,
+                                        idkelas: widget.idkelas,
                                       ),
                                       transitionsBuilder: (context, animation,
                                           secondaryAnimation, child) {
@@ -263,6 +268,7 @@ class _DataAsistenScreenDosenState extends State<DataAsistenScreenDosen> {
                                           DataAsistenScreenDosen(
                                         kodeKelas: widget.kodeKelas,
                                         mataKuliah: widget.mataKuliah,
+                                        idkelas: widget.idkelas,
                                       ),
                                       transitionsBuilder: (context, animation,
                                           secondaryAnimation, child) {
@@ -307,7 +313,11 @@ class _DataAsistenScreenDosenState extends State<DataAsistenScreenDosen> {
                       const SizedBox(
                         height: 20.0,
                       ),
-                      TabelDataAsistenAdmin(kodeKelas: widget.kodeKelas),
+                      TabelDataAsisten(
+                        mataKuliah: widget.mataKuliah,
+                        idkelas: widget.idkelas,
+                        kode: widget.kodeKelas,
+                      ),
                       const SizedBox(
                         height: 20.0,
                       )

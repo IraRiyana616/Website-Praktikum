@@ -4,9 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../Navigasi/dasboard_nav.dart';
+import '../../../../../Revisi Tampilan/Pengguna/Mahasiswa/Praktikan/Dashboard/Navigasi/dashboardnav_praktikan.dart';
+import '../../../../Asisten/Absensi/Screen/absensi_ass.dart';
 
 class TokenPraktikan extends StatefulWidget {
   const TokenPraktikan({super.key});
@@ -16,8 +17,9 @@ class TokenPraktikan extends StatefulWidget {
 }
 
 class _TokenPraktikanState extends State<TokenPraktikan> {
-  //== Controller Class Code ==//
-  final TextEditingController _classCodeController = TextEditingController();
+  //== Controller TextField ==//
+  final TextEditingController _idKelasController = TextEditingController();
+
   //== Fungsi Mendapatkan Data ==//
   Future<void> _getData() async {
     try {
@@ -36,21 +38,23 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
 
           QuerySnapshot<Map<String, dynamic>> classSnapshot =
               await FirebaseFirestore.instance
-                  .collection('dataKelas')
-                  .where('kodeKelas', isEqualTo: _classCodeController.text)
+                  .collection('dataKelasPraktikum')
+                  .where('idKelas', isEqualTo: _idKelasController.text)
                   .get();
 
           if (classSnapshot.docs.isNotEmpty) {
             for (QueryDocumentSnapshot<Map<String, dynamic>> classDocument
                 in classSnapshot.docs) {
-              String classCode = classDocument['kodeKelas'];
+              String idKelas = classDocument['idKelas'];
+              String kode = classDocument['kodeMatakuliah'];
 
               // Check if there is an existing document with the same nim and kode_kelas
               QuerySnapshot<Map<String, dynamic>> existingTokenSnapshot =
                   await FirebaseFirestore.instance
-                      .collection('tokenKelas')
+                      .collection('dataMahasiswaPraktikum')
                       .where('nim', isEqualTo: userNim)
-                      .where('kodeKelas', isEqualTo: classCode)
+                      .where('idKelas', isEqualTo: idKelas)
+                      .where('kodeMatakuliah', isEqualTo: kode)
                       .get();
 
               if (existingTokenSnapshot.docs.isNotEmpty) {
@@ -58,24 +62,20 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text(
-                        'Data dengan nim dan kode kelas yang sama sudah terdaftar'),
+                        'Data dengan nim dan token praktikum telah terdapat pada database'),
                     backgroundColor: Colors.red,
                   ),
                 );
               } else {
                 // Jika data belum terdaftar, simpan data baru
                 Map<String, dynamic> updatedClassData = {
-                  'kodeKelas': classDocument['kodeKelas'],
-                  'mataKuliah': classDocument['mataKuliah'],
-                  'tahunAjaran': classDocument['tahunAjaran'],
-                  'dosenPengampu': classDocument['dosenPengampu'],
-                  'dosenPengampu2': classDocument['dosenPengampu2'],
+                  'idKelas': idKelas,
                   'nim': userNim,
-                  'nama': userSnapshot['nama'],
+                  'kodeMatakuliah': kode
                 };
 
                 await FirebaseFirestore.instance
-                    .collection('tokenKelas')
+                    .collection('dataMahasiswaPraktikum')
                     .add(updatedClassData);
 
                 // Tampilkan snackbar bahwa data berhasil disimpan
@@ -85,13 +85,13 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
                     backgroundColor: Colors.green,
                   ),
                 );
-                _classCodeController.clear();
+                _idKelasController.clear();
               }
             }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Data kelas tidak ditemukan'),
+                content: Text('Data tidak ditemukan pada database'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -177,7 +177,7 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
                     context,
                     PageRouteBuilder(
                       pageBuilder: (context, animation, secondaryAnimation) =>
-                          const DashboardPraktikanNav(),
+                          const DashboardNavigasiPraktikan(),
                       transitionsBuilder:
                           (context, animation, secondaryAnimation, child) {
                         const begin = Offset(0.0, 0.0);
@@ -268,7 +268,11 @@ class _TokenPraktikanState extends State<TokenPraktikan> {
                       child: SizedBox(
                         width: 550.0,
                         child: TextField(
-                          controller: _classCodeController,
+                          inputFormatters: [
+                            UpperCaseTextFormatter(),
+                            LengthLimitingTextInputFormatter(10)
+                          ],
+                          controller: _idKelasController,
                           decoration: InputDecoration(
                             hintText: 'Masukkan Kode Kelas Praktikum',
                             border: OutlineInputBorder(

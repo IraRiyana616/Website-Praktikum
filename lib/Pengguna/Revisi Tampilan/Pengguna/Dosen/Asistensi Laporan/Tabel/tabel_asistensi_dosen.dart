@@ -3,8 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../Komponen/Data Mahasiswa/Screen/data_asistensi_dosen.dart';
+import '../Komponen/Data Tahun Ajaran/Screen/ta_asistensi.dart';
 
 class TabelAsistensiLaporanDosen extends StatefulWidget {
   const TabelAsistensiLaporanDosen({super.key});
@@ -20,21 +19,15 @@ class _TabelAsistensiLaporanDosenState
   List<DataClass> demoClassData = [];
   List<DataClass> filteredClassData = [];
 
-  //== Search ==//
+  //== Fungsi Search ==//
   final TextEditingController _textController = TextEditingController();
   bool _isTextFieldNotEmpty = false;
-
-  //== Dropdown Button Tahun Ajaran ==//
-  String selectedYear = 'Tahun Ajaran';
-  List<String> availableYears = [];
 
   //== Fungsi dari Authentikasi ==//
   String nip = '';
   User? user = FirebaseAuth.instance.currentUser;
 
-  //== Menampilkan data dari database ==//
-  Future<void> fetchUserNIPFromDatabase(
-      String userUid, String? selectedYear) async {
+  Future<void> fetchUserNIPFromDatabase(String userUid) async {
     try {
       if (userUid.isNotEmpty) {
         DocumentSnapshot<Map<String, dynamic>> userSnapshot =
@@ -45,15 +38,6 @@ class _TabelAsistensiLaporanDosenState
         if (userSnapshot.exists) {
           String? userNip = userSnapshot['nip'] as String?;
           nip = userNip ?? '';
-
-          QuerySnapshot<Map<String, dynamic>> querySnapshot =
-              await FirebaseFirestore.instance.collection('dataKelas').get();
-          Set<String> years = querySnapshot.docs
-              .map((doc) => doc['tahunAjaran'].toString())
-              .toSet();
-          setState(() {
-            availableYears = ['Tahun Ajaran', ...years.toList()];
-          });
         }
       }
     } catch (e) {
@@ -63,7 +47,7 @@ class _TabelAsistensiLaporanDosenState
     }
   }
 
-  Future<void> fetchDataFromFirebase(String selectedYear) async {
+  Future<void> fetchDataFromFirebase(String nip) async {
     try {
       // Query pertama untuk mengambil 'nip' dari koleksi 'akun_dosen'
       QuerySnapshot<Map<String, dynamic>> nipSnapshot =
@@ -73,42 +57,40 @@ class _TabelAsistensiLaporanDosenState
       Set<String> availableNips =
           nipSnapshot.docs.map((doc) => doc['nip'].toString()).toSet();
 
-      // Query kedua untuk mengambil data 'dataKelas' berdasarkan 'tahunAjaran'
-      QuerySnapshot<Map<String, dynamic>> querySnapshot;
-      if (selectedYear != 'Tahun Ajaran') {
-        querySnapshot = await FirebaseFirestore.instance
-            .collection('dataKelas')
-            .where('tahunAjaran', isEqualTo: selectedYear)
-            .get();
-      } else {
-        querySnapshot =
-            await FirebaseFirestore.instance.collection('dataKelas').get();
+      if (kDebugMode) {
+        print('Available NIPs: $availableNips');
       }
+
+      // Query kedua untuk mengambil data 'dataTahunAjaran' berdasarkan 'tahunAjaran'
+      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+
+      querySnapshot =
+          await FirebaseFirestore.instance.collection('dataMatakuliah').get();
 
       List<DataClass> data = querySnapshot.docs
           .map((doc) {
             Map<String, dynamic> data = doc.data();
-            // Cocokkan 'nip' dengan Set 'availableNips'
-            if (availableNips.contains(data['nipDosenPengampu']) ||
-                availableNips.contains(data['nipDosenPengampu2'])) {
+            // Cocokkan 'nip' yang diambil dengan nip yang sesuai dengan akun yang login
+            if (nip == data['nipDosen'] || nip == data['nipDosen2']) {
+              if (kDebugMode) {
+                print('Match found for NIP: $nip');
+              }
               return DataClass(
-                kelas: data['kodeKelas'],
-                asisten: data['kodeAsisten'],
-                tahun: data['tahunAjaran'],
-                matkul: data['mataKuliah'],
-                nip: data['nipDosenPengampu'] ??
+                kode: data['kodeMatakuliah'],
+                matkul: data['matakuliah'],
+                nip: data['nipDosen'] ??
                     data[
-                        'nipDosenPengampu2'], // Gunakan nipDosenPengampu atau nipDosenPengampu2, jika salah satu kosong
-                dosenpengampu: data['dosenPengampu'],
-                dosenpengampu2: data['dosenPengampu2'],
+                        'nipDosen2'], // Gunakan nipDosenPengampu atau nipDosenPengampu2, jika salah satu kosong
+                dosenPengampu: data['namaDosen'],
+                dosenPengampu2: data['namaDosen2'],
               );
             } else {
-              // Jika 'nip' tidak valid, kembalikan null
+              //== Jika 'nip' tidak valid, kembalikan null ===//
               return null;
             }
           })
-          .whereType<DataClass>() // Hapus elemen null dari daftar
-          .toList(); // Konversi ke List<DataClass>
+          .whereType<DataClass>() //== Hapus elemen null dari daftar ==//
+          .toList(); //== Konversi ke List<DataClass> ==//
 
       setState(() {
         demoClassData = data;
@@ -128,14 +110,10 @@ class _TabelAsistensiLaporanDosenState
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       String userUid = user.uid;
-      fetchUserNIPFromDatabase(userUid, selectedYear).then((_) {
-        fetchDataFromFirebase(selectedYear);
+      fetchUserNIPFromDatabase(userUid).then((_) {
+        fetchDataFromFirebase(nip);
       });
     }
-  }
-
-  Future<void> _onRefresh() async {
-    await fetchDataFromFirebase(selectedYear);
   }
 
   void _onTextChanged() {
@@ -149,10 +127,10 @@ class _TabelAsistensiLaporanDosenState
     setState(() {
       filteredClassData = demoClassData
           .where((data) =>
-              (data.kelas.toLowerCase().contains(query.toLowerCase()) ||
-                  data.asisten.toLowerCase().contains(query.toLowerCase()) ||
-                  data.tahun.toLowerCase().contains(query.toLowerCase()) ||
-                  data.matkul.toLowerCase().contains(query.toLowerCase())))
+              data.kode.toLowerCase().contains(query.toLowerCase()) ||
+              data.dosenPengampu.toLowerCase().contains(query.toLowerCase()) ||
+              data.dosenPengampu2.toLowerCase().contains(query.toLowerCase()) ||
+              data.matkul.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -181,158 +159,112 @@ class _TabelAsistensiLaporanDosenState
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Asistensi Laporan',
+            child: Text('Data Kelas Praktikum',
                 style: GoogleFonts.quicksand(
                     fontSize: 18, fontWeight: FontWeight.bold)),
           ),
-          RefreshIndicator(
-            onRefresh: _onRefresh,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 15.0, left: 0.0),
-                  child: Container(
-                    height: 47.0,
-                    width: 1020.0,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: DropdownButton<String>(
-                      value: selectedYear,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedYear = newValue!;
-                          fetchDataFromFirebase(selectedYear);
-                        });
-                      },
-                      items: availableYears
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 15.0),
-                            child: Text(value),
-                          ),
-                        );
-                      }).toList(),
-                      style: const TextStyle(color: Colors.black),
-                      icon:
-                          const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                      iconSize: 24,
-                      elevation: 16,
-                      isExpanded: true,
-                      underline: Container(),
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, left: 25.0),
-                      child: SizedBox(
-                        width: 250.0,
-                        height: 35.0,
-                        child: Row(
-                          children: [
-                            const Text("Search :",
-                                style: TextStyle(fontSize: 16)),
-                            const SizedBox(width: 10.0),
-                            Expanded(
-                              child: TextField(
-                                onChanged: (value) {
-                                  filterData(value);
-                                },
-                                controller: _textController,
-                                decoration: InputDecoration(
-                                  hintText: '',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 0, horizontal: 10),
-                                  suffixIcon: Visibility(
-                                    visible: _isTextFieldNotEmpty,
-                                    child: IconButton(
-                                      onPressed: clearSearchField,
-                                      icon: const Icon(Icons.clear),
-                                    ),
-                                  ),
-                                  labelStyle: const TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.white,
+          Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0, left: 25.0),
+                    child: SizedBox(
+                      width: 250.0,
+                      height: 35.0,
+                      child: Row(
+                        children: [
+                          const Text("Search :",
+                              style: TextStyle(fontSize: 16)),
+                          const SizedBox(width: 10.0),
+                          Expanded(
+                            child: TextField(
+                              onChanged: (value) {
+                                filterData(value);
+                              },
+                              controller: _textController,
+                              decoration: InputDecoration(
+                                hintText: '',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
                                 ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 10),
+                                suffixIcon: Visibility(
+                                  visible: _isTextFieldNotEmpty,
+                                  child: IconButton(
+                                    onPressed: clearSearchField,
+                                    icon: const Icon(Icons.clear),
+                                  ),
+                                ),
+                                labelStyle: const TextStyle(
+                                  fontSize: 16,
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
                               ),
                             ),
-                            const SizedBox(width: 27.0),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 27.0),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 18.0, right: 25.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: filteredClassData.isNotEmpty
-                        ? PaginatedDataTable(
-                            columnSpacing: 10,
-                            columns: const [
-                              DataColumn(
-                                label: Text(
-                                  "Kode Praktikum",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  "Kode Asisten",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  "MataKuliah",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  "Dosen Pengampu 1",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  "Dosen Pengampu 2",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                            source: DataSource(filteredClassData, context),
-                            rowsPerPage:
-                                calculateRowsPerPage(filteredClassData.length),
-                          )
-                        : const Center(
-                            child: Text(
-                              'No data available',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 18.0, right: 25.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: filteredClassData.isNotEmpty
+                      ? PaginatedDataTable(
+                          columnSpacing: 10,
+                          columns: const [
+                            DataColumn(
+                              label: Text(
+                                "Kode Matakuliah",
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
+                            DataColumn(
+                              label: Text(
+                                "Matakuliah",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                "Dosen Pengampu 1",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                "Dosen Pengampu 2",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                          source: DataSource(filteredClassData, context),
+                          rowsPerPage:
+                              calculateRowsPerPage(filteredClassData.length),
+                        )
+                      : const Center(
+                          child: Text(
+                            'No data available',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                  ),
+                        ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
@@ -351,22 +283,17 @@ class _TabelAsistensiLaporanDosenState
 }
 
 class DataClass {
-  String nip;
-  String kelas;
-  String asisten;
-  String tahun;
+  String kode;
   String matkul;
-  String dosenpengampu;
-  String dosenpengampu2;
-  DataClass({
-    required this.nip,
-    required this.kelas,
-    required this.asisten,
-    required this.tahun,
-    required this.matkul,
-    required this.dosenpengampu,
-    required this.dosenpengampu2,
-  });
+  String nip;
+  String dosenPengampu;
+  String dosenPengampu2;
+  DataClass(
+      {required this.kode,
+      required this.matkul,
+      required this.nip,
+      required this.dosenPengampu,
+      required this.dosenPengampu2});
 }
 
 DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
@@ -377,18 +304,16 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
       },
     ),
     cells: [
-      DataCell(Text(fileInfo.kelas)),
+      DataCell(Text(fileInfo.kode)),
       DataCell(
-        Text(
-          fileInfo.asisten,
-        ),
-      ),
-      DataCell(
-        Text(
-          fileInfo.matkul,
-          style: TextStyle(
-            color: Colors.lightBlue[700],
-            fontWeight: FontWeight.bold,
+        SizedBox(
+          width: 230.0,
+          child: Text(
+            fileInfo.matkul,
+            style: TextStyle(
+              color: Colors.lightBlue[700],
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         onTap: () {
@@ -396,9 +321,9 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-                  DataAsistenDosen(
-                kodeKelas: fileInfo.kelas,
-                mataKuliah: fileInfo.matkul,
+                  TahunAjaranAsistensi(
+                kode: fileInfo.kode,
+                matakuliah: fileInfo.matkul,
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
@@ -418,22 +343,18 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
           );
         },
       ),
-      DataCell(
-        SizedBox(
-          width: 180.0,
-          child: Text(
-            getLimitedText(fileInfo.dosenpengampu, 30),
-          ),
+      DataCell(SizedBox(
+        width: 230.0,
+        child: Text(
+          getLimitedText(fileInfo.dosenPengampu, 33),
         ),
-      ),
-      DataCell(
-        SizedBox(
-          width: 180.0,
-          child: Text(
-            getLimitedText(fileInfo.dosenpengampu2, 30),
-          ),
+      )),
+      DataCell(SizedBox(
+        width: 230.0,
+        child: Text(
+          getLimitedText(fileInfo.dosenPengampu2, 33),
         ),
-      ),
+      ))
     ],
   );
 }

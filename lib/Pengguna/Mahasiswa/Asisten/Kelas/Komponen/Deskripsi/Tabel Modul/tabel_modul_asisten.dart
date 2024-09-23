@@ -70,7 +70,7 @@ class _TabelModulPraktikumAsistenState
         documentId: doc.id,
       );
     }).toList();
-
+    dataList.sort((a, b) => a.modul.compareTo(b.modul));
     setState(() {
       demoDataSilabus = dataList;
       filteredDataSilabus = dataList;
@@ -96,58 +96,56 @@ class _TabelModulPraktikumAsistenState
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey.shade400),
                   borderRadius: BorderRadius.circular(6.0)),
-              child: isLoading
-                  ? const CircularProgressIndicator()
-                  : filteredDataSilabus.isNotEmpty
-                      ? PaginatedDataTable(
-                          columnSpacing: 10,
-                          columns: const [
-                            DataColumn(
-                              label: Text(
-                                'Judul Modul',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Hari Praktikum',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Waktu Praktikum',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'File Modul',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            DataColumn(
-                                label: Text(
-                              '      Aksi',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ))
-                          ],
-                          source: DataSource(
-                              filteredDataSilabus,
-                              deleteDataFromFirestore,
-                              context), // Pass delete function
-                          rowsPerPage:
-                              calculateRowsPerPage(filteredDataSilabus.length),
-                        )
-                      : const Center(
-                          child: Text(
-                            'No data available',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
+              child: filteredDataSilabus.isNotEmpty
+                  ? PaginatedDataTable(
+                      columnSpacing: 10,
+                      columns: const [
+                        DataColumn(
+                          label: Text(
+                            'Judul Modul',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
+                        DataColumn(
+                          label: Text(
+                            'Hari Praktikum',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Waktu Praktikum',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'File Modul',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        DataColumn(
+                            label: Text(
+                          '      Aksi',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ))
+                      ],
+                      source: DataSource(
+                          filteredDataSilabus,
+                          deleteDataFromFirestore,
+                          context), // Pass delete function
+                      rowsPerPage:
+                          calculateRowsPerPage(filteredDataSilabus.length),
+                    )
+                  : const Center(
+                      child: Text(
+                        'No data available',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
             ),
           ),
         )
@@ -260,7 +258,7 @@ DataRow dataFileDataRow(DataSilabus fileInfo, int index,
           ),
         ),
       ),
-      DataCell(SizedBox(width: 170.0, child: Text(fileInfo.tanggal))),
+      DataCell(SizedBox(width: 280.0, child: Text(fileInfo.tanggal))),
       DataCell(SizedBox(width: 170.0, child: Text(fileInfo.jadwal))),
       DataCell(Row(
         children: [

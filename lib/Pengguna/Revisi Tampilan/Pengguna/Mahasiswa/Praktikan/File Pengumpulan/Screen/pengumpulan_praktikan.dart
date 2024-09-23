@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../Tabel/tabel_pengumpulan.dart';
 
 class FilePengumpulanPraktikan extends StatefulWidget {
@@ -134,7 +133,7 @@ class _FilePengumpulanPraktikanState extends State<FilePengumpulanPraktikan> {
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 1105.0),
                     color: Colors.white,
-                    child: const TabelFilePengumpulan(),
+                    child: const TabelMataKuliahPraktikan(),
                   ),
                 ),
               ],

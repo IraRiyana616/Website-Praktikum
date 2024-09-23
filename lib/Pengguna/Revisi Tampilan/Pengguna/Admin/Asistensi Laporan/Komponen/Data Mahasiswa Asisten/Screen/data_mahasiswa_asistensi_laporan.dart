@@ -5,10 +5,10 @@ import '../../../Navigasi/asistensi_laporan_navigasi_admin.dart';
 import '../Tabel/tabel_data_mahasiswa_asistensi_laporan.dart';
 
 class DataMahasiswaAsistensiLaporan extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String mataKuliah;
   const DataMahasiswaAsistensiLaporan(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.idkelas, required this.mataKuliah});
 
   @override
   State<DataMahasiswaAsistensiLaporan> createState() =>
@@ -104,7 +104,8 @@ class _DataMahasiswaAsistensiLaporanState
                           constraints: const BoxConstraints(maxWidth: 1250.0),
                           color: Colors.white,
                           child: TabelDataMahasiswaAsistensiLaporan(
-                            kodeKelas: widget.kodeKelas,
+                            idkelas: widget.idkelas,
+                            matkul: widget.mataKuliah,
                           ),
                         ),
                       ),

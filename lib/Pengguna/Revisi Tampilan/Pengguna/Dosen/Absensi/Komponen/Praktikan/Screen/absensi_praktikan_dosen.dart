@@ -3,17 +3,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../Navigasi/absensinav_dosen.dart';
-import '../../Asisten/Screen/absensi_asisten_dosen.dart';
+import '../../Tahun Ajaran/Screen/tahun_ajaran_ds.dart';
 import '../Tabel/tabel_absensi_praktikan_dosen.dart';
 
 class AbsensiPraktikanScreenDosen extends StatefulWidget {
-  final String kodeKelas;
-  final String mataKuliah;
+  final String idkelas;
+  final String kode;
+  final String matakuliah;
   const AbsensiPraktikanScreenDosen({
     super.key,
-    required this.kodeKelas,
-    required this.mataKuliah,
+    required this.idkelas,
+    required this.kode,
+    required this.matakuliah,
   });
 
   @override
@@ -23,66 +24,6 @@ class AbsensiPraktikanScreenDosen extends StatefulWidget {
 
 class _AbsensiPraktikanScreenDosenState
     extends State<AbsensiPraktikanScreenDosen> {
-  //Fungsi Untuk Bottom Navigation
-  int _selectedIndex = 0; // untuk mengatur index bottom navigation
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      // Memilih halaman sesuai dengan index yang dipilih
-      if (index == 0) {
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                AbsensiPraktikanScreenDosen(
-              kodeKelas: widget.kodeKelas,
-              mataKuliah: widget.mataKuliah,
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = Offset(0.0, 0.0);
-              const end = Offset.zero;
-              const curve = Curves.ease;
-
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-              return SlideTransition(
-                position: animation.drive(tween),
-                child: child,
-              );
-            },
-          ),
-        );
-      } else if (index == 1) {
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                AbsensiAsistenScreenDosen(
-              mataKuliah: widget.mataKuliah,
-              kodeKelas: widget.kodeKelas,
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = Offset(0.0, 0.0);
-              const end = Offset.zero;
-              const curve = Curves.ease;
-
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-              return SlideTransition(
-                position: animation.drive(tween),
-                child: child,
-              );
-            },
-          ),
-        );
-      }
-    });
-  }
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   //== Fungsi Nama Mahasiswa ==//
@@ -137,7 +78,10 @@ class _AbsensiPraktikanScreenDosenState
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        const AbsensiNavigasiDosen(),
+                        TahunAjaranAbsensi(
+                      mataKuliah: widget.matakuliah,
+                      kode: widget.kode,
+                    ),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       const begin = Offset(0.0, 0.0);
@@ -168,7 +112,7 @@ class _AbsensiPraktikanScreenDosenState
                 children: [
                   Expanded(
                       child: Text(
-                    widget.mataKuliah,
+                    widget.matakuliah,
                     style: GoogleFonts.quicksand(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -211,8 +155,9 @@ class _AbsensiPraktikanScreenDosenState
                         child: Column(
                           children: [
                             TabelAbsensiPraktikanScreenDosen(
-                              kodeKelas: widget.kodeKelas,
-                              mataKuliah: widget.mataKuliah,
+                              mataKuliah: widget.matakuliah,
+                              idkelas: widget.idkelas,
+                              kode: widget.kode,
                             ),
                             const SizedBox(
                               height: 30.0,
@@ -227,21 +172,6 @@ class _AbsensiPraktikanScreenDosenState
             ),
           );
         },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Praktikan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Asisten',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFF3CBEA9),
-        onTap: _onItemTapped,
       ),
     );
   }

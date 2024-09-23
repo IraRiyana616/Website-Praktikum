@@ -3,16 +3,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../../../../Mahasiswa/Praktikan/Dashboard/Komponen/Pengumpulan/Latihan/Tabel/tabel_peng_latihan_mhs.dart';
 import '../../Navigasi/file_pengumpulan_nav.dart';
 import '../Tugas/tugas_praktikan.dart';
 
 class LatihanPraktikanScreen extends StatefulWidget {
-  final String kodeKelas;
-  final String mataKuliah;
-  const LatihanPraktikanScreen(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+  final String idkelas;
+  final String matkul;
+  const LatihanPraktikanScreen({
+    super.key,
+    required this.idkelas,
+    required this.matkul,
+  });
 
   @override
   State<LatihanPraktikanScreen> createState() => _LatihanPraktikanScreenState();
@@ -71,7 +73,9 @@ class _LatihanPraktikanScreenState extends State<LatihanPraktikanScreen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 LatihanPraktikanScreen(
-                    kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah),
+              idkelas: widget.idkelas,
+              matkul: widget.matkul,
+            ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               const begin = Offset(0.0, 0.0);
@@ -94,9 +98,7 @@ class _LatihanPraktikanScreenState extends State<LatihanPraktikanScreen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 TugasPraktikanScreen(
-              kodeKelas: widget.kodeKelas,
-              mataKuliah: widget.mataKuliah,
-            ),
+                    idkelas: widget.idkelas, matkul: widget.matkul),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               const begin = Offset(0.0, 0.0);
@@ -162,7 +164,7 @@ class _LatihanPraktikanScreenState extends State<LatihanPraktikanScreen> {
                 children: [
                   Expanded(
                       child: Text(
-                    widget.mataKuliah,
+                    widget.idkelas,
                     style: GoogleFonts.quicksand(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -206,8 +208,8 @@ class _LatihanPraktikanScreenState extends State<LatihanPraktikanScreen> {
                           child: Column(
                             children: [
                               TabelKLatihanPraktikan(
-                                kodeKelas: widget.kodeKelas,
-                              ),
+                                  idkelas: widget.idkelas,
+                                  matkul: widget.matkul),
                               const SizedBox(
                                 height: 30.0,
                               )

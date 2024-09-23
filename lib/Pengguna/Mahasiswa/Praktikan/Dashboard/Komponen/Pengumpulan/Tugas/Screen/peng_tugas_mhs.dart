@@ -3,12 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
 import '../../../Asistensi/Screen/asistensi_laporan_prak.dart';
 import '../../../Deskripsi/Screen/deskripsi_mhs.dart';
 import '../../Latihan/Screen/peng_latihan_mhs.dart';
-import '../Tabel/tabel_peng_tugas_mhs.dart';
 
 class DataTugasPraktikan extends StatefulWidget {
   final String kodeKelas;
@@ -356,7 +354,7 @@ class _DataTugasPraktikanState extends State<DataTugasPraktikan> {
                         ),
                       ),
                       //Tampilan Tabel Absensi Praktikan
-                      TabelKTugasPraktikan(kodeKelas: widget.kodeKelas),
+                      // TabelKTugasPraktikan(kodeKelas: widget.kodeKelas),
                       const SizedBox(
                         height: 20.0,
                       ),

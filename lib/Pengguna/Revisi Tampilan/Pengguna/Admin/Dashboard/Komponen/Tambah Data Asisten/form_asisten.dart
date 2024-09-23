@@ -1,101 +1,143 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../Navigasi/dasboardnav_admin.dart';
+import '../Data Kelas/Komponen/Edit Kelas Praktikum/edit_tahun_ajaran.dart';
 
 class FormDataAsisten extends StatefulWidget {
-  final String kodeAsisten;
+  final String kodeMatakuliah;
   final String mataKuliah;
-  final String kodeKelas;
-  final String dosenPengampu;
-  final String dosenPengampu2;
-  final String tahunAjaran;
-  const FormDataAsisten(
-      {super.key,
-      required this.kodeAsisten,
-      required this.mataKuliah,
-      required this.kodeKelas,
-      required this.dosenPengampu,
-      required this.dosenPengampu2,
-      required this.tahunAjaran});
+  final String idkelas;
+  const FormDataAsisten({
+    super.key,
+    required this.kodeMatakuliah,
+    required this.mataKuliah,
+    required this.idkelas,
+  });
 
   @override
   State<FormDataAsisten> createState() => _FormDataAsistenState();
 }
 
 class _FormDataAsistenState extends State<FormDataAsisten> {
-  //== Nama Asisten ==//
-  TextEditingController namaAsistenController = TextEditingController();
-  TextEditingController namaAsisten2Controller = TextEditingController();
-  TextEditingController namaAsisten3Controller = TextEditingController();
-  TextEditingController namaAsisten4Controller = TextEditingController();
-
-  //== NIM Asisten ==//
+  //== Fungsi Controller  ==//
+  TextEditingController idAsistenController = TextEditingController();
   TextEditingController nimAsistenController = TextEditingController();
   TextEditingController nimAsisten2Controller = TextEditingController();
   TextEditingController nimAsisten3Controller = TextEditingController();
   TextEditingController nimAsisten4Controller = TextEditingController();
 
-  //== Koleksi dari Database ==//
-  final CollectionReference _dataAsistenCollection =
-      FirebaseFirestore.instance.collection('dataAsisten');
+//== Fungsi untuk menyimpan data ==//
+  Future<void> saveData() async {
+    String idAsisten = idAsistenController.text;
+    String nimAsisten = nimAsistenController.text;
+    String nimAsisten2 = nimAsisten2Controller.text;
+    String nimAsisten3 = nimAsisten3Controller.text;
+    String nimAsisten4 = nimAsisten4Controller.text;
 
-  Future<void> _saveDataToFirestore(
-      Map<String, dynamic> data1, Map<String, dynamic> data2) async {
-    try {
-      //== Validasi untuk memastikan tidak ada TextField yang kosong ==//
-      if (namaAsistenController.text.isEmpty ||
-          namaAsisten2Controller.text.isEmpty ||
-          nimAsistenController.text.isEmpty ||
-          nimAsisten2Controller.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Minimal Mengisi 2 Data Asisten'),
+    // Pengecekan tidak boleh ada kolom yang kosong
+    if ([idAsisten, nimAsisten, nimAsisten2, nimAsisten3, nimAsisten4]
+        .every((element) => element.isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Data pada kolom tidak boleh kosong semua'),
           backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
-        ));
-      } else {
-        // Validasi untuk memastikan tidak ada data yang sama pada kode kelas yang sama.
-        var existingData = await _dataAsistenCollection
-            .where('kodeAsisten', isEqualTo: widget.kodeAsisten)
-            .get();
-        if (existingData.docs.isNotEmpty) {
-          //== Tampilka pesan jika data telah terdapat pada database ==//
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Data Telah Terdapat Pada Database'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
-          ));
+        ),
+      );
+      return;
+    }
+
+    // Pengecekan apakah NIM bertipe integer dan tidak duplikat
+    List<String> nims = [nimAsisten, nimAsisten2, nimAsisten3, nimAsisten4];
+    Set<String> nimSet = {};
+
+    for (var nim in nims) {
+      if (nim.isNotEmpty) {
+        int? parsedNim = int.tryParse(nim);
+        if (parsedNim == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('NIM harus bertipe angka'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+        if (nimSet.contains(nim)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('NIM tidak boleh duplikat'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
         } else {
-          //== Jika tida ada kesalahan, simpan data ke Firestore
-          await _dataAsistenCollection.add(data1);
-          await _dataAsistenCollection.add(data2);
-
-          //== Tampilkan Pesan Sukses ==
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Data Berhasil disimpan'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 3)));
-
-          //== Menghapus Semua TextField yang Telah disimpan
-          namaAsistenController.clear();
-          namaAsisten2Controller.clear();
-          namaAsisten3Controller.clear();
-          namaAsisten4Controller.clear();
-          nimAsistenController.clear();
-          nimAsisten2Controller.clear();
-          nimAsisten3Controller.clear();
-          nimAsisten4Controller.clear();
+          nimSet.add(nim);
         }
       }
+    }
+
+    // Pengecekan idAsisten pada Database
+    var existingIdAsisten = await FirebaseFirestore.instance
+        .collection('dataAsisten')
+        .where('idKelas', isEqualTo: widget.idkelas)
+        .where('idAsisten', isEqualTo: idAsisten)
+        .get();
+
+    if (existingIdAsisten.docs.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('idAsisten telah terdaftar pada database'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Pengecekan idTA pada Database
+    var existingIdTA = await FirebaseFirestore.instance
+        .collection('dataAsisten')
+        .where('kodeMatakuliah', isEqualTo: widget.kodeMatakuliah)
+        .where('idKelas', isEqualTo: widget.idkelas)
+        .get();
+
+    if (existingIdTA.docs.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Data telah terdapat pada database'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Fungsi untuk menyimpan data
+      await FirebaseFirestore.instance.collection('dataAsisten').add({
+        'idKelas': widget.idkelas,
+        'idAsisten': idAsisten,
+        'nim': nimAsisten.isNotEmpty ? int.parse(nimAsisten) : 0,
+        'nim2': nimAsisten2.isNotEmpty ? int.parse(nimAsisten2) : 0,
+        'nim3': nimAsisten3.isNotEmpty ? int.parse(nimAsisten3) : 0,
+        'nim4': nimAsisten4.isNotEmpty ? int.parse(nimAsisten4) : 0,
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Data berhasil disimpan'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      idAsistenController.clear();
+      nimAsistenController.clear();
+      nimAsisten2Controller.clear();
+      nimAsisten3Controller.clear();
+      nimAsisten4Controller.clear();
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal menyimpan data: $e')),
+      );
     }
   }
 
@@ -111,27 +153,7 @@ class _FormDataAsistenState extends State<FormDataAsisten> {
             automaticallyImplyLeading: false,
             leading: IconButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const DashboardNavigasiAdmin(),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(0.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.ease;
-
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-
-                      return SlideTransition(
-                        position: animation.drive(tween),
-                        child: child,
-                      );
-                    },
-                  ),
-                );
+                Navigator.pop(context);
               },
               icon: const Icon(
                 Icons.arrow_back,
@@ -144,9 +166,6 @@ class _FormDataAsistenState extends State<FormDataAsisten> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const SizedBox(
-                    width: 10.0,
-                  ),
                   Expanded(
                       child: Text(
                     widget.mataKuliah,
@@ -185,7 +204,7 @@ class _FormDataAsistenState extends State<FormDataAsisten> {
               Center(
                 child: Container(
                   width: screenWidth > 750.0 ? 950.0 : screenWidth,
-                  height: screenHeight > 420 ? 620.0 : screenHeight,
+                  height: screenHeight > 420 ? 470.0 : screenHeight,
                   color: Colors.white,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,19 +237,19 @@ class _FormDataAsistenState extends State<FormDataAsisten> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               SizedBox(
-                                height: 420.0,
+                                height: 370.0,
                                 width: 475.0,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     //===============//
-                                    //== Nama Asisten 1==//
+                                    //== Id Asisten ==//
                                     //==============//
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           left: 70.0, top: 18.0),
                                       child: Text(
-                                        "Nama Asisten ",
+                                        "idAsisten",
                                         style: GoogleFonts.quicksand(
                                             fontSize: 16.0,
                                             fontWeight: FontWeight.bold),
@@ -247,17 +266,20 @@ class _FormDataAsistenState extends State<FormDataAsisten> {
                                             ? 330
                                             : screenWidth,
                                         child: TextField(
-                                          controller: namaAsistenController,
-                                          decoration: InputDecoration(
-                                              hintText:
-                                                  'Masukkan Nama Asisten 1',
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0)),
-                                              filled: true,
-                                              fillColor: Colors.white),
-                                        ),
+                                            controller: idAsistenController,
+                                            decoration: InputDecoration(
+                                                hintText: 'Masukkan ID Asisten',
+                                                border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0)),
+                                                filled: true,
+                                                fillColor: Colors.white),
+                                            inputFormatters: [
+                                              LengthLimitingTextInputFormatter(
+                                                  10),
+                                              UpperCaseTextFormatter()
+                                            ]),
                                       ),
                                     ),
 
@@ -296,59 +318,24 @@ class _FormDataAsistenState extends State<FormDataAsisten> {
                                               filled: true,
                                               fillColor: Colors.white),
                                           keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
+                                          inputFormatters: [
                                             FilteringTextInputFormatter
-                                                .digitsOnly
+                                                .digitsOnly,
+                                            LengthLimitingTextInputFormatter(
+                                                10),
                                           ],
                                         ),
                                       ),
                                     ),
 
                                     //===================//
-                                    //== Nama Asisten 2 ==//
+                                    //== NIM Asisten 2 ==//
                                     //==================//
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           left: 70.0, top: 15.0),
                                       child: Text(
-                                        "Nama Asisten ",
-                                        style: GoogleFonts.quicksand(
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 15.0,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 70.0, right: 30.0),
-                                      child: SizedBox(
-                                        width: screenWidth > 230
-                                            ? 330
-                                            : screenWidth,
-                                        child: TextField(
-                                          controller: namaAsisten2Controller,
-                                          decoration: InputDecoration(
-                                              hintText:
-                                                  'Masukkan Nama Asisten 2',
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0)),
-                                              filled: true,
-                                              fillColor: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    //=================//
-                                    //== NIM Asisten 2 ==//
-                                    //===============//
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 70.0, top: 15.0),
-                                      child: Text(
-                                        "NIM Asisten ",
+                                        "NIM Asisten 2 ",
                                         style: GoogleFonts.quicksand(
                                             fontSize: 16.0,
                                             fontWeight: FontWeight.bold),
@@ -375,10 +362,11 @@ class _FormDataAsistenState extends State<FormDataAsisten> {
                                                           10.0)),
                                               filled: true,
                                               fillColor: Colors.white),
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
+                                          inputFormatters: [
                                             FilteringTextInputFormatter
-                                                .digitsOnly
+                                                .digitsOnly,
+                                            LengthLimitingTextInputFormatter(
+                                                10),
                                           ],
                                         ),
                                       ),
@@ -388,57 +376,19 @@ class _FormDataAsistenState extends State<FormDataAsisten> {
                               ),
 
                               //== Row 2 ==//
-                              //=== Nama Asisten 3 dan 4, serta NIM Asisten 3 dan 4 ===//
+                              //=== NIM Asisten 3 dan 4===//
                               SizedBox(
-                                height: 420.0,
+                                height: 370.0,
                                 width: 475.0,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     //===============//
-                                    //== Nama Asisten 3==//
+                                    //== NIM Asisten 3 ==//
                                     //==============//
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           top: 18.0, left: 70.0),
-                                      child: Text(
-                                        "Nama Asisten ",
-                                        style: GoogleFonts.quicksand(
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 15.0,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 70.0, right: 30.0),
-                                      child: SizedBox(
-                                        width: screenWidth > 230
-                                            ? 330
-                                            : screenWidth,
-                                        child: TextField(
-                                          controller: namaAsisten3Controller,
-                                          decoration: InputDecoration(
-                                              hintText:
-                                                  'Masukkan Nama Asisten 3',
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0)),
-                                              filled: true,
-                                              fillColor: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-
-                                    //===================//
-                                    //== NIM Asisten 3 ==//
-                                    //==================//
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 70.0, top: 15.0),
                                       child: Text(
                                         "NIM Asisten ",
                                         style: GoogleFonts.quicksand(
@@ -467,55 +417,19 @@ class _FormDataAsistenState extends State<FormDataAsisten> {
                                                           10.0)),
                                               filled: true,
                                               fillColor: Colors.white),
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
+                                          inputFormatters: [
                                             FilteringTextInputFormatter
-                                                .digitsOnly
+                                                .digitsOnly,
+                                            LengthLimitingTextInputFormatter(
+                                                10),
                                           ],
                                         ),
                                       ),
                                     ),
 
                                     //===================//
-                                    //== Nama Asisten 4 ==//
-                                    //==================//
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 70.0, top: 15.0),
-                                      child: Text(
-                                        "Nama Asisten ",
-                                        style: GoogleFonts.quicksand(
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 15.0,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 70.0, right: 30.0),
-                                      child: SizedBox(
-                                        width: screenWidth > 230
-                                            ? 330
-                                            : screenWidth,
-                                        child: TextField(
-                                          controller: namaAsisten4Controller,
-                                          decoration: InputDecoration(
-                                              hintText:
-                                                  'Masukkan Nama Asisten 4',
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0)),
-                                              filled: true,
-                                              fillColor: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    //=================//
                                     //== NIM Asisten 4 ==//
-                                    //===============//
+                                    //==================//
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           left: 70.0, top: 15.0),
@@ -548,99 +462,48 @@ class _FormDataAsistenState extends State<FormDataAsisten> {
                                               filled: true,
                                               fillColor: Colors.white),
                                           keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
+                                          inputFormatters: [
                                             FilteringTextInputFormatter
-                                                .digitsOnly
+                                                .digitsOnly,
+                                            LengthLimitingTextInputFormatter(
+                                                10),
                                           ],
                                         ),
                                       ),
                                     ),
+                                    //== ElevatedButton 'SIMPAN DATA' ==//
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 25.0, left: 270.0),
+                                      child: SizedBox(
+                                          height: screenHeight > 45.0
+                                              ? 45.0
+                                              : screenHeight,
+                                          width: screenWidth > 130.0
+                                              ? 130
+                                              : screenWidth,
+                                          child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      const Color(0xFF3CBEA9)),
+                                              onPressed: saveData,
+                                              child: Text('Simpan Data',
+                                                  style: GoogleFonts.quicksand(
+                                                      fontWeight:
+                                                          FontWeight.bold)))),
+                                    )
                                   ],
                                 ),
                               ),
                             ],
                           ),
-                          //== ElevatedButton 'SIMPAN DATA' ==//
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(top: 15.0, left: 610.0),
-                            child: SizedBox(
-                                height:
-                                    screenHeight > 45.0 ? 45.0 : screenHeight,
-                                width: screenWidth > 100.0 ? 180 : screenWidth,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xFF3CBEA9)),
-                                    onPressed: () {
-                                      _saveDataToFirestore({
-                                        'kodeAsisten': widget.kodeAsisten,
-                                        'kodeKelas': widget.kodeKelas,
-                                        'mataKuliah': widget.mataKuliah,
-                                        'nama': namaAsistenController.text,
-                                        'nim': int.tryParse(
-                                                nimAsistenController.text) ??
-                                            0,
-                                        'dosenPengampu': widget.dosenPengampu,
-                                        'dosenPengampu2': widget.dosenPengampu2,
-                                        'tahunAjaran': widget.tahunAjaran,
-                                      }, {
-                                        'kodeAsisten': widget.kodeAsisten,
-                                        'mataKuliah': widget.mataKuliah,
-                                        'kodeKelas': widget.kodeKelas,
-                                        'nama': namaAsisten2Controller.text,
-                                        'nim': int.tryParse(
-                                                nimAsisten2Controller.text) ??
-                                            0,
-                                        'dosenPengampu': widget.dosenPengampu,
-                                        'dosenPengampu2': widget.dosenPengampu2,
-                                        'tahunAjaran': widget.tahunAjaran,
-                                      });
-
-                                      _saveDataToFirestore({
-                                        'kodeAsisten': widget.kodeAsisten,
-                                        'mataKuliah': widget.mataKuliah,
-                                        'kodeKelas': widget.kodeKelas,
-                                        'nama': namaAsisten3Controller.text,
-                                        'nim': int.tryParse(
-                                                nimAsisten3Controller.text) ??
-                                            0,
-                                        'dosenPengampu': widget.dosenPengampu,
-                                        'dosenPengampu2': widget.dosenPengampu2,
-                                        'tahunAjaran': widget.tahunAjaran,
-                                      }, {
-                                        'kodeAsisten': widget.kodeAsisten,
-                                        'mataKuliah': widget.mataKuliah,
-                                        'kodeKelas': widget.kodeKelas,
-                                        'nama': namaAsisten4Controller.text,
-                                        'nim': int.tryParse(
-                                                nimAsisten4Controller.text) ??
-                                            0,
-                                        'dosenPengampu': widget.dosenPengampu,
-                                        'dosenPengampu2': widget.dosenPengampu2,
-                                        'tahunAjaran': widget.tahunAjaran,
-                                      });
-
-                                      namaAsistenController.clear();
-                                      namaAsisten2Controller.clear();
-                                      namaAsisten3Controller.clear();
-                                      namaAsisten4Controller.clear();
-                                      nimAsistenController.clear();
-                                      nimAsisten2Controller.clear();
-                                      nimAsisten3Controller.clear();
-                                      nimAsisten4Controller.clear();
-                                    },
-                                    child: Text('Simpan Data',
-                                        style: GoogleFonts.quicksand(
-                                            fontWeight: FontWeight.bold)))),
-                          )
                         ],
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 30.0)
+              const SizedBox(height: 1000.0)
             ],
           ),
         ),

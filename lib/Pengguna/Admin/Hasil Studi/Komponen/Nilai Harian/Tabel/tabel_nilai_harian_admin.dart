@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class TabelNilaiHarianAdmin extends StatefulWidget {
-  final String kodeKelas;
-  const TabelNilaiHarianAdmin({super.key, required this.kodeKelas});
+  final String idkelas;
+  const TabelNilaiHarianAdmin({super.key, required this.idkelas});
 
   @override
   State<TabelNilaiHarianAdmin> createState() => _TabelNilaiHarianAdminState();
@@ -55,80 +55,88 @@ class _TabelNilaiHarianAdminState extends State<TabelNilaiHarianAdmin> {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
           await FirebaseFirestore.instance
-              .collection('tokenKelas')
-              .where('kodeKelas', isEqualTo: widget.kodeKelas)
+              .collection('dataMahasiswaPraktikum')
+              .where('idKelas', isEqualTo: widget.idkelas)
               .get();
 
-      // ignore: avoid_function_literals_in_foreach_calls
-      querySnapshot.docs.forEach((doc) async {
-        PenilaianPercobaan data = PenilaianPercobaan(
-          nama: doc['nama'] ?? '',
-          nim: doc['nim'] ?? 0,
-          kode: doc['kodeKelas'] ?? '',
-        );
+      for (var doc in querySnapshot.docs) {
+        int nim = doc['nim'];
 
-        // Check if data exists in 'nilaiHarian'
-        QuerySnapshot<Map<String, dynamic>> nilaiSnapshot =
+        // Cari data di 'akun_mahasiswa' berdasarkan nim
+        QuerySnapshot<Map<String, dynamic>> akunSnapshot =
             await FirebaseFirestore.instance
-                .collection('nilaiHarian')
-                .where('nim', isEqualTo: data.nim)
-                .where('kodeKelas', isEqualTo: widget.kodeKelas)
+                .collection('akun_mahasiswa')
+                .where('nim', isEqualTo: nim)
                 .get();
 
-        if (nilaiSnapshot.docs.isEmpty) {
-          // Data doesn't exist, add it to 'nilaiHarian'
-          await FirebaseFirestore.instance.collection('nilaiHarian').add({
-            'nama': data.nama,
-            'nim': data.nim,
-            'kodeKelas': data.kode,
-            //== Nilai Rata-Rata ==
-            'modul1': 0.0,
-            'modul2': 0.0,
-            'modul3': 0.0,
-            'modul4': 0.0,
-            'modul5': 0.0,
-            'modul6': 0.0,
-            'modul7': 0.0,
-            'modul8': 0.0,
-            //== Laporan ==
-            'laporan1': 0.0,
-            'laporan2': 0.0,
-            'laporan3': 0.0,
-            'laporan4': 0.0,
-            'laporan5': 0.0,
-            'laporan6': 0.0,
-            'laporan7': 0.0,
-            'laporan8': 0.0,
-            //== Afektif ===
-            'afektif1': 0.0,
-            'afektif2': 0.0,
-            'afektif3': 0.0,
-            'afektif4': 0.0,
-            'afektif5': 0.0,
-            'afektif6': 0.0,
-            'afektif7': 0.0,
-            'afektif8': 0.0,
-            //== Tugas ===
-            'tugas1': 0.0,
-            'tugas2': 0.0,
-            'tugas3': 0.0,
-            'tugas4': 0.0,
-            'tugas5': 0.0,
-            'tugas6': 0.0,
-            'tugas7': 0.0,
-            'tugas8': 0.0,
-            //== Latihan ==
-            'latihan1': 0.0,
-            'latihan2': 0.0,
-            'latihan3': 0.0,
-            'latihan4': 0.0,
-            'latihan5': 0.0,
-            'latihan6': 0.0,
-            'latihan7': 0.0,
-            'latihan8': 0.0,
-          });
+        for (var akunDoc in akunSnapshot.docs) {
+          // Ambil hanya nama dan nim
+          String nama = akunDoc['nama'];
+          int nim = akunDoc['nim'];
+
+          // Check if data exists in 'nilaiHarian'
+          QuerySnapshot<Map<String, dynamic>> nilaiSnapshot =
+              await FirebaseFirestore.instance
+                  .collection('nilaiHarian')
+                  .where('nim', isEqualTo: nim)
+                  .where('idKelas', isEqualTo: widget.idkelas)
+                  .get();
+
+          if (nilaiSnapshot.docs.isEmpty) {
+            // Data doesn't exist, add it to 'nilaiHarian'
+            await FirebaseFirestore.instance.collection('nilaiHarian').add({
+              'nama': nama,
+              'nim': nim,
+              'idKelas': widget.idkelas,
+              //== Nilai Rata-Rata ==
+              'modul1': 0.0,
+              'modul2': 0.0,
+              'modul3': 0.0,
+              'modul4': 0.0,
+              'modul5': 0.0,
+              'modul6': 0.0,
+              'modul7': 0.0,
+              'modul8': 0.0,
+              //== Laporan ==
+              'laporan1': 0.0,
+              'laporan2': 0.0,
+              'laporan3': 0.0,
+              'laporan4': 0.0,
+              'laporan5': 0.0,
+              'laporan6': 0.0,
+              'laporan7': 0.0,
+              'laporan8': 0.0,
+              //== Afektif ===
+              'afektif1': 0.0,
+              'afektif2': 0.0,
+              'afektif3': 0.0,
+              'afektif4': 0.0,
+              'afektif5': 0.0,
+              'afektif6': 0.0,
+              'afektif7': 0.0,
+              'afektif8': 0.0,
+              //== Tugas ===
+              'tugas1': 0.0,
+              'tugas2': 0.0,
+              'tugas3': 0.0,
+              'tugas4': 0.0,
+              'tugas5': 0.0,
+              'tugas6': 0.0,
+              'tugas7': 0.0,
+              'tugas8': 0.0,
+              //== Latihan ==
+              'latihan1': 0.0,
+              'latihan2': 0.0,
+              'latihan3': 0.0,
+              'latihan4': 0.0,
+              'latihan5': 0.0,
+              'latihan6': 0.0,
+              'latihan7': 0.0,
+              'latihan8': 0.0,
+            });
+          }
         }
-      });
+      }
 
       // Call getDataFromFirebase to fetch data from 'nilaiHarian' after adding new data if needed
       await getDataFromFirebase();
@@ -144,7 +152,7 @@ class _TabelNilaiHarianAdminState extends State<TabelNilaiHarianAdmin> {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
           await FirebaseFirestore.instance
               .collection('nilaiHarian')
-              .where('kodeKelas', isEqualTo: widget.kodeKelas)
+              .where('idKelas', isEqualTo: widget.idkelas)
               .get();
 
       setState(() {
@@ -153,7 +161,7 @@ class _TabelNilaiHarianAdminState extends State<TabelNilaiHarianAdmin> {
           return PenilaianPercobaan(
             nim: data['nim'] ?? 0,
             nama: data['nama'] ?? '',
-            kode: data['kodeKelas'] ?? '',
+            kode: data['idKelas'] ?? '',
             rata1: data['modul1'] ?? 0.0,
             rata2: data['modul2'] ?? 0.0,
             rata3: data['modul3'] ?? 0.0,
@@ -183,7 +191,7 @@ class _TabelNilaiHarianAdminState extends State<TabelNilaiHarianAdmin> {
           await FirebaseFirestore.instance
               .collection('nilaiHarian')
               .where('nim', isEqualTo: nilai.nim)
-              .where('kodeKelas', isEqualTo: widget.kodeKelas)
+              .where('idKelas', isEqualTo: widget.idkelas)
               .get();
 
       // Jika data ditemukan, isi nilai-nilai default
@@ -1595,7 +1603,7 @@ class _TabelNilaiHarianAdminState extends State<TabelNilaiHarianAdmin> {
                         await FirebaseFirestore.instance
                             .collection('nilaiHarian')
                             .where('nim', isEqualTo: nilai.nim)
-                            .where('kodeKelas', isEqualTo: widget.kodeKelas)
+                            .where('idKelas', isEqualTo: widget.idkelas)
                             .get();
 
 // If data does not exist, add it
@@ -1604,7 +1612,7 @@ class _TabelNilaiHarianAdminState extends State<TabelNilaiHarianAdmin> {
                           .collection('nilaiHarian')
                           .add({
                         'nim': nilai.nim,
-                        'kodeKelas': widget.kodeKelas,
+                        'idKelas': widget.idkelas,
                         //== Modul 1 ==
                         'latihan1': nilai.latihan1,
                         'tugas1': nilai.tugas1,

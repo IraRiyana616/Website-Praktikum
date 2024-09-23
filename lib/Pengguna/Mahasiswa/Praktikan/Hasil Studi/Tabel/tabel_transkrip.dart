@@ -14,12 +14,14 @@ class TabelTranskripNilai extends StatefulWidget {
 class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
   List<TranskripNilai> demoTranskripNilai = [];
   List<TranskripNilai> filteredTranskripNilai = [];
-  //==
-  //Dropdown Button Tahun Ajaran
-  String selectedKeterangan = ' Status Praktikum';
-  List<String> availableKeterangans = [];
-  //==
-  String nim = ''; // Deklarasi variable nim di luar block if
+
+  String selectedKeterangan = 'Status Praktikum';
+  List<String> availableKeterangans = [
+    'Status Praktikum',
+    'Lulus',
+    'Tidak Lulus'
+  ];
+  String nim = '';
   User? user = FirebaseAuth.instance.currentUser;
 
   Future<void> fetchUserNIMFromDatabase(String userUid) async {
@@ -32,15 +34,8 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
                 .get();
         if (userSnapshot.exists) {
           int userNim = userSnapshot['nim'] as int;
-          nim = userNim.toString(); // Ubah ke string dan simpan ke dalam nim
-
-          QuerySnapshot<Map<String, dynamic>> querySnapshot =
-              await FirebaseFirestore.instance.collection('nilaiAkhir').get();
-          Set<String> status =
-              querySnapshot.docs.map((doc) => doc['status'].toString()).toSet();
-          setState(() {
-            availableKeterangans = [' Status Praktikum', ...status.toList()];
-          });
+          nim = userNim.toString();
+          await fetchDataFromFirebase();
         }
       }
     } catch (error) {
@@ -52,25 +47,20 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
 
   Future<void> fetchDataFromFirebase() async {
     try {
-      QuerySnapshot<Map<String, dynamic>> transkripQuerySnapshot;
-
-      transkripQuerySnapshot =
+      QuerySnapshot<Map<String, dynamic>> transkripQuerySnapshot =
           await FirebaseFirestore.instance.collection('nilaiAkhir').get();
 
       List<TranskripNilai> data = [];
-
-      // Pemrosesan pencocokan berdasarkan NIM dan keterangan yang dipilih
       for (var transkripDoc in transkripQuerySnapshot.docs) {
-        // Menggunakan 'nim' sebagai int karena sudah diubah di fetchUserNIMFromDatabase
         int transkripNim = transkripDoc['nim'] as int;
 
         if (transkripNim.toString() == nim) {
-          // Check kesamaan NIM dengan pengguna yang sedang login
           Map<String, dynamic> transkripData = transkripDoc.data();
-          if (selectedKeterangan == ' Status Praktikum' ||
+          if (selectedKeterangan == 'Status Praktikum' ||
               transkripData['status'] == selectedKeterangan) {
             data.add(TranskripNilai(
-              kode: transkripData['kodeKelas'] ?? '',
+              matkul: transkripData['matakuliah'] ?? '',
+              kode: transkripData['idKelas'] ?? '',
               nama: transkripData['nama'] ?? '',
               huruf: transkripData['nilaiHuruf'] ?? '',
               keterangan: transkripData['status'] ?? '',
@@ -81,10 +71,14 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
         }
       }
 
-      setState(() {
-        demoTranskripNilai = data;
-        filteredTranskripNilai = demoTranskripNilai;
-      });
+      data.sort((a, b) => a.kode.compareTo(b.kode));
+
+      if (mounted) {
+        setState(() {
+          demoTranskripNilai = data;
+          filteredTranskripNilai = demoTranskripNilai;
+        });
+      }
     } catch (error) {
       if (kDebugMode) {
         print('Error fetching data from Firebase: $error');
@@ -96,15 +90,10 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
   void initState() {
     super.initState();
 
-    // Ambil tahun ajaran yang tersedia
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      // Dapatkan NIM pengguna yang sedang Login
       String userUid = user.uid;
-      fetchUserNIMFromDatabase(userUid).then((_) {
-        // Mengambil data dari Firebase
-        fetchDataFromFirebase();
-      });
+      fetchUserNIMFromDatabase(userUid);
     }
   }
 
@@ -147,8 +136,7 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
                     });
                   },
                   underline: Container(),
-                  items: [' Status Praktikum', ' Lulus', ' Tidak Lulus']
-                      .map((String value) {
+                  items: availableKeterangans.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Padding(
@@ -171,7 +159,13 @@ class _TabelTranskripNilaiState extends State<TabelTranskripNilai> {
                         columns: const [
                           DataColumn(
                             label: Text(
-                              'Kode Kelas',
+                              'id Kelas Praktikum',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Matakuliah',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -230,6 +224,7 @@ class TranskripNilai {
   String nama;
   String huruf;
   String keterangan;
+  String matkul;
 
   int nim;
   double akhir;
@@ -239,6 +234,7 @@ class TranskripNilai {
     required this.huruf,
     required this.keterangan,
     required this.nim,
+    required this.matkul,
     this.akhir = 0.0,
   });
 }
@@ -252,6 +248,8 @@ DataRow dataFileDataRow(TranskripNilai fileInfo, int index) {
     ),
     cells: [
       DataCell(Text(fileInfo.kode)),
+      DataCell(SizedBox(
+          width: 250.0, child: Text(getLimitedText(fileInfo.matkul, 30)))),
       DataCell(Text(getLimitedText(fileInfo.akhir.toString(), 6))),
       DataCell(Text(fileInfo.huruf)),
       DataCell(Text(fileInfo.keterangan)),

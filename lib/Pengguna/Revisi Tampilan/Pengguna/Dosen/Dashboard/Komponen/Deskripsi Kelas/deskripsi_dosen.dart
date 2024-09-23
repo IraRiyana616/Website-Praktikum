@@ -1,16 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../../Dosen/Dashboard/Komponen/Deskripsi/Tabel/tabel_modul.dart';
 import '../../Navigasi/dasboardnav_dosen.dart';
 import '../Data Asisten/data_asistensi_dosen.dart';
 import '../Data Mahasiswa/data_mahasiswa_dosen.dart';
+import 'Tabel Silabus/tabel_silabus_dosen.dart';
 
 class DeskripsiKelasDosen extends StatefulWidget {
+  final String idKelas;
   final String kodeKelas;
   final String mataKuliah;
   const DeskripsiKelasDosen(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key,
+      required this.kodeKelas,
+      required this.mataKuliah,
+      required this.idKelas});
 
   @override
   State<DeskripsiKelasDosen> createState() => _DeskripsiKelasDosenState();
@@ -79,7 +83,7 @@ class _DeskripsiKelasDosenState extends State<DeskripsiKelasDosen> {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('deskripsiKelas')
-            .where('kodeKelas', isEqualTo: widget.kodeKelas)
+            .where('idKelas', isEqualTo: widget.idKelas)
             .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -173,6 +177,7 @@ class _DeskripsiKelasDosenState extends State<DeskripsiKelasDosen> {
                                                   DataMahasiswaScreenDosen(
                                                 kodeKelas: widget.kodeKelas,
                                                 mataKuliah: widget.mataKuliah,
+                                                idkelas: widget.idKelas,
                                               ),
                                               transitionsBuilder: (context,
                                                   animation,
@@ -225,9 +230,11 @@ class _DeskripsiKelasDosenState extends State<DeskripsiKelasDosen> {
                                               pageBuilder: (context, animation,
                                                       secondaryAnimation) =>
                                                   DataAsistenScreenDosen(
-                                                kodeKelas: widget.kodeKelas,
-                                                mataKuliah: widget.mataKuliah,
-                                              ),
+                                                      kodeKelas:
+                                                          widget.kodeKelas,
+                                                      mataKuliah:
+                                                          widget.mataKuliah,
+                                                      idkelas: widget.idKelas),
                                               transitionsBuilder: (context,
                                                   animation,
                                                   secondaryAnimation,
@@ -287,8 +294,8 @@ class _DeskripsiKelasDosenState extends State<DeskripsiKelasDosen> {
                                   Padding(
                                     padding: const EdgeInsets.only(left: 90.0),
                                     child: SizedBox(
-                                      height: screenHeight > 200
-                                          ? 350
+                                      height: screenHeight > 400
+                                          ? 450
                                           : screenHeight,
                                       width: screenWidth > 300.0
                                           ? 730.0
@@ -309,7 +316,7 @@ class _DeskripsiKelasDosenState extends State<DeskripsiKelasDosen> {
                                               top: 20.0,
                                             ),
                                             child: Text(
-                                              '${data['deskripsi_kelas'] ?? 'Not available'}',
+                                              '${data['deskripsikelas'] ?? 'Not available'}',
                                               style: GoogleFonts.quicksand(
                                                 fontSize: 15.0,
                                                 height: 2.5,
@@ -473,8 +480,11 @@ class _DeskripsiKelasDosenState extends State<DeskripsiKelasDosen> {
                                 ),
                               ),
 
-                              TabelSilabusPraktikumDosen(
-                                  kodeKelas: widget.kodeKelas),
+                              SilabusPraktikumDosen(
+                                idkelas: widget.idKelas,
+                                kodeMatakuliah: widget.kodeKelas,
+                                mataKuliah: widget.mataKuliah,
+                              ),
 
                               const SizedBox(height: 50.0)
                             ],

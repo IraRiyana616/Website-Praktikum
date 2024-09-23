@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Tabel/Komponen/token_mhs.dart';
-import '../../../../Revisi Tampilan/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi Kelas/deskripsi_praktikan.dart';
 
 class TabelKelasPraktikan extends StatefulWidget {
   const TabelKelasPraktikan({super.key});
@@ -393,30 +392,30 @@ DataRow dataFileDataRow(DataToken fileInfo, int index, BuildContext context) {
           ),
         ),
         onTap: () {
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  DeskripsiKelasPraktikan(
-                kodeKelas: fileInfo.kode,
-                mataKuliah: fileInfo.matkul,
-              ),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                const begin = Offset(0.0, 0.0);
-                const end = Offset.zero;
-                const curve = Curves.ease;
+          // Navigator.push(
+          //   context,
+          //   PageRouteBuilder(
+          //     pageBuilder: (context, animation, secondaryAnimation) =>
+          //     //     DeskripsiKelasPraktikan(
+          //     //   kodeKelas: fileInfo.kode,
+          //     //   mataKuliah: fileInfo.matkul,
+          //     // ),
+          //     transitionsBuilder:
+          //         (context, animation, secondaryAnimation, child) {
+          //       const begin = Offset(0.0, 0.0);
+          //       const end = Offset.zero;
+          //       const curve = Curves.ease;
 
-                var tween = Tween(begin: begin, end: end)
-                    .chain(CurveTween(curve: curve));
+          //       var tween = Tween(begin: begin, end: end)
+          //           .chain(CurveTween(curve: curve));
 
-                return SlideTransition(
-                  position: animation.drive(tween),
-                  child: child,
-                );
-              },
-            ),
-          );
+          //       return SlideTransition(
+          //         position: animation.drive(tween),
+          //         child: child,
+          //       );
+          //     },
+          //   ),
+          // );
         },
       ),
       DataCell(SizedBox(

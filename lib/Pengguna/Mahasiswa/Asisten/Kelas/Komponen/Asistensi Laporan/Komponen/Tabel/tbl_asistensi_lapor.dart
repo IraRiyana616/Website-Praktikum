@@ -132,8 +132,7 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
                               ),
                             ),
                           ],
-                          source: DataSource(
-                              filteredAsistenLaporan, context, deleteData),
+                          source: DataSource(filteredAsistenLaporan, context),
                           rowsPerPage: calculateRowsPerPage(
                               filteredAsistenLaporan.length),
                         )
@@ -189,7 +188,8 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
           status: data['statusRevisi'] ?? '',
         );
       }).toList();
-
+// Mengurutkan data berdasarkan modul
+      fetchedData.sort((a, b) => a.modul.compareTo(b.modul));
       setState(() {
         demoAsistensiLaporan = fetchedData;
         availableModuls = ['Tampilkan Semua'] +
@@ -204,18 +204,6 @@ class _TabelAsistensiLaporanState extends State<TabelAsistensiLaporan> {
         _filterData(
             selectedModul); // Memanggil _filterData setelah data diambil
       });
-    }
-  }
-
-  //== Menghapus Data dari Database 'Laporan' ==//
-  void deleteData(String id) async {
-    try {
-      await FirebaseFirestore.instance.collection('laporan').doc(id).delete();
-      checkAndFetchData();
-    } catch (error) {
-      if (kDebugMode) {
-        print('Error deleting data:$error');
-      }
     }
   }
 }
@@ -242,8 +230,8 @@ class AsistensiLaporan {
   });
 }
 
-DataRow dataFileDataRow(AsistensiLaporan fileInfo, int index,
-    BuildContext context, Function(String) onDelete) {
+DataRow dataFileDataRow(
+    AsistensiLaporan fileInfo, int index, BuildContext context) {
   return DataRow(
     color: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -310,47 +298,6 @@ DataRow dataFileDataRow(AsistensiLaporan fileInfo, int index,
                   Icons.upload,
                   color: Colors.grey,
                 ),
-              ),
-            ),
-            const SizedBox(
-              width: 2.0,
-            ),
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: IconButton(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text(
-                            'Hapus Data',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16.0),
-                          ),
-                          content: const Text(
-                              'Apakah Anda yakin ingin menghapusnya ?'),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  onDelete(fileInfo.id);
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('Hapus')),
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('Batal'))
-                          ],
-                        );
-                      });
-                },
-                icon: const Icon(
-                  Icons.delete,
-                  color: Colors.grey,
-                ),
-                tooltip: 'Hapus Data',
               ),
             ),
             const SizedBox(
@@ -611,38 +558,6 @@ Future<void> uploadFile(
         nama = userDoc['nama'];
       }
 
-      // Pengecekan data di Firestore
-      QuerySnapshot existingData = await FirebaseFirestore.instance
-          .collection('asistensiLaporan')
-          .where('kodeKelas', isEqualTo: kodeKelas)
-          .where('judulMateri', isEqualTo: modul)
-          .where('statusRevisi', isEqualTo: selectedRevisi)
-          .get();
-
-      if (existingData.docs.isNotEmpty) {
-        Navigator.pop(context); // Menutup dialog loading
-
-        // Menampilkan dialog bahwa data sudah ada
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Data Sudah Ada'),
-              content: const Text('Data telah terdapat pada database.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-        return;
-      }
-
       final firebase_storage.Reference storageRef = firebase_storage
           .FirebaseStorage.instance
           .ref()
@@ -778,9 +693,9 @@ Color getRowColor(int index) {
 class DataSource extends DataTableSource {
   final List<AsistensiLaporan> data;
   final BuildContext context;
-  final Function(String) onDelete;
+  // final Function(String) onDelete;
 
-  DataSource(this.data, this.context, this.onDelete);
+  DataSource(this.data, this.context);
 
   @override
   DataRow? getRow(int index) {
@@ -788,7 +703,7 @@ class DataSource extends DataTableSource {
       return null;
     }
     final fileInfo = data[index];
-    return dataFileDataRow(fileInfo, index, context, onDelete);
+    return dataFileDataRow(fileInfo, index, context);
   }
 
   @override

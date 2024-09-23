@@ -5,10 +5,10 @@ import '../../Navigasi/hasil_studinav_admin.dart';
 import '../Nilai Akhir/nilai_akhir.dart';
 
 class NilaiHarianScreen extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String mataKuliah;
   const NilaiHarianScreen(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.idkelas, required this.mataKuliah});
 
   @override
   State<NilaiHarianScreen> createState() => _NilaiHarianScreenState();
@@ -27,7 +27,7 @@ class _NilaiHarianScreenState extends State<NilaiHarianScreen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 NilaiHarianScreen(
-              kodeKelas: widget.kodeKelas,
+              idkelas: widget.idkelas,
               mataKuliah: widget.mataKuliah,
             ),
             transitionsBuilder:
@@ -52,7 +52,7 @@ class _NilaiHarianScreenState extends State<NilaiHarianScreen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 NilaiAkhirScreen(
-              kodeKelas: widget.kodeKelas,
+              idkelas: widget.idkelas,
               mataKuliah: widget.mataKuliah,
             ),
             transitionsBuilder:
@@ -162,7 +162,7 @@ class _NilaiHarianScreenState extends State<NilaiHarianScreen> {
                         child: Column(
                           children: [
                             TabelNilaiHarianAdmin(
-                              kodeKelas: widget.kodeKelas,
+                              idkelas: widget.idkelas,
                             ),
                             const SizedBox(
                               height: 30.0,

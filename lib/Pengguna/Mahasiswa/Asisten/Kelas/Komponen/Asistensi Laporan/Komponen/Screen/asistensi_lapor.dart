@@ -53,33 +53,35 @@ class _AsistensiLaporanState extends State<AsistensiLaporan> {
                   ]),
             ),
           )),
-      body: Container(
-        color: const Color(0xFFE3E8EF),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 20.0,
-            ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 35.0, right: 40.0),
-                child: Container(
-                    width: 1230.0,
-                    color: Colors.white,
-                    //Tabel disini
-                    child: TabelAsistensiLaporan(
-                      modul: widget.modul,
-                      kodeKelas: widget.kodeKelas,
-                      nama: widget.nama,
-                      nim: widget.nim,
-                    )),
+      body: SingleChildScrollView(
+        child: Container(
+          color: const Color(0xFFE3E8EF),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 20.0,
               ),
-            ),
-            const SizedBox(
-              height: 20.0,
-            )
-          ],
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 35.0, right: 40.0),
+                  child: Container(
+                      width: 1230.0,
+                      color: Colors.white,
+                      //Tabel disini
+                      child: TabelAsistensiLaporan(
+                        modul: widget.modul,
+                        kodeKelas: widget.kodeKelas,
+                        nama: widget.nama,
+                        nim: widget.nim,
+                      )),
+                ),
+              ),
+              const SizedBox(
+                height: 20.0,
+              )
+            ],
+          ),
         ),
       ),
     );

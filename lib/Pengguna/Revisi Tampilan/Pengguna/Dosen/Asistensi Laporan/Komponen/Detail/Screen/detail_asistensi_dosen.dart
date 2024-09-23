@@ -8,18 +8,17 @@ import '../../Data Mahasiswa/Screen/data_asistensi_dosen.dart';
 import '../Tabel/tabel_detail_asistensi_dosen.dart';
 
 class DetailAsistensiLaporanDosen extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String nama;
-  final String modul;
   final int nim;
   final String mataKuliah;
-  const DetailAsistensiLaporanDosen(
-      {super.key,
-      required this.kodeKelas,
-      required this.nama,
-      required this.modul,
-      required this.nim,
-      required this.mataKuliah});
+  const DetailAsistensiLaporanDosen({
+    super.key,
+    required this.idkelas,
+    required this.nama,
+    required this.nim,
+    required this.mataKuliah,
+  });
 
   @override
   State<DetailAsistensiLaporanDosen> createState() =>
@@ -84,7 +83,7 @@ class _DetailAsistensiLaporanDosenState
                     PageRouteBuilder(
                       pageBuilder: (context, animation, secondaryAnimation) =>
                           DataAsistenDosen(
-                        kodeKelas: widget.kodeKelas,
+                        idkelas: widget.idkelas,
                         mataKuliah: widget.mataKuliah,
                       ),
                       transitionsBuilder:
@@ -138,31 +137,32 @@ class _DetailAsistensiLaporanDosenState
                   ]),
             ),
           )),
-      body: Container(
-        color: const Color(0xFFE3E8EF),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 20.0,
-            ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 35.0, right: 40.0),
-                child: Container(
-                    width: 1270.0,
-                    color: Colors.white,
-                    child: TabelDetailAsistensiLaporanDosen(
-                        kodeKelas: widget.kodeKelas,
-                        nim: widget.nim,
-                        modul: widget.modul,
-                        nama: widget.nama)),
+      body: SingleChildScrollView(
+        child: Container(
+          color: const Color(0xFFE3E8EF),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 20.0,
               ),
-            ),
-            const SizedBox(
-              height: 20.0,
-            )
-          ],
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 35.0, right: 40.0),
+                  child: Container(
+                      width: 1270.0,
+                      color: Colors.white,
+                      child: TabelDetailAsistensiLaporanDosen(
+                          idkelas: widget.idkelas,
+                          nim: widget.nim,
+                          nama: widget.nama)),
+                ),
+              ),
+              const SizedBox(
+                height: 1000.0,
+              )
+            ],
+          ),
         ),
       ),
     );

@@ -9,10 +9,10 @@ import '../../Navigasi/file_pengumpulannav_dosen.dart';
 import '../Tugas/tugas_dosen.dart';
 
 class PengumpulanLatihanDosen extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String mataKuliah;
   const PengumpulanLatihanDosen(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.idkelas, required this.mataKuliah});
 
   @override
   State<PengumpulanLatihanDosen> createState() =>
@@ -72,7 +72,7 @@ class _PengumpulanLatihanDosenState extends State<PengumpulanLatihanDosen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 PengumpulanLatihanDosen(
-                    kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah),
+                    idkelas: widget.idkelas, mataKuliah: widget.mataKuliah),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               const begin = Offset(0.0, 0.0);
@@ -95,7 +95,7 @@ class _PengumpulanLatihanDosenState extends State<PengumpulanLatihanDosen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 PengumpulanTugasDosen(
-              kodeKelas: widget.kodeKelas,
+              idkelas: widget.idkelas,
               mataKuliah: widget.mataKuliah,
             ),
             transitionsBuilder:
@@ -207,7 +207,7 @@ class _PengumpulanLatihanDosenState extends State<PengumpulanLatihanDosen> {
                           child: Column(
                             children: [
                               TabelLatihanAsistenScreen(
-                                kodeKelas: widget.kodeKelas,
+                                idkelas: widget.idkelas,
                                 mataKuliah: widget.mataKuliah,
                               ),
                               const SizedBox(

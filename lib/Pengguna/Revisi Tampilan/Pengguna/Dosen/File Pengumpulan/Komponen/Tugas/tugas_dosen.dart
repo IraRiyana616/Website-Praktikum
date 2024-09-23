@@ -3,15 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../Mahasiswa/Asisten/File Pengumpulan/Komponen/Tugas/Tabel/tabel_tugas_asisten.dart';
 import '../../Navigasi/file_pengumpulannav_dosen.dart';
+import '../Latihan/latihan_dosen.dart';
 
 class PengumpulanTugasDosen extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String mataKuliah;
   const PengumpulanTugasDosen(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.idkelas, required this.mataKuliah});
 
   @override
   State<PengumpulanTugasDosen> createState() => _PengumpulanTugasDosenState();
@@ -65,35 +65,35 @@ class _PengumpulanTugasDosenState extends State<PengumpulanTugasDosen> {
       _selectedIndex = index;
       // Memilih halaman sesuai dengan index yang dipilih
       if (index == 0) {
-        // Navigator.push(
-        //   context,
-        //   PageRouteBuilder(
-        //     pageBuilder: (context, animation, secondaryAnimation) =>
-        //         LatihanAsistenScreen(
-        //             kodeKelas: widget.kodeKelas, mataKuliah: widget.mataKuliah),
-        //     transitionsBuilder:
-        //         (context, animation, secondaryAnimation, child) {
-        //       const begin = Offset(0.0, 0.0);
-        //       const end = Offset.zero;
-        //       const curve = Curves.ease;
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                PengumpulanLatihanDosen(
+                    idkelas: widget.idkelas, mataKuliah: widget.mataKuliah),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
 
-        //       var tween =
-        //           Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-        //       return SlideTransition(
-        //         position: animation.drive(tween),
-        //         child: child,
-        //       );
-        //     },
-        //   ),
-        // );
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          ),
+        );
       } else if (index == 1) {
         Navigator.push(
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 PengumpulanTugasDosen(
-              kodeKelas: widget.kodeKelas,
+              idkelas: widget.idkelas,
               mataKuliah: widget.mataKuliah,
             ),
             transitionsBuilder:
@@ -205,7 +205,7 @@ class _PengumpulanTugasDosenState extends State<PengumpulanTugasDosen> {
                           child: Column(
                             children: [
                               TabelTugasAsistenScreen(
-                                kodeKelas: widget.kodeKelas,
+                                idkelas: widget.idkelas,
                                 mataKuliah: widget.mataKuliah,
                               ),
                               const SizedBox(

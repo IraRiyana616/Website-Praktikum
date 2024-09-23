@@ -5,10 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../Revisi Tampilan/Pengguna/Admin/Absensi/Akses Absensi/Edit Akses/Screen/edit_akses_admin.dart';
-import '../../../Revisi Tampilan/Pengguna/Admin/Absensi/Akses Absensi/Tambah Akses/tambah_akses_absensi.dart';
-import '../../../Revisi Tampilan/Pengguna/Admin/Absensi/Komponen/Praktikan/absensi_praktikan.dart';
-
 class TabelDataAbsensiAdmin extends StatefulWidget {
   const TabelDataAbsensiAdmin({Key? key}) : super(key: key);
 
@@ -269,31 +265,31 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
                 style: TextStyle(
                     color: Colors.lightBlue[700], fontWeight: FontWeight.bold)),
           ), onTap: () {
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                AbsensiPraktikanScreen(
-              kodeKelas: fileInfo.kelas,
-              mataKuliah: fileInfo.matkul,
-              kodeAsisten: fileInfo.asisten,
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = Offset(0.0, 0.0);
-              const end = Offset.zero;
-              const curve = Curves.ease;
+        // Navigator.push(
+        //   context,
+        //   PageRouteBuilder(
+        //     pageBuilder: (context, animation, secondaryAnimation) =>
+        //         AbsensiPraktikanScreen(
+        //       kodeKelas: fileInfo.kelas,
+        //       mataKuliah: fileInfo.matkul,
+        //       kodeAsisten: fileInfo.asisten,
+        //     ),
+        //     transitionsBuilder:
+        //         (context, animation, secondaryAnimation, child) {
+        //       const begin = Offset(0.0, 0.0);
+        //       const end = Offset.zero;
+        //       const curve = Curves.ease;
 
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        //       var tween =
+        //           Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-              return SlideTransition(
-                position: animation.drive(tween),
-                child: child,
-              );
-            },
-          ),
-        );
+        //       return SlideTransition(
+        //         position: animation.drive(tween),
+        //         child: child,
+        //       );
+        //     },
+        //   ),
+        // );
       }),
       DataCell(
         SizedBox(
@@ -318,31 +314,30 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
               onPressed: () async {
                 bool dataExists = await checkDataExistence(fileInfo.kelas);
                 if (dataExists) {
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          TambahAksesAbsensiMahasiswa(
-                        kodeKelas: fileInfo.kelas,
-                        mataKuliah: fileInfo.matkul,
-                        kodeAsisten: fileInfo.asisten,
-                      ),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        const begin = Offset(0.0, 0.0);
-                        const end = Offset.zero;
-                        const curve = Curves.ease;
+                  // Navigator.push(
+                  //   context,
+                  //   PageRouteBuilder(
+                  //     pageBuilder: (context, animation, secondaryAnimation) =>
+                  //     //     TambahAksesAbsensiMahasiswa(
+                  //     //   kodeKelas: fileInfo.kelas,
+                  //     //   mataKuliah: fileInfo.matkul,
+                  //     // ),
+                  //     transitionsBuilder:
+                  //         (context, animation, secondaryAnimation, child) {
+                  //       const begin = Offset(0.0, 0.0);
+                  //       const end = Offset.zero;
+                  //       const curve = Curves.ease;
 
-                        var tween = Tween(begin: begin, end: end)
-                            .chain(CurveTween(curve: curve));
+                  //       var tween = Tween(begin: begin, end: end)
+                  //           .chain(CurveTween(curve: curve));
 
-                        return SlideTransition(
-                          position: animation.drive(tween),
-                          child: child,
-                        );
-                      },
-                    ),
-                  );
+                  //       return SlideTransition(
+                  //         position: animation.drive(tween),
+                  //         child: child,
+                  //       );
+                  //     },
+                  //   ),
+                  // );
                 } else {
                   showDialog(
                     context: context,
@@ -395,31 +390,30 @@ DataRow dataFileDataRow(DataClass fileInfo, int index, BuildContext context) {
             ),
             IconButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        EditAksesScreenAdmin(
-                      kodeKelas: fileInfo.kelas,
-                      mataKuliah: fileInfo.matkul,
-                      kodeAsisten: fileInfo.asisten,
-                    ),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(0.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.ease;
+                // Navigator.push(
+                //   context,
+                //   PageRouteBuilder(
+                //     pageBuilder: (context, animation, secondaryAnimation) =>
+                //         EditAksesScreenAdmin(
+                //       kodeKelas: fileInfo.kelas,
+                //       mataKuliah: fileInfo.matkul,
+                //     ),
+                //     transitionsBuilder:
+                //         (context, animation, secondaryAnimation, child) {
+                //       const begin = Offset(0.0, 0.0);
+                //       const end = Offset.zero;
+                //       const curve = Curves.ease;
 
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
+                //       var tween = Tween(begin: begin, end: end)
+                //           .chain(CurveTween(curve: curve));
 
-                      return SlideTransition(
-                        position: animation.drive(tween),
-                        child: child,
-                      );
-                    },
-                  ),
-                );
+                //       return SlideTransition(
+                //         position: animation.drive(tween),
+                //         child: child,
+                //       );
+                //     },
+                //   ),
+                // );
               },
               icon: const Icon(
                 Icons.edit_document,

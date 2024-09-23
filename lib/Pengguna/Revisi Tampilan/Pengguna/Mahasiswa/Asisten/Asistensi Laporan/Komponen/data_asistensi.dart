@@ -3,15 +3,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../../../../../Mahasiswa/Asisten/Kelas/Komponen/Asistensi Laporan/Tabel/tbl_data_prak.dart';
+import '../../../../Admin/Asistensi Laporan/Komponen/Data Mahasiswa Asisten/Tabel/tabel_data_mahasiswa_asistensi_laporan.dart';
 import '../Navigasi/asistensi_laporannav.dart';
 
 class DataAsistensiMahasiswa extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String mataKuliah;
   const DataAsistensiMahasiswa(
-      {super.key, required this.kodeKelas, required this.mataKuliah});
+      {super.key, required this.idkelas, required this.mataKuliah});
 
   @override
   State<DataAsistensiMahasiswa> createState() => _DataAsistensiMahasiswaState();
@@ -146,8 +145,9 @@ class _DataAsistensiMahasiswaState extends State<DataAsistensiMahasiswa> {
                           color: Colors.white,
                           child: Column(
                             children: [
-                              TabelDataPraktikan(
-                                kodeKelas: widget.kodeKelas,
+                              TabelDataMahasiswaAsistensiLaporan(
+                                idkelas: widget.idkelas,
+                                matkul: widget.mataKuliah,
                               ),
                               const SizedBox(
                                 height: 30.0,

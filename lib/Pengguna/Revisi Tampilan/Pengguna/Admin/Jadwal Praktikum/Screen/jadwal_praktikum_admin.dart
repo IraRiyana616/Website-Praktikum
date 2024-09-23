@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../Admin/Jadwal Praktikum/Tabel/tbl_jadwal_praktikum.dart';
+import '../Tabel/tabel_jadwal.dart';
 
 class JadwalPraktikumScreen extends StatefulWidget {
   const JadwalPraktikumScreen({super.key});
@@ -98,7 +98,7 @@ class _JadwalPraktikumScreenState extends State<JadwalPraktikumScreen> {
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 1105.0),
                     color: Colors.white,
-                    child: const TabelJadwalPraktikumAdmin(),
+                    child: const TabelJadwalPraktikum(),
                   ),
                 ),
               ],

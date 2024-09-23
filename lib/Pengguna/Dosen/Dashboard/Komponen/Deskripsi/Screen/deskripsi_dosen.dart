@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Dosen/Dashboard/Komponen/Asistensi/Screen/asistensi_ds.dart';
 import '../../../Navigasi/dasboardnav_ds.dart';
 import '../../Pengumpulan/Latihan/latihan_ds.dart';
-import '../Tabel/tabel_modul.dart';
 
 class DeskripsiKelasDosen extends StatefulWidget {
   final String kodeKelas;
@@ -464,8 +463,8 @@ class _DeskripsiKelasDosenState extends State<DeskripsiKelasDosen> {
                                 ),
                               ),
 
-                              TabelSilabusPraktikumDosen(
-                                  kodeKelas: widget.kodeKelas),
+                              // TabelSilabusPraktikumDosen(
+                              //     kodeKelas: widget.kodeKelas),
 
                               const SizedBox(height: 50.0)
                             ],

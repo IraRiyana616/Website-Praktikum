@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Deskripsi/Screen/deskripsi_mhs.dart';
-import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Pengumpulan/Latihan/Tabel/tabel_peng_latihan_mhs.dart';
 import 'package:laksi/Pengguna/Mahasiswa/Praktikan/Dashboard/Komponen/Pengumpulan/Tugas/Screen/peng_tugas_mhs.dart';
 
 import '../../../../../Absensi/Komponen/tampilan_absensi_mhs.dart';
@@ -355,7 +354,7 @@ class _DataLatihanPraktikanState extends State<DataLatihanPraktikan> {
                           color: Colors.grey,
                         ),
                       ),
-                      TabelKLatihanPraktikan(kodeKelas: widget.kodeKelas),
+                      // TabelKLatihanPraktikan(kodeKelas: widget.kodeKelas),
                       const SizedBox(
                         height: 20.0,
                       )

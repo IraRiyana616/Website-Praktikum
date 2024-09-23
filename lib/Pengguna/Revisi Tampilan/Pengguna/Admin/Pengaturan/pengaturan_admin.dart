@@ -57,7 +57,7 @@ class _PengaturanAdminState extends State<PengaturanAdmin> {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Password updated successfully.'),
+            content: Text('Password berhasil disimpan'),
             backgroundColor: Colors.green,
           ),
         );

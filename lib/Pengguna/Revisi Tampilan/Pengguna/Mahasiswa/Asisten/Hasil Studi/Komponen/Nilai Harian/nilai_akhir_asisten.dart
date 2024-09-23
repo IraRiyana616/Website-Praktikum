@@ -3,16 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../../../../Admin/Hasil Studi/Komponen/Nilai Harian/Tabel/tabel_nilai_harian_admin.dart';
 import '../../Navigasi/hasil_studi_nav.dart';
 import '../Nilai Akhir/nilai_akhir_asisten.dart';
 
 class NilaiHarianScreen extends StatefulWidget {
-  final String kodeKelas;
+  final String idkelas;
   final String matakuliah;
   const NilaiHarianScreen(
-      {super.key, required this.kodeKelas, required this.matakuliah});
+      {super.key, required this.idkelas, required this.matakuliah});
 
   @override
   State<NilaiHarianScreen> createState() => _NilaiHarianScreenState();
@@ -71,7 +70,7 @@ class _NilaiHarianScreenState extends State<NilaiHarianScreen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 NilaiHarianScreen(
-              kodeKelas: widget.kodeKelas,
+              idkelas: widget.idkelas,
               matakuliah: widget.matakuliah,
             ),
             transitionsBuilder:
@@ -96,7 +95,7 @@ class _NilaiHarianScreenState extends State<NilaiHarianScreen> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 NilaiAkhirAsistenScreen(
-              kodeKelas: widget.kodeKelas,
+              idkelas: widget.idkelas,
               matakuliah: widget.matakuliah,
             ),
             transitionsBuilder:
@@ -207,7 +206,7 @@ class _NilaiHarianScreenState extends State<NilaiHarianScreen> {
                         child: Column(
                           children: [
                             TabelNilaiHarianAdmin(
-                              kodeKelas: widget.kodeKelas,
+                              idkelas: widget.idkelas,
                             ),
                             const SizedBox(
                               height: 30.0,
