@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -153,7 +154,7 @@ class _TabelFileLaporanAdminState extends State<TabelFileLaporanAdmin> {
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 25;
+    const int defaultRowsPerPage = 50;
     return rowCount <= defaultRowsPerPage ? rowCount : defaultRowsPerPage;
   }
 
@@ -188,6 +189,11 @@ class _TabelFileLaporanAdminState extends State<TabelFileLaporanAdmin> {
           status: data['statusRevisi'] ?? '',
         );
       }).toList();
+      // Mengurutkan data berdasarkan status
+      fetchedData.sort((a, b) {
+        // Asumsi bahwa statusRevisi adalah string yang bisa diurutkan
+        return a.status.compareTo(b.status);
+      });
 
       setState(() {
         demoAsistensiLaporan = fetchedData;
@@ -254,13 +260,13 @@ DataRow dataFileDataRow(AsistensiLaporan fileInfo, int index,
     ),
     cells: [
       DataCell(SizedBox(
-        width: 150.0,
+        width: 180.0,
         child: Text(
-          getLimitedText(fileInfo.waktu, 23),
+          getLimitedText(fileInfo.waktu, 30),
         ),
       )),
       DataCell(SizedBox(
-        width: 200.0,
+        width: 250.0,
         child: Text(
           getLimitedText(fileInfo.modul, 30),
         ),
@@ -595,12 +601,23 @@ Future<void> uploadFile(
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
       PlatformFile file = result.files.first;
+      User? user = FirebaseAuth.instance.currentUser;
+      String nama = '';
+
+      if (user != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('akun_mahasiswa')
+            .doc(user.uid)
+            .get();
+        nama = userDoc['nama'];
+      }
 
       // Pengecekan data di Firestore
       QuerySnapshot existingData = await FirebaseFirestore.instance
           .collection('asistensiLaporan')
           .where('idKelas', isEqualTo: idkelas)
           .where('judulModul', isEqualTo: modul)
+          .where('nim', isEqualTo: nim)
           .where('statusRevisi', isEqualTo: selectedRevisi)
           .get();
 
@@ -638,7 +655,7 @@ Future<void> uploadFile(
       await FirebaseFirestore.instance.collection('asistensiLaporan').add({
         'namaFile': fileName,
         'waktuAsistensi': DateTime.now(),
-        'namaAsisten': 'Admin',
+        'namaAsisten': nama,
         'idKelas': idkelas,
         'judulModul': modul,
         'statusRevisi': selectedRevisi,

@@ -59,7 +59,7 @@ class _PengumpulanAsistenState extends State<PengumpulanAsisten> {
       );
 
       String formattedDateTime =
-          DateFormat('dd MMMM yyyy HH:mm a').format(selectedDateTime);
+          DateFormat('dd MMMM yyyy hh:mm a').format(selectedDateTime);
 
       setState(() {
         controller.text = formattedDateTime;

@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Pengaturan extends StatefulWidget {
@@ -15,8 +18,6 @@ class _PengaturanState extends State<Pengaturan> {
   //== TextField Controller ==//
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
-      TextEditingController();
-  final TextEditingController _newPhoneNumberController =
       TextEditingController();
   TextEditingController namaLengkapController = TextEditingController();
   TextEditingController nimController = TextEditingController();
@@ -86,7 +87,6 @@ class _PengaturanState extends State<Pengaturan> {
         _confirmPasswordController.clear();
 
         // Show success message
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Password berhasil diperbaharui'),
           backgroundColor: Colors.green,
@@ -109,7 +109,7 @@ class _PengaturanState extends State<Pengaturan> {
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        String newPhoneNumber = _newPhoneNumberController.text;
+        String newPhoneNumber = noHandphoneController.text.trim();
 
         // Validate if the entered value is a valid integer
         if (newPhoneNumber.isEmpty || int.tryParse(newPhoneNumber) == null) {
@@ -124,13 +124,33 @@ class _PengaturanState extends State<Pengaturan> {
         // Convert the string to an integer
         int parsedPhoneNumber = int.parse(newPhoneNumber);
 
+        // Get the current user's document
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('akun_mahasiswa')
+            .doc(user.uid)
+            .get();
+
+        // Check if the phone number has changed
+        if (userDoc.exists) {
+          var currentPhoneNumber = userDoc.get('no_hp') as int?;
+
+          if (currentPhoneNumber == parsedPhoneNumber) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content:
+                  Text('Anda tidak melakukan perubahan pada nomor handphone'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            ));
+            return;
+          }
+        }
+
+        // Update the phone number
         await FirebaseFirestore.instance
             .collection('akun_mahasiswa')
             .doc(user.uid)
             .update({'no_hp': parsedPhoneNumber});
-        _newPhoneNumberController.clear();
 
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Nomor handphone berhasil diperbaharui'),
           backgroundColor: Colors.green,
@@ -189,7 +209,6 @@ class _PengaturanState extends State<Pengaturan> {
   Future<void> _logout() async {
     try {
       await _auth.signOut();
-      // ignore: use_build_context_synchronously
       Navigator.of(context).pushReplacementNamed('/login-mahasiswa');
     } catch (e) {
       if (kDebugMode) {
@@ -432,6 +451,9 @@ class _PengaturanState extends State<Pengaturan> {
                                           filled: true,
                                           fillColor: Colors.white,
                                         ),
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(12),
+                                        ],
                                       ),
                                     ),
                                   ),

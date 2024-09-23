@@ -56,7 +56,7 @@ class _TabelAksesAbsensiState extends State<TabelAksesAbsensi> {
           mataKuliah: widget.mataKuliah,
         );
       }).toList();
-      fetchedData.sort((a, b) => b.waktuAkses.compareTo(a.waktuAkses));
+      fetchedData.sort((a, b) => a.waktuAkses.compareTo(b.waktuAkses));
       if (mounted) {
         setState(() {
           demoDataAksesAbsensi = fetchedData;

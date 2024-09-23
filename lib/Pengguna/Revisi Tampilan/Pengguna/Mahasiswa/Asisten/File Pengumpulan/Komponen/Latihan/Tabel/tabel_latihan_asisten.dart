@@ -111,7 +111,7 @@ class _TabelLatihanAsistenScreenState extends State<TabelLatihanAsistenScreen> {
 
   void _sortDataByName() {
     setState(() {
-      filteredPengumpulan.sort((a, b) => a.nama.compareTo(b.nama));
+      filteredPengumpulan.sort((a, b) => a.nim.compareTo(b.nim));
     });
   }
 
@@ -266,7 +266,7 @@ class _TabelLatihanAsistenScreenState extends State<TabelLatihanAsistenScreen> {
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 25;
+    const int defaultRowsPerPage = 50;
 
     return rowCount <= defaultRowsPerPage ? rowCount : defaultRowsPerPage;
   }
@@ -303,11 +303,11 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
     cells: [
       DataCell(
         SizedBox(
-          width: 130.0,
+          width: 160.0,
           child: Text(
               getLimitedText(
                 fileInfo.waktu,
-                19,
+                25,
               ),
               style: const TextStyle(color: Colors.black)),
         ),

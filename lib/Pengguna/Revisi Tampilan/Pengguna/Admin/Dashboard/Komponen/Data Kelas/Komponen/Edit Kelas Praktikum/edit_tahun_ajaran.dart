@@ -78,7 +78,6 @@ class _EditTahunAjaranState extends State<EditTahunAjaran> {
     _loadUserData();
   }
 
-  //= Fungsi untuk menyimpan data ke database =//
   void saveData(BuildContext context, String documentId) async {
     // Validasi jika ada kolom yang tidak diisi
     if (kodeKelasController.text.isEmpty ||
@@ -125,25 +124,37 @@ class _EditTahunAjaranState extends State<EditTahunAjaran> {
         return;
       }
 
-      // Jika semua pengecekan lolos, simpan atau update data
-      await FirebaseFirestore.instance
+      // Mencari dokumen berdasarkan idKelas yang cocok
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('dataKelasPraktikum')
-          .doc(documentId) // Gunakan documentId untuk update
-          .set({
-        'kodeMatakuliah': widget.kodeMatakuliah,
-        'matakuliah': widget.mataKuliah,
-        'idKelas': kodeKelasController.text,
-        'tahunAjaran': tahunAjaranController.text,
-        'semester': selectedSemester
-      });
+          .where('idKelas', isEqualTo: widget.idkelas)
+          .get();
 
-      // Berhasil menyimpan data
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Data berhasil disimpan'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      if (querySnapshot.docs.isNotEmpty) {
+        // Update dokumen pertama yang ditemukan
+        DocumentSnapshot document = querySnapshot.docs.first;
+        await document.reference.update({
+          'kodeMatakuliah': widget.kodeMatakuliah,
+          'matakuliah': widget.mataKuliah,
+          'idKelas': kodeKelasController.text,
+          'tahunAjaran': tahunAjaranController.text,
+          'semester': selectedSemester
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Data berhasil disimpan'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Dokumen tidak ditemukan'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Terjadi kesalahan: $e')),

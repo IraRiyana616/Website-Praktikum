@@ -54,7 +54,7 @@ class _TabelTugasAdminState extends State<TabelTugasAdmin> {
       );
     }).toList();
 // Mengurutkan data berdasarkan nama secara ascending
-    demoPengumpulan.sort((a, b) => a.nama.compareTo(b.nama));
+    demoPengumpulan.sort((a, b) => a.nim.compareTo(b.nim));
     setState(() {
       demoPengumpulan = dataList;
       filteredPengumpulan = dataList;
@@ -273,7 +273,7 @@ class _TabelTugasAdminState extends State<TabelTugasAdmin> {
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 25;
+    const int defaultRowsPerPage = 50;
 
     return rowCount <= defaultRowsPerPage ? rowCount : defaultRowsPerPage;
   }
@@ -325,11 +325,11 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index,
     cells: [
       DataCell(
         SizedBox(
-          width: 145.0,
+          width: 180.0,
           child: Text(
               getLimitedText(
                 fileInfo.waktu,
-                23,
+                30,
               ),
               style: const TextStyle(color: Colors.black)),
         ),

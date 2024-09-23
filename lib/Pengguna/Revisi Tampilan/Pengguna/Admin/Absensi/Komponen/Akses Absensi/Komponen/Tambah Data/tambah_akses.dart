@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import '../../Screen/akses_absensi.dart';
-
 class TambahAksesAbsensi extends StatefulWidget {
   final String idkelas;
   final String mataKuliah;
@@ -149,7 +147,7 @@ class _TambahAksesAbsensiState extends State<TambahAksesAbsensi> {
       );
 
       String formattedDateTime =
-          DateFormat('dd MMMM yyyy HH:mm a').format(selectedDateTime);
+          DateFormat('dd MMMM yyyy hh:mm a').format(selectedDateTime);
 
       setState(() {
         controller.text = formattedDateTime;
@@ -165,31 +163,7 @@ class _TambahAksesAbsensiState extends State<TambahAksesAbsensi> {
         child: AppBar(
           leading: IconButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      AksesAbsensiAdmin(
-                    mataKuliah: widget.mataKuliah,
-                    idkelas: widget.idkelas,
-                    kode: widget.kode,
-                  ),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    const begin = Offset(0.0, 0.0);
-                    const end = Offset.zero;
-                    const curve = Curves.ease;
-
-                    var tween = Tween(begin: begin, end: end)
-                        .chain(CurveTween(curve: curve));
-
-                    return SlideTransition(
-                      position: animation.drive(tween),
-                      child: child,
-                    );
-                  },
-                ),
-              );
+              Navigator.pop(context);
             },
             icon: const Icon(
               Icons.arrow_back,

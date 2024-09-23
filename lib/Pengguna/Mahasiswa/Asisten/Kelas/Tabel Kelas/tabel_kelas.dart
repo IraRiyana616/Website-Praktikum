@@ -308,7 +308,7 @@ DataRow dataFileDataRow(DataKelas fileInfo, int index, BuildContext context) {
           SizedBox(
             width: 250.0,
             child: Text(
-              getLimitedText(fileInfo.matkul, 25),
+              getLimitedText(fileInfo.matkul, 30),
               style: TextStyle(
                   color: Colors.lightBlue[700], fontWeight: FontWeight.bold),
             ),

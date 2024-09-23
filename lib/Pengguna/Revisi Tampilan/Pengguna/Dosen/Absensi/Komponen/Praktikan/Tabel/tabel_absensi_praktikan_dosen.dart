@@ -60,7 +60,7 @@ class _TabelAbsensiPraktikanScreenDosenState
             waktu: doc['waktuAbsensi'] ?? '',
             pertemuan: doc['pertemuan'] ?? '');
       }).toList();
-      absensiList.sort((a, b) => a.nama.compareTo(b.nama));
+      absensiList.sort((a, b) => a.nim.compareTo(b.nim));
       setState(() {
         demoDataAbsensi = absensiList;
         filteredDataAbsensi = List.from(demoDataAbsensi);

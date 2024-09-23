@@ -164,7 +164,7 @@ class _LatihanPraktikanScreenState extends State<LatihanPraktikanScreen> {
                 children: [
                   Expanded(
                       child: Text(
-                    widget.idkelas,
+                    widget.matkul,
                     style: GoogleFonts.quicksand(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,

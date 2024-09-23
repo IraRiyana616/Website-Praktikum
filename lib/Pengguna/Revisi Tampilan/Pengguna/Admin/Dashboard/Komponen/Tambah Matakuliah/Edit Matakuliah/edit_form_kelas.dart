@@ -82,18 +82,6 @@ class _EditFormDataKelasState extends State<EditFormDataKelas> {
       return;
     }
 
-    // Validasi panjang kodeMatakuliah 10 huruf atau 10 angka
-    if (kodeMatakuliah.length != 10) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-              Text('Masukkan kodeMatakuliah dengan 10 huruf atau 10 angka'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
     try {
       // Periksa apakah kodeMatakuliah sudah ada
       final querySnapshot = await FirebaseFirestore.instance
@@ -110,21 +98,7 @@ class _EditFormDataKelasState extends State<EditFormDataKelas> {
         );
         return;
       }
-      // Validasi apakah namaMatakuliah sudah ada
-      final namaQuerySnapshot = await FirebaseFirestore.instance
-          .collection('dataMatakuliah')
-          .where('matakuliah', isEqualTo: namaMatakuliah)
-          .get();
 
-      if (namaQuerySnapshot.docs.isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Nama matakuliah telah terdapat pada database'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
       //== Validasi apabila nama dan nip tidak sesuai ==//
       final dosen1 = await FirebaseFirestore.instance
           .collection('akun_dosen')
@@ -151,7 +125,7 @@ class _EditFormDataKelasState extends State<EditFormDataKelas> {
       await FirebaseFirestore.instance
           .collection('dataMatakuliah')
           .doc(querySnapshot.docs.first.id)
-          .set({
+          .update({
         'kodeMatakuliah': kodeMatakuliah,
         'matakuliah': namaMatakuliah,
         'namaDosen': selectedNamaDosen,
@@ -382,9 +356,7 @@ class _EditFormDataKelasState extends State<EditFormDataKelas> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                        left: 70.0,
-                                        right: 30.0,
-                                      ),
+                                          left: 70.0, right: 30.0),
                                       child: SizedBox(
                                         width: screenWidth > 300.0
                                             ? 430.0
@@ -409,13 +381,11 @@ class _EditFormDataKelasState extends State<EditFormDataKelas> {
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.only(
-                                                    left: 15.0,
-                                                  ),
+                                                          left: 15.0),
                                                   child: Text(
                                                     namaDosen,
                                                     style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                    ),
+                                                        fontSize: 16.0),
                                                   ),
                                                 ),
                                               );
@@ -426,24 +396,28 @@ class _EditFormDataKelasState extends State<EditFormDataKelas> {
                                               width: 360.0,
                                               decoration: BoxDecoration(
                                                 border: Border.all(
-                                                  color: Colors.grey.shade700,
-                                                ),
+                                                    color:
+                                                        Colors.grey.shade700),
                                                 borderRadius:
                                                     BorderRadius.circular(8.0),
                                               ),
-                                              child: DropdownButton(
+                                              child: DropdownButton<String>(
                                                 value: selectedNamaDosen,
                                                 hint: const Text(
                                                   '   Pilih Nama Dosen Pengampu',
-                                                  style: TextStyle(
-                                                    fontSize: 15.0,
-                                                  ),
+                                                  style:
+                                                      TextStyle(fontSize: 15.0),
                                                 ),
                                                 items: modulItems,
                                                 onChanged: (newValue) {
                                                   setState(() {
                                                     selectedNamaDosen =
                                                         newValue;
+                                                    selectedNipDosen = snapshot
+                                                        .data!.docs
+                                                        .firstWhere((document) =>
+                                                            document['nama'] ==
+                                                            newValue)['nip'];
                                                   });
                                                 },
                                                 isExpanded: true,
@@ -493,83 +467,35 @@ class _EditFormDataKelasState extends State<EditFormDataKelas> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                        left: 70.0,
-                                        right: 30.0,
-                                      ),
+                                          left: 70.0, right: 30.0),
                                       child: SizedBox(
                                         width: screenWidth > 300.0
                                             ? 430.0
                                             : screenWidth,
-                                        child: StreamBuilder<QuerySnapshot>(
-                                          stream: FirebaseFirestore.instance
-                                              .collection('akun_dosen')
-                                              .snapshots(),
-                                          builder: (context, snapshot) {
-                                            if (!snapshot.hasData) {
-                                              return const CircularProgressIndicator();
-                                            }
-
-                                            List<DropdownMenuItem<String>>
-                                                modulItems = snapshot.data!.docs
-                                                    .map((DocumentSnapshot
-                                                        document) {
-                                              String nipDosen = document['nip'];
-                                              return DropdownMenuItem<String>(
-                                                value: nipDosen,
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                    left: 15.0,
-                                                  ),
-                                                  child: Text(
-                                                    nipDosen,
-                                                    style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            }).toList();
-
-                                            return Container(
-                                              height: 47.0,
-                                              width: 360.0,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: Colors.grey.shade700,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                              ),
-                                              child: DropdownButton(
-                                                value: selectedNipDosen,
-                                                hint: const Text(
-                                                  '   Pilih NIP Dosen Pengampu',
-                                                  style: TextStyle(
-                                                    fontSize: 15.0,
-                                                  ),
-                                                ),
-                                                items: modulItems,
-                                                onChanged: (newValue) {
-                                                  setState(() {
-                                                    selectedNipDosen = newValue;
-                                                  });
-                                                },
-                                                isExpanded: true,
-                                                dropdownColor: Colors.white,
-                                                style: TextStyle(
-                                                  color: Colors.grey.shade700,
-                                                  fontSize: 14.0,
-                                                ),
-                                                underline: Container(),
-                                                icon: const Icon(
-                                                  Icons.arrow_drop_down,
-                                                  color: Colors.grey,
-                                                ),
-                                                iconSize: 24,
-                                              ),
-                                            );
-                                          },
+                                        child: Container(
+                                          height: 47.0,
+                                          width: 360.0,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Colors.grey.shade700),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                          child: TextField(
+                                            controller: TextEditingController(
+                                                text: selectedNipDosen),
+                                            decoration: const InputDecoration(
+                                              hintText: ' NIP Dosen Pengampu',
+                                              border: InputBorder.none,
+                                              contentPadding:
+                                                  EdgeInsets.only(left: 15.0),
+                                            ),
+                                            style: TextStyle(
+                                              color: Colors.grey.shade700,
+                                              fontSize: 14.0,
+                                            ),
+                                            readOnly: true,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -588,9 +514,7 @@ class _EditFormDataKelasState extends State<EditFormDataKelas> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                        left: 70.0,
-                                        right: 30.0,
-                                      ),
+                                          left: 70.0, right: 30.0),
                                       child: SizedBox(
                                         width: screenWidth > 300.0
                                             ? 430.0
@@ -608,20 +532,18 @@ class _EditFormDataKelasState extends State<EditFormDataKelas> {
                                                 modulItems = snapshot.data!.docs
                                                     .map((DocumentSnapshot
                                                         document) {
-                                              String namaDosen =
+                                              String namaDosen2 =
                                                   document['nama'];
                                               return DropdownMenuItem<String>(
-                                                value: namaDosen,
+                                                value: namaDosen2,
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.only(
-                                                    left: 15.0,
-                                                  ),
+                                                          left: 15.0),
                                                   child: Text(
-                                                    namaDosen,
+                                                    namaDosen2,
                                                     style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                    ),
+                                                        fontSize: 16.0),
                                                   ),
                                                 ),
                                               );
@@ -632,24 +554,28 @@ class _EditFormDataKelasState extends State<EditFormDataKelas> {
                                               width: 360.0,
                                               decoration: BoxDecoration(
                                                 border: Border.all(
-                                                  color: Colors.grey.shade700,
-                                                ),
+                                                    color:
+                                                        Colors.grey.shade700),
                                                 borderRadius:
                                                     BorderRadius.circular(8.0),
                                               ),
-                                              child: DropdownButton(
+                                              child: DropdownButton<String>(
                                                 value: selectedNamaDosen2,
                                                 hint: const Text(
-                                                  '   Pilih Nama Dosen Pengampu 2',
-                                                  style: TextStyle(
-                                                    fontSize: 15.0,
-                                                  ),
+                                                  '   Pilih Nama Dosen Pengampu',
+                                                  style:
+                                                      TextStyle(fontSize: 15.0),
                                                 ),
                                                 items: modulItems,
                                                 onChanged: (newValue) {
                                                   setState(() {
                                                     selectedNamaDosen2 =
                                                         newValue;
+                                                    selectedNipDosen2 = snapshot
+                                                        .data!.docs
+                                                        .firstWhere((document) =>
+                                                            document['nama'] ==
+                                                            newValue)['nip'];
                                                   });
                                                 },
                                                 isExpanded: true,
@@ -685,84 +611,35 @@ class _EditFormDataKelasState extends State<EditFormDataKelas> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                        left: 70.0,
-                                        right: 30.0,
-                                      ),
+                                          left: 70.0, right: 30.0),
                                       child: SizedBox(
                                         width: screenWidth > 300.0
                                             ? 430.0
                                             : screenWidth,
-                                        child: StreamBuilder<QuerySnapshot>(
-                                          stream: FirebaseFirestore.instance
-                                              .collection('akun_dosen')
-                                              .snapshots(),
-                                          builder: (context, snapshot) {
-                                            if (!snapshot.hasData) {
-                                              return const CircularProgressIndicator();
-                                            }
-
-                                            List<DropdownMenuItem<String>>
-                                                modulItems = snapshot.data!.docs
-                                                    .map((DocumentSnapshot
-                                                        document) {
-                                              String nipDosen = document['nip'];
-                                              return DropdownMenuItem<String>(
-                                                value: nipDosen,
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                    left: 15.0,
-                                                  ),
-                                                  child: Text(
-                                                    nipDosen,
-                                                    style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            }).toList();
-
-                                            return Container(
-                                              height: 47.0,
-                                              width: 360.0,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: Colors.grey.shade700,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                              ),
-                                              child: DropdownButton(
-                                                value: selectedNipDosen2,
-                                                hint: const Text(
-                                                  '   Pilih NIP Dosen Pengampu 2',
-                                                  style: TextStyle(
-                                                    fontSize: 15.0,
-                                                  ),
-                                                ),
-                                                items: modulItems,
-                                                onChanged: (newValue) {
-                                                  setState(() {
-                                                    selectedNipDosen2 =
-                                                        newValue;
-                                                  });
-                                                },
-                                                isExpanded: true,
-                                                dropdownColor: Colors.white,
-                                                style: TextStyle(
-                                                  color: Colors.grey.shade700,
-                                                  fontSize: 14.0,
-                                                ),
-                                                underline: Container(),
-                                                icon: const Icon(
-                                                  Icons.arrow_drop_down,
-                                                  color: Colors.grey,
-                                                ),
-                                                iconSize: 24,
-                                              ),
-                                            );
-                                          },
+                                        child: Container(
+                                          height: 47.0,
+                                          width: 360.0,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Colors.grey.shade700),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                          child: TextField(
+                                            controller: TextEditingController(
+                                                text: selectedNipDosen2),
+                                            decoration: const InputDecoration(
+                                              hintText: ' NIP Dosen Pengampu',
+                                              border: InputBorder.none,
+                                              contentPadding:
+                                                  EdgeInsets.only(left: 15.0),
+                                            ),
+                                            style: TextStyle(
+                                              color: Colors.grey.shade700,
+                                              fontSize: 14.0,
+                                            ),
+                                            readOnly: true,
+                                          ),
                                         ),
                                       ),
                                     ),

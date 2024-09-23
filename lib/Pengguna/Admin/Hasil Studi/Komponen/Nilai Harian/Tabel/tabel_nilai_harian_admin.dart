@@ -173,7 +173,7 @@ class _TabelNilaiHarianAdminState extends State<TabelNilaiHarianAdmin> {
           );
         }).toList();
 // Mengurutkan data berdasarkan nama secara ascending
-        demoPenilaianPercobaan.sort((a, b) => a.nama.compareTo(b.nama));
+        demoPenilaianPercobaan.sort((a, b) => a.nim.compareTo(b.nim));
         filteredPenilaianPercobaan = List.from(demoPenilaianPercobaan);
       });
     } catch (e) {

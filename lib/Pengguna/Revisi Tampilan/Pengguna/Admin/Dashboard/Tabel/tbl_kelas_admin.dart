@@ -78,7 +78,7 @@ class _TabelKelasAdminState extends State<TabelKelasAdmin> {
       }).toList();
 
       // Urutkan fetchedData berdasarkan kodeMatakuliah
-      fetchedData.sort((a, b) => a.matkul.compareTo(b.matkul));
+      fetchedData.sort((a, b) => a.kelas.compareTo(b.kelas));
 
       if (mounted) {
         setState(() {

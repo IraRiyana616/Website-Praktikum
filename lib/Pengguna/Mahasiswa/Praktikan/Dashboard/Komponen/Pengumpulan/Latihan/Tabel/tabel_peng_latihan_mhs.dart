@@ -181,7 +181,7 @@ class _TabelKLatihanPraktikanState extends State<TabelKLatihanPraktikan> {
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 25;
+    const int defaultRowsPerPage = 50;
 
     return rowCount <= defaultRowsPerPage ? rowCount : defaultRowsPerPage;
   }
@@ -216,15 +216,15 @@ DataRow dataFileDataRow(Pengumpulan fileInfo, int index) {
     cells: [
       DataCell(
         SizedBox(
-          width: 150.0,
-          child: Text(getLimitedText(fileInfo.waktu, 23,
+          width: 165.0,
+          child: Text(getLimitedText(fileInfo.waktu, 30,
               style: const TextStyle(color: Colors.black))),
         ),
       ),
       DataCell(
         SizedBox(
-          width: 200.0,
-          child: Text(getLimitedText(fileInfo.modul, 25,
+          width: 280.0,
+          child: Text(getLimitedText(fileInfo.modul, 35,
               style: const TextStyle(color: Colors.black))),
         ),
       ),

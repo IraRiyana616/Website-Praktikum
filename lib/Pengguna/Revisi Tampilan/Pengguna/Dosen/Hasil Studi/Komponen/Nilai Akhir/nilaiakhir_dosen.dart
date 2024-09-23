@@ -363,7 +363,7 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
           );
         }).toList();
         // Mengurutkan data berdasarkan nama secara ascending
-        data.sort((a, b) => a.nama.compareTo(b.nama));
+        data.sort((a, b) => a.nim.compareTo(b.nim));
 
         // Simpan data ke dalam 'nilaiAkhir' Firestore
         await saveDataToNilaiAkhir(data);
@@ -453,8 +453,9 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
 //== Fungsi Download dengan bentuk CSV ===//
   Future<void> downloadData() async {
     // Mengambil data dari Firestore
-    CollectionReference collectionRef =
-        FirebaseFirestore.instance.collection('nilaiAkhir');
+    Query<Map<String, dynamic>> collectionRef = FirebaseFirestore.instance
+        .collection('nilaiAkhir')
+        .where('idKelas', isEqualTo: widget.idkelas);
     QuerySnapshot querySnapshot = await collectionRef.get();
 
     // Menyiapkan data untuk diubah menjadi CSV
@@ -663,14 +664,6 @@ class _NilaiAkhirScreenDosenState extends State<NilaiAkhirScreenDosen> {
                 const SizedBox(
                   width: 700.0,
                 ),
-                Text(
-                  'Admin',
-                  style: GoogleFonts.quicksand(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-                const SizedBox(width: 30.0)
               ],
             ),
           ),

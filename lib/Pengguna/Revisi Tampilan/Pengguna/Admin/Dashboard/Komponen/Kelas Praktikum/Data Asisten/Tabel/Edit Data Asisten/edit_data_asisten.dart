@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../Screen/data_asisten_admin.dart';
-
 class FormEditDataAsisten extends StatefulWidget {
   final String idkelas;
   final String mataKuliah;
@@ -91,7 +89,7 @@ class _FormEditDataAsistenState extends State<FormEditDataAsisten> {
     }
 
     // Pengecekan apakah NIM bertipe integer dan validasi agar tidak ada NIM yang sama
-    Set<String> nimSet = {};
+
     List<int> nimValues = [];
 
     for (var nim in nims) {
@@ -106,15 +104,7 @@ class _FormEditDataAsistenState extends State<FormEditDataAsisten> {
           );
           return;
         }
-        if (!nimSet.add(nim)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('NIM tidak boleh sama antar kolom'),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
+
         nimValues.add(parsedNim);
       }
     }
@@ -191,31 +181,31 @@ class _FormEditDataAsistenState extends State<FormEditDataAsisten> {
               onPressed: () {
                 Navigator.pop(context);
 
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        DataAsistenScreen(
-                      mataKuliah: widget.mataKuliah,
-                      idkelas: widget.idkelas,
-                      kode: widget.kode,
-                    ),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(0.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.ease;
+                // Navigator.push(
+                //   context,
+                //   PageRouteBuilder(
+                //     pageBuilder: (context, animation, secondaryAnimation) =>
+                //         DataAsistenScreen(
+                //       mataKuliah: widget.mataKuliah,
+                //       idkelas: widget.idkelas,
+                //       kode: widget.kode,
+                //     ),
+                //     transitionsBuilder:
+                //         (context, animation, secondaryAnimation, child) {
+                //       const begin = Offset(0.0, 0.0);
+                //       const end = Offset.zero;
+                //       const curve = Curves.ease;
 
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
+                //       var tween = Tween(begin: begin, end: end)
+                //           .chain(CurveTween(curve: curve));
 
-                      return SlideTransition(
-                        position: animation.drive(tween),
-                        child: child,
-                      );
-                    },
-                  ),
-                );
+                //       return SlideTransition(
+                //         position: animation.drive(tween),
+                //         child: child,
+                //       );
+                //     },
+                //   ),
+                // );
               },
               icon: const Icon(
                 Icons.arrow_back,
@@ -240,7 +230,7 @@ class _FormEditDataAsistenState extends State<FormEditDataAsisten> {
                   Padding(
                     padding: const EdgeInsets.only(right: 10.0),
                     child: Text(
-                      'Admin',
+                      '',
                       style: GoogleFonts.quicksand(
                         fontSize: 17.0,
                         fontWeight: FontWeight.bold,

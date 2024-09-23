@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -19,6 +18,7 @@ class _FormJadwalPraktikumState extends State<FormJadwalPraktikum> {
   TextEditingController waktuPraktikumController = TextEditingController();
   final TextEditingController kodeMatakuliahController =
       TextEditingController();
+  final TextEditingController semesterController = TextEditingController();
 
   ////=====/////
   @override
@@ -33,6 +33,7 @@ class _FormJadwalPraktikumState extends State<FormJadwalPraktikum> {
   String? selectedDay;
   String? selectedRuangPraktikum;
   String? selectedKodeMatakuliah;
+  String? selectedSemester;
 
   //== DropdownButton Memilih Hari ==//
   final List<String> days = [
@@ -98,13 +99,15 @@ class _FormJadwalPraktikumState extends State<FormJadwalPraktikum> {
     }
   }
 
-//=== Menyimpan data pada Firestore 'JadwalPraktikum ===//
+//== Fungsi untuk menyimpan data pada Firestore 'JadwalPraktikum' ==//
   Future<void> _saveDataToFirestore() async {
     if (selectedMatakuliah == null ||
         selectedTahunAjaran == null ||
         selectedDay == null ||
+        selectedSemester == null ||
         selectedRuangPraktikum == null ||
-        waktuPraktikumController.text.isEmpty) {
+        waktuPraktikumController.text.isEmpty ||
+        kodeMatakuliahController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Harap lengkapi data'),
         backgroundColor: Colors.red,
@@ -112,25 +115,56 @@ class _FormJadwalPraktikumState extends State<FormJadwalPraktikum> {
       return;
     }
 
-    // Memeriksa apakah data sudah ada sebelum menyimpan
-    bool isDataExist = await _checkDataExist();
-    if (isDataExist) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Ruangan tersebut telah terdapat pada database'),
-        backgroundColor: Colors.red,
-      ));
-      return;
-    }
-
     try {
+      // Membuat query untuk memeriksa apakah data dengan kombinasi yang sama sudah ada
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('JadwalPraktikum')
+          .where('kodeMatakuliah', isEqualTo: kodeMatakuliahController.text)
+          .where('matakuliah', isEqualTo: selectedMatakuliah)
+          .where('hari', isEqualTo: selectedDay)
+          .where('waktuPraktikum', isEqualTo: waktuPraktikumController.text)
+          .where('ruangPraktikum', isEqualTo: selectedRuangPraktikum)
+          .where('tahunAjaran', isEqualTo: selectedTahunAjaran)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Jika ada data yang sama, tampilkan pesan error
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Data telah terdapat pada database'),
+          backgroundColor: Colors.red,
+        ));
+        return;
+      }
+
+      // Membuat query untuk memeriksa apakah ruangan dan waktu sudah ada
+      var ruangquerySnapshot = await FirebaseFirestore.instance
+          .collection('JadwalPraktikum')
+          .where('hari', isEqualTo: selectedDay)
+          .where('waktuPraktikum', isEqualTo: waktuPraktikumController.text)
+          .where('ruangPraktikum', isEqualTo: selectedRuangPraktikum)
+          .where('tahunAjaran', isEqualTo: selectedTahunAjaran)
+          .get();
+
+      if (ruangquerySnapshot.docs.isNotEmpty) {
+        // Jika ada data yang sama, tampilkan pesan error
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Ruangan dan Waktu telah terdapat pada database'),
+          backgroundColor: Colors.red,
+        ));
+        return;
+      }
+
+      // Jika tidak ada data yang sama, simpan data baru
       await FirebaseFirestore.instance.collection('JadwalPraktikum').add({
         'matakuliah': selectedMatakuliah,
         'kodeMatakuliah': kodeMatakuliahController.text,
         'tahunAjaran': selectedTahunAjaran,
         'hari': selectedDay,
+        'semester': selectedSemester,
         'ruangPraktikum': selectedRuangPraktikum,
         'waktuPraktikum': waktuPraktikumController.text,
       });
+
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Data berhasil disimpan'),
         backgroundColor: Colors.green,
@@ -142,35 +176,15 @@ class _FormJadwalPraktikumState extends State<FormJadwalPraktikum> {
     }
   }
 
-  Future<bool> _checkDataExist() async {
-    try {
-      final QuerySnapshot<Map<String, dynamic>> snapshot =
-          await FirebaseFirestore.instance
-              .collection('JadwalPraktikum')
-              .where('tahunAjaran', isEqualTo: selectedTahunAjaran)
-              .where('waktuPraktikum', isEqualTo: waktuPraktikumController.text)
-              .where('ruangPraktikum', isEqualTo: selectedRuangPraktikum)
-              .get();
-
-      return snapshot.docs.isNotEmpty;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error checking data existence: $e');
-      }
-      return false;
-    }
-  }
-
   void _clearForm() {
     setState(() {
-      selectedKodeMatakuliah = null;
+      selectedMatakuliah = null;
       selectedTahunAjaran = null;
       selectedDay = null;
+      selectedSemester = null;
       selectedRuangPraktikum = null;
       waktuPraktikumController.clear();
       kodeMatakuliahController.clear();
-      startTime = null;
-      endTime = null;
     });
   }
 
@@ -254,7 +268,7 @@ class _FormJadwalPraktikumState extends State<FormJadwalPraktikum> {
               Center(
                 child: Container(
                   width: screenWidth > 400.0 ? 1050.0 : screenWidth,
-                  height: screenHeight > 490.0 ? 540.0 : screenHeight,
+                  height: screenHeight > 540.0 ? 580.0 : screenHeight,
                   color: Colors.white,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,7 +300,7 @@ class _FormJadwalPraktikumState extends State<FormJadwalPraktikum> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               SizedBox(
-                                height: 425.0,
+                                height: 475.0,
                                 width: 525.0,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,104 +321,141 @@ class _FormJadwalPraktikumState extends State<FormJadwalPraktikum> {
                                       padding: const EdgeInsets.only(
                                           left: 70.0, right: 30.0),
                                       child: SizedBox(
-                                        width: screenWidth > 300.0
-                                            ? 430.0
-                                            : screenWidth,
-                                        child: StreamBuilder<QuerySnapshot>(
-                                          stream: FirebaseFirestore.instance
-                                              .collection('dataKelasPraktikum')
-                                              .snapshots(),
-                                          builder: (context, snapshot) {
-                                            if (!snapshot.hasData) {
-                                              return const CircularProgressIndicator();
-                                            }
-
-                                            List<DropdownMenuItem<String>>
-                                                modulItems = [];
-                                            Set<String> seen = {};
-
-                                            for (var document
-                                                in snapshot.data!.docs) {
-                                              String matakuliah =
-                                                  document['matakuliah'];
-                                              if (!seen.contains(matakuliah)) {
-                                                seen.add(matakuliah);
-                                                modulItems.add(
-                                                  DropdownMenuItem<String>(
-                                                    value: matakuliah,
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 15.0),
-                                                      child: Text(matakuliah,
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize:
-                                                                      16.0)),
-                                                    ),
-                                                  ),
-                                                );
+                                          width: screenWidth > 300.0
+                                              ? 430.0
+                                              : screenWidth,
+                                          child: StreamBuilder<QuerySnapshot>(
+                                            stream: FirebaseFirestore.instance
+                                                .collection(
+                                                    'dataKelasPraktikum')
+                                                .snapshots(),
+                                            builder: (context, snapshot) {
+                                              if (!snapshot.hasData) {
+                                                return const CircularProgressIndicator();
                                               }
-                                            }
 
-                                            if (!modulItems.any((item) =>
-                                                item.value ==
-                                                selectedMatakuliah)) {
-                                              selectedMatakuliah =
-                                                  null; // Or handle it in a way that fits your logic
-                                            }
+                                              List<DropdownMenuItem<String>>
+                                                  modulItems = [];
+                                              Set<String> seen = {};
+                                              Map<String, Map<String, String>>
+                                                  matakuliahDetails = {};
 
-                                            return Container(
-                                              height: 47.0,
-                                              width: 360.0,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color:
-                                                        Colors.grey.shade700),
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                              ),
-                                              child: DropdownButton<String>(
-                                                value: selectedMatakuliah,
-                                                hint: const Text(
-                                                  '   Pilih Nama Matakuliah',
-                                                  style:
-                                                      TextStyle(fontSize: 15.0),
+                                              for (var document
+                                                  in snapshot.data!.docs) {
+                                                String matakuliah =
+                                                    document['matakuliah'];
+                                                String kodeMatakuliah =
+                                                    document['kodeMatakuliah'];
+                                                String semester =
+                                                    document['semester'];
+
+                                                if (!seen
+                                                    .contains(matakuliah)) {
+                                                  seen.add(matakuliah);
+                                                  modulItems.add(
+                                                    DropdownMenuItem<String>(
+                                                      value: matakuliah,
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                left: 15.0),
+                                                        child: Text(matakuliah,
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        16.0)),
+                                                      ),
+                                                    ),
+                                                  );
+
+                                                  // Simpan detail matakuliah
+                                                  matakuliahDetails[
+                                                      matakuliah] = {
+                                                    'kodeMatakuliah':
+                                                        kodeMatakuliah,
+                                                    'semester': semester,
+                                                  };
+                                                }
+                                              }
+
+                                              if (!modulItems.any((item) =>
+                                                  item.value ==
+                                                  selectedMatakuliah)) {
+                                                selectedMatakuliah =
+                                                    null; // Or handle it in a way that fits your logic
+                                              }
+
+                                              return Container(
+                                                height: 47.0,
+                                                width: 360.0,
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color:
+                                                          Colors.grey.shade700),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0),
                                                 ),
-                                                items: modulItems,
-                                                onChanged: (newValue) {
-                                                  setState(() {
-                                                    selectedMatakuliah =
-                                                        newValue;
-                                                    selectedKodeMatakuliah = snapshot
-                                                            .data!.docs
-                                                            .firstWhere(
-                                                                (document) =>
-                                                                    document[
-                                                                        'matakuliah'] ==
-                                                                    newValue)[
-                                                        'kodeMatakuliah'];
-                                                    kodeMatakuliahController
-                                                            .text =
-                                                        selectedKodeMatakuliah ??
+                                                child: DropdownButton<String>(
+                                                  value: selectedMatakuliah,
+                                                  hint: const Text(
+                                                      '   Pilih Nama Matakuliah',
+                                                      style: TextStyle(
+                                                          fontSize: 15.0)),
+                                                  items: modulItems,
+                                                  onChanged: (newValue) {
+                                                    setState(() {
+                                                      selectedMatakuliah =
+                                                          newValue;
+
+                                                      if (newValue != null &&
+                                                          matakuliahDetails
+                                                              .containsKey(
+                                                                  newValue)) {
+                                                        selectedKodeMatakuliah =
+                                                            matakuliahDetails[
+                                                                    newValue]![
+                                                                'kodeMatakuliah'];
+                                                        selectedSemester =
+                                                            matakuliahDetails[
+                                                                    newValue]![
+                                                                'semester'];
+
+                                                        kodeMatakuliahController
+                                                                .text =
+                                                            selectedKodeMatakuliah ??
+                                                                '';
+                                                        semesterController
+                                                                .text =
+                                                            selectedSemester ??
+                                                                '';
+                                                      } else {
+                                                        selectedKodeMatakuliah =
                                                             '';
-                                                  });
-                                                },
-                                                isExpanded: true,
-                                                dropdownColor: Colors.white,
-                                                style: TextStyle(
-                                                    color: Colors.grey.shade700,
-                                                    fontSize: 14.0),
-                                                underline: Container(),
-                                                icon: const Icon(
-                                                    Icons.arrow_drop_down,
-                                                    color: Colors.grey),
-                                                iconSize: 24,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
+                                                        selectedSemester = '';
+                                                        kodeMatakuliahController
+                                                            .text = '';
+                                                        semesterController
+                                                            .text = '';
+                                                      }
+                                                    });
+                                                  },
+                                                  isExpanded: true,
+                                                  dropdownColor: Colors.white,
+                                                  style: TextStyle(
+                                                      color:
+                                                          Colors.grey.shade700,
+                                                      fontSize: 14.0),
+                                                  underline: Container(),
+                                                  icon: const Icon(
+                                                      Icons.arrow_drop_down,
+                                                      color: Colors.grey),
+                                                  iconSize: 24,
+                                                ),
+                                              );
+                                            },
+                                          )),
                                     ),
 
                                     //== Kode Matakuliah ==//
@@ -547,13 +598,52 @@ class _FormJadwalPraktikumState extends State<FormJadwalPraktikum> {
                                           },
                                         ),
                                       ),
-                                    )
+                                    ),
+                                    //== Semester ==//
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 70.0, top: 18.0),
+                                      child: Text('Semester',
+                                          style: GoogleFonts.quicksand(
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
+                                    const SizedBox(height: 15.0),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(left: 70.0),
+                                      child: SizedBox(
+                                        width: screenWidth > 250.0
+                                            ? 430.0
+                                            : screenWidth,
+                                        height: 47.0,
+                                        child: TextField(
+                                          controller: semesterController,
+                                          decoration: InputDecoration(
+                                            hintText: 'Semester',
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
+                                            filled: true,
+                                            fillColor: Colors.white,
+                                            contentPadding:
+                                                const EdgeInsets.only(
+                                                    left: 15.0),
+                                          ),
+                                          style: TextStyle(
+                                              color: Colors.grey.shade700,
+                                              fontSize: 14.0),
+                                          readOnly: true,
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                               //== Waktu Praktikum, Tahun Ajaran ==//
                               SizedBox(
-                                  height: 425.0,
+                                  height: 475.0,
                                   width: 525.0,
                                   child: Column(
                                     crossAxisAlignment:

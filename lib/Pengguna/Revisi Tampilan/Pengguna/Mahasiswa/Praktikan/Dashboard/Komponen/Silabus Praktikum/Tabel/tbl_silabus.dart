@@ -30,41 +30,38 @@ class _TabelSilabusPraktikanState extends State<TabelSilabusPraktikan> {
 
 //== Fungsi untuk menampilkan data dari Firestore ==//
   Future<void> fetchDataFromFirestore() async {
-    setState(() {
-      isLoading = true;
-    });
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('silabusMatakuliah')
           .where('idKelas', isEqualTo: widget.idkelas)
           .get();
 
-      List<DataSilabus> loadedData = [];
-      for (var doc in snapshot.docs) {
-        loadedData.add(DataSilabus(
-            id: doc.id,
-            idkelas: widget.idkelas,
-            idModul: doc['idModul'] ?? '',
-            judulModul: doc['judulModul'] ?? '',
-            namaFile: doc['namaFile'] ?? '',
-            pertemuan: doc['pertemuan'] ?? '',
+      // Buat daftar baru untuk menyimpan data yang diambil dari Firestore
+      List<DataSilabus> dataList = [];
 
-            ///=======///
-            kode: widget.kodeMatakuliah,
-            matkul: widget.matkul));
+      for (var doc in snapshot.docs) {
+        dataList.add(DataSilabus(
+          id: doc.id,
+          idkelas: widget.idkelas,
+          idModul: doc['idModul'] ?? '',
+          judulModul: doc['judulModul'] ?? '',
+          namaFile: doc['namaFile'] ?? '',
+          pertemuan: doc['pertemuan'] ?? '',
+          kode: widget.kodeMatakuliah,
+          matkul: widget.matkul,
+        ));
       }
 
-      updateTableData(loadedData);
-      // Urutkan data berdasarkan field 'pertemuan'
-      loadedData.sort((a, b) => a.pertemuan.compareTo(b.pertemuan));
+      // Urutkan data berdasarkan 'pertemuan'
+      dataList.sort((a, b) => a.pertemuan.compareTo(b.pertemuan));
+
+      // Update tabel dengan data yang sudah diurutkan
+      updateTableData(dataList);
     } catch (error) {
       if (kDebugMode) {
         print('Error fetching data: $error');
       }
     }
-    setState(() {
-      isLoading = false;
-    });
   }
 
   @override

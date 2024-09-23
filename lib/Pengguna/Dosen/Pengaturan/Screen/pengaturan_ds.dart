@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PengaturanDosen extends StatefulWidget {
@@ -16,14 +19,12 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  final TextEditingController _newPhoneNumberController =
-      TextEditingController();
   TextEditingController namaLengkapController = TextEditingController();
   TextEditingController nipController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController noHandphoneController = TextEditingController();
   //== Nama Akun ==//
-  //== Nama Akun ==//
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? _currentUser;
   String _namaDosen = '';
@@ -70,7 +71,7 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
     try {
       await _auth.signOut();
       // Navigasi kembali ke halaman login atau halaman lain setelah logout berhasil
-      // ignore: use_build_context_synchronously
+
       Navigator.of(context).pushReplacementNamed('/login-dosen');
     } catch (e) {
       // Tangani kesalahan logout
@@ -142,7 +143,6 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
         _confirmPasswordController.clear();
 
         // Show success message
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Password berhasil diperbaharui'),
           backgroundColor: Colors.green,
@@ -158,14 +158,13 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
       ));
     }
   }
-  //== Update Nomor Handphone ==//
 
   Future<void> _updatePhoneNumber() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        String newPhoneNumber = _newPhoneNumberController.text;
+        String newPhoneNumber = noHandphoneController.text.trim();
 
         // Validate if the entered value is a valid integer
         if (newPhoneNumber.isEmpty || int.tryParse(newPhoneNumber) == null) {
@@ -180,13 +179,33 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
         // Convert the string to an integer
         int parsedPhoneNumber = int.parse(newPhoneNumber);
 
+        // Get the current user's document
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('akun_dosen')
+            .doc(user.uid)
+            .get();
+
+        // Check if the phone number has changed
+        if (userDoc.exists) {
+          var currentPhoneNumber = userDoc.get('no_hp') as int?;
+
+          if (currentPhoneNumber == parsedPhoneNumber) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content:
+                  Text('Anda tidak melakukan perubahan pada nomor handphone'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            ));
+            return;
+          }
+        }
+
+        // Update the phone number
         await FirebaseFirestore.instance
             .collection('akun_dosen')
             .doc(user.uid)
             .update({'no_hp': parsedPhoneNumber});
-        _newPhoneNumberController.clear();
 
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Nomor handphone berhasil diperbaharui'),
           backgroundColor: Colors.green,
@@ -436,6 +455,9 @@ class _PengaturanDosenState extends State<PengaturanDosen> {
                                           filled: true,
                                           fillColor: Colors.white,
                                         ),
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(12),
+                                        ],
                                       ),
                                     ),
                                   ),

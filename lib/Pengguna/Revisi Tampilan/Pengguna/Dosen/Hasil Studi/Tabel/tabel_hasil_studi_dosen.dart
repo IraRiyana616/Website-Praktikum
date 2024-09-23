@@ -157,7 +157,7 @@ class _TabelHasilStudiDosenState extends State<TabelHasilStudiDosen> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Kelas Praktikum',
+            child: Text('Data Matakuliah Praktikum',
                 style: GoogleFonts.quicksand(
                     fontSize: 18, fontWeight: FontWeight.bold)),
           ),
@@ -169,7 +169,7 @@ class _TabelHasilStudiDosenState extends State<TabelHasilStudiDosen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 10.0, left: 25.0),
                     child: SizedBox(
-                      width: 250.0,
+                      width: 300.0,
                       height: 35.0,
                       child: Row(
                         children: [

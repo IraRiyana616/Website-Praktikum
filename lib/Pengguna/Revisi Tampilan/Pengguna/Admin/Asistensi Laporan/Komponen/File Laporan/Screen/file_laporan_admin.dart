@@ -53,7 +53,7 @@ class _FileLaporanPraktikanAdminState extends State<FileLaporanPraktikanAdmin> {
                     Padding(
                       padding: const EdgeInsets.only(right: 10.0),
                       child: Text(
-                        'Admin',
+                        '',
                         style: GoogleFonts.quicksand(
                           fontSize: 17.0,
                           fontWeight: FontWeight.bold,

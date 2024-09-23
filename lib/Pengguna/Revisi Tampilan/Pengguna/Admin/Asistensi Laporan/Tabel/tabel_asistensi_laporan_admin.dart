@@ -78,7 +78,7 @@ class _TabelAsistensiLaporanAdminState
       }).toList();
 
       // Urutkan fetchedData berdasarkan kodeMatakuliah
-      fetchedData.sort((a, b) => a.matkul.compareTo(b.matkul));
+      fetchedData.sort((a, b) => a.kelas.compareTo(b.kelas));
 
       if (mounted) {
         setState(() {
@@ -113,7 +113,7 @@ class _TabelAsistensiLaporanAdminState
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20.0),
-            child: Text('Data Absensi Praktikum',
+            child: Text('Data Matakuliah Praktikum',
                 style: GoogleFonts.quicksand(
                     fontSize: 18, fontWeight: FontWeight.bold)),
           ),

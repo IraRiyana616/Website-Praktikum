@@ -446,6 +446,7 @@ class _TambahSilabusPraktikumState extends State<TambahSilabusPraktikum> {
                                                 'Pertemuan 6',
                                                 'Pertemuan 7',
                                                 'Pertemuan 8',
+                                                'Pengumpulan Project Akhir'
                                               ].map<DropdownMenuItem<String>>(
                                                   (String value) {
                                                 return DropdownMenuItem(

@@ -69,7 +69,10 @@ class _TabelDataAsistensiLaporanState extends State<TabelDataAsistensiLaporan> {
               status: data['statusRevisi'] ?? '',
             );
           }).toList();
-
+          // Mengurutkan demoAsistensi berdasarkan status
+          demoAsistensi.sort((a, b) {
+            return a.status.compareTo(b.status);
+          });
           filteredAsistensi = List.from(demoAsistensi);
           // Menambahkan modul ke availableModuls
           availableModuls = ['Judul Modul'] +
@@ -200,7 +203,7 @@ class _TabelDataAsistensiLaporanState extends State<TabelDataAsistensiLaporan> {
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 25;
+    const int defaultRowsPerPage = 50;
 
     return rowCount <= defaultRowsPerPage ? rowCount : defaultRowsPerPage;
   }
@@ -237,7 +240,7 @@ DataRow dataFileDataRow(Asistensi fileInfo, int index) {
       DataCell(
         SizedBox(
           width: 130.0,
-          child: Text(getLimitedText(fileInfo.waktu.toDate().toString(), 19,
+          child: Text(getLimitedText(fileInfo.waktu.toDate().toString(), 16,
               style: const TextStyle(color: Colors.black))),
         ),
       ),

@@ -60,7 +60,7 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
             waktu: doc['waktuAbsensi'] ?? '',
             pertemuan: doc['pertemuan'] ?? '');
       }).toList();
-      absensiList.sort((a, b) => a.nama.compareTo(b.nama));
+      absensiList.sort((a, b) => a.nim.compareTo(b.nim));
       setState(() {
         demoDataAbsensi = absensiList;
         filteredDataAbsensi = List.from(demoDataAbsensi);
@@ -295,7 +295,7 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 25;
+    const int defaultRowsPerPage = 50;
 
     if (rowCount <= defaultRowsPerPage) {
       return rowCount;

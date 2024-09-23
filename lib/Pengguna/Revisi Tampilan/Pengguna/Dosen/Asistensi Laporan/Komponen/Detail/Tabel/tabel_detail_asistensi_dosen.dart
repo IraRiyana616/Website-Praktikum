@@ -153,7 +153,7 @@ class _TabelDetailAsistensiLaporanDosenState
   }
 
   int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 25;
+    const int defaultRowsPerPage = 50;
     return rowCount <= defaultRowsPerPage ? rowCount : defaultRowsPerPage;
   }
 
@@ -188,6 +188,11 @@ class _TabelDetailAsistensiLaporanDosenState
           status: data['statusRevisi'] ?? '',
         );
       }).toList();
+
+      // Mengurutkan fetchedData berdasarkan status
+      fetchedData.sort((a, b) {
+        return a.status.compareTo(b.status);
+      });
 
       setState(() {
         demoAsistensiLaporan = fetchedData;
@@ -254,9 +259,9 @@ DataRow dataFileDataRow(AsistensiLaporan fileInfo, int index,
     ),
     cells: [
       DataCell(SizedBox(
-        width: 150.0,
+        width: 175.0,
         child: Text(
-          getLimitedText(fileInfo.waktu.toString(), 19),
+          getLimitedText(fileInfo.waktu.toString(), 35),
         ),
       )),
       DataCell(SizedBox(

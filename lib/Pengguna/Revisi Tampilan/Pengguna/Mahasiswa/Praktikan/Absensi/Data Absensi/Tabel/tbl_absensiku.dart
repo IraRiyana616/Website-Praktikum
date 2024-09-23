@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -138,9 +140,11 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
           'idAbsensi': fileInfo.idModul,
         });
 
-        setState(() {
-          fileInfo.sudahAbsen = true;
-        });
+        if (mounted) {
+          setState(() {
+            fileInfo.sudahAbsen = true;
+          });
+        }
       } catch (e) {
         if (kDebugMode) {
           print('Error: $e');
@@ -228,7 +232,7 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
                               ),
                             ],
                             source: DataSource(
-                                filteredDataAbsensi, context, addAbsensi),
+                                filteredDataAbsensi, addAbsensi, context),
                             rowsPerPage: calculateRowsPerPage(
                                 filteredDataAbsensi.length),
                           )
@@ -237,10 +241,7 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
                             child: Center(
                               child: Text(
                                 'No data available',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: TextStyle(fontSize: 16),
                               ),
                             ),
                           ),
@@ -253,27 +254,17 @@ class _TabelAbsensiPraktikanState extends State<TabelAbsensiPraktikan> {
       ),
     );
   }
-
-  int calculateRowsPerPage(int rowCount) {
-    const int defaultRowsPerPage = 25;
-
-    if (rowCount <= defaultRowsPerPage) {
-      return rowCount;
-    } else {
-      return defaultRowsPerPage;
-    }
-  }
 }
 
 class DataAbsensi {
-  String id;
-  String idkelas;
-  String idModul;
-  String modul;
-  String file;
-  String pertemuan;
-  DateTime? waktuAkses;
-  DateTime? waktuTutupAkses;
+  final String id;
+  final String idkelas;
+  final String idModul;
+  final String modul;
+  final String file;
+  final String pertemuan;
+  final DateTime? waktuAkses;
+  final DateTime? waktuTutupAkses;
   bool sudahAbsen;
 
   DataAbsensi({
@@ -283,94 +274,111 @@ class DataAbsensi {
     required this.modul,
     required this.file,
     required this.pertemuan,
-    this.waktuAkses,
-    this.waktuTutupAkses,
-    this.sudahAbsen = false,
+    required this.waktuAkses,
+    required this.waktuTutupAkses,
+    required this.sudahAbsen,
   });
 }
 
 class DataSource extends DataTableSource {
-  final List<DataAbsensi> _data;
-  final BuildContext _context;
-  final Future<void> Function(DataAbsensi) _addAbsensi;
+  final List<DataAbsensi> data;
+  final Function(DataAbsensi) onAddAbsensi;
+  final BuildContext context;
 
-  DataSource(this._data, this._context, this._addAbsensi);
+  DataSource(this.data, this.onAddAbsensi, this.context);
 
   @override
-  DataRow? getRow(int index) {
-    assert(index >= 0);
-    if (index >= _data.length) return null;
-    final data = _data[index];
+  DataRow getRow(int index) {
+    final item = data[index];
+    final now = DateTime.now();
 
-    return DataRow.byIndex(
-      index: index,
-      color: MaterialStateProperty.resolveWith<Color?>(
-        (Set<MaterialState> states) {
-          return getRowColor(index);
-        },
-      ),
+    bool isWithinAbsenTime = item.waktuAkses != null &&
+        item.waktuTutupAkses != null &&
+        now.isAfter(item.waktuAkses!) &&
+        now.isBefore(item.waktuTutupAkses!);
+    return DataRow(
+      color: MaterialStateColor.resolveWith((states) => getRowColor(index)),
       cells: [
+        DataCell(Text(item.modul)),
+        DataCell(Text(item.pertemuan)),
         DataCell(
-          Text(data.modul),
-        ),
-        DataCell(
-          Text(data.pertemuan),
-        ),
-        DataCell(
-          Builder(
-            builder: (context) {
-              if (data.waktuAkses != null && data.waktuTutupAkses != null) {
-                DateTime currentTime = DateTime.now();
-                if (currentTime.isAfter(data.waktuAkses!) &&
-                    currentTime.isBefore(data.waktuTutupAkses!)) {
-                  return data.sudahAbsen
-                      ? const Text(
-                          'Sudah Absen',
-                        )
-                      : SizedBox(
-                          width: 130.0,
-                          height: 32.0,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              await _addAbsensi(data);
-                            },
-                            child: const Text('Absen'),
-                          ),
-                        );
-                } else if (currentTime.isBefore(data.waktuAkses!)) {
-                  return const Text(
-                    'Absen Belum Tersedia',
-                  );
-                } else {
-                  return const Text(
-                    'Waktu Absen Selesai',
-                  );
-                }
-              } else {
-                return const Text(
-                  'Jadwal Tidak Tersedia',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                );
-              }
-            },
-          ),
+          item.sudahAbsen
+              ? const Text(
+                  'Sudah Absen',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.green),
+                )
+              : isWithinAbsenTime
+                  ? SizedBox(
+                      width: 130.0,
+                      height: 33.0,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          onAddAbsensi(item);
+                        },
+                        child: const Text(
+                          'Absen',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    )
+                  : const Text(
+                      'Absen',
+                      style: TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.bold),
+                    ),
         ),
       ],
     );
   }
 
-  Color getRowColor(int index) {
-    if (index % 2 == 0) {
-      return Colors.grey.shade200;
-    } else {
-      return Colors.transparent;
-    }
-  }
-
-  @override
-  int get rowCount => _data.length;
   @override
   bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => data.length;
+
   @override
   int get selectedRowCount => 0;
+
+  Color getRowColor(int index) {
+    return index % 2 == 0 ? Colors.grey.shade200 : Colors.transparent;
+  }
+
+  void setSelected(bool value) {}
 }
+
+int calculateRowsPerPage(int length) {
+  return length < 10 ? length : 10;
+}
+// class DataSource extends DataTableSource {
+//   final List<DataAbsensi> data;
+//   final Function(DataAbsensi) onAddAbsensi;
+//   final BuildContext context;
+
+//   DataSource(this.data, this.onAddAbsensi, this.context);
+
+//   @override
+//   DataRow getRow(int index) {
+//     final item = data[index];
+//   
+
+//     return DataRow(
+//       color: MaterialStateColor.resolveWith((states) => getRowColor(index)),
+//       cells: [
+//         DataCell(Text(item.modul)),
+//         DataCell(Text(item.pertemuan)),
+    
+//       ],
+//     );
+//   }
+
+//   @override
+//   bool get isRowCountApproximate => false;
+//   @override
+//   int get rowCount => data.length;
+//   @override
+//   int get selectedRowCount => 0;
+//   @override
+//   DataRow? getRow(int index) => getRow(index);
+// }

@@ -92,7 +92,7 @@ class _TblDataAsistenState extends State<TblDataAsisten> {
           }
         }
       }
-      dataAsistenList.sort((a, b) => a.nama.compareTo(b.nama));
+      dataAsistenList.sort((a, b) => a.nim.compareTo(b.nim));
       setState(() {
         demoDataAsisten = dataAsistenList;
         filteredDataAsisten = dataAsistenList;

@@ -75,7 +75,7 @@ class _TabelDataMahasiswaState extends State<TabelDataMahasiswa> {
         }
       }
 
-      dataMahasiswaList.sort((a, b) => a.nama.compareTo(b.nama));
+      dataMahasiswaList.sort((a, b) => a.nim.compareTo(b.nim));
       setState(() {
         demoDataMahasiswa = dataMahasiswaList;
         filteredDataMahasiswa = dataMahasiswaList;
@@ -108,8 +108,7 @@ class _TabelDataMahasiswaState extends State<TabelDataMahasiswa> {
           .where((data) => (data.nama
                   .toLowerCase()
                   .contains(query.toLowerCase()) ||
-              data.nim.toString().toLowerCase().contains(query.toLowerCase()) ||
-              data.nohp.toString().toLowerCase().contains(query.toLowerCase())))
+              data.nim.toString().toLowerCase().contains(query.toLowerCase())))
           .toList();
     });
   }

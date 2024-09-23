@@ -54,7 +54,7 @@ class _EditPengumpulanTugasState extends State<EditPengumpulanTugas> {
       );
 
       String formattedDateTime =
-          DateFormat('dd MMMM yyyy HH:mm a').format(selectedDateTime);
+          DateFormat('dd MMMM yyyy hh:mm a').format(selectedDateTime);
 
       setState(() {
         controller.text = formattedDateTime;

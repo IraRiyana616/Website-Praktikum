@@ -74,7 +74,7 @@ class _TabelDataMahasiswaAsistensiLaporanState
         }
       }
 
-      dataMahasiswaList.sort((a, b) => a.nama.compareTo(b.nama));
+      dataMahasiswaList.sort((a, b) => a.nim.compareTo(b.nim));
       setState(() {
         demoDataPraktikan = dataMahasiswaList;
         filteredDataPraktikan = dataMahasiswaList;

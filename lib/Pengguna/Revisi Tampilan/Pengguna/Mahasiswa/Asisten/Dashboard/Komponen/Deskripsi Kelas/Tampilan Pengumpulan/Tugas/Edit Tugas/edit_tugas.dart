@@ -54,7 +54,7 @@ class _EditTugasState extends State<EditTugas> {
       );
 
       String formattedDateTime =
-          DateFormat('dd MMMM yyyy HH:mm a').format(selectedDateTime);
+          DateFormat('dd MMMM yyyy hh:mm a').format(selectedDateTime);
 
       setState(() {
         controller.text = formattedDateTime;

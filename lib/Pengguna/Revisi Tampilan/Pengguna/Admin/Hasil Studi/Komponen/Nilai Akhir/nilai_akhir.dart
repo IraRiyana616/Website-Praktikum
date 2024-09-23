@@ -363,7 +363,7 @@ class _NilaiAkhirScreenState extends State<NilaiAkhirScreen> {
           );
         }).toList();
         // Mengurutkan data berdasarkan nama secara ascending
-        data.sort((a, b) => a.nama.compareTo(b.nama));
+        data.sort((a, b) => a.nim.compareTo(b.nim));
 
         // Simpan data ke dalam 'nilaiAkhir' Firestore
         await saveDataToNilaiAkhir(data);
@@ -453,8 +453,9 @@ class _NilaiAkhirScreenState extends State<NilaiAkhirScreen> {
 //== Fungsi Download dengan bentuk CSV ===//
   Future<void> downloadData() async {
     // Mengambil data dari Firestore
-    CollectionReference collectionRef =
-        FirebaseFirestore.instance.collection('nilaiAkhir');
+    Query<Map<String, dynamic>> collectionRef = FirebaseFirestore.instance
+        .collection('nilaiAkhir')
+        .where('idKelas', isEqualTo: widget.idkelas);
     QuerySnapshot querySnapshot = await collectionRef.get();
 
     // Menyiapkan data untuk diubah menjadi CSV
@@ -513,9 +514,6 @@ class _NilaiAkhirScreenState extends State<NilaiAkhirScreen> {
       final bytes = const Utf8Encoder().convert(csv);
       final blob = html.Blob([bytes]);
       final url = html.Url.createObjectUrlFromBlob(blob);
-      final anchor = html.AnchorElement(href: url)
-        ..setAttribute("download", "data_nilai.csv")
-        ..click();
       html.Url.revokeObjectUrl(url);
     } else {
       // Mendapatkan direktori untuk menyimpan file (Android/iOS)
