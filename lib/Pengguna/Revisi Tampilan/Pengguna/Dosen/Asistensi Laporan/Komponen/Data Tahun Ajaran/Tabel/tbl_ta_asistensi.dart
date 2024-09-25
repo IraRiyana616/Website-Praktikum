@@ -199,13 +199,13 @@ class _TabelTAAsistensiState extends State<TabelTAAsistensi> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Tahun Ajaran",
+                                  "Semester",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
-                                  "Semester",
+                                  "Tahun Ajaran",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -320,22 +320,21 @@ DataRow dataFileDataRow(
               );
             },
           ))),
-
+//== Semester ==//
+      DataCell(
+        SizedBox(
+          width: 250.0,
+          child: Text(
+            fileInfo.semester,
+          ),
+        ),
+      ),
       //== Tahun Ajaran ==//
       DataCell(
         SizedBox(
           width: 250.0,
           child: Text(
             fileInfo.tahun,
-          ),
-        ),
-      ),
-      //== Semester ==//
-      DataCell(
-        SizedBox(
-          width: 250.0,
-          child: Text(
-            fileInfo.semester,
           ),
         ),
       ),
